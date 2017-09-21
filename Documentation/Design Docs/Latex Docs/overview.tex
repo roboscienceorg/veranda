@@ -3,88 +3,45 @@
 
 \chapter{Overview, Description and Deliverables}
 
-The overview should take the form of an executive summary.  Give the reader a feel 
-for the purpose of the document, what is contained in the document, and an idea 
-of the purpose for the system or product. 
-
 \section{Team Members and Team Name}
-
+The team, named Team Alpha Robots, consists of the following members:
+\begin{itemize}
+	\item Kendra Deziel
+	\item Andrew Stelter
+	\item Ryley Sutton
+	\item Samuel Williams
+\end{itemize}
 
 \section{Client}
-A description of the client or customer.
-Description of sponsor if different than client.
-Brief statement of customer's problem or goal for this project
-List the customer needs
+The clients (and sponsors), Dr. McGough and Christopher Smith, would like an improved version of the 2D ROS simulation environment known as the STDR. The client would like an improved physics simulation, as well as increased ease of use so that the simulator can be used as a fast, easy introduction to programming with ROS.
 
 \section{Project}
-A high level description of the project.  Project environment ...
-Project boundaries.
-Project context.
-Technical Environment.
-Current systems overview.
+The project will consist of one or more packages which run in the ROS (Robot Operating System) environment. The software will have a graphical interface, both for setting up the system and displaying the simulation. The simulator should allow for importing and exporting robots and map layouts, as well as simulation of said robots and maps in a real-time ROS system. It should be possible to change the connections to the rest of ROS in order to allow external code to control the simulated robots. The simulator should, in turn, produce sensor data which can be sent back to the control code.
 
+The project is to represent a two-dimensional, top-down simulation. It is intended for mobile robots which can be easily represented on a plane. It is not intended for three-dimensional simulation, or side-view simulation (such as with an industrial robotic arm)
+
+The project will run in Ubuntu 16.04 and may be used as part of a ROS system containing robot control code.
 
 \subsection{Mission Statement}
-Mission statement for the team inserted here.   
 
 \subsection{Elevator Pitch}
-Elevator Pitch for your project inserted here.   
 
 \subsection{Purpose of the System}
-What is the purpose of the system or product? 
-
-
-\section{Business/Market Need}
-Use this section to define what business need exist and how this software will 
-meet and/or exceed that business need.    How do you make money!!  What is the revenue model?  What is the market? Who are customers?
-
-\noindent
-\underline{Example:  Mouse Detector Phone App}
-
-\begin{description}
-\item [Product Description:] iPhone based app that can detect the high frequency sounds of mice and locate them.
-
-\item [Key Business Goals:] Product introduced in the second quarter 2009
-\begin{itemize}
-\item 50\% gross margin
-\item 15\% share of mouse trap market
-\end{itemize}
-
-\item [Primary Market:] Consumers
-\item [Secondary Markets:] Lazy cats
-
-\item [Assumptions:]  ~~ \\
-\begin{itemize}
-\item Available from App store
-\item Survillence mode
-\item Low power consumption
-\item Autodial on detection
-\end{itemize}
-
-\item [Stakeholders:]  ~~ \\
-\begin{itemize}
-\item User
-\item Retailer
-\item Sales Force
-\item Production
-\item Legal department
-\end{itemize}
-
-\item [Certifications:] Apple, Cat Fancy Magazine
-\end{description}
+The purpose of the system is to provide a simple environment in which ROS-based robot control software can be tested. Current environments (such as Gazebo) add many layers of complexity and can be overwhelming to users new to ROS.
 
 \section{Deliverables}
 
-Provide a complete description of the client requested deliverables.   This section should be the section that your software contract refers to.
-(e.g. prototype, documentation, code, users manual, ...)
-
-
 \subsection{Software}
-If you are required to deliver software.  Compiled vs code ...
-
-\subsection{Hardware}
-If you have hardware requirements.
+Source code of the project and all required files to build it as a set of ROS packages. The project should be unit-tested as well as possible, and require minimal setup to use. 
 
 \subsection{Documentation}
-And so on.  Anything that your contract states that you will deliver to the client.
-
+Documentation of the following items:
+\begin{itemize}
+	\item Original requirements for the project
+	\item Design of the software
+	\item Implementation details of the software
+	\item Requirements to build and run the software
+	\item Use of the software (User Manual)
+	\item Testing and Verification of software correctness
+	\item Extension of the software to provide new functionality
+\end{itemize}
