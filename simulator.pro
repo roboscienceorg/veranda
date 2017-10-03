@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = sdsmt_simulator
 TEMPLATE = app
 
-INCLUDEPATH += include
+INCLUDEPATH += include Box2D/Box2D/Box2D
 
 SOURCES += \
     src/main.cpp
