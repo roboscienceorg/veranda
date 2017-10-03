@@ -46,6 +46,44 @@ set(UI_FILES )
 ## Any other source files
 set(CPP_SRCS src/main.cpp)
 
+## Box2D sources
+set(BOX2D_PATH Box2D/Box2D/Box2D)
+set(BOX2D_SRCS
+    ${BOX2D_PATH}/Common/b2BlockAllocator.cpp
+    ${BOX2D_PATH}/Common/b2Draw.cpp
+    ${BOX2D_PATH}/Common/b2Math.cpp
+    ${BOX2D_PATH}/Common/b2Settings.cpp
+    ${BOX2D_PATH}/Common/b2StackAllocator.cpp
+    ${BOX2D_PATH}/Common/b2Timer.cpp
+    ${BOX2D_PATH}/Collision/b2BroadPhase.cpp
+    ${BOX2D_PATH}/Collision/b2CollideCircle.cpp
+    ${BOX2D_PATH}/Collision/b2CollidePolygon.cpp
+    ${BOX2D_PATH}/Collision/b2CollideEdge.cpp
+    ${BOX2D_PATH}/Collision/b2Collision.cpp
+    ${BOX2D_PATH}/Collision/b2Distance.cpp
+    ${BOX2D_PATH}/Collision/b2DynamicTree.cpp
+    ${BOX2D_PATH}/Collision/b2TimeOfImpact.cpp
+    ${BOX2D_PATH}/Dynamics/b2Body.cpp
+    ${BOX2D_PATH}/Dynamics/b2ContactManager.cpp
+    ${BOX2D_PATH}/Dynamics/b2Fixture.cpp
+    ${BOX2D_PATH}/Dynamics/b2Island.cpp
+    ${BOX2D_PATH}/Dynamics/b2WorldCallbacks.cpp
+    ${BOX2D_PATH}/Dynamics/b2World.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2DistanceJoint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2Joint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2PrismaticJoint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2RopeJoint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2FrictionJoint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2MotorJoint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2PulleyJoint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2WeldJoint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2GearJoint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2MouseJoint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2RevoluteJoint.cpp
+    ${BOX2D_PATH}/Dynamics/Joints/b2WheelJoint.cpp
+    ${BOX2D_PATH}/Rope/b2Rope.cpp
+)
+
 ###########
 ## Build ##
 ###########
@@ -53,8 +91,12 @@ set(CPP_SRCS src/main.cpp)
 ## Locations of header files
 include_directories(
   include
+  Box2D/Box2D
   ${catkin_INCLUDE_DIRS}
 )
+
+## Build Box2d
+add_library(box2d STATIC ${BOX2D_SRCS})
 
 ## Run MOC on files with Qt Keywords and Macros
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
@@ -71,5 +113,6 @@ qt5_use_modules(sdsmt_simulator Core Gui Widgets)
 
 ## Link any other libraries
 target_link_libraries(sdsmt_simulator
+  box2d
   ${catkin_LIBRARIES}
 )
