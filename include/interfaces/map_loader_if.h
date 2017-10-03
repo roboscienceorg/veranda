@@ -9,7 +9,7 @@
 class MapLoader_If
 {
 public:
-    virtual QVector<b2Shape> loadMapFile(QString file) = 0;
-}
+    virtual QString loadMapFile(QString file, QVector<b2Shape*>& result) = 0;
+};
 
 #endif // MAP_LOADER_IF_H

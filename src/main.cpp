@@ -1,25 +1,32 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
 
 #include <string>
 #include <functional>
 #include <iostream>
 
-#include <QCoreApplication>
 #include <QTimer>
 #include <QObject>
-#include <QGuiApplication>
-#include <QUrl>
 #include <QString>
 #include <QApplication>
 #include <QtConcurrent/QtConcurrent>
 #include <QFuture>
 #include <QFutureWatcher>
 
+#include "basic_maploader.h"
+#include "basic_physics.h"
+#include "basic_robotloader.h"
+#include "basic_ui.h"
+#include "basic_viewer.h"
+
+#include "sdsmt_simulator.h"
+
 using namespace std;
 
 int main(int argc, char** argv)
 {
+   /*************************************
+    * Setup ROS and Qt to play nice
+    *************************************/
     //Init ros stuff
     ros::init(argc, argv, "sdsmt_simulator");
 
@@ -33,20 +40,38 @@ int main(int argc, char** argv)
     QObject::connect(&rosThread, &QFutureWatcher<void>::finished, &app, &QCoreApplication::quit);
     QObject::connect(&app, &QCoreApplication::aboutToQuit, [](){ros::shutdown();});
 
-    //5 second timer to publish
-    QTimer sec5;
-    sec5.setInterval(5000);
-
-    //Set up slot for 5 second timer
-    int i=0;
-    QObject::connect(&sec5, &QTimer::timeout, [&]()
+   /*************************************
+    * Setup simulator
+    *************************************/
+    visualizerFactory visuals =
+    []()
     {
-        cout << ros::ok() << endl;
-    });
+        return new BasicViewer();
+    };
 
-    //Start timer
-    sec5.start();
+    MapLoader_If* mapLoader = new BasicMapLoader();
+    RobotLoader_If* robotLoader = new BasicRobotLoader();
 
+    Simulator_Physics_If* physics = new BasicPhysics();
+    Simulator_Ui_If* userinterface = new BasicUi(visuals);
+
+    SDSMT_Simulator sim(mapLoader, robotLoader, physics, userinterface, &app);
+
+    sim.start();
+
+   /******************
+    * Run application
+    ******************/
     //Start main app
-    return app.exec();
+    int ret = app.exec();
+
+   /*******************
+    * Clean up
+    *******************/
+    delete mapLoader;
+    delete robotLoader;
+    delete physics;
+    delete userinterface;
+
+    return ret;
 }

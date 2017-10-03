@@ -34,5 +34,5 @@ public slots:
 
 signals:
     void visualChanged(QVector<b2Shape*> visualObjects);
-}
+};
 #endif // SENSOR_H

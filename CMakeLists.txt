@@ -38,13 +38,32 @@ catkin_package(
 
 ## Files that have any Qt macros or keywords in them
 ## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
-set(MOC_HDRS )
+set(MOC_HDRS
+    include/interfaces/drivetrain_if.h
+    include/interfaces/robot_interfaces.h
+    include/interfaces/sensor_if.h
+    include/interfaces/simulator_physics_if.h
+    include/interfaces/simulator_ui_if.h
+    include/interfaces/simulator_visual_if.h
+    include/basic_physics.h
+    include/basic_ui.h
+    include/basic_viewer.h
+    include/sdsmt_simulator.h
+    include/robot.h)
 
 ## .ui qt widgets form files
 set(UI_FILES )
 
 ## Any other source files
-set(CPP_SRCS src/main.cpp)
+set(CPP_SRCS
+    src/main.cpp
+    src/basic_maploader.cpp
+    src/basic_physics.cpp
+    src/basic_robotloader.cpp
+    src/basic_ui.cpp
+    src/basic_viewer.cpp
+    src/sdsmt_simulator.cpp
+    src/robot.cpp)
 
 ## Box2D sources
 set(BOX2D_PATH Box2D/Box2D/Box2D)

@@ -34,6 +34,6 @@ public slots:
 
     //Disconnects all ROS topics
     virtual void disconnectFromROS() = 0;
-}
+};
 
 #endif // DRIVETRAIN_H

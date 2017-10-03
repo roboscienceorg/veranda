@@ -11,7 +11,7 @@
 class RobotLoader_If
 {
 public:
-    virtual Robot* loadRobotFile(QString file /*, QMap<QString, pluginFactory>*/) = 0;
-}
+    virtual QString loadRobotFile(QString file, Robot*& output/*, QMap<QString, pluginFactory>*/) = 0;
+};
 
 #endif // ROBOT_LOADER_IF_H

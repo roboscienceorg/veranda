@@ -8,20 +8,32 @@ TEMPLATE = app
 INCLUDEPATH += include Box2D/Box2D
 
 SOURCES += \
-    src/main.cpp
+    src/main.cpp \
+    src/sdsmt_simulator.cpp \
+    src/basic_viewer.cpp \
+    src/basic_ui.cpp \
+    src/basic_physics.cpp \
+    src/basic_maploader.cpp \
+    src/basic_robotloader.cpp \
+    src/robot.cpp
 
 
 HEADERS += \
     include/sdsmt_simulator.h \
     include/robot.h \
-    include/map_loader_if.h \
-    include/simulator_visual_if.h \
-    include/simulator_ui_if.h \
-    include/simulator_physics_if.h \
-    include/sensor_if.h \
-    include/drivetrain_if.h \
-    include/robot_loader_if.h \
-    include/robot_interfaces.h
+    include/interfaces/map_loader_if.h \
+    include/interfaces/simulator_visual_if.h \
+    include/interfaces/simulator_ui_if.h \
+    include/interfaces/simulator_physics_if.h \
+    include/interfaces/sensor_if.h \
+    include/interfaces/drivetrain_if.h \
+    include/interfaces/robot_loader_if.h \
+    include/interfaces/robot_interfaces.h \
+    include/basic_physics.h \
+    include/basic_ui.h \
+    include/basic_viewer.h \
+    include/basic_maploader.h \
+    include/basic_robotloader.h
 
 
 FORMS += \

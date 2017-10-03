@@ -3,6 +3,8 @@
 
 #include "robot.h"
 
+#include <QVariantMap>
+
 /*************************************
  * Interface classes for interacting with robots
  *
@@ -21,10 +23,10 @@ class Robot_Physics : public QObject
 {
     Q_OBJECT
 
-    b2Shape _body;
+    const b2Shape* _body;
 
 public:
-    Robot_Physics(Robot* observed, QObject* parent = nullptr) : QObject(parent)
+    Robot_Physics(Robot* observed) : QObject(observed)
     {
         connect(this, &Robot_Physics::setActualPosition, observed, &Robot::actualPosition);
         connect(this, &Robot_Physics::setActualVelocity, observed, &Robot::actualVelocity);
@@ -35,7 +37,7 @@ public:
         _body = observed->getBodyShape();
     }
 
-    const b2Shape getBodyShape(){ return _body; }
+    const b2Shape* getBodyShape(){ return _body; }
 
 signals:
    /****************************************************************
@@ -65,7 +67,7 @@ class Robot_Properties : public QObject
     Q_OBJECT
 
 public:
-    Robot_Properties(Robot* observed, QObject* parent = nullptr) : QObject(parent)
+    Robot_Properties(Robot* observed) : QObject(observed)
     {
 
     }
@@ -94,7 +96,7 @@ class Robot_Visual : public QObject
     Q_OBJECT
 
 public:
-    Robot_Visual(Robot* observed, QObject* parent = nullptr) : QObject(parent)
+    Robot_Visual(Robot* observed) : QObject(observed)
     {
 
     }
