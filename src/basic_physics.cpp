@@ -30,7 +30,7 @@ void BasicPhysics::newStaticShapes(QVector<b2Shape *> shapes)
 
 }
 
-void BasicPhysics::addRobot(Robot_Physics *robot, robot_id rId)
+void BasicPhysics::addRobot(Robot_Physics *robot)
 {
 
 }

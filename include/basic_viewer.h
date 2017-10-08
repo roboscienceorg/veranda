@@ -11,19 +11,11 @@ public:
     BasicViewer(QWidget* parent = nullptr);
 
 public slots:
-
-    //A robot was selected as the 'current' robot
-    void robotSelected(robot_id rId) override;
-
-    //Robot added to simulation
-    //Do not delete the robot interface when the robot is removed; it will be handled elsewhere
-    void robotAddedToSimulation(Robot_Visual* robot, robot_id rId) override;
-
-    //Robot removed from simulation
-    void robotRemovedFromSimulation(robot_id rId) override;
-
-    //Map objects were set into the simulation
-    void mapObjectsSetInSimulation(/*QVector<[world-space polygons]> polygons*/) override;
+    void modelAddedToScreen(ScreenModel_If* model, model_id id) override;
+    void modelRemovedFromScreen(model_id id) override;
+    void modelDisabled(model_id id) override;
+    void modelEnabled(model_id id) override;
+    void modelSelected(model_id id) override;
 };
 
 #endif // BASIC_VIEWER_H

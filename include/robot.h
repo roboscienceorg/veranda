@@ -6,6 +6,8 @@
 #include "interfaces/sensor_if.h"
 #include "interfaces/drivetrain_if.h"
 
+#include "interfaces/screen_model_if.h"
+
 #include <Box2D/Box2D.h>
 
 typedef uint64_t robot_id;
@@ -14,10 +16,14 @@ class Robot : public QObject
 {
     Q_OBJECT
 
+    b2Shape* _body;
+    QVector<b2Shape*> _model;
+
 public:
     Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors, QObject* parent = nullptr);
 
-    const b2Shape* getBodyShape();
+    const b2Shape* getRobotBody();
+    const QVector<b2Shape*>& getRobotModel();
 
     //Gets descriptions for the channels this
     //mediator uses; should map 1-1 to the return of getChannelList
@@ -49,6 +55,30 @@ public slots:
 signals:
     //Signals velocity that this robot wants to go, in global coordinates
     void targetVelocity(double xDot, double yDot, double thetaDot);
+};
+
+class RobotSensorsScreenModel : public ScreenModel_If
+{
+public:
+    RobotSensorsScreenModel(Robot* robot);
+
+    QVector<b2Shape*> getModel();
+    void getTransform(double& x, double& y, double& theta);
+
+    void setModel(QVector<b2Shape*> newModel);
+    void setTransform(double x, double y, double theta);
+};
+
+class RobotBaseScreenModel : public ScreenModel_If
+{
+public:
+    RobotBaseScreenModel(Robot* robot);
+
+    QVector<b2Shape*> getModel();
+    void getTransform(double& x, double& y, double& theta);
+
+    void setModel(QVector<b2Shape*> newModel);
+    void setTransform(double x, double y, double theta);
 };
 
 #endif // ROBOT_H

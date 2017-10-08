@@ -40,9 +40,8 @@ public:
 signals:
     void robotRemoved(robot_id rId);
 
-    void robotAdded(Robot_Physics* interface, robot_id rId);
-    void robotAdded(Robot_Visual* interface, robot_id rId);
-    void robotAdded(Robot_Properties* interface, robot_id rId);
+    void robotAdded(Robot_Physics* interface);
+    void robotAdded(Robot_Properties* interface);
 
     void mapObjectsLoaded(QVector<b2Shape*> shapes);
 

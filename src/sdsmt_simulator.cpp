@@ -15,8 +15,8 @@ _physicsEngine(physics), _userInterface(ui)
     connect(this, &SDSMT_Simulator::robotRemoved, _physicsEngine, &Simulator_Physics_If::removeRobot);
 
     connect(_userInterface, &Simulator_Ui_If::userAddRobotIntoSimulation, this, &SDSMT_Simulator::addSimRobotFromFile);
-    connect(this, static_cast<void (SDSMT_Simulator::*)(Robot_Physics*, robot_id)>(&SDSMT_Simulator::robotAdded), _physicsEngine, &Simulator_Physics_If::addRobot);
-    connect(this, static_cast<void (SDSMT_Simulator::*)(Robot_Properties*, robot_id)>(&SDSMT_Simulator::robotAdded), _userInterface, &Simulator_Ui_If::robotAddedToSimulation);
+    connect(this, static_cast<void (SDSMT_Simulator::*)(Robot_Physics*)>(&SDSMT_Simulator::robotAdded), _physicsEngine, &Simulator_Physics_If::addRobot);
+    connect(this, static_cast<void (SDSMT_Simulator::*)(Robot_Properties*)>(&SDSMT_Simulator::robotAdded), _userInterface, &Simulator_Ui_If::robotAddedToSimulation);
 
     connect(_userInterface, &Simulator_Ui_If::userSetMapInSimulation, this, &SDSMT_Simulator::setSimMapFromFile);
     connect(this, &SDSMT_Simulator::mapObjectsLoaded, _physicsEngine, &Simulator_Physics_If::newStaticShapes);
@@ -72,9 +72,8 @@ void SDSMT_Simulator::addSimRobotFromFile(QString file)
         newBot->moveToThread(rThread);
 
         //Send out robot interfaces
-        emit robotAdded(new Robot_Physics(newBot), _nextRobotId);
-        emit robotAdded(new Robot_Properties(newBot), _nextRobotId);
-        emit robotAdded(new Robot_Visual(newBot), _nextRobotId);
+        emit robotAdded(new Robot_Physics(newBot, _nextRobotId));
+        emit robotAdded(new Robot_Properties(newBot, _nextRobotId));
 
         //Keep references to robot and thread
         _activeRobots[_nextRobotId] = newBot;

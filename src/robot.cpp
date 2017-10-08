@@ -5,9 +5,14 @@ Robot::Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors, QObj
 
 }
 
-const b2Shape* Robot::getBodyShape()
+const b2Shape* Robot::getRobotBody()
 {
+    return _body;
+}
 
+const QVector<b2Shape*>& Robot::getRobotModel()
+{
+    return _model;
 }
 
 QVector<QString> Robot::getChannelDescriptions()

@@ -20,7 +20,7 @@ public:
 public slots:
     //Simulator core added a robot to simulation
     //Do not delete the robot interface when the robot is removed; it will be handled elsewhere
-    void robotAddedToSimulation(Robot_Properties* robot, robot_id rId) override;
+    void robotAddedToSimulation(Robot_Properties* robot) override;
 
     //Simulator core removed a robot from simulation
     void robotRemovedFromSimulation(robot_id rId) override;

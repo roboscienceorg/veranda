@@ -33,7 +33,8 @@ HEADERS += \
     include/basic_ui.h \
     include/basic_viewer.h \
     include/basic_maploader.h \
-    include/basic_robotloader.h
+    include/basic_robotloader.h \
+    include/interfaces/screen_model_if.h
 
 
 FORMS += \

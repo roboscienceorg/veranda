@@ -27,7 +27,7 @@ public slots:
     //The simulator should add the robot body as a dynamic shape
     //And connect signals to the robot slots
     //Do not delete the robot interface when the robot is removed; it will be handled elsewhere
-    virtual void addRobot(Robot_Physics* robot, robot_id rId) override;
+    virtual void addRobot(Robot_Physics* robot) override;
 
     //Removes a robot from simulation
     virtual void removeRobot(robot_id rId) override;

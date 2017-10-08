@@ -5,7 +5,7 @@ BasicUi::BasicUi(visualizerFactory visualMaker, QObject *parent) : Simulator_Ui_
 
 }
 
-void BasicUi::robotAddedToSimulation(Robot_Properties* robot, robot_id rId)
+void BasicUi::robotAddedToSimulation(Robot_Properties* robot)
 {
 
 }

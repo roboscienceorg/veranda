@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "robot_interfaces.h"
+#include "screen_model_if.h"
 
 class Simulator_Visual_If : public QWidget
 {
@@ -14,20 +14,13 @@ public:
 
 signals:
     //Signals that the user clicked on a robot
-    void userSelectedRobot(robot_id rId);
+    void userSelectedModel(model_id id);
 
 public slots:
-    //A robot was selected as the 'current' robot
-    virtual void robotSelected(robot_id rId) = 0;
-
-    //Robot added to simulation
-    //Do not delete the robot interface when the robot is removed; it will be handled elsewhere
-    virtual void robotAddedToSimulation(Robot_Visual* robot, robot_id rId) = 0;
-
-    //Robot removed from simulation
-    virtual void robotRemovedFromSimulation(robot_id rId) = 0;
-
-    //Map objects were set into the simulation
-    virtual void mapObjectsSetInSimulation(/*QVector<[world-space polygons]> polygons*/) = 0;
+    virtual void modelAddedToScreen(ScreenModel_If* model, model_id id) = 0;
+    virtual void modelRemovedFromScreen(model_id id) = 0;
+    virtual void modelDisabled(model_id id) = 0;
+    virtual void modelEnabled(model_id id) = 0;
+    virtual void modelSelected(model_id id) = 0;
 };
 #endif // SIMULATOR_VISUAL_H

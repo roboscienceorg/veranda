@@ -45,6 +45,7 @@ set(MOC_HDRS
     include/interfaces/simulator_physics_if.h
     include/interfaces/simulator_ui_if.h
     include/interfaces/simulator_visual_if.h
+    include/interfaces/screen_model_if.h
     include/basic_physics.h
     include/basic_ui.h
     include/basic_viewer.h

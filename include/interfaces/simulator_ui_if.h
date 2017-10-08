@@ -59,7 +59,7 @@ signals:
 public slots:
     //Simulator core added a robot to simulation
     //Do not delete the robot interface when the robot is removed; it will be handled elsewhere
-    virtual void robotAddedToSimulation(Robot_Properties* robot, robot_id rId) = 0;
+    virtual void robotAddedToSimulation(Robot_Properties* robot) = 0;
 
     //Simulator core removed a robot from simulation
     virtual void robotRemovedFromSimulation(robot_id rId) = 0;

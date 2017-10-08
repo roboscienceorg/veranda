@@ -5,22 +5,27 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
 
 }
 
-void BasicViewer::robotSelected(robot_id rId)
+void BasicViewer::modelAddedToScreen(ScreenModel_If* model, model_id id)
 {
 
 }
 
-void BasicViewer::robotAddedToSimulation(Robot_Visual* robot, robot_id rId)
+void BasicViewer::modelRemovedFromScreen(model_id id)
 {
 
 }
 
-void BasicViewer::robotRemovedFromSimulation(robot_id rId)
+void BasicViewer::modelDisabled(model_id id)
 {
 
 }
 
-void BasicViewer::mapObjectsSetInSimulation(/*QVector<[world-space polygons]> polygons*/)
+void BasicViewer::modelEnabled(model_id id)
+{
+
+}
+
+void BasicViewer::modelSelected(model_id id)
 {
 
 }
