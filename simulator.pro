@@ -18,7 +18,7 @@ SOURCES += \
     src/robot.cpp \
     \
     src/ui/emptysimwindow.cpp
-
+    src/ui/mainwindow.cpp
 
 HEADERS += \
     include/interfaces/map_loader_if.h \
@@ -40,11 +40,15 @@ HEADERS += \
 \
     include/sdsmt_simulator.h \
     include/robot.h \
+    include/interfaces/screen_model_if.h \
+    include/ui/mainwindow.h
 
-
-FORMS += \
+FORMS    += \
+    ui/mainwindow.ui \
     ui/emptysimwindow.ui
 
+RESOURCES += \
+    ui/resources.qrc
 
 DISTFILES += \
     CMakeLists.txt \
