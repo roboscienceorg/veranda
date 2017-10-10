@@ -17,7 +17,7 @@ SOURCES += \
     src/basic_robotloader.cpp \
     src/robot.cpp \
     \
-    src/ui/emptysimwindow.cpp
+    src/ui/emptysimwindow.cpp\
     src/ui/mainwindow.cpp
 
 HEADERS += \

@@ -41,7 +41,7 @@
               </property>
               <property name="icon">
                <iconset resource="resources.qrc">
-                <normaloff>:/new/SimModeIcon/SimulationIcon.png</normaloff>:/new/SimModeIcon/SimulationIcon.png</iconset>
+                <normaloff>:/new/SimModeIcon/images/SimulationIcon.png</normaloff>:/new/SimModeIcon/images/SimulationIcon.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -60,7 +60,7 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="resources.qrc">
+               <iconset>
                 <normaloff>:/new/MapModeIcon/MapMakerIcon.png</normaloff>:/new/MapModeIcon/MapMakerIcon.png</iconset>
               </property>
               <property name="iconSize">
@@ -80,7 +80,7 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="resources.qrc">
+               <iconset>
                 <normaloff>:/new/RobotModeIcon/RobotMakerIcon.png</normaloff>:/new/RobotModeIcon/RobotMakerIcon.png</iconset>
               </property>
               <property name="iconSize">
@@ -132,7 +132,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/NewFileIcon.png</normaloff>:/Generic/NewFileIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -152,7 +152,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/SaveFileIcon.png</normaloff>:/Generic/SaveFileIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -172,7 +172,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/CopyFileIcon.png</normaloff>:/Generic/CopyFileIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -192,7 +192,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/DeleteIcon.png</normaloff>:/Generic/DeleteIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -212,7 +212,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/simModeMenu/RecordIcon.png</normaloff>:/simModeMenu/RecordIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -232,7 +232,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/simModeMenu/ScreenshotIcon.png</normaloff>:/simModeMenu/ScreenshotIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -249,7 +249,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/simModeMenu/SpeedOneIcon.png</normaloff>:/simModeMenu/SpeedOneIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -266,7 +266,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/simModeMenu/PlayIcon.png</normaloff>:/simModeMenu/PlayIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -292,7 +292,7 @@
                 <string>New</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/NewFileIcon.png</normaloff>:/Generic/NewFileIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -312,7 +312,7 @@
                 <string>Imp</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/SaveFileIcon.png</normaloff>:/Generic/SaveFileIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -332,7 +332,7 @@
                 <string>Sav</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/ImportFileIcon.png</normaloff>:/Generic/ImportFileIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -352,7 +352,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/CopyFileIcon.png</normaloff>:/Generic/CopyFileIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -372,7 +372,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/DeleteIcon.png</normaloff>:/Generic/DeleteIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -398,7 +398,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/NewFileIcon.png</normaloff>:/Generic/NewFileIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -418,7 +418,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/SaveFileIcon.png</normaloff>:/Generic/SaveFileIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -438,7 +438,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/CopyFileIcon.png</normaloff>:/Generic/CopyFileIcon.png</iconset>
                </property>
                <property name="iconSize">
@@ -458,7 +458,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset>
                  <normaloff>:/Generic/DeleteIcon.png</normaloff>:/Generic/DeleteIcon.png</iconset>
                </property>
                <property name="iconSize">

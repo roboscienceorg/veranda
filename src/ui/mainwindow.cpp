@@ -1,12 +1,15 @@
-#include "mainwindow.h"
+#include "ui/mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include <QMessageBox>
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
+    Simulator_Ui_If(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    _makeWidget = factory;
 
     speed = 1;
     play = false;

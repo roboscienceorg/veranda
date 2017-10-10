@@ -54,11 +54,13 @@ set(MOC_HDRS
     include/sdsmt_simulator.h
     include/robot.h
 
-    include/ui/emptysimwindow.h)
+    include/ui/emptysimwindow.h
+    include/ui/mainwindow.h)
 
 ## .ui qt widgets form files
 set(UI_FILES
-    ui/emptysimwindow.ui)
+    ui/emptysimwindow.ui
+    ui/mainwindow.ui)
 
 ## Any other source files
 set(CPP_SRCS
@@ -71,7 +73,12 @@ set(CPP_SRCS
     src/sdsmt_simulator.cpp
     src/robot.cpp
 
-    src/ui/emptysimwindow.cpp)
+    src/ui/emptysimwindow.cpp
+    src/ui/mainwindow.cpp
+    )
+
+set(RCC_FILES ui/resources.qrc)
+qt5_add_resources(RCC_SRCS ${RCC_FILES})
 
 ## Box2D sources
 set(BOX2D_PATH Box2D/Box2D/Box2D)
@@ -136,7 +143,7 @@ qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 qt5_wrap_ui(UI_SRCS ${UI_FILES})
 
 ## Build the executable
-add_executable(sdsmt_simulator ${UI_SRCS} ${CPP_SRCS} ${MOC_SRCS})
+add_executable(sdsmt_simulator ${UI_SRCS} ${CPP_SRCS} ${MOC_SRCS} ${RCC_SRCS})
 
 ## Add qt module dependencies to executable
 ## this will find all the headers and link all the libraries

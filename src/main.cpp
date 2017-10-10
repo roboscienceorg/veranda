@@ -18,6 +18,7 @@
 #include "basic_ui.h"
 #include "basic_viewer.h"
 #include "ui/emptysimwindow.h"
+#include "ui/mainwindow.h"
 
 #include "sdsmt_simulator.h"
 
@@ -44,7 +45,7 @@ int main(int argc, char** argv)
    /*************************************
     * Setup simulator
     *************************************/
-    emptysimwindow::visualizerFactory visuals =
+    MainWindow::visualizerFactory visuals =
     []()
     {
         return new BasicViewer();
@@ -54,7 +55,7 @@ int main(int argc, char** argv)
     RobotLoader_If* robotLoader = new BasicRobotLoader();
 
     Simulator_Physics_If* physics = new BasicPhysics();
-    Simulator_Ui_If* userinterface = new emptysimwindow(visuals);
+    Simulator_Ui_If* userinterface = new MainWindow(visuals);
 
     SDSMT_Simulator sim(mapLoader, robotLoader, physics, userinterface, &app);
 
