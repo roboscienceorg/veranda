@@ -1,0 +1,56 @@
+<RCC>
+    <qresource prefix="/new/MapModeIcon">
+        <file>MapMakerIcon.png</file>
+    </qresource>
+    <qresource prefix="/new/RobotModeIcon">
+        <file>RobotMakerIcon.png</file>
+    </qresource>
+    <qresource prefix="/new/SimModeIcon">
+        <file>SimulationIcon.png</file>
+    </qresource>
+    <qresource prefix="/Generic">
+        <file>DeleteIcon.png</file>
+    </qresource>
+    <qresource prefix="/simModeMenu">
+        <file>PlayIcon.png</file>
+    </qresource>
+    <qresource prefix="/simModeMenu">
+        <file>StopIcon.png</file>
+    </qresource>
+    <qresource prefix="/simModeMenu">
+        <file>SpeedOneIcon.png</file>
+    </qresource>
+    <qresource prefix="/simModeMenu">
+        <file>SpeedTwoIcon.png</file>
+    </qresource>
+    <qresource prefix="/simModeMenu">
+        <file>SpeedThreeIcon.png</file>
+    </qresource>
+    <qresource prefix="/simModeMenu">
+        <file>SpeedHalfIcon.png</file>
+    </qresource>
+    <qresource prefix="/Generic">
+        <file>NewFileIcon.png</file>
+    </qresource>
+    <qresource prefix="/Generic">
+        <file>CopyFileIcon.png</file>
+    </qresource>
+    <qresource prefix="/Generic">
+        <file>SaveFileIcon.png</file>
+    </qresource>
+    <qresource prefix="/Generic">
+        <file>ImportFileIcon.png</file>
+    </qresource>
+    <qresource prefix="/simModeMenu">
+        <file>ScreenshotIcon.png</file>
+    </qresource>
+    <qresource prefix="/simModeMenu">
+        <file>RecordIcon.png</file>
+    </qresource>
+    <qresource prefix="/simModeMenu">
+        <file>DontRecordIcon.png</file>
+    </qresource>
+    <qresource prefix="/Generic">
+        <file>DeleteAllIcon.png</file>
+    </qresource>
+</RCC>
