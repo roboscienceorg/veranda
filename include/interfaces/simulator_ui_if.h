@@ -5,17 +5,19 @@
 
 #include <QObject>
 #include <QVector>
+#include <QWidget>
+#include <QMainWindow>
 
 #include <Box2D/Box2D.h>
 
 #include "robot_interfaces.h"
 
-class Simulator_Ui_If : public QObject
+class Simulator_Ui_If : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    Simulator_Ui_If(QObject* parent = nullptr) : QObject(parent){}
+    Simulator_Ui_If(QWidget* parent = nullptr) : QMainWindow(parent){}
 
 signals:
     //Signals for simulator window open/close

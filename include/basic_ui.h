@@ -6,16 +6,18 @@
 
 #include <functional>
 
-typedef std::function<Simulator_Visual_If*()> visualizerFactory;
-
 class BasicUi : public Simulator_Ui_If
 {
+public:
+    typedef std::function<Simulator_Visual_If*()> visualizerFactory;
+
+private:
     Q_OBJECT
 
     visualizerFactory _visFactory;
 
 public:
-    BasicUi(visualizerFactory visualMaker, QObject* parent = nullptr);
+    BasicUi(visualizerFactory visualMaker, QWidget* parent = nullptr);
 
 public slots:
     //Simulator core added a robot to simulation

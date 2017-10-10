@@ -1,6 +1,6 @@
 #include "basic_ui.h"
 
-BasicUi::BasicUi(visualizerFactory visualMaker, QObject *parent) : Simulator_Ui_If(parent), _visFactory(visualMaker)
+BasicUi::BasicUi(visualizerFactory visualMaker, QWidget *parent) : Simulator_Ui_If(parent), _visFactory(visualMaker)
 {
 
 }
