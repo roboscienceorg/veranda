@@ -60,25 +60,25 @@ signals:
 class RobotSensorsScreenModel : public ScreenModel_If
 {
 public:
-    RobotSensorsScreenModel(Robot* robot);
+    RobotSensorsScreenModel(Robot* robot){}
 
-    QVector<b2Shape*> getModel();
-    void getTransform(double& x, double& y, double& theta);
+    QVector<b2Shape*> getModel(){}
+    void getTransform(double& x, double& y, double& theta){}
 
-    void setModel(QVector<b2Shape*> newModel);
-    void setTransform(double x, double y, double theta);
+    void setModel(QVector<b2Shape*> newModel){}
+    void setTransform(double x, double y, double theta){}
 };
 
 class RobotBaseScreenModel : public ScreenModel_If
 {
 public:
-    RobotBaseScreenModel(Robot* robot);
+    RobotBaseScreenModel(Robot* robot){}
 
-    QVector<b2Shape*> getModel();
-    void getTransform(double& x, double& y, double& theta);
+    QVector<b2Shape*> getModel(){}
+    void getTransform(double& x, double& y, double& theta){}
 
-    void setModel(QVector<b2Shape*> newModel);
-    void setTransform(double x, double y, double theta);
+    void setModel(QVector<b2Shape*> newModel){}
+    void setTransform(double x, double y, double theta){}
 };
 
 #endif // ROBOT_H

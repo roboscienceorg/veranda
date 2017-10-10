@@ -1,5 +1,9 @@
 #include "sdsmt_simulator.h"
 
+#include <iostream>
+
+using namespace std;
+
 SDSMT_Simulator::SDSMT_Simulator(MapLoader_If *mapLoad, RobotLoader_If *robotLoad,
                                  Simulator_Physics_If *physics, Simulator_Ui_If *ui,
                                  QObject *parent) :
@@ -43,8 +47,11 @@ SDSMT_Simulator::~SDSMT_Simulator()
 
 void SDSMT_Simulator::start()
 {
-    _userInterface->showMainWindow();
+    cerr << "Start physics engine" << endl;
     _physicsThread->start();
+
+    cerr << "Show main window" << endl;
+    _userInterface->showMainWindow();
 }
 
 void SDSMT_Simulator::setSimMapFromFile(QString file)

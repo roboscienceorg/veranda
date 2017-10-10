@@ -39,6 +39,7 @@ catkin_package(
 ## Files that have any Qt macros or keywords in them
 ## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
 set(MOC_HDRS
+
     include/interfaces/drivetrain_if.h
     include/interfaces/robot_interfaces.h
     include/interfaces/sensor_if.h
@@ -46,14 +47,18 @@ set(MOC_HDRS
     include/interfaces/simulator_ui_if.h
     include/interfaces/simulator_visual_if.h
     include/interfaces/screen_model_if.h
+
     include/basic_physics.h
     include/basic_ui.h
     include/basic_viewer.h
     include/sdsmt_simulator.h
-    include/robot.h)
+    include/robot.h
+
+    include/ui/emptysimwindow.h)
 
 ## .ui qt widgets form files
-set(UI_FILES )
+set(UI_FILES
+    ui/emptysimwindow.ui)
 
 ## Any other source files
 set(CPP_SRCS
@@ -64,17 +69,21 @@ set(CPP_SRCS
     src/basic_ui.cpp
     src/basic_viewer.cpp
     src/sdsmt_simulator.cpp
-    src/robot.cpp)
+    src/robot.cpp
+
+    src/ui/emptysimwindow.cpp)
 
 ## Box2D sources
 set(BOX2D_PATH Box2D/Box2D/Box2D)
 set(BOX2D_SRCS
+
     ${BOX2D_PATH}/Common/b2BlockAllocator.cpp
     ${BOX2D_PATH}/Common/b2Draw.cpp
     ${BOX2D_PATH}/Common/b2Math.cpp
     ${BOX2D_PATH}/Common/b2Settings.cpp
     ${BOX2D_PATH}/Common/b2StackAllocator.cpp
     ${BOX2D_PATH}/Common/b2Timer.cpp
+
     ${BOX2D_PATH}/Collision/b2BroadPhase.cpp
     ${BOX2D_PATH}/Collision/b2CollideCircle.cpp
     ${BOX2D_PATH}/Collision/b2CollidePolygon.cpp
@@ -83,6 +92,7 @@ set(BOX2D_SRCS
     ${BOX2D_PATH}/Collision/b2Distance.cpp
     ${BOX2D_PATH}/Collision/b2DynamicTree.cpp
     ${BOX2D_PATH}/Collision/b2TimeOfImpact.cpp
+
     ${BOX2D_PATH}/Dynamics/b2Body.cpp
     ${BOX2D_PATH}/Dynamics/b2ContactManager.cpp
     ${BOX2D_PATH}/Dynamics/b2Fixture.cpp
@@ -101,6 +111,7 @@ set(BOX2D_SRCS
     ${BOX2D_PATH}/Dynamics/Joints/b2MouseJoint.cpp
     ${BOX2D_PATH}/Dynamics/Joints/b2RevoluteJoint.cpp
     ${BOX2D_PATH}/Dynamics/Joints/b2WheelJoint.cpp
+
     ${BOX2D_PATH}/Rope/b2Rope.cpp
 )
 
@@ -125,7 +136,7 @@ qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 qt5_wrap_ui(UI_SRCS ${UI_FILES})
 
 ## Build the executable
-add_executable(sdsmt_simulator ${CPP_SRCS} ${MOC_SRCS} ${UI_SRCS})
+add_executable(sdsmt_simulator ${UI_SRCS} ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to executable
 ## this will find all the headers and link all the libraries
