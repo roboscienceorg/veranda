@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>sdsmt_simulator_floating_drivetrain_plugin</name>
+  <version>0.0.1</version>
+  <description>Basic Drivetrain Plugin</description>
+
+  <maintainer email="andrew.stelter@mines.sdsmt.edu">Andrew Stelter</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>sdsmt_simulator</depend>
+  <depend>sdsmt_simulator_box2d</depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+
+  <export>
+
+  </export>
+</package>

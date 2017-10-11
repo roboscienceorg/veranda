@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>sdsmt_simulator_box2d</name>
+  <version>0.0.1</version>
+  <description>Copy of Box2D used in sdsmt_simulator</description>
+
+  <maintainer email="andrew.stelter@mines.sdsmt.edu">Andrew Stelter</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+
+  </export>
+</package>
