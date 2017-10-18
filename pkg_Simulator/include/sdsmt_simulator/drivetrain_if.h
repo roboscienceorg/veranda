@@ -3,12 +3,18 @@
 
 #include <QObject>
 
-class DriveTrain_If : public QObject
+#include "robotcomponent_if.h"
+
+class DriveTrain_If : public RobotComponent_If
 {
     Q_OBJECT
 
 public:
-    DriveTrain_If(QObject* parent = nullptr) : QObject(parent){}
+    DriveTrain_If(QObject* parent = nullptr) : RobotComponent_If(parent){}
+
+    //Returns a set of shapes that are the
+    //base model for this component
+    virtual QVector<b2Shape*> getModel() = 0;
 
     //Gets descriptions for the channels this
     //mediator uses; should map 1-1 to the return of getChannelList

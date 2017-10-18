@@ -2,6 +2,7 @@
 #define DRIVETRAIN_PLUGIN_H
 
 #include "drivetrain_if.h"
+#include "robotcomponent_if.h"
 
 class DriveTrain_Plugin_If
 {

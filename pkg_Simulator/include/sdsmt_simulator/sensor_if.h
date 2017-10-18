@@ -6,12 +6,14 @@
 #include <QVector>
 #include <QObject>
 
-class Sensor_If : public QObject
+#include "robotcomponent_if.h"
+
+class Sensor_If : public RobotComponent_If
 {
     Q_OBJECT
 
 public:
-    Sensor_If(QObject* parent = nullptr) : QObject(parent){}
+    Sensor_If(QObject* parent = nullptr) : RobotComponent_If(parent){}
 
     //Gets descriptions for the channels this
     //mediator uses; should map 1-1 to the return of getChannelList

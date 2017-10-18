@@ -1,7 +1,7 @@
 QT       += core
 
 TARGET = floating_drivetrain
-TEMPLATE = plugin
+TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being set
 
 INCLUDEPATH += include
 

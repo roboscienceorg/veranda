@@ -3,9 +3,11 @@ project(sdsmt_simulator_floating_drivetrain_plugin)
 
 add_compile_options(-std=c++11)
 
-find_package(catkin REQUIRED)
-find_package(sdsmt_simulator REQUIRED)
-find_package(sdsmt_simulator_box2d REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+    roscpp
+    std_msgs
+    sdsmt_simulator
+    sdsmt_simulator_box2d)
 
 ## Find and configure QT
 find_package(Qt5 REQUIRED COMPONENTS
@@ -22,7 +24,11 @@ include_directories( ${CMAKE_BINARY_DIR} )
 
 ## TODO If possible: Figure out how to mark Qt as a dependency
 catkin_package(
-    CATKIN_DEPENDS sdsmt_simulator sdsmt_simulator_box2d
+    CATKIN_DEPENDS
+    roscpp
+    std_msgs
+    sdsmt_simulator
+    sdsmt_simulator_box2d
 )
 
 ###################
@@ -48,8 +54,6 @@ set(CPP_SRCS
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${sdsmt_simulator_INCLUDE_DIRS}
-  ${sdsmt_simulator_box2d_INCLUDE_DIRS}
 )
 
 ## Run MOC on files with Qt Keywords and Macros
@@ -65,7 +69,6 @@ qt5_use_modules(floating_drivetrain_plugin Core)
 ## Link any other libraries
 target_link_libraries(floating_drivetrain_plugin
   ${catkin_LIBRARIES}
-  ${sdsmt_simulator_box2d_LIBRARIES}
 )
 
 #############
