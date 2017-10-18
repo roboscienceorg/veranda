@@ -1,6 +1,8 @@
 #include "simulator_core.h"
 
 #include <iostream>
+#include <QDebug>
+#include <QTimer>
 
 using namespace std;
 
@@ -39,19 +41,21 @@ SimulatorCore::~SimulatorCore()
     _physicsThread->wait();
 
     //Destroy all remaining robots
-    for(auto iter = _activeRobots.begin(); iter != _activeRobots.end(); iter++)
-    {
-        removeSimRobot(iter.key());
-    }
+    while(_activeRobots.size())
+        removeSimRobot(_activeRobots.firstKey());
 }
 
 void SimulatorCore::start()
 {
-    cerr << "Start physics engine" << endl;
+    qInfo() << "Start physics engine";
     _physicsThread->start();
 
-    cerr << "Show main window" << endl;
+    qInfo() << "Show main window";
     _userInterface->showMainWindow();
+
+    addSimRobotFromFile("");
+    for(auto iter = _activeRobots.begin(); iter != _activeRobots.end(); iter++)
+        QTimer::singleShot(10, iter.value(), &Robot::connectToROS);
 }
 
 void SimulatorCore::setSimMapFromFile(QString file)
@@ -74,13 +78,16 @@ void SimulatorCore::addSimRobotFromFile(QString file)
     QString error = _robotLoader->loadRobotFile(file, newBot);
     if(!error.size())
     {
+        Robot_Physics* phys_interface = new Robot_Physics(newBot, _nextRobotId);
+        Robot_Properties* prop_interface = new Robot_Properties(newBot, _nextRobotId);
+
         //Put robot in its own thread
         QThread* rThread = new QThread(this);
         newBot->moveToThread(rThread);
 
         //Send out robot interfaces
-        emit robotAdded(new Robot_Physics(newBot, _nextRobotId));
-        emit robotAdded(new Robot_Properties(newBot, _nextRobotId));
+        emit robotAdded(phys_interface);
+        emit robotAdded(prop_interface);
 
         //Keep references to robot and thread
         _activeRobots[_nextRobotId] = newBot;

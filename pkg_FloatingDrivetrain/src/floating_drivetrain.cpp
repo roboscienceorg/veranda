@@ -1,5 +1,10 @@
 #include "floating_drivetrain.h"
 
+Floating_Drivetrain::Floating_Drivetrain(QObject *parent) : DriveTrain_If(parent)
+{
+
+}
+
 QVector<QString> Floating_Drivetrain::getChannelDescriptions()
 {
 

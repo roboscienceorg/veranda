@@ -35,13 +35,19 @@ set(BOX2D_SRCS
     ${BOX2D_PATH}/Collision/b2Distance.cpp
     ${BOX2D_PATH}/Collision/b2DynamicTree.cpp
     ${BOX2D_PATH}/Collision/b2TimeOfImpact.cpp
-
+    
+    ${BOX2D_PATH}/Collision/Shapes/b2ChainShape.cpp
+    ${BOX2D_PATH}/Collision/Shapes/b2CircleShape.cpp
+    ${BOX2D_PATH}/Collision/Shapes/b2EdgeShape.cpp
+    ${BOX2D_PATH}/Collision/Shapes/b2PolygonShape.cpp
+                        
     ${BOX2D_PATH}/Dynamics/b2Body.cpp
     ${BOX2D_PATH}/Dynamics/b2ContactManager.cpp
     ${BOX2D_PATH}/Dynamics/b2Fixture.cpp
     ${BOX2D_PATH}/Dynamics/b2Island.cpp
     ${BOX2D_PATH}/Dynamics/b2WorldCallbacks.cpp
     ${BOX2D_PATH}/Dynamics/b2World.cpp
+    
     ${BOX2D_PATH}/Dynamics/Joints/b2DistanceJoint.cpp
     ${BOX2D_PATH}/Dynamics/Joints/b2Joint.cpp
     ${BOX2D_PATH}/Dynamics/Joints/b2PrismaticJoint.cpp

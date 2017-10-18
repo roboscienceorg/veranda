@@ -1,6 +1,6 @@
 #include "robot.h"
 
-Robot::Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors, QObject* parent) : QObject(parent)
+Robot::Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors, QObject* parent) : QObject(parent), _body(body)
 {
 
 }

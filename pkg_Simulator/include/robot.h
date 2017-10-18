@@ -20,7 +20,7 @@ class Robot : public QObject
     QVector<b2Shape*> _model;
 
 public:
-    Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors, QObject* parent = nullptr);
+    Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
 
     const b2Shape* getRobotBody();
     const QVector<b2Shape*>& getRobotModel();
@@ -62,7 +62,7 @@ class RobotSensorsScreenModel : public ScreenModel_If
 public:
     RobotSensorsScreenModel(Robot* robot){}
 
-    QVector<b2Shape*> getModel(){}
+    QVector<b2Shape*> getModel(){return QVector<b2Shape*>{};}
     void getTransform(double& x, double& y, double& theta){}
 
     void setModel(QVector<b2Shape*> newModel){}
@@ -71,10 +71,12 @@ public:
 
 class RobotBaseScreenModel : public ScreenModel_If
 {
+    b2Shape* robotBody;
+    b2BlockAllocator alloc;
 public:
-    RobotBaseScreenModel(Robot* robot){}
+    RobotBaseScreenModel(Robot* robot){robotBody = robot->getRobotBody()->Clone(&alloc);}
 
-    QVector<b2Shape*> getModel(){}
+    QVector<b2Shape*> getModel(){return QVector<b2Shape*>{robotBody};}
     void getTransform(double& x, double& y, double& theta){}
 
     void setModel(QVector<b2Shape*> newModel){}
