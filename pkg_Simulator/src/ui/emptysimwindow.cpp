@@ -1,6 +1,8 @@
 #include "ui/emptysimwindow.h"
 #include "ui_emptysimwindow.h"
 
+#include <QSizePolicy>
+
 emptysimwindow::emptysimwindow(visualizerFactory factory, QWidget *parent) :
     Simulator_Ui_If(parent),
     ui(new Ui::emptysimwindow)

@@ -11,6 +11,7 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  sdsmt_simulator_box2d
 )
 
 ## Find and configure QT
@@ -19,8 +20,6 @@ find_package(Qt5 REQUIRED COMPONENTS
   Widgets
   Gui
 )
-
-find_package(sdsmt_simulator_box2d REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -46,6 +45,7 @@ set(MOC_HDRS
 
     include/sdsmt_simulator/drivetrain_if.h
     include/sdsmt_simulator/sensor_if.h
+    include/sdsmt_simulator/robotcomponent_if.h
 
     include/interfaces/robot_interfaces.h
     include/interfaces/simulator_physics_if.h
@@ -85,7 +85,6 @@ set(CPP_SRCS
 ## Locations of header files
 include_directories(
   include
-  ${sdsmt_simulator_box2d_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -104,7 +103,6 @@ qt5_use_modules(sdsmt_simulator Core Gui Widgets)
 
 ## Link any other libraries
 target_link_libraries(sdsmt_simulator
-  ${sdsmt_simulator_box2d_LIBRARIES}
   ${catkin_LIBRARIES}
 )
 

@@ -14,6 +14,9 @@
 #include <QPluginLoader>
 #include <QDir>
 #include <QDirIterator>
+#include <QDebug>
+#include <QTextStream>
+#include <QMap>
 
 #include "basic_maploader.h"
 #include "basic_physics.h"
@@ -30,6 +33,8 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+    QTextStream cout(stdout);
+
    /*************************************
     * Setup ROS and Qt to play nice
     *************************************/
@@ -49,8 +54,8 @@ int main(int argc, char** argv)
    /*************************************
     * Load robot part plugins
     *************************************/
-    QVector<DriveTrain_Plugin_If*> driveTrainPlugins;
-    QVector<Sensor_Plugin_If*> sensorPlugins;
+    QMap<QString, DriveTrain_Plugin_If*> driveTrainPlugins;
+    QMap<QString, Sensor_Plugin_If*> sensorPlugins;
 
     QPluginLoader plugLoader;
 
@@ -59,31 +64,38 @@ int main(int argc, char** argv)
     //As of October, 2017, this is what ${CATKIN_PACKAGE_LIB_DESTINATION} points to
     //All packages for a workspace are put together in the same folders, so as long as all
     //plugins are set up as packages in the same workspace as this project, they should be found
-    QDirIterator dir(QCoreApplication::applicationDirPath() + "/../", {"*.so", "*.dll"}, QDir::Files, QDirIterator::Subdirectories);
+    qInfo() << "Searching" << QCoreApplication::applicationDirPath() + "/.." << "for plugins";
+    QDirIterator dir(QCoreApplication::applicationDirPath() + "/..", {"*.so", "*.dll"}, QDir::Files, QDirIterator::Subdirectories);
     while(dir.hasNext())
     {
         dir.next();
         plugLoader.setFileName(dir.fileInfo().absoluteFilePath());
 
+        qInfo() << "Checking" << dir.fileInfo().absoluteFilePath() << "for plugin";
+
         if(plugLoader.load())
         {
             QObject* plugin = plugLoader.instance();
+            QString iid = plugLoader.metaData()["IID"].toString();
 
-            cout << "Loaded plugin library: " << dir.fileName().toStdString() << endl;
             if(qobject_cast<DriveTrain_Plugin_If*>(plugin))
             {
-                cout << "Plugin type: Drivetrain" << endl;
-                driveTrainPlugins.push_back(qobject_cast<DriveTrain_Plugin_If*>(plugin));
+                qInfo() << "Plugin type: Drivetrain";
+                driveTrainPlugins[iid] = qobject_cast<DriveTrain_Plugin_If*>(plugin);
             }
             else if(qobject_cast<Sensor_Plugin_If*>(plugin))
             {
-                cout << "Plugin type: Sensor" << endl;
-                sensorPlugins.push_back(qobject_cast<Sensor_Plugin_If*>(plugin));
+                qInfo() << "Plugin type: Sensor";
+                sensorPlugins[iid] = qobject_cast<Sensor_Plugin_If*>(plugin);
             }
             else
             {
-                cout << "Unknown plugin type" << endl;
+                qInfo() << "Unknown plugin type";
             }
+        }
+        else
+        {
+            qInfo() << plugLoader.errorString();
         }
     }
    /*************************************
@@ -96,7 +108,7 @@ int main(int argc, char** argv)
     };
 
     MapLoader_If* mapLoader = new BasicMapLoader();
-    RobotLoader_If* robotLoader = new BasicRobotLoader();
+    RobotLoader_If* robotLoader = new BasicRobotLoader(driveTrainPlugins, sensorPlugins);
 
     Simulator_Physics_If* physics = new BasicPhysics();
     Simulator_Ui_If* userinterface = new emptysimwindow(visuals);

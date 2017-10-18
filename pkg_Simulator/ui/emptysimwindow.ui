@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QVBoxLayout" name="simviewcontainer"/>
+     <layout class="QVBoxLayout" name="simviewcontainer" stretch=""/>
     </item>
    </layout>
   </widget>
