@@ -15,7 +15,7 @@ BasicPhysics::BasicPhysics(QObject *parent) : Simulator_Physics_If(parent)
 
 void BasicPhysics::start()
 {
-    tick.setInterval(1000.0f / rate_hz);
+    tick.setInterval(1000.0f / tickRate);
     tick.setTimerType(Qt::PreciseTimer);
 
     tick.start();
@@ -29,6 +29,7 @@ void BasicPhysics::stop()
 void BasicPhysics::clear()
 {
     delete world;
+    b2Vec2 gravity(0.0f, 0.0f);
     world = new b2World(gravity);
 }
 
@@ -45,13 +46,13 @@ void BasicPhysics::newStaticShapes(QVector<b2Shape *> shapes)
     {
         b2BodyDef staticBodyDef;
         b2Vec2 position;
-        if(shapes[i]->GetType() == b2Shape.e_circle)
-            position = shapes[i]->m_p;
+        if(shapes[i]->GetType() == 0)
+            position = static_cast<b2CircleShape*>(shapes[i])->m_p;
         else
-            position = shapes[i]->m_centroid;
+            position = static_cast<b2PolygonShape*>(shapes[i])->m_centroid;
         staticBodyDef.position.Set(position.x, position.y);
-        b2Body* staticBody = world.CreateBody(&staticBodyDef);
-        staticBody->CreateFixture(&shapes[i], 0.0f);
+        b2Body* staticBody = world->CreateBody(&staticBodyDef);
+        staticBody->CreateFixture(shapes[i], 0.0f);
     }
 }
 
@@ -61,8 +62,8 @@ void BasicPhysics::addRobot(Robot_Physics *robot)
 
     b2BodyDef robotBodyDef;
     robotBodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(robot->xPos, robot->yPos); //robot doesn't have position, but it needs it
-    b2Body* robotBody = world.CreateBody(&robotBodyDef);
+    robotBodyDef.position.Set(10.0f, 10.0f); //robot doesn't have position, but it needs it
+    b2Body* robotBody = world->CreateBody(&robotBodyDef);
     b2FixtureDef robotFixtureDef;
     robotFixtureDef.shape = robot->getBodyShape();
     robotFixtureDef.density = 1.0f;
@@ -80,7 +81,7 @@ void BasicPhysics::removeRobot(robot_id rId)
         if(robots[i].rID == rId)
         {
             world->DestroyBody(robots[i].robotBody);
-            robots.erase[i];
+            robots.erase(robots.begin() + i);
         }
 }
 
@@ -102,5 +103,5 @@ void BasicPhysics::step()
         b2Vec2 velocity(robots[i].xDot, robots[i].yDot);
         robots[i].robotBody->SetLinearVelocity(velocity);
     }
-    world.step(stepTime, 8, 3); //suggested values for velocity and position iterations
+    world->Step(stepTime, 8, 3); //suggested values for velocity and position iterations
 }

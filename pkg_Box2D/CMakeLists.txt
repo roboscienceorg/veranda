@@ -47,6 +47,16 @@ set(BOX2D_SRCS
     ${BOX2D_PATH}/Dynamics/b2Island.cpp
     ${BOX2D_PATH}/Dynamics/b2WorldCallbacks.cpp
     ${BOX2D_PATH}/Dynamics/b2World.cpp
+
+    ${BOX2D_PATH}/Dynamics/Contacts/b2ChainAndCircleContact.cpp
+    ${BOX2D_PATH}/Dynamics/Contacts/b2ChainAndPolygonContact.cpp
+    ${BOX2D_PATH}/Dynamics/Contacts/b2CircleContact.cpp
+    ${BOX2D_PATH}/Dynamics/Contacts/b2Contact.cpp
+    ${BOX2D_PATH}/Dynamics/Contacts/b2ContactSolver.cpp
+    ${BOX2D_PATH}/Dynamics/Contacts/b2EdgeAndCircleContact.cpp
+    ${BOX2D_PATH}/Dynamics/Contacts/b2EdgeAndPolygonContact.cpp
+    ${BOX2D_PATH}/Dynamics/Contacts/b2PolygonAndCircleContact.cpp
+    ${BOX2D_PATH}/Dynamics/Contacts/b2PolygonContact.cpp
     
     ${BOX2D_PATH}/Dynamics/Joints/b2DistanceJoint.cpp
     ${BOX2D_PATH}/Dynamics/Joints/b2Joint.cpp

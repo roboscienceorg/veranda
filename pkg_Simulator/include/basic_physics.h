@@ -9,6 +9,9 @@
 struct robotWorldData{
     b2Body *robotBody;
     robot_id rID;
+    double xDot;
+    double yDot;
+    double thetaDot;
 };
 
 class BasicPhysics : public Simulator_Physics_If
@@ -48,7 +51,9 @@ public slots:
     //Removes a robot from simulation
     virtual void removeRobot(robot_id rId) override;
 
-    virtual void step() override;
+    void changeTargetVelocity(robot_id rId, double xDot, double yDot, double thetaDot);
+
+    void step();
 };
 
 #endif // BASIC_PHYSICS_H
