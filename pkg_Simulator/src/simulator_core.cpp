@@ -27,22 +27,42 @@ _physicsEngine(physics), _userInterface(ui)
     connect(_userInterface, &Simulator_Ui_If::userSetMapInSimulation, this, &SimulatorCore::setSimMapFromFile);
     connect(this, &SimulatorCore::mapObjectsLoaded, _physicsEngine, &Simulator_Physics_If::newStaticShapes);
 
-    connect(_userInterface, &Simulator_Ui_If::userStartPhysics, _physicsEngine, &Simulator_Physics_If::start);
-    connect(_userInterface, &Simulator_Ui_If::userStopPhysics, _physicsEngine, &Simulator_Physics_If::stop);
-    connect(_userInterface, &Simulator_Ui_If::userSetPhysicsTick, _physicsEngine, &Simulator_Physics_If::setTick);
+    connect(this, &SimulatorCore::userStartPhysics, _physicsEngine, &Simulator_Physics_If::start);
+    connect(this, &SimulatorCore::userStopPhysics, _physicsEngine, &Simulator_Physics_If::stop);
+    connect(this, &SimulatorCore::userSetPhysicsTick, _physicsEngine, &Simulator_Physics_If::setTick);
+
+    connect(this, &SimulatorCore::physicsStarted, _userInterface, &Simulator_Ui_If::physicsStarted);
+    connect(this, &SimulatorCore::physicsStopped, _userInterface, &Simulator_Ui_If::physicsStopped);
+    connect(this, &SimulatorCore::physicsTickSet, _userInterface, &Simulator_Ui_If::physicsTickChanged);
+
+    connect(_userInterface, &Simulator_Ui_If::userStartPhysics, this, &SimulatorCore::userStartPhysics);
+    connect(_userInterface, &Simulator_Ui_If::userStopPhysics, this, &SimulatorCore::userStopPhysics);
+    connect(_userInterface, &Simulator_Ui_If::userSetPhysicsTick, this, &SimulatorCore::userSetPhysicsTick);
+
+    connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, this, &SimulatorCore::physicsStarted);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, this, &SimulatorCore::physicsStopped);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsTickSet, this, &SimulatorCore::physicsTickSet);
 
     connect(this, &SimulatorCore::errorMsg, _userInterface, &Simulator_Ui_If::errorMessage);
 }
 
 SimulatorCore::~SimulatorCore()
 {
-    //Stop physics engine
-    _physicsThread->quit();
-    _physicsThread->wait();
-
     //Destroy all remaining robots
     while(_activeRobots.size())
         removeSimRobot(_activeRobots.firstKey());
+
+    //Stop physics engine
+    userStopPhysics();
+    _physicsEngine->deleteLater();
+    _physicsThread->quit();
+    _physicsThread->wait();
+
+    //Destroy ui
+    _userInterface->deleteLater();
+
+    delete _robotLoader;
+    delete _mapLoader;
 }
 
 void SimulatorCore::start()
@@ -60,6 +80,8 @@ void SimulatorCore::start()
         iter.value()->setChannelList({"robot0/world_velocity"});
         QTimer::singleShot(10, iter.value(), &Robot::connectToROS);
     }
+
+    userSetPhysicsTick(100.0, 1.0/100.0);
 }
 
 void SimulatorCore::setSimMapFromFile(QString file)

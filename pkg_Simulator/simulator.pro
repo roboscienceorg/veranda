@@ -6,7 +6,7 @@ TARGET = sdsmt_simulator
 TEMPLATE = app
 
 INCLUDEPATH += include \
-               #Fixes Box2D autocomplete. Since the .pro isn't actually used to build, this is ok to hack \
+               # Hack to make box2d work with autocomplete in qtcreator
                ../pkg_Box2D/include
 
 SOURCES += \
@@ -17,8 +17,8 @@ SOURCES += \
     src/basic_maploader.cpp \
     src/basic_robotloader.cpp \
     src/robot.cpp \
-    \
-    src/ui/mainwindow.cpp
+\
+    src/ui/mainwindow.cpp \
     src/ui/emptysimwindow.cpp \
     src/simulator_core.cpp
 
@@ -43,7 +43,7 @@ HEADERS += \
 \
     include/robot.h \
     include/interfaces/screen_model_if.h \
-    include/ui/mainwindow.h
+    include/ui/mainwindow.h \
 \
     include/simulator_core.h \
     include/sdsmt_simulator/sensor_plugin.h \

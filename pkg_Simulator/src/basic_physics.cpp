@@ -1,5 +1,5 @@
 #include "basic_physics.h"
-
+#include <QDebug>
 BasicPhysics::BasicPhysics(QObject *parent) : Simulator_Physics_If(parent)
 {
     //No gravity for top down simulation
@@ -20,11 +20,15 @@ void BasicPhysics::start()
     tick->setTimerType(Qt::PreciseTimer);
 
     tick->start();
+
+    emit physicsStarted();
 }
 
 void BasicPhysics::stop()
 {
     tick->stop();
+
+    emit physicsStopped();
 }
 
 void BasicPhysics::clear()
@@ -38,6 +42,10 @@ void BasicPhysics::setTick(double rate_hz, double duration_s)
 {
     tickRate = rate_hz;
     stepTime = duration_s;
+
+    //TODO :: Update QTimer with new rate settings
+
+    emit physicsTickSet(tickRate, stepTime);
 }
 
 void BasicPhysics::newStaticShapes(QVector<b2Shape *> shapes)

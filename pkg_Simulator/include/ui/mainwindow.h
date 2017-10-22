@@ -48,8 +48,8 @@ public slots:
 
     //Slots to indicate that physics settings changed
     void physicsTickChanged(double rate_hz, double duration_s){}
-    void physicsStopped(){}
-    void physicsStarted(){}
+    void physicsStopped();
+    void physicsStarted();
 
     //Slot to throw an error message to the user
     void errorMessage(QString error){}

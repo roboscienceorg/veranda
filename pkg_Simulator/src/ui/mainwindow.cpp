@@ -100,42 +100,53 @@ void MainWindow::robotModeButtonClick()
     ui->robotModeButton->setEnabled(false);
 }
 
+void MainWindow::physicsStarted()
+{
+    play = true;
+    ui->playSimButton->setToolTip("Stop Simulation");
+    ui->playSimButton->setIcon(QIcon(":/sim/StopSimIcon"));
+    ui->playSimButton->setIconSize(QSize(32,32));
+
+    //disable options while simulation is running
+    ui->newSimButton->setEnabled(false);
+    ui->copySimButton->setEnabled(false);
+    ui->saveSimButton->setEnabled(false);
+    ui->deleteSimButton->setEnabled(false);
+    ui->mapModeButton->setEnabled(false);
+    ui->robotModeButton->setEnabled(false);
+    ui->buildToolsList->setEnabled(false);
+}
+
+void MainWindow::physicsStopped()
+{
+    play = false;
+    ui->playSimButton->setToolTip("Play Simulation");
+    ui->playSimButton->setIcon(QIcon(":/sim/PlaySimIcon"));
+    ui->playSimButton->setIconSize(QSize(32,32));
+
+    //enable options while simulation is running
+    ui->newSimButton->setEnabled(true);
+    ui->copySimButton->setEnabled(true);
+    ui->saveSimButton->setEnabled(true);
+    ui->deleteSimButton->setEnabled(true);
+    ui->mapModeButton->setEnabled(true);
+    ui->robotModeButton->setEnabled(true);
+    ui->buildToolsList->setEnabled(true);
+}
+
 //Simulation Mode Button Clicks
 void MainWindow::playSimButtonClick()
 {
     //Reset Simulation Now
     if (play)
     {
-        play = false;
-        ui->playSimButton->setToolTip("Play Simulation");
-        ui->playSimButton->setIcon(QIcon(":/sim/PlaySimIcon"));
-
-        //enable options while simulation is running
-        ui->newSimButton->setEnabled(true);
-        ui->copySimButton->setEnabled(true);
-        ui->saveSimButton->setEnabled(true);
-        ui->deleteSimButton->setEnabled(true);
-        ui->mapModeButton->setEnabled(true);
-        ui->robotModeButton->setEnabled(true);
-        ui->buildToolsList->setEnabled(true);
+        emit userStopPhysics();
     }
     //Play Simulation Now
     else
     {
-        play = true;
-        ui->playSimButton->setToolTip("Stop Simulation");
-        ui->playSimButton->setIcon(QIcon(":/sim/StopSimIcon"));
-
-        //disable options while simulation is running
-        ui->newSimButton->setEnabled(false);
-        ui->copySimButton->setEnabled(false);
-        ui->saveSimButton->setEnabled(false);
-        ui->deleteSimButton->setEnabled(false);
-        ui->mapModeButton->setEnabled(false);
-        ui->robotModeButton->setEnabled(false);
-        ui->buildToolsList->setEnabled(false);
+        emit userStartPhysics();
     }
-    ui->playSimButton->setIconSize(QSize(32,32));
 }
 void MainWindow::speedSimButtonClick()
 {

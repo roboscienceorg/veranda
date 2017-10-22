@@ -1,5 +1,7 @@
 #include "robot.h"
 
+#include <QDebug>
+
 Robot::Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors, QObject* parent) : QObject(parent), _body(body), _drivetrain(dt)
 {
     connect(_drivetrain, &DriveTrain_If::targetVelocity, this, &Robot::targetVelocity);
@@ -50,9 +52,9 @@ void Robot::actualPosition(double x, double y, double theta)
     _x = x;
     _y = y;
     _theta = theta;
+    _newPosition(_x, _y, _theta);
 }
 
 void Robot::worldTicked()
 {
-
 }
