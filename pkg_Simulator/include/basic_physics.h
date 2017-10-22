@@ -8,7 +8,7 @@
 
 struct robotWorldData{
     b2Body *robotBody;
-    robot_id rID;
+    Robot_Physics *robot;
     double xDot;
     double yDot;
     double thetaDot;

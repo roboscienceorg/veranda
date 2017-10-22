@@ -62,7 +62,7 @@ void BasicPhysics::addRobot(Robot_Physics *robot)
 
     b2BodyDef robotBodyDef;
     robotBodyDef.type = b2_dynamicBody;
-    robotBodyDef.position.Set(10.0f, 10.0f); //robot doesn't have position, but it needs it
+    robotBodyDef.position.Set(10.0f, 10.0f);
     b2Body* robotBody = world->CreateBody(&robotBodyDef);
     b2FixtureDef robotFixtureDef;
     robotFixtureDef.shape = robot->getBodyShape();
@@ -70,7 +70,7 @@ void BasicPhysics::addRobot(Robot_Physics *robot)
     robotFixtureDef.friction = 0.0f; //CONSIDER CHANGING
     robotBody->CreateFixture(&robotFixtureDef);
     robotWorldData r;
-    r.rID = robot->getRobotId();
+    r.robot = robot;
     r.robotBody = robotBody;
     robots.push_back(r);
 }
@@ -78,7 +78,7 @@ void BasicPhysics::addRobot(Robot_Physics *robot)
 void BasicPhysics::removeRobot(robot_id rId)
 {
     for(int i = 0; i < robots.size(); i++)
-        if(robots[i].rID == rId)
+        if(robots[i].robot->getRobotId() == rId)
         {
             world->DestroyBody(robots[i].robotBody);
             robots.erase(robots.begin() + i);
@@ -88,20 +88,20 @@ void BasicPhysics::removeRobot(robot_id rId)
 void BasicPhysics::changeTargetVelocity(robot_id rId, double xDot, double yDot, double thetaDot)
 {
     for(int i = 0; i < robots.size(); i++)
-        if(robots[i].rID == rId)
+        if(robots[i].robot->getRobotId() == rId)
         {
-            robots[i].xDot = xDot;
-            robots[i].yDot = yDot;
-            robots[i].thetaDot = thetaDot;
+            b2Vec2 v(xDot, yDot);
+            robots[i].robotBody->SetLinearVelocity(v);
         }
 }
 
 void BasicPhysics::step()
 {
+    world->Step(stepTime, 8, 3); //suggested values for velocity and position iterations
     for(int i = 0; i < robots.size(); i++)
     {
-        b2Vec2 velocity(robots[i].xDot, robots[i].yDot);
-        robots[i].robotBody->SetLinearVelocity(velocity);
+        b2Vec2 v = robots[i].robotBody->GetPosition();
+        robots[i].robot->setActualPosition(v.x, v.y, 0.0f);
+        robots[i].robot->notifyWorldTicked();
     }
-    world->Step(stepTime, 8, 3); //suggested values for velocity and position iterations
 }
