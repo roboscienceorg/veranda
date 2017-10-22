@@ -60,7 +60,6 @@ void Floating_Drivetrain::_incomingMessageSl(std_msgs::Float64MultiArray data)
 {
     if(sizeof(data.data) >= 2 * sizeof(std_msgs::Float64))
     {
-        qDebug() << "Setting target velocity to" << data.data[0] << data.data[1];
         targetVelocity(data.data[0], data.data[1], 0);
     }
 }

@@ -5,7 +5,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = sdsmt_simulator
 TEMPLATE = app
 
-INCLUDEPATH += include Box2D/Box2D
+INCLUDEPATH += include \
+               #Fixes Box2D autocomplete. Since the .pro isn't actually used to build, this is ok to hack \
+               ../pkg_Box2D/include
 
 SOURCES += \
     src/main.cpp \

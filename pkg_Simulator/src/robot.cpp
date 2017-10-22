@@ -47,7 +47,9 @@ void Robot::actualVelocity(double xDot, double yDot, double thetaDot)
 
 void Robot::actualPosition(double x, double y, double theta)
 {
-
+    _x = x;
+    _y = y;
+    _theta = theta;
 }
 
 void Robot::worldTicked()

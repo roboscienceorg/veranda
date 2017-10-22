@@ -3,8 +3,6 @@ from std_msgs.msg import Float64MultiArray
 from std_msgs.msg import MultiArrayLayout
 from std_msgs.msg import MultiArrayDimension
 import math
-import numpy as np
-from scipy.misc import derivative
 
 # Robot parameters
 R = 0.2

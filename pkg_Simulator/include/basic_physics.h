@@ -2,12 +2,31 @@
 #define BASIC_PHYSICS_H
 
 #include "interfaces/simulator_physics_if.h"
+#include <QTimer>
 
 #include <QObject>
+
+struct robotWorldData{
+    b2Body *robotBody;
+    Robot_Physics *robot;
+    double xDot;
+    double yDot;
+    double thetaDot;
+};
 
 class BasicPhysics : public Simulator_Physics_If
 {
     Q_OBJECT
+
+    b2World *world;
+
+    QVector<robotWorldData> robots;
+
+    QTimer* tick = nullptr;
+
+    double tickRate;
+    double stepTime;
+
 
 public:
     BasicPhysics(QObject* parent = nullptr);
@@ -31,6 +50,10 @@ public slots:
 
     //Removes a robot from simulation
     virtual void removeRobot(robot_id rId) override;
+
+    void changeTargetVelocity(robot_id rId, double xDot, double yDot, double thetaDot);
+
+    void step();
 };
 
 #endif // BASIC_PHYSICS_H

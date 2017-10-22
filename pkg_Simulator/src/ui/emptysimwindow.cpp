@@ -22,6 +22,8 @@ emptysimwindow::~emptysimwindow()
 void emptysimwindow::showMainWindow()
 {
     show();
+    emit userSetPhysicsTick(100.0f, 1.0f/100.0f);
+    emit userStartPhysics();
 }
 
 void emptysimwindow::robotAddedToSimulation(Robot_Properties* robot)

@@ -42,6 +42,8 @@ class Robot_Physics : public QObject, public Robot_Interface
 
     void _init()
     {
+        qRegisterMetaType<robot_id>("robot_id");
+
         connect(this, &Robot_Physics::setActualPosition, _observed, &Robot::actualPosition);
         connect(this, &Robot_Physics::setActualVelocity, _observed, &Robot::actualVelocity);
         connect(this, &Robot_Physics::notifyWorldTicked, _observed, &Robot::worldTicked);

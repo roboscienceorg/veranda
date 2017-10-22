@@ -16,6 +16,8 @@ class Robot : public QObject
 {
     Q_OBJECT
 
+    double _x=0, _y=0, _theta=0;
+
     b2Shape* _body;
     QVector<b2Shape*> _model;
 
@@ -57,10 +59,13 @@ public slots:
 signals:
     //Signals velocity that this robot wants to go, in global coordinates
     void targetVelocity(double xDot, double yDot, double thetaDot);
+
+    void _newPosition(double x, double y, double theta);
 };
 
 class RobotSensorsScreenModel : public ScreenModel_If
 {
+    Q_OBJECT
 public:
     RobotSensorsScreenModel(Robot* robot){}
 
@@ -73,16 +78,39 @@ public:
 
 class RobotBaseScreenModel : public ScreenModel_If
 {
+    Q_OBJECT
+
     b2Shape* robotBody;
     b2BlockAllocator alloc;
+
+    double _x, _y, _theta;
 public:
-    RobotBaseScreenModel(Robot* robot){robotBody = robot->getRobotBody()->Clone(&alloc);}
+    RobotBaseScreenModel(Robot* robot)
+    {
+        robotBody = robot->getRobotBody()->Clone(&alloc);
+        connect(robot, &Robot::_newPosition, this, &RobotBaseScreenModel::robotMoved);
+    }
 
     QVector<b2Shape*> getModel(){return QVector<b2Shape*>{robotBody};}
-    void getTransform(double& x, double& y, double& theta){}
+    void getTransform(double& x, double& y, double& theta)
+    {
+        x = _x;
+        y = _y;
+        theta = _theta;
+    }
 
     void setModel(QVector<b2Shape*> newModel){}
     void setTransform(double x, double y, double theta){}
+
+private slots:
+    void robotMoved(double x, double y, double theta)
+    {
+        _x = x;
+        _y = y;
+        _theta = theta;
+
+        transformChanged(this);
+    }
 };
 
 #endif // ROBOT_H
