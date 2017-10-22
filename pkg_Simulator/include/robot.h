@@ -65,6 +65,7 @@ signals:
 
 class RobotSensorsScreenModel : public ScreenModel_If
 {
+    Q_OBJECT
 public:
     RobotSensorsScreenModel(Robot* robot){}
 
@@ -77,6 +78,8 @@ public:
 
 class RobotBaseScreenModel : public ScreenModel_If
 {
+    Q_OBJECT
+
     b2Shape* robotBody;
     b2BlockAllocator alloc;
 
@@ -97,7 +100,7 @@ public:
     }
 
     void setModel(QVector<b2Shape*> newModel){}
-    void setTransform(double x, double y, double theta);
+    void setTransform(double x, double y, double theta){}
 
 private slots:
     void robotMoved(double x, double y, double theta)
