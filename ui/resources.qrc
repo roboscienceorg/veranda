@@ -1,56 +1,26 @@
 <RCC>
-    <qresource prefix="/new/MapModeIcon">
-        <file>images/MapMakerIcon.png</file>
+    <qresource prefix="/modes">
+        <file alias="MapIcon">images/MapMakerIcon.png</file>
+        <file alias="RobotIcon">images/RobotMakerIcon.png</file>
+        <file alias="SimulationIcon">images/SimulationIcon.png</file>
     </qresource>
-    <qresource prefix="/new/RobotModeIcon">
-        <file>images/RobotMakerIcon.png</file>
+    <qresource prefix="/generic">
+        <file alias="DeleteFileIcon">images/DeleteIcon.png</file>
+        <file alias="NewFileIcon">images/NewFileIcon.png</file>
+        <file alias="CopyFileIcon">images/CopyFileIcon.png</file>
+        <file alias="SaveFileIcon">images/SaveFileIcon.png</file>
+        <file alias="ImportFileIcon">images/ImportFileIcon.png</file>
+        <file alias="DeleteAllFileIcon">images/DeleteAllIcon.png</file>
     </qresource>
-    <qresource prefix="/new/SimModeIcon">
-        <file>images/SimulationIcon.png</file>
-    </qresource>
-    <qresource prefix="/Generic">
-        <file>images/DeleteIcon.png</file>
-    </qresource>
-    <qresource prefix="/simModeMenu">
-        <file>images/PlayIcon.png</file>
-    </qresource>
-    <qresource prefix="/simModeMenu">
-        <file>images/StopIcon.png</file>
-    </qresource>
-    <qresource prefix="/simModeMenu">
-        <file>images/SpeedOneIcon.png</file>
-    </qresource>
-    <qresource prefix="/simModeMenu">
-        <file>images/SpeedTwoIcon.png</file>
-    </qresource>
-    <qresource prefix="/simModeMenu">
-        <file>images/SpeedThreeIcon.png</file>
-    </qresource>
-    <qresource prefix="/simModeMenu">
-        <file>images/SpeedHalfIcon.png</file>
-    </qresource>
-    <qresource prefix="/Generic">
-        <file>images/NewFileIcon.png</file>
-    </qresource>
-    <qresource prefix="/Generic">
-        <file>images/CopyFileIcon.png</file>
-    </qresource>
-    <qresource prefix="/Generic">
-        <file>images/SaveFileIcon.png</file>
-    </qresource>
-    <qresource prefix="/Generic">
-        <file>images/ImportFileIcon.png</file>
-    </qresource>
-    <qresource prefix="/simModeMenu">
-        <file>images/ScreenshotIcon.png</file>
-    </qresource>
-    <qresource prefix="/simModeMenu">
-        <file>images/RecordIcon.png</file>
-    </qresource>
-    <qresource prefix="/simModeMenu">
-        <file>images/DontRecordIcon.png</file>
-    </qresource>
-    <qresource prefix="/Generic">
-        <file>images/DeleteAllIcon.png</file>
+    <qresource prefix="/sim">
+        <file alias="PlaySimIcon">images/PlayIcon.png</file>
+        <file alias="StopSimIcon">images/StopIcon.png</file>
+        <file alias="SpeedOneSimIcon">images/SpeedOneIcon.png</file>
+        <file alias="SpeedTwoSimIcon">images/SpeedTwoIcon.png</file>
+        <file alias="SpeedThreeSimIcon">images/SpeedThreeIcon.png</file>
+        <file alias="SpeedHalfSimIcon">images/SpeedHalfIcon.png</file>
+        <file alias="ScreenshotSimIcon">images/ScreenshotIcon.png</file>
+        <file alias="RecordSimIcon">images/RecordIcon.png</file>
+        <file alias="DontRecordSimIcon">images/DontRecordIcon.png</file>
     </qresource>
 </RCC>

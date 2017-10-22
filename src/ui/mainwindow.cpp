@@ -104,7 +104,7 @@ void MainWindow::playSimButtonClick()
     {
         play = false;
         ui->playSimButton->setToolTip("Play Simulation");
-        ui->playSimButton->setIcon(QIcon(":/simModeMenu/PlayIcon.png"));
+        ui->playSimButton->setIcon(QIcon(":/sim/PlaySimIcon"));
 
         //enable options while simulation is running
         ui->newSimButton->setEnabled(true);
@@ -120,7 +120,7 @@ void MainWindow::playSimButtonClick()
     {
         play = true;
         ui->playSimButton->setToolTip("Stop Simulation");
-        ui->playSimButton->setIcon(QIcon(":/simModeMenu/StopIcon.png"));
+        ui->playSimButton->setIcon(QIcon(":/sim/StopSimIcon"));
 
         //disable options while simulation is running
         ui->newSimButton->setEnabled(false);
@@ -139,25 +139,25 @@ void MainWindow::speedSimButtonClick()
     {
         speed = 2;
         ui->speedSimButton->setToolTip("Speed x3");
-        ui->speedSimButton->setIcon(QIcon(":/simModeMenu/SpeedTwoIcon.png"));
+        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedTwoSimIcon"));
     }
     else if (speed == 2)
     {
         speed = 3;
         ui->speedSimButton->setToolTip("Speed 1/2");
-        ui->speedSimButton->setIcon(QIcon(":/simModeMenu/SpeedThreeIcon.png"));
+        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedThreeSimIcon"));
     }
     else if (speed == 3)
     {
         speed = 0;
         ui->speedSimButton->setToolTip("Speed x1");
-        ui->speedSimButton->setIcon(QIcon(":/simModeMenu/SpeedHalfIcon.png"));
+        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedHalfSimIcon"));
     }
     else if (speed == 0)
     {
         speed = 1;
         ui->speedSimButton->setToolTip("Speed x2");
-        ui->speedSimButton->setIcon(QIcon(":/simModeMenu/SpeedOneIcon.png"));
+        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedOneSimIcon"));
     }
     ui->speedSimButton->setIconSize(QSize(32,32));
 }
@@ -168,14 +168,14 @@ void MainWindow::recordSimButtonClick()
     {
         record = false;
         ui->recordSimButton->setToolTip("Record Simulation");
-        ui->recordSimButton->setIcon(QIcon(":/simModeMenu/RecordIcon.png"));
+        ui->recordSimButton->setIcon(QIcon(":/sim/RecordSimIcon"));
     }
     //Play Simulation Now
     else
     {
         record = true;
         ui->recordSimButton->setToolTip("Dont Record Simulation");
-        ui->recordSimButton->setIcon(QIcon(":/simModeMenu/DontRecordIcon.png"));
+        ui->recordSimButton->setIcon(QIcon(":/sim/DontRecordSimIcon"));
     }
     ui->recordSimButton->setIconSize(QSize(32,32));
 }
