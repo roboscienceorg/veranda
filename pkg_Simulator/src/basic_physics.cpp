@@ -10,20 +10,21 @@ BasicPhysics::BasicPhysics(QObject *parent) : Simulator_Physics_If(parent)
     tickRate = 1;
     stepTime = 1;
 
-    connect(&tick, &QTimer::timeout, this, &BasicPhysics::step);
+    tick = new QTimer(this);
+    connect(tick, &QTimer::timeout, this, &BasicPhysics::step);
 }
 
 void BasicPhysics::start()
 {
-    tick.setInterval(1000.0f / tickRate);
-    tick.setTimerType(Qt::PreciseTimer);
+    tick->setInterval(1000.0f / tickRate);
+    tick->setTimerType(Qt::PreciseTimer);
 
-    tick.start();
+    tick->start();
 }
 
 void BasicPhysics::stop()
 {
-    tick.stop();
+    tick->stop();
 }
 
 void BasicPhysics::clear()

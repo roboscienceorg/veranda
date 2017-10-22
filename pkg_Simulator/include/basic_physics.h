@@ -22,7 +22,7 @@ class BasicPhysics : public Simulator_Physics_If
 
     QVector<robotWorldData> robots;
 
-    QTimer tick;
+    QTimer* tick = nullptr;
 
     double tickRate;
     double stepTime;
