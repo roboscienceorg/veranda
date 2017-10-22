@@ -54,8 +54,12 @@ void SimulatorCore::start()
     _userInterface->showMainWindow();
 
     addSimRobotFromFile("");
+
     for(auto iter = _activeRobots.begin(); iter != _activeRobots.end(); iter++)
+    {
+        iter.value()->setChannelList({"robot0/world_velocity"});
         QTimer::singleShot(10, iter.value(), &Robot::connectToROS);
+    }
 }
 
 void SimulatorCore::setSimMapFromFile(QString file)

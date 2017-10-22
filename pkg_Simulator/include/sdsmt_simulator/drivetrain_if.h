@@ -24,7 +24,7 @@ public:
     virtual QVector<QString> getChannelList() = 0;
 
     //Sets the names of ROS topics to use
-    virtual void setChannelList(QVector<QString>& channels) = 0;
+    virtual void setChannelList(const QVector<QString>& channels) = 0;
 
 signals:
     //Signals velocity that this drivetrain wants to go, in local coordinates

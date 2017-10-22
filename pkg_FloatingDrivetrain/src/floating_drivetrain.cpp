@@ -1,9 +1,12 @@
 #include "floating_drivetrain.h"
 #include "std_msgs/Float64.h"
+#include <QDebug>
 
 Floating_Drivetrain::Floating_Drivetrain(QObject *parent) : DriveTrain_If(parent)
 {
     connect(this, &Floating_Drivetrain::_incomingMessageSi, this, &Floating_Drivetrain::_incomingMessageSl);
+
+    qRegisterMetaType<std_msgs::Float64MultiArray>("std_msgs::Float64MultiArray");
 }
 
 QVector<QString> Floating_Drivetrain::getChannelDescriptions()
@@ -16,7 +19,7 @@ QVector<QString> Floating_Drivetrain::getChannelList()
     return QVector<QString>{_velocityChannel};
 }
 
-void Floating_Drivetrain::setChannelList(QVector<QString>& channels)
+void Floating_Drivetrain::setChannelList(const QVector<QString>& channels)
 {
     if(channels.size())
         _velocityChannel = channels[0];
@@ -57,6 +60,7 @@ void Floating_Drivetrain::_incomingMessageSl(std_msgs::Float64MultiArray data)
 {
     if(sizeof(data.data) >= 2 * sizeof(std_msgs::Float64))
     {
+        qDebug() << "Setting target velocity to" << data.data[0] << data.data[1];
         targetVelocity(data.data[0], data.data[1], 0);
     }
 }

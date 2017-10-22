@@ -19,6 +19,8 @@ class Robot : public QObject
     b2Shape* _body;
     QVector<b2Shape*> _model;
 
+    DriveTrain_If* _drivetrain;
+
 public:
     Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
 
@@ -33,7 +35,7 @@ public:
     virtual QVector<QString> getChannelList();
 
     //Sets the names of ROS topics to use
-    virtual void setChannelList(QVector<QString>& channels);
+    virtual void setChannelList(const QVector<QString> &channels);
 
 public slots:
     //Tells the robot to connect all its ROS topics

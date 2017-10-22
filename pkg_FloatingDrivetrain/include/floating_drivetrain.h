@@ -33,7 +33,7 @@ public:
     virtual QVector<QString> getChannelList();
 
     //Sets the names of ROS topics to use
-    virtual void setChannelList(QVector<QString>& channels);
+    virtual void setChannelList(const QVector<QString> &channels);
 
 signals:
     void _incomingMessageSi(std_msgs::Float64MultiArray);
