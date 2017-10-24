@@ -77,7 +77,8 @@ void SimulatorCore::start()
 
     for(auto iter = _activeRobots.begin(); iter != _activeRobots.end(); iter++)
     {
-        iter.value()->setChannelList({"robot0/world_velocity"});
+        //qDebug() << "Set channel property";
+        iter.value()->getAllProperties()["Float Drive/channels/input_velocities"].set("robot0/world_velocity");
         QTimer::singleShot(10, iter.value(), &Robot::connectToROS);
     }
 

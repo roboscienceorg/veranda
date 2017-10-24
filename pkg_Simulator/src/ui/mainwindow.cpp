@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QMessageBox>
+#include <QDebug>
 
 MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     Simulator_Ui_If(parent),
@@ -241,4 +242,7 @@ void MainWindow::robotAddedToSimulation(Robot_Properties* robot)
 {
     _visual->modelAddedToScreen(robot->createRobotBaseModel(), _modelNum++);
     _visual->modelAddedToScreen(robot->createRobotSensorsModel(), _modelNum++);
+
+    for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++)
+        connect(&iter.value(), &PropertyView::valueSet, [](QVariant v){qDebug() << v;});
 }

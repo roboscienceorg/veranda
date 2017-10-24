@@ -29,7 +29,6 @@ protected:
 
 public:
     Robot_Interface(Robot* observed, robot_id id) : _observed(observed), _id(id){}
-    Robot_Interface(Robot_Interface* interface) : _observed(interface->_observed), _id(interface->_id){}
 
     robot_id getRobotId() { return _id; }
 };
@@ -59,11 +58,6 @@ public:
         _init();
     }
 
-    Robot_Physics(Robot_Physics* interface) : QObject(interface->_observed), Robot_Interface(interface)
-    {
-        _init();
-    }
-
     const b2Shape* getBodyShape(){ return _body; }
 
 signals:
@@ -89,22 +83,19 @@ signals:
     void notifyWorldTicked();
 };
 
-class Robot_Properties : public QObject, public Robot_Interface
+class Robot_Properties : public PropertyObject_If, public Robot_Interface
 {
     Q_OBJECT
 
+    QMap<QString, PropertyView> _properties;
+
     void _init()
     {
-
+        _properties = _observed->getAllProperties();
     }
 
 public:
-    Robot_Properties(Robot* observed, robot_id id) : QObject(observed), Robot_Interface(observed, id)
-    {
-        _init();
-    }
-
-    Robot_Properties(Robot_Properties* interface) : QObject(interface->_observed), Robot_Interface(interface)
+    Robot_Properties(Robot* observed, robot_id id, QObject* parent=nullptr) : PropertyObject_If(observed), Robot_Interface(observed, id)
     {
         _init();
     }
@@ -119,6 +110,8 @@ public:
         return new RobotSensorsScreenModel(_observed);
     }
 
+    QString propertyGroupName(){ return ""; }
+    QMap<QString, PropertyView>& getAllProperties(){ return _properties; }
 signals:
     /****************************************************************
      * From Robot

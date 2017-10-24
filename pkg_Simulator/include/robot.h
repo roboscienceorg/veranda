@@ -9,10 +9,12 @@
 #include "interfaces/screen_model_if.h"
 
 #include <Box2D/Box2D.h>
+#include <QMap>
+#include <QMutex>
 
 typedef uint64_t robot_id;
 
-class Robot : public QObject
+class Robot : public PropertyObject_If
 {
     Q_OBJECT
 
@@ -23,21 +25,18 @@ class Robot : public QObject
 
     DriveTrain_If* _drivetrain;
 
+    QMap<QString, PropertyView> _properties;
+
+protected:
+    virtual QString propertyGroupName(){return "";}
+
 public:
     Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
 
     const b2Shape* getRobotBody();
     const QVector<b2Shape*>& getRobotModel();
 
-    //Gets descriptions for the channels this
-    //mediator uses; should map 1-1 to the return of getChannelList
-    virtual QVector<QString> getChannelDescriptions();
-
-    //Gets the current names of ROS topics to use
-    virtual QVector<QString> getChannelList();
-
-    //Sets the names of ROS topics to use
-    virtual void setChannelList(const QVector<QString> &channels);
+    QMap<QString, PropertyView>& getAllProperties(){ return _properties; }
 
 public slots:
     //Tells the robot to connect all its ROS topics

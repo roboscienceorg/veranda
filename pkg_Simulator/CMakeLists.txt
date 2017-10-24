@@ -46,6 +46,7 @@ set(MOC_HDRS
     include/sdsmt_simulator/drivetrain_if.h
     include/sdsmt_simulator/sensor_if.h
     include/sdsmt_simulator/robotcomponent_if.h
+    include/sdsmt_simulator/properties_if.h
 
     include/interfaces/robot_interfaces.h
     include/interfaces/simulator_physics_if.h

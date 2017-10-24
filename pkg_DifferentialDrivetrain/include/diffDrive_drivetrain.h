@@ -5,24 +5,23 @@
 #include "std_msgs/Float64MultiArray.h"
 
 #include <sdsmt_simulator/drivetrain_if.h>
-#include <sdsmt_simulator/properties_if.h>
 
 #include <QVector>
 #include <QString>
 #include <QObject>
-#include <QMap>
 
-class Floating_Drivetrain : public DriveTrain_If
+class DiffDrive_Drivetrain : public DriveTrain_If
 {
     Q_OBJECT
 
+    QString _velocityChannel;
     bool _connected = false;
 
     ros::NodeHandle _rosNode;
     ros::Subscriber _listenChannel;
 
     Property velocity_channel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
-                                                      "Input channel for velocity of the craft in world coords (x, y, theta)"), "");
+                                                      "Input channel for velocity of the craft's wheels"), "");
 
     Property velocity_x = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE,
                                      "Velocity of the craft in the x direction"), QVariant(0));
@@ -33,25 +32,48 @@ class Floating_Drivetrain : public DriveTrain_If
     Property velocity_theta = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE,
                                          "Rotational velocity of the craft"), QVariant(0));
 
+    Property wheel_radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+                                                  "Radius of wheels"), QVariant(0),
+                                                [](QVariant _old, QVariant _new)
+                                                {
+                                                    bool good;
+                                                    _new.toDouble(&good);
+                                                    if(good) return _new;
+                                                    return _old;
+                                                });
+
+    Property axle_length = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+                                                  "Length of full axle"), QVariant(0),
+                                                [](QVariant _old, QVariant _new)
+                                                {
+                                                    bool good;
+                                                    _new.toDouble(&good);
+                                                    if(good) return _new;
+                                                    return _old;
+                                                });
+
     QMap<QString, PropertyView> _properties{
         {"channels/input_velocities", PropertyView(&velocity_channel)},
         {"velocity/x", PropertyView(&velocity_x)},
         {"velocity/y", PropertyView(&velocity_y)},
-        {"velocity/theta", PropertyView(&velocity_theta)}
+        {"velocity/theta", PropertyView(&velocity_theta)},
+        {"wheel_radius", PropertyView(&wheel_radius)}
     };
 
+    void FK(const double& phi1, const double& phi2, double& xDot, double& yDot, double& thetaDot);
+
 public:
-    Floating_Drivetrain(QObject* parent=nullptr);
+    DiffDrive_Drivetrain(QObject* parent=nullptr);
 
     virtual QVector<b2Shape*> getModel();
 
-    virtual bool usesWorldCoords(){return true;}
+    virtual bool usesWorldCoords(){return false;}
 
     virtual QMap<QString, PropertyView>& getAllProperties(){
         return _properties;
     }
 
-    virtual QString propertyGroupName(){ return "Float Drive"; }
+    virtual QString propertyGroupName(){ return "Diff Drive"; }
 
 signals:
     void _incomingMessageSi(std_msgs::Float64MultiArray);
