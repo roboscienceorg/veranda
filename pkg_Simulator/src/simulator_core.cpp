@@ -13,9 +13,6 @@ QObject(parent),
 _mapLoader(mapLoad), _robotLoader(robotLoad),
 _physicsEngine(physics), _userInterface(ui)
 {
-    _physicsThread = new QThread(this);
-    _physicsEngine->moveToThread(_physicsThread);
-
     connect(_userInterface, &Simulator_Ui_If::userRemoveRobotFromSimulation, this, &SimulatorCore::removeSimRobot);
     connect(this, &SimulatorCore::robotRemoved, _userInterface, &Simulator_Ui_If::robotRemovedFromSimulation);
     connect(this, &SimulatorCore::robotRemoved, _physicsEngine, &Simulator_Physics_If::removeRobot);
@@ -55,8 +52,6 @@ SimulatorCore::~SimulatorCore()
     //Stop physics engine
     userStopPhysics();
     _physicsEngine->deleteLater();
-    _physicsThread->quit();
-    _physicsThread->wait();
 
     //Destroy ui
     _userInterface->deleteLater();
@@ -67,12 +62,13 @@ SimulatorCore::~SimulatorCore()
 
 void SimulatorCore::start()
 {
-    qInfo() << "Start physics engine";
-    _physicsThread->start();
+    //Set default physics tick rate
+    userSetPhysicsTick(100.0, 1.0/100.0);
 
-    qInfo() << "Show main window";
+    //Show UI
     _userInterface->showMainWindow();
 
+    //Add default robot
     addSimRobotFromFile("");
 
     for(auto iter = _activeRobots.begin(); iter != _activeRobots.end(); iter++)
@@ -81,8 +77,6 @@ void SimulatorCore::start()
         iter.value()->getAllProperties()["Float Drive/channels/input_velocities"].set("robot0/world_velocity");
         QTimer::singleShot(10, iter.value(), &Robot::connectToROS);
     }
-
-    userSetPhysicsTick(100.0, 1.0/100.0);
 }
 
 void SimulatorCore::setSimMapFromFile(QString file)
@@ -108,20 +102,12 @@ void SimulatorCore::addSimRobotFromFile(QString file)
         Robot_Physics* phys_interface = new Robot_Physics(newBot, _nextRobotId);
         Robot_Properties* prop_interface = new Robot_Properties(newBot, _nextRobotId);
 
-        //Put robot in its own thread
-        QThread* rThread = new QThread(this);
-        newBot->moveToThread(rThread);
-
         //Send out robot interfaces
         emit robotAdded(phys_interface);
         emit robotAdded(prop_interface);
 
         //Keep references to robot and thread
         _activeRobots[_nextRobotId] = newBot;
-        _robotThreads[_nextRobotId] = rThread;
-
-        //Start robot's thread
-        rThread->start();
 
         _nextRobotId++;
     }
@@ -138,17 +124,9 @@ void SimulatorCore::removeSimRobot(robot_id rId)
         //Signal that robot is no longer in simulation
         emit robotRemoved(rId);
 
-        //End thread the robot was running on
-        _robotThreads[rId]->quit();
-        _robotThreads[rId]->wait();
-
         //Delete robot object
         //This should delete all robot interfaces; they are children to it
         delete _activeRobots[rId];
         _activeRobots.remove(rId);
-
-        //Delete thread object
-        delete _robotThreads[rId];
-        _robotThreads.remove(rId);
     }
 }

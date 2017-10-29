@@ -21,12 +21,10 @@ class SimulatorCore : public QObject
     MapLoader_If* _mapLoader;
     RobotLoader_If* _robotLoader;
 
-    QThread* _physicsThread;
     Simulator_Physics_If* _physicsEngine;
     Simulator_Ui_If* _userInterface;
 
     robot_id _nextRobotId = 0;
-    QMap<robot_id, QThread*> _robotThreads;
     QMap<robot_id, Robot*> _activeRobots;
 
 public:
