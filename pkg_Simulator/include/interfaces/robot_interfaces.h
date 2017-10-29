@@ -37,19 +37,9 @@ class Robot_Physics : public QObject, public Robot_Interface
 {
     Q_OBJECT
 
-    const b2Shape* _body;
-
     void _init()
     {
-        qRegisterMetaType<robot_id>("robot_id");
-
-        connect(this, &Robot_Physics::setActualPosition, _observed, &Robot::actualPosition);
-        connect(this, &Robot_Physics::setActualVelocity, _observed, &Robot::actualVelocity);
         connect(this, &Robot_Physics::notifyWorldTicked, _observed, &Robot::worldTicked);
-
-        connect(_observed, &Robot::targetVelocity, [this](double x, double y, double z){targetVelocityChanged(_id, x, y, z);});
-
-        _body = _observed->getRobotBody();
     }
 
 public:
@@ -58,40 +48,25 @@ public:
         _init();
     }
 
-    const b2Shape* getBodyShape(){ return _body; }
+    //Sets b2Body for robot; robot populates with fixtures
+    void setPhysicsBody(b2Body* body)
+    {
+        _observed->setPhysicsBody(body);
+    }
 
 signals:
-   /****************************************************************
-    * Connect For Data From Robot
-    ****************************************************************/
-
-    //Signals velocity that this robot wants to go, in global coordinates
-    void targetVelocityChanged(robot_id, double xDot, double yDot, double thetaDot);
-
-    /****************************************************************
-     * Call To Update Robot
-     ****************************************************************/
-
-    //Tells the robot the speed it's actually going, in global coordinates
-    //Should be used for feedback to control code
-    void setActualVelocity(double xDot, double yDot, double thetaDot);
-
-    //Tells the robot it's world-space position
-    void setActualPosition(double x, double y, double theta);
-
     //Tells the robot that the world has updated
-    void notifyWorldTicked();
+    void notifyWorldTicked(const double t, const b2World*);
 };
 
 class Robot_Properties : public PropertyObject_If, public Robot_Interface
 {
     Q_OBJECT
 
-    QMap<QString, PropertyView> _properties;
-
     void _init()
     {
-        _properties = _observed->getAllProperties();
+        connect(this, &Robot_Properties::disconnectRobotFromROS, _observed, &Robot::disconnectFromROS);
+        connect(this, &Robot_Properties::connectRobotToROS, _observed, &Robot::connectToROS);
     }
 
 public:
@@ -110,21 +85,10 @@ public:
         return new RobotSensorsScreenModel(_observed);
     }
 
-    QString propertyGroupName(){ return ""; }
-    QMap<QString, PropertyView>& getAllProperties(){ return _properties; }
+    QString propertyGroupName(){ return _observed->propertyGroupName(); }
+    QMap<QString, PropertyView>& getAllProperties(){ return _observed->getAllProperties(); }
+
 signals:
-    /****************************************************************
-     * From Robot
-     ****************************************************************/
-
-    void robotPropertiesChanged(QVariantMap properties);
-
-    /****************************************************************
-     * To Robot
-     ****************************************************************/
-
-    void setRobotProperty(QString property, QVariant value);
-
     void disconnectRobotFromROS();
     void connectRobotToROS();
 };

@@ -21,7 +21,7 @@ public:
 
 signals:
     void modelChanged(ScreenModel_If*);
-    void transformChanged(ScreenModel_If*);
+    void transformChanged(ScreenModel_If*, double dx, double dy, double dt);
 };
 
 #endif // SCREEN_MODEL_H

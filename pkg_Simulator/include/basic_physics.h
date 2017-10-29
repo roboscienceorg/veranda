@@ -51,8 +51,6 @@ public slots:
     //Removes a robot from simulation
     virtual void removeRobot(robot_id rId) override;
 
-    void changeTargetVelocity(robot_id rId, double xDot, double yDot, double thetaDot);
-
     void step();
 };
 

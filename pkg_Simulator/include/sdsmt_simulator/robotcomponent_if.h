@@ -11,6 +11,9 @@ class RobotComponent_If : public PropertyObject_If
 {
     Q_OBJECT
 
+protected:
+    const b2World* _world = nullptr;
+
 public:
     RobotComponent_If(QObject* parent=nullptr) : PropertyObject_If(parent){}
 
@@ -19,6 +22,8 @@ public:
     virtual QVector<b2Shape*> getModel() = 0;
 
 public slots:
+    virtual void worldTicked(const double t, const b2World*, const b2Body*) = 0;
+
     //Connects to all ROS topics
     virtual void connectToROS() = 0;
 

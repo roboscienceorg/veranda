@@ -17,7 +17,7 @@ class BasicViewer : public Simulator_Visual_If
     Q_OBJECT
 
     QMap<model_id, ScreenModel_If*> _models;
-    QMap<ScreenModel_If*, QGraphicsEllipseItem*> _shapes;
+    QMap<ScreenModel_If*, QVector<QGraphicsItem*>> _shapes;
 
     QTimer _refresh;
 
@@ -36,7 +36,7 @@ public slots:
     void modelSelected(model_id id) override;
 
 private slots:
-    void modelMoved(ScreenModel_If* m);
+    void modelMoved(ScreenModel_If* m, double dx, double dy, double dt);
 };
 
 #endif // BASIC_VIEWER_H

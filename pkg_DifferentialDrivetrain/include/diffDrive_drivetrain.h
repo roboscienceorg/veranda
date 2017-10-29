@@ -92,6 +92,8 @@ public slots:
 
     //Disconnects all ROS topics
     virtual void disconnectFromROS();
+
+    virtual void worldTicked(const double t, const b2World*, const b2Body*){}
 };
 
 #endif // FLOATER_DRIVETRAIN_H

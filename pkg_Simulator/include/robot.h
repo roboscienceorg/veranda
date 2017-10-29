@@ -20,24 +20,23 @@ class Robot : public PropertyObject_If
 
     double _x=0, _y=0, _theta=0;
 
-    b2Shape* _body;
+    b2Body* _bodyPhysics;
     QVector<b2Shape*> _model;
 
     DriveTrain_If* _drivetrain;
+    QVector<Sensor_If*> _sensors;
 
     QMap<QString, PropertyView> _properties;
 
-protected:
-    virtual QString propertyGroupName(){return "";}
-
 public:
-    Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
+    Robot(QVector<b2Shape*> body, DriveTrain_If* dt, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
 
-    const b2Shape* getRobotBody();
-    const QVector<b2Shape*>& getRobotModel();
+    void setPhysicsBody(b2Body* body);
 
     QMap<QString, PropertyView>& getAllProperties(){ return _properties; }
+    const QVector<b2Shape*> getRobotModel(){return _model;}
 
+    virtual QString propertyGroupName(){return "";}
 public slots:
     //Tells the robot to connect all its ROS topics
     void connectToROS();
@@ -45,20 +44,12 @@ public slots:
     //Tells the robot to disconnect all its ROS topics
     void disconnectFromROS();
 
-    //Tells the robot the speed it's actually going, in global coordinates
-    //Should be used for feedback to control code
-    void actualVelocity(double xDot, double yDot, double thetaDot);
-
-    //Tells the robot it's world-space position
-    void actualPosition(double x, double y, double theta);
-
     //Tells the robot that the world has updated
-    void worldTicked();
+    void worldTicked(const double t, const b2World *world);
+
+    void targetVelocity(double x, double y, double theta);
 
 signals:
-    //Signals velocity that this robot wants to go, in global coordinates
-    void targetVelocity(double xDot, double yDot, double thetaDot);
-
     void _newPosition(double x, double y, double theta);
 };
 
@@ -79,18 +70,18 @@ class RobotBaseScreenModel : public ScreenModel_If
 {
     Q_OBJECT
 
-    b2Shape* robotBody;
+    QVector<b2Shape*> model;
     b2BlockAllocator alloc;
 
     double _x, _y, _theta;
 public:
     RobotBaseScreenModel(Robot* robot)
     {
-        robotBody = robot->getRobotBody()->Clone(&alloc);
+        model = robot->getRobotModel();
         connect(robot, &Robot::_newPosition, this, &RobotBaseScreenModel::robotMoved);
     }
 
-    QVector<b2Shape*> getModel(){return QVector<b2Shape*>{robotBody};}
+    QVector<b2Shape*> getModel(){return model;}
     void getTransform(double& x, double& y, double& theta)
     {
         x = _x;
@@ -104,11 +95,15 @@ public:
 private slots:
     void robotMoved(double x, double y, double theta)
     {
+        double dx = x - _x;
+        double dy = y - _y;
+        double dt = theta - _theta;
+
         _x = x;
         _y = y;
         _theta = theta;
 
-        transformChanged(this);
+        transformChanged(this, dx, dy, dt);
     }
 };
 

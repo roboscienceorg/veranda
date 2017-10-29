@@ -28,24 +28,31 @@ void BasicViewer::modelAddedToScreen(ScreenModel_If* model, model_id id)
             case b2Shape::Type::e_circle:
             {
                 b2CircleShape* circle = static_cast<b2CircleShape*>(s);
-                if(!_shapes[model])
-                {
-                    _shapes[model] = _scene->addEllipse(circle->m_p.x-circle->m_radius, circle->m_p.y-circle->m_radius,
-                                                        circle->m_radius*2, circle->m_radius*2);
-                    connect(model, &ScreenModel_If::transformChanged, this, &BasicViewer::modelMoved);
-                }
+                double r = circle->m_radius;
+                qDebug() << "Circle at " << circle->m_p.x << circle->m_p.y << ":" << circle->m_radius;
+                _shapes[model].push_back(_scene->addEllipse(circle->m_p.x-r, -(circle->m_p.y+r),
+                                            circle->m_radius*2, circle->m_radius*2));
+
+            }
+            case b2Shape::Type::e_edge:
+            {
+                b2EdgeShape* edge = static_cast<b2EdgeShape*>(s);
+                _shapes[model].push_back(_scene->addLine(edge->m_vertex1.x, -edge->m_vertex1.y, edge->m_vertex2.x, -edge->m_vertex2.y));
             }
             break;
         }
     }
+    connect(model, &ScreenModel_If::transformChanged, this, &BasicViewer::modelMoved);
+
 }
 
-void BasicViewer::modelMoved(ScreenModel_If *m)
+void BasicViewer::modelMoved(ScreenModel_If *m, double dx, double dy, double dt)
 {
-    double x, y, t;
-    m->getTransform(x, y, t);
-    _shapes[m]->setPos(x, y);
-    _shapes[m]->setRotation(t);
+    for(QGraphicsItem* i : _shapes[m])
+    {
+        i->moveBy(dx, -dy);
+        i->setRotation(i->rotation() + dt);
+    }
 }
 
 void BasicViewer::modelRemovedFromScreen(model_id id)

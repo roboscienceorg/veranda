@@ -13,8 +13,11 @@ QString BasicRobotLoader::loadRobotFile(QString file, Robot *&output)
     if(_drivetrains.size())
     {
         b2CircleShape* circle = new b2CircleShape;
-        circle->m_p.Set(10, 10);
+        circle->m_p.Set(0, 0);
         circle->m_radius = 10;
+
+        b2EdgeShape* line = new b2EdgeShape;
+        line->Set(b2Vec2(0, 0), b2Vec2(0, 10));
 
         //qDebug() << "Construct drivetrain";
         DriveTrain_If* dt;
@@ -24,7 +27,7 @@ QString BasicRobotLoader::loadRobotFile(QString file, Robot *&output)
             dt = _drivetrains.first()->createDrivetrain();
 
         //qDebug() << "Construct robot";
-        output = new Robot(circle, dt);
+        output = new Robot({circle, line}, dt);
         return "";
     }
     return "No drivetrains defined";
