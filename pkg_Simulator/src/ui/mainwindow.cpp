@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QMessageBox>
+#include <QFileDialog>
 
 MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     Simulator_Ui_If(parent),
@@ -9,10 +10,10 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    _makeWidget = factory;
+    makeWidget = factory;
 
     speed = 1;
-    _modelNum = 0;
+    modelNum = 0;
     play = false;
 
     //Initialize Widget Settings
@@ -26,8 +27,8 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     ui->mapModeButton->setEnabled(false);
     ui->modeLabel->setText("Map Mode");
 
-    _visual = _makeWidget();
-    ui->worldViewLayout->addWidget(_visual);
+    visual = makeWidget();
+    ui->worldViewLayout->addWidget(visual);
 
     //Main window button signals and slots
     connect(ui->showBuildObjectsButton, SIGNAL (released()), this, SLOT (showBuildObjectsButtonClick()));
@@ -43,6 +44,9 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
 
     //Simulation build tools widgets and slots
     connect(ui->chooseMapButton, SIGNAL (released()), this, SLOT (chooseMapButtonClick()));
+
+    //Build tools list and world view slots
+    connect(visual, SIGNAL (released()), this, SLOT (worldViewClick(QMouseEvent *eventPress)));
 }
 
 MainWindow::~MainWindow()
@@ -54,7 +58,7 @@ MainWindow::~MainWindow()
 void MainWindow::simModeButtonClick()
 {
     ui->modeLabel->setText("Simulation Mode");
-    ui->availabilityLabel->setText("Available Simulations");
+    ui->propertiesLabel->setText("Simulation Properties");
     ui->buildToolsLabel->setText("Simulation Build Tools");
 
     ui->simModeMenuWidget->setVisible(true);
@@ -70,7 +74,7 @@ void MainWindow::simModeButtonClick()
 void MainWindow::mapModeButtonClick()
 {
     ui->modeLabel->setText("Map Mode");
-    ui->availabilityLabel->setText("Available Maps");
+    ui->propertiesLabel->setText("Map Properties");
     ui->buildToolsLabel->setText("Map Build Tools");
 
     ui->simModeMenuWidget->setVisible(false);
@@ -86,7 +90,7 @@ void MainWindow::mapModeButtonClick()
 void MainWindow::robotModeButtonClick()
 {
     ui->modeLabel->setText("Robot Mode");
-    ui->availabilityLabel->setText("Available Robots");
+    ui->propertiesLabel->setText("Robot Properties");
     ui->buildToolsLabel->setText("Robot Build Tools");
 
     ui->simModeMenuWidget->setVisible(false);
@@ -100,43 +104,55 @@ void MainWindow::robotModeButtonClick()
     ui->robotModeButton->setEnabled(false);
 }
 
+void MainWindow::physicsStarted()
+{
+    play = true;
+    ui->playSimButton->setToolTip("Stop Simulation");
+    ui->playSimButton->setIcon(QIcon(":/sim/StopSimIcon"));
+    ui->playSimButton->setIconSize(QSize(32,32));
+
+    //disable options while simulation is running
+    ui->newSimButton->setEnabled(false);
+    ui->copySimButton->setEnabled(false);
+    ui->saveSimButton->setEnabled(false);
+    ui->deleteSimButton->setEnabled(false);
+    ui->mapModeButton->setEnabled(false);
+    ui->robotModeButton->setEnabled(false);
+    ui->buildToolsList->setEnabled(false);
+}
+
+void MainWindow::physicsStopped()
+{
+    play = false;
+    ui->playSimButton->setToolTip("Play Simulation");
+    ui->playSimButton->setIcon(QIcon(":/sim/PlaySimIcon"));
+    ui->playSimButton->setIconSize(QSize(32,32));
+
+    //enable options while simulation is running
+    ui->newSimButton->setEnabled(true);
+    ui->copySimButton->setEnabled(true);
+    ui->saveSimButton->setEnabled(true);
+    ui->deleteSimButton->setEnabled(true);
+    ui->mapModeButton->setEnabled(true);
+    ui->robotModeButton->setEnabled(true);
+    ui->buildToolsList->setEnabled(true);
+}
+
 //Simulation Mode Button Clicks
 void MainWindow::playSimButtonClick()
 {
     //Reset Simulation Now
     if (play)
     {
-        play = false;
-        ui->playSimButton->setToolTip("Play Simulation");
-        ui->playSimButton->setIcon(QIcon(":/sim/PlaySimIcon"));
-
-        //enable options while simulation is running
-        ui->newSimButton->setEnabled(true);
-        ui->copySimButton->setEnabled(true);
-        ui->saveSimButton->setEnabled(true);
-        ui->deleteSimButton->setEnabled(true);
-        ui->mapModeButton->setEnabled(true);
-        ui->robotModeButton->setEnabled(true);
-        ui->buildToolsList->setEnabled(true);
+        emit userStopPhysics();
     }
     //Play Simulation Now
     else
     {
-        play = true;
-        ui->playSimButton->setToolTip("Stop Simulation");
-        ui->playSimButton->setIcon(QIcon(":/sim/StopSimIcon"));
-
-        //disable options while simulation is running
-        ui->newSimButton->setEnabled(false);
-        ui->copySimButton->setEnabled(false);
-        ui->saveSimButton->setEnabled(false);
-        ui->deleteSimButton->setEnabled(false);
-        ui->mapModeButton->setEnabled(false);
-        ui->robotModeButton->setEnabled(false);
-        ui->buildToolsList->setEnabled(false);
+        emit userStartPhysics();
     }
-    ui->playSimButton->setIconSize(QSize(32,32));
 }
+
 void MainWindow::speedSimButtonClick()
 {
     if (speed == 1)
@@ -228,6 +244,17 @@ void MainWindow::chooseMapButtonClick()
 //Add robot to the simulation world view
 void MainWindow::robotAddedToSimulation(Robot_Properties* robot)
 {
-    _visual->modelAddedToScreen(robot->createRobotBaseModel(), _modelNum++);
-    _visual->modelAddedToScreen(robot->createRobotSensorsModel(), _modelNum++);
+    visual->modelAddedToScreen(robot->createRobotBaseModel(), modelNum++);
+    visual->modelAddedToScreen(robot->createRobotSensorsModel(), modelNum++);
+}
+
+void MainWindow::listProperties()
+{
+    //foreach property in future *selectedObject parameter,
+    //ui->propertiesView.add(property);
+}
+
+void MainWindow::listBuildTools(int mode)
+{
+
 }

@@ -27,6 +27,7 @@ class BasicViewer : public Simulator_Visual_If
 
 public:
     BasicViewer(QWidget* parent = nullptr);
+    QPointF mouseClickPosition;
 
 public slots:
     void modelAddedToScreen(ScreenModel_If* model, model_id id) override;
@@ -37,6 +38,7 @@ public slots:
 
 private slots:
     void modelMoved(ScreenModel_If* m);
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // BASIC_VIEWER_H

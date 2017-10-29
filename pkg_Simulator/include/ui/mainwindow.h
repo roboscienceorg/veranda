@@ -21,8 +21,8 @@ public:
 private:
     Q_OBJECT
 
-    visualizerFactory _makeWidget;
-    Simulator_Visual_If* _visual;
+    visualizerFactory makeWidget;
+    Simulator_Visual_If* visual;
 
 public:
     explicit MainWindow(visualizerFactory factory, QWidget *parent = 0);
@@ -30,7 +30,7 @@ public:
     int speed;
     bool play;
     bool record;
-    model_id _modelNum;
+    model_id modelNum;
 
 public slots:
     //Simulator core added a robot to simulation
@@ -48,14 +48,18 @@ public slots:
 
     //Slots to indicate that physics settings changed
     void physicsTickChanged(double rate_hz, double duration_s){}
-    void physicsStopped(){}
-    void physicsStarted(){}
+    void physicsStopped();
+    void physicsStarted();
 
     //Slot to throw an error message to the user
     void errorMessage(QString error){}
 
+    //Slot to show main window
     void showMainWindow(){ show(); }
+
 private slots:
+
+    //Slots for button clicks on all menus
     void simModeButtonClick();
     void mapModeButtonClick();
     void robotModeButtonClick();
@@ -65,6 +69,11 @@ private slots:
     void speedSimButtonClick();
     void recordSimButtonClick();
     void chooseMapButtonClick();
+
+    //Slots for build tools and properties
+    void listProperties();
+    void listBuildTools(int mode);
+
 private:
     Ui::MainWindow *ui;
 };

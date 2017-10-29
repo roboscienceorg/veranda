@@ -3,6 +3,8 @@
 #include <QPainter>
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QMouseEvent>
+#include <QMessageBox>
 
 
 BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
@@ -46,6 +48,21 @@ void BasicViewer::modelMoved(ScreenModel_If *m)
     m->getTransform(x, y, t);
     _shapes[m]->setPos(x, y);
     _shapes[m]->setRotation(t);
+}
+
+
+//World View Clicked
+void BasicViewer::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton)
+    {
+       QMessageBox *msgBox ;
+       msgBox = new QMessageBox();
+       msgBox->setWindowTitle("Hello");
+       msgBox->setText("You Clicked Left Mouse Button");
+       msgBox->show();
+       mouseClickPosition = event->pos();
+    }
 }
 
 void BasicViewer::modelRemovedFromScreen(model_id id)
