@@ -34,6 +34,11 @@ public slots:
 
     //Removes a robot from simulation
     virtual void removeRobot(robot_id rId) = 0;
+
+signals:
+    void physicsStarted();
+    void physicsStopped();
+    void physicsTickSet(double, double);
 };
 
 #endif // SIMULATOR_PHYSICS_H

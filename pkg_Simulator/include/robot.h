@@ -9,17 +9,26 @@
 #include "interfaces/screen_model_if.h"
 
 #include <Box2D/Box2D.h>
+#include <QMap>
+#include <QMutex>
 
 typedef uint64_t robot_id;
 
-class Robot : public QObject
+class Robot : public PropertyObject_If
 {
     Q_OBJECT
+
+    double _x=0, _y=0, _theta=0;
 
     b2Shape* _body;
     QVector<b2Shape*> _model;
 
     DriveTrain_If* _drivetrain;
+
+    QMap<QString, PropertyView> _properties;
+
+protected:
+    virtual QString propertyGroupName(){return "";}
 
 public:
     Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
@@ -27,15 +36,7 @@ public:
     const b2Shape* getRobotBody();
     const QVector<b2Shape*>& getRobotModel();
 
-    //Gets descriptions for the channels this
-    //mediator uses; should map 1-1 to the return of getChannelList
-    virtual QVector<QString> getChannelDescriptions();
-
-    //Gets the current names of ROS topics to use
-    virtual QVector<QString> getChannelList();
-
-    //Sets the names of ROS topics to use
-    virtual void setChannelList(const QVector<QString> &channels);
+    QMap<QString, PropertyView>& getAllProperties(){ return _properties; }
 
 public slots:
     //Tells the robot to connect all its ROS topics
@@ -57,10 +58,13 @@ public slots:
 signals:
     //Signals velocity that this robot wants to go, in global coordinates
     void targetVelocity(double xDot, double yDot, double thetaDot);
+
+    void _newPosition(double x, double y, double theta);
 };
 
 class RobotSensorsScreenModel : public ScreenModel_If
 {
+    Q_OBJECT
 public:
     RobotSensorsScreenModel(Robot* robot){}
 
@@ -73,16 +77,39 @@ public:
 
 class RobotBaseScreenModel : public ScreenModel_If
 {
+    Q_OBJECT
+
     b2Shape* robotBody;
     b2BlockAllocator alloc;
+
+    double _x, _y, _theta;
 public:
-    RobotBaseScreenModel(Robot* robot){robotBody = robot->getRobotBody()->Clone(&alloc);}
+    RobotBaseScreenModel(Robot* robot)
+    {
+        robotBody = robot->getRobotBody()->Clone(&alloc);
+        connect(robot, &Robot::_newPosition, this, &RobotBaseScreenModel::robotMoved);
+    }
 
     QVector<b2Shape*> getModel(){return QVector<b2Shape*>{robotBody};}
-    void getTransform(double& x, double& y, double& theta){}
+    void getTransform(double& x, double& y, double& theta)
+    {
+        x = _x;
+        y = _y;
+        theta = _theta;
+    }
 
     void setModel(QVector<b2Shape*> newModel){}
     void setTransform(double x, double y, double theta){}
+
+private slots:
+    void robotMoved(double x, double y, double theta)
+    {
+        _x = x;
+        _y = y;
+        _theta = theta;
+
+        transformChanged(this);
+    }
 };
 
 #endif // ROBOT_H

@@ -3,8 +3,6 @@ from std_msgs.msg import Float64MultiArray
 from std_msgs.msg import MultiArrayLayout
 from std_msgs.msg import MultiArrayDimension
 import math
-import numpy as np
-from scipy.misc import derivative
 
 # Robot parameters
 R = 0.2
@@ -12,10 +10,10 @@ L = 0.1
 
 # Location Functions to form a figure 8 of the necessary size
 def x_t(t, scale=1.0):
-    return math.sin(t/scale)
+    return 100*math.sin(t/scale)
 
 def y_t(t, scale=1.0):
-    return math.sin(t/scale)*math.cos(t/scale)
+    return 100*math.cos(t*2/scale)
 
 # Publishes a set of wheel velocities
 # in the format required by the STDR
@@ -38,7 +36,7 @@ if __name__ == '__main__':
         rospy.init_node('talker', anonymous=True)
         
         # Factor to scale down speed by
-        speedScale = 10
+        speedScale = 1
 
         # Start time at pi because that's the function lines up
         # with the robot starting location I've set

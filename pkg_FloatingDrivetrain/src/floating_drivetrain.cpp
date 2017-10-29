@@ -5,25 +5,18 @@
 Floating_Drivetrain::Floating_Drivetrain(QObject *parent) : DriveTrain_If(parent)
 {
     connect(this, &Floating_Drivetrain::_incomingMessageSi, this, &Floating_Drivetrain::_incomingMessageSl);
+    connect(&velocity_channel, &Property::valueSet, this, &Floating_Drivetrain::_channelChanged);
 
     qRegisterMetaType<std_msgs::Float64MultiArray>("std_msgs::Float64MultiArray");
+
+    //qDebug() << "Floating drivetrain properties";
+    //for(auto& p : _properties)
+        //qDebug() << &p;
 }
 
-QVector<QString> Floating_Drivetrain::getChannelDescriptions()
+void Floating_Drivetrain::_channelChanged(QVariant channel)
 {
-    return QVector<QString>{"Absolute world velocities : Float64MultiArray{ x, y }"};
-}
-
-QVector<QString> Floating_Drivetrain::getChannelList()
-{
-    return QVector<QString>{_velocityChannel};
-}
-
-void Floating_Drivetrain::setChannelList(const QVector<QString>& channels)
-{
-    if(channels.size())
-        _velocityChannel = channels[0];
-
+    //qDebug() << "Floating drivetrain channel changed to " << channel;
     if(_connected)
     {
         disconnectFromROS();
@@ -33,7 +26,9 @@ void Floating_Drivetrain::setChannelList(const QVector<QString>& channels)
 
 void Floating_Drivetrain::actualVelocity(double xDot, double yDot, double thetaDot)
 {
-
+    velocity_x.set(xDot);
+    velocity_y.set(yDot);
+    velocity_theta.set(thetaDot);
 }
 
 void Floating_Drivetrain::connectToROS()
@@ -41,7 +36,7 @@ void Floating_Drivetrain::connectToROS()
     if(_connected)
         disconnectFromROS();
 
-    _listenChannel = _rosNode.subscribe(_velocityChannel.toStdString(), 10, &Floating_Drivetrain::_incomingMessageSi, this);
+    _listenChannel = _rosNode.subscribe(velocity_channel.get().toString().toStdString(), 10, &Floating_Drivetrain::_incomingMessageSi, this);
     _connected = true;
 }
 
@@ -58,9 +53,12 @@ QVector<b2Shape*> Floating_Drivetrain::getModel()
 
 void Floating_Drivetrain::_incomingMessageSl(std_msgs::Float64MultiArray data)
 {
-    if(sizeof(data.data) >= 2 * sizeof(std_msgs::Float64))
+    if(sizeof(data.data) >= 3 * sizeof(std_msgs::Float64))
     {
-        qDebug() << "Setting target velocity to" << data.data[0] << data.data[1];
-        targetVelocity(data.data[0], data.data[1], 0);
+        velocity_x.set(data.data[0]);
+        velocity_y.set(data.data[1]);
+        velocity_theta.set(data.data[2]);
+
+        targetVelocity(data.data[0], data.data[1], data.data[2]);
     }
 }

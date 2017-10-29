@@ -3,6 +3,7 @@
 
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDebug>
 
 MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     Simulator_Ui_If(parent),
@@ -19,7 +20,6 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     //Initialize Widget Settings
     ui->buildToolsWidget->setVisible((false));
     ui->simModeMenuWidget->setVisible(false);
-    ui->chooseMapButton->setVisible(false);
     ui->robotModeMenuWidget->setVisible(false);
     ui->playSimButton->setToolTip("Play Simulation");
     ui->speedSimButton->setToolTip("Speed x2");
@@ -43,7 +43,7 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     connect(ui->recordSimButton, SIGNAL (released()), this, SLOT (recordSimButtonClick()));
 
     //Simulation build tools widgets and slots
-    connect(ui->chooseMapButton, SIGNAL (released()), this, SLOT (chooseMapButtonClick()));
+    connect(ui->importMapButton, SIGNAL (released()), this, SLOT (chooseMapButtonClick()));
 
     //Build tools list and world view slots
     connect(visual, SIGNAL (released()), this, SLOT (worldViewClick(QMouseEvent *eventPress)));
@@ -64,7 +64,6 @@ void MainWindow::simModeButtonClick()
     ui->simModeMenuWidget->setVisible(true);
     ui->mapModeMenuWidget->setVisible(false);
     ui->robotModeMenuWidget->setVisible(false);
-    ui->chooseMapButton->setVisible(true);
 
     //Enable/Disable Mode Buttons
     ui->robotModeButton->setEnabled(true);
@@ -80,7 +79,6 @@ void MainWindow::mapModeButtonClick()
     ui->simModeMenuWidget->setVisible(false);
     ui->mapModeMenuWidget->setVisible(true);
     ui->robotModeMenuWidget->setVisible(false);
-    ui->chooseMapButton->setVisible(false);
 
     //Enable/Disable Mode Buttons
     ui->robotModeButton->setEnabled(true);
@@ -96,7 +94,6 @@ void MainWindow::robotModeButtonClick()
     ui->simModeMenuWidget->setVisible(false);
     ui->mapModeMenuWidget->setVisible(false);
     ui->robotModeMenuWidget->setVisible(true);
-    ui->chooseMapButton->setVisible(false);
 
     //Enable/Disable Mode Buttons
     ui->simModeButton->setEnabled(true);
@@ -256,5 +253,6 @@ void MainWindow::listProperties()
 
 void MainWindow::listBuildTools(int mode)
 {
-
+    //for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++)
+        //connect(&iter.value(), &PropertyView::valueSet, [](QVariant v){qDebug() << v;});
 }

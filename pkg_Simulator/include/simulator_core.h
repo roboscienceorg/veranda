@@ -47,6 +47,14 @@ signals:
 
     void errorMsg(QString);
 
+    void userStartPhysics();
+    void userStopPhysics();
+    void userSetPhysicsTick(double, double);
+
+    void physicsStarted();
+    void physicsStopped();
+    void physicsTickSet(double, double);
+
 public slots:
     void setSimMapFromFile(QString file);
 

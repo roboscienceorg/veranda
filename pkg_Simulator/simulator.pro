@@ -5,7 +5,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = sdsmt_simulator
 TEMPLATE = app
 
-INCLUDEPATH += include Box2D/Box2D
+INCLUDEPATH += include \
+               # Hack to make box2d work with autocomplete in qtcreator
+               ../pkg_Box2D/include
 
 SOURCES += \
     src/main.cpp \
@@ -15,8 +17,8 @@ SOURCES += \
     src/basic_maploader.cpp \
     src/basic_robotloader.cpp \
     src/robot.cpp \
-    \
-    src/ui/mainwindow.cpp
+\
+    src/ui/mainwindow.cpp \
     src/ui/emptysimwindow.cpp \
     src/simulator_core.cpp
 
@@ -41,12 +43,13 @@ HEADERS += \
 \
     include/robot.h \
     include/interfaces/screen_model_if.h \
-    include/ui/mainwindow.h
+    include/ui/mainwindow.h \
 \
     include/simulator_core.h \
     include/sdsmt_simulator/sensor_plugin.h \
     include/sdsmt_simulator/drivetrain_plugin.h \
-    include/sdsmt_simulator/robotcomponent_if.h
+    include/sdsmt_simulator/robotcomponent_if.h \
+    include/sdsmt_simulator/properties_if.h
 
 FORMS    += \
     ui/mainwindow.ui \

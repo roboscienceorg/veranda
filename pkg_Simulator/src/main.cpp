@@ -121,15 +121,7 @@ int main(int argc, char** argv)
     * Run application
     ******************/
     //Start main app
-    int ret = app.exec();
-
-   /*******************
-    * Clean up
-    *******************/
-    delete mapLoader;
-    delete robotLoader;
-    delete physics;
-    delete userinterface;
+    int ret = app.exec();\
 
     return ret;
 }
