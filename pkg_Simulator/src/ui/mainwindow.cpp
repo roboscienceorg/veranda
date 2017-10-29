@@ -2,7 +2,10 @@
 #include "ui_mainwindow.h"
 
 #include <QMessageBox>
+#include <QFileDialog>
 #include <QDebug>
+#include <QDir>
+#include <QStandardItemModel>
 
 MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     Simulator_Ui_If(parent),
@@ -10,16 +13,15 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    _makeWidget = factory;
+    makeWidget = factory;
 
     speed = 1;
-    _modelNum = 0;
+    modelNum = 0;
     play = false;
 
     //Initialize Widget Settings
     ui->buildToolsWidget->setVisible((false));
     ui->simModeMenuWidget->setVisible(false);
-    ui->chooseMapButton->setVisible(false);
     ui->robotModeMenuWidget->setVisible(false);
     ui->playSimButton->setToolTip("Play Simulation");
     ui->speedSimButton->setToolTip("Speed x2");
@@ -27,8 +29,9 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     ui->mapModeButton->setEnabled(false);
     ui->modeLabel->setText("Map Mode");
 
-    _visual = _makeWidget();
-    ui->worldViewLayout->addWidget(_visual);
+    visual = makeWidget();
+    ui->worldViewLayout->addWidget(visual);
+    ui->propertiesTableView->verticalHeader()->setVisible(false);
 
     //Main window button signals and slots
     connect(ui->showBuildObjectsButton, SIGNAL (released()), this, SLOT (showBuildObjectsButtonClick()));
@@ -43,7 +46,10 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     connect(ui->recordSimButton, SIGNAL (released()), this, SLOT (recordSimButtonClick()));
 
     //Simulation build tools widgets and slots
-    connect(ui->chooseMapButton, SIGNAL (released()), this, SLOT (chooseMapButtonClick()));
+    connect(ui->importMapButton, SIGNAL (released()), this, SLOT (importMapButtonClick()));
+
+    //Build tools list and world view slots
+    connect(visual, SIGNAL (userSelectedModel(model_id id)), this, SLOT (modelSelected(model_id id)));
 }
 
 MainWindow::~MainWindow()
@@ -55,13 +61,12 @@ MainWindow::~MainWindow()
 void MainWindow::simModeButtonClick()
 {
     ui->modeLabel->setText("Simulation Mode");
-    ui->availabilityLabel->setText("Available Simulations");
+    ui->propertiesLabel->setText("Simulation Properties");
     ui->buildToolsLabel->setText("Simulation Build Tools");
 
     ui->simModeMenuWidget->setVisible(true);
     ui->mapModeMenuWidget->setVisible(false);
     ui->robotModeMenuWidget->setVisible(false);
-    ui->chooseMapButton->setVisible(true);
 
     //Enable/Disable Mode Buttons
     ui->robotModeButton->setEnabled(true);
@@ -71,13 +76,12 @@ void MainWindow::simModeButtonClick()
 void MainWindow::mapModeButtonClick()
 {
     ui->modeLabel->setText("Map Mode");
-    ui->availabilityLabel->setText("Available Maps");
+    ui->propertiesLabel->setText("Map Properties");
     ui->buildToolsLabel->setText("Map Build Tools");
 
     ui->simModeMenuWidget->setVisible(false);
     ui->mapModeMenuWidget->setVisible(true);
     ui->robotModeMenuWidget->setVisible(false);
-    ui->chooseMapButton->setVisible(false);
 
     //Enable/Disable Mode Buttons
     ui->robotModeButton->setEnabled(true);
@@ -87,13 +91,12 @@ void MainWindow::mapModeButtonClick()
 void MainWindow::robotModeButtonClick()
 {
     ui->modeLabel->setText("Robot Mode");
-    ui->availabilityLabel->setText("Available Robots");
+    ui->propertiesLabel->setText("Robot Properties");
     ui->buildToolsLabel->setText("Robot Build Tools");
 
     ui->simModeMenuWidget->setVisible(false);
     ui->mapModeMenuWidget->setVisible(false);
     ui->robotModeMenuWidget->setVisible(true);
-    ui->chooseMapButton->setVisible(false);
 
     //Enable/Disable Mode Buttons
     ui->simModeButton->setEnabled(true);
@@ -149,6 +152,7 @@ void MainWindow::playSimButtonClick()
         emit userStartPhysics();
     }
 }
+
 void MainWindow::speedSimButtonClick()
 {
     if (speed == 1)
@@ -213,7 +217,7 @@ void MainWindow::showMenuButtonClick()
 }
 
 //Simulation Build Tools Button Clicks
-void MainWindow::chooseMapButtonClick()
+void MainWindow::importMapButtonClick()
 {
     QMessageBox msgBox;
     msgBox.setText("WARNING: Changing the map will delete all robots from this simulation.");
@@ -222,10 +226,22 @@ void MainWindow::chooseMapButtonClick()
     msgBox.setDefaultButton(QMessageBox::No);
     int ret = msgBox.exec();
 
+    QDir directory;
+
     switch (ret) {
       case QMessageBox::Yes:
+        /*
+    {
           // Save was clicked
+          QString path = QFileDialog::getExistingDirectory (this, tr("Directory"), directory.path());
+          if ( path.isNull() == false )
+          {
+              directory.setPath(path);
+          }
           break;
+    }
+    */
+        break;
       case QMessageBox::No:
           // Don't Save was clicked
           break;
@@ -236,13 +252,76 @@ void MainWindow::chooseMapButtonClick()
 }
 
 //World View Slots
+void MainWindow::modelSelected(model_id id)
+{
+    try
+    {
+        selected = id;
+    }
+    catch (std::exception & e)
+    {
+      // do something with what...
+    }
+    catch (...)
+    {
+      // someone threw something undecypherable
+    }
+
+    Robot_Properties* robot = models[selected];
+    PropertyView selectedProperties;
+    QStandardItemModel* model;
+
+    model = new QStandardItemModel(12,2,this); //12 Rows and 2 Columns
+    model->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
+    model->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
+    ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->propertiesTableView->setModel(model);
+
+    //for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++)
+       // connect(&iter.value(), viewModel, [](QVariant v){qDebug() << v;});
+
+    //foreach property in future *selectedObject parameter,
+    //ui->propertiesListView.add(property);
+}
 
 //Add robot to the simulation world view
 void MainWindow::robotAddedToSimulation(Robot_Properties* robot)
 {
-    _visual->modelAddedToScreen(robot->createRobotBaseModel(), _modelNum++);
-    _visual->modelAddedToScreen(robot->createRobotSensorsModel(), _modelNum++);
+    models[modelNum] = robot;
+    visual->modelAddedToScreen(robot->createRobotBaseModel(), modelNum++);
+    models[modelNum] = robot;
+    visual->modelAddedToScreen(robot->createRobotSensorsModel(), modelNum++);
 
-    for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++)
-        connect(&iter.value(), &PropertyView::valueSet, [](QVariant v){qDebug() << v;});
+    selected = modelNum-1;
+    Robot_Properties* robot2 = models[selected];
+    QStandardItemModel* model;
+
+
+    model = new QStandardItemModel(robot2->getAllProperties().size(),2,this); //12 Rows and 2 Columns
+    model->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
+    model->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
+    ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->propertiesTableView->setModel(model);
+
+    int i = 0;
+    for(auto iter = robot2->getAllProperties().begin(); iter != robot2->getAllProperties().end(); iter++, i++)
+    {
+       QModelIndex ind = model->index(i, 0);
+       model->setData(ind, iter.key(), Qt::DisplayRole);
+       ind = model->index(i, 1);
+       bool readOnly = iter.value().info().readOnly;
+       qDebug() << iter.key() << iter.value().get();
+       model->setData(ind, iter.value().get(), readOnly ? Qt::DisplayRole : Qt::EditRole);
+       connect(&iter.value(), &PropertyView::valueSet, [i, model, ind, readOnly](QVariant v)
+       {
+           qDebug () << "Set model data " << v;
+           model->setData(ind, v, readOnly ? Qt::DisplayRole : Qt::EditRole);
+       });
+    }
+}
+
+void MainWindow::listBuildTools(int mode)
+{
+    //for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++)
+        //connect(&iter.value(), &PropertyView::valueSet, [](QVariant v){qDebug() << v;});
 }

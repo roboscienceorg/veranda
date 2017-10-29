@@ -21,8 +21,8 @@ public:
 private:
     Q_OBJECT
 
-    visualizerFactory _makeWidget;
-    Simulator_Visual_If* _visual;
+    visualizerFactory makeWidget;
+    Simulator_Visual_If* visual;
 
 public:
     explicit MainWindow(visualizerFactory factory, QWidget *parent = 0);
@@ -30,7 +30,9 @@ public:
     int speed;
     bool play;
     bool record;
-    model_id _modelNum;
+    model_id modelNum;
+    model_id selected;
+    QMap<model_id, Robot_Properties*> models;
 
 public slots:
     //Simulator core added a robot to simulation
@@ -54,8 +56,12 @@ public slots:
     //Slot to throw an error message to the user
     void errorMessage(QString error){}
 
+    //Slot to show main window
     void showMainWindow(){ show(); }
+
 private slots:
+
+    //Slots for button clicks on all menus
     void simModeButtonClick();
     void mapModeButtonClick();
     void robotModeButtonClick();
@@ -64,7 +70,12 @@ private slots:
     void playSimButtonClick();
     void speedSimButtonClick();
     void recordSimButtonClick();
-    void chooseMapButtonClick();
+    void importMapButtonClick();
+
+    //Slots for build tools and properties
+    void modelSelected(model_id id);
+    void listBuildTools(int mode);
+
 private:
     Ui::MainWindow *ui;
 };

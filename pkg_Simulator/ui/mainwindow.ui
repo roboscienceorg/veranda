@@ -23,7 +23,7 @@
       <height>794</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="mainLayout" stretch="0,0,0">
+    <layout class="QHBoxLayout" name="mainLayout" stretch="0,1,0">
      <item>
       <layout class="QHBoxLayout" name="menuLayout">
        <item>
@@ -473,7 +473,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="availabilityLabel">
+           <widget class="QLabel" name="propertiesLabel">
             <property name="frameShape">
              <enum>QFrame::Panel</enum>
             </property>
@@ -481,7 +481,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>Available Maps</string>
+             <string>Selected Object Properties</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -489,7 +489,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="listWidget"/>
+           <widget class="QTableView" name="propertiesTableView"/>
           </item>
          </layout>
         </widget>
@@ -626,13 +626,6 @@
           </item>
           <item>
            <widget class="QListWidget" name="buildToolsList"/>
-          </item>
-          <item>
-           <widget class="QPushButton" name="chooseMapButton">
-            <property name="text">
-             <string>Choose Map</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>
