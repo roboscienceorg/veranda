@@ -489,7 +489,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QTableView" name="propertiesView"/>
+           <widget class="QTableView" name="propertiesTableView"/>
           </item>
          </layout>
         </widget>

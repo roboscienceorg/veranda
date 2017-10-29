@@ -31,6 +31,8 @@ public:
     bool play;
     bool record;
     model_id modelNum;
+    model_id selected;
+    QMap<model_id, Robot_Properties*> models;
 
 public slots:
     //Simulator core added a robot to simulation
@@ -68,10 +70,10 @@ private slots:
     void playSimButtonClick();
     void speedSimButtonClick();
     void recordSimButtonClick();
-    void chooseMapButtonClick();
+    void importMapButtonClick();
 
     //Slots for build tools and properties
-    void listProperties();
+    void modelSelected(model_id id);
     void listBuildTools(int mode);
 
 private:
