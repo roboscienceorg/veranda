@@ -6,7 +6,11 @@
 #include <QMouseEvent>
 #include <QMessageBox>
 
+//ScreenModel_if - found in a header file
 
+//Constructor
+//Sets up widget with subwidget to view a graphics scene
+//makes the 
 BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
 {
     _children = new QVBoxLayout(this);
@@ -19,10 +23,16 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     setLayout(_children);
 }
 
+//Something new was added to the world view
+//It needs to get added to the graphics scene and indexed
+//When the model updates, (transformChanged) the graphics shape
+//needs to be moved within the scene
 void BasicViewer::modelAddedToScreen(ScreenModel_If* model, model_id id)
 {
+    //set the id to a model
     _models[id] = model;
 
+    //b2Shape types are what comes from physics engine
     for(b2Shape* s : model->getModel())
     {
         switch(s->m_type)
@@ -42,9 +52,12 @@ void BasicViewer::modelAddedToScreen(ScreenModel_If* model, model_id id)
     }
 }
 
+//Updates a graphics scene object to have a new
+//location
 void BasicViewer::modelMoved(ScreenModel_If *m)
 {
     double x, y, t;
+    //getTransform returns the x, y positions as well as the roation
     m->getTransform(x, y, t);
     _shapes[m]->setPos(x, y);
     _shapes[m]->setRotation(t);
@@ -65,20 +78,29 @@ void BasicViewer::mousePressEvent(QMouseEvent *event)
     }
 }
 
+//for after the MVP 
+//The model identified by model_id is no longer on the world
 void BasicViewer::modelRemovedFromScreen(model_id id)
 {
+   //
+
 }
 
+//The model identified by model_id is in the world, but should not be drawn
+//for users not wanting to see their sensors drawn
 void BasicViewer::modelDisabled(model_id id)
 {
 
 }
 
+//The model identified by model_id is in the world and should be drawn
 void BasicViewer::modelEnabled(model_id id)
 {
 
 }
 
+//The model identified by model_id has been selcted
+//maybe we draw a selection box around it?
 void BasicViewer::modelSelected(model_id id)
 {
 
