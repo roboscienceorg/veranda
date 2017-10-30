@@ -75,7 +75,6 @@ void SimulatorCore::start()
     {
         //qDebug() << "Set channel property";
         iter.value()->getAllProperties()["Float Drive/channels/input_velocities"].set("robot0/world_velocity");
-        QTimer::singleShot(10, iter.value(), &Robot::connectToROS);
     }
 }
 
@@ -99,6 +98,9 @@ void SimulatorCore::addSimRobotFromFile(QString file)
     QString error = _robotLoader->loadRobotFile(file, newBot);
     if(!error.size())
     {
+        connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, newBot, &Robot::connectToROS);
+        connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, newBot, &Robot::disconnectFromROS);
+
         Robot_Physics* phys_interface = new Robot_Physics(newBot, _nextRobotId);
         Robot_Properties* prop_interface = new Robot_Properties(newBot, _nextRobotId);
 
@@ -110,6 +112,11 @@ void SimulatorCore::addSimRobotFromFile(QString file)
         _activeRobots[_nextRobotId] = newBot;
 
         _nextRobotId++;
+
+        if(_physicsEngine->running())
+            newBot->connectToROS();
+        else
+            newBot->disconnectFromROS();
     }
     else
     {

@@ -37,6 +37,7 @@ public:
     const QVector<b2Shape*> getRobotModel(){return _model;}
 
     virtual QString propertyGroupName(){return "";}
+    void getTransform(double& x, double& y, double& theta){ x = _x; y = _y; theta = _theta;}
 public slots:
     //Tells the robot to connect all its ROS topics
     void connectToROS();
@@ -79,6 +80,7 @@ public:
     {
         model = robot->getRobotModel();
         connect(robot, &Robot::_newPosition, this, &RobotBaseScreenModel::robotMoved);
+        robot->getTransform(_x, _y, _theta);
     }
 
     QVector<b2Shape*> getModel(){return model;}

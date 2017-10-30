@@ -296,7 +296,6 @@ void MainWindow::robotAddedToSimulation(Robot_Properties* robot)
     Robot_Properties* robot2 = models[selected];
     QStandardItemModel* model;
 
-
     model = new QStandardItemModel(robot2->getAllProperties().size(),2,this); //12 Rows and 2 Columns
     model->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
     model->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
@@ -306,18 +305,30 @@ void MainWindow::robotAddedToSimulation(Robot_Properties* robot)
     int i = 0;
     for(auto iter = robot2->getAllProperties().begin(); iter != robot2->getAllProperties().end(); iter++, i++)
     {
-       QModelIndex ind = model->index(i, 0);
-       model->setData(ind, iter.key(), Qt::DisplayRole);
+       QModelIndex ind;
+
+       //Set key
+       ind = model->index(i, 0);
+       model->setData(ind, iter.key());
+
+       //Init value
        ind = model->index(i, 1);
-       bool readOnly = iter.value().info().readOnly;
-       qDebug() << iter.key() << iter.value().get();
-       model->setData(ind, iter.value().get(), readOnly ? Qt::DisplayRole : Qt::EditRole);
-       connect(&iter.value(), &PropertyView::valueSet, [i, model, ind, readOnly](QVariant v)
+       model->setData(ind, iter.value().get());
+
+       //Update value when it changes
+       connect(&iter.value(), &PropertyView::valueSet, [i, model, ind](QVariant v)
        {
-           qDebug () << "Set model data " << v;
-           model->setData(ind, v, readOnly ? Qt::DisplayRole : Qt::EditRole);
+           model->setData(ind, v);
        });
+
+       displayed_properties[i] = iter.key();
     }
+
+    connect(model, &QStandardItemModel::dataChanged, [this, robot2, model](QModelIndex tl, QModelIndex br)
+    {
+       for(int i = tl.row(); i <= br.row(); i++)
+           robot2->getAllProperties()[displayed_properties[i]].set(model->data(model->index(i, 1)));
+    });
 }
 
 void MainWindow::listBuildTools(int mode)

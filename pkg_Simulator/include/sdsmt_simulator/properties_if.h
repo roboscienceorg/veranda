@@ -83,43 +83,32 @@ class PropertyView : public QObject
     Q_OBJECT
 
     Property* _origin = nullptr;
-    PropertyInfo _info;
-    QVariant _value;
 
     void init()
     {
         if(_origin)
         {
-            connect(_origin, &Property::valueSet, this, &PropertyView::update);
+            connect(_origin, &Property::valueSet, this, &PropertyView::valueSet);
             connect(_origin, &Property::destroyed, [this](){_origin = nullptr;});
-            connect(this, &PropertyView::requestUpdate, _origin, &Property::_update);
             connect(this, &PropertyView::requestValue, _origin, &Property::_set);
-
-            requestUpdate();
         }
     }
 
 public:
     PropertyView(Property* origin=nullptr) : _origin(origin)
     {
-        if(origin)
-            _info = origin->_info;
-        //qDebug() << this << "of" << _origin;
         init();
     }
 
     PropertyView(const PropertyView& other) : _origin(other._origin)
     {
-        _info = other._info;
-        //qDebug() << this << "of" << _origin;
         init();
     }
 
     PropertyView& operator =(const PropertyView& other)
     {
-        _info = other._info;
         _origin = other._origin;
-        //qDebug() << this << "of" << _origin;
+        init();
 
         return *this;
     }
@@ -127,26 +116,19 @@ public:
     void set(const QVariant& value)
     {
         //qDebug() << "Set " << _origin << "from" << this;
-        if(!_info.readOnly)
+        if(_origin && !_origin->info().readOnly)
             requestValue(value);
     }
 
-    const PropertyInfo& info()
-    { return _info; }
+    const PropertyInfo info()
+    { return _origin ? _origin->info() : PropertyInfo(); }
 
-    const QVariant& get()
-    { return _value; }
+    const QVariant get()
+    { return _origin ? _origin->get() : QVariant(); }
 
 signals:
     void valueSet(QVariant);
     void requestValue(QVariant);
-    void requestUpdate();
-
-private slots:
-    void update(QVariant v)
-    {
-        _value = v;
-    }
 };
 
 class PropertyObject_If : public QObject

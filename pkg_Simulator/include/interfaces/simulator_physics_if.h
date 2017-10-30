@@ -15,6 +15,8 @@ class Simulator_Physics_If : public QObject
 public:
     Simulator_Physics_If(QObject* parent = nullptr) : QObject(parent){}
 
+    virtual bool running() = 0;
+
 public slots:
     virtual void start() = 0;
     virtual void stop() = 0;

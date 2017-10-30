@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStandardItem>
 
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/robot_interfaces.h"
@@ -24,15 +25,18 @@ private:
     visualizerFactory makeWidget;
     Simulator_Visual_If* visual;
 
-public:
-    explicit MainWindow(visualizerFactory factory, QWidget *parent = 0);
-    ~MainWindow();
     int speed;
     bool play;
     bool record;
     model_id modelNum;
     model_id selected;
     QMap<model_id, Robot_Properties*> models;
+
+    QMap<uint64_t, QString> displayed_properties;
+
+public:
+    explicit MainWindow(visualizerFactory factory, QWidget *parent = 0);
+    ~MainWindow();
 
 public slots:
     //Simulator core added a robot to simulation

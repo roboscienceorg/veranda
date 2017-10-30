@@ -78,6 +78,8 @@ void BasicPhysics::addRobot(Robot_Physics *robot)
     r.robot = robot;
     r.robotBody = robotBody;
     robots.push_back(r);
+
+    robot->notifyWorldTicked(0, world);
 }
 
 void BasicPhysics::removeRobot(robot_id rId)

@@ -34,6 +34,8 @@ void Robot::setPhysicsBody(b2Body* body)
 
             body->CreateFixture(&bodyDef);
         }
+        body->SetLinearVelocity(b2Vec2(0,0));
+        body->SetAngularVelocity(0);
     }
     _bodyPhysics = body;
 }

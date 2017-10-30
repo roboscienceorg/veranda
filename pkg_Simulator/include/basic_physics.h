@@ -31,6 +31,8 @@ class BasicPhysics : public Simulator_Physics_If
 public:
     BasicPhysics(QObject* parent = nullptr);
 
+    bool running(){return tick->isActive();}
+
 public slots:
     virtual void start() override;
     virtual void stop() override;

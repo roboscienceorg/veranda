@@ -41,7 +41,6 @@ void BasicViewer::modelAddedToScreen(ScreenModel_If* model, model_id id)
             {
                 b2CircleShape* circle = static_cast<b2CircleShape*>(s);
                 double r = circle->m_radius;
-                qDebug() << "Circle at " << circle->m_p.x << circle->m_p.y << ":" << circle->m_radius;
                 _shapes[model].push_back(_scene->addEllipse(circle->m_p.x-r, -(circle->m_p.y+r),
                                             circle->m_radius*2, circle->m_radius*2));
 
