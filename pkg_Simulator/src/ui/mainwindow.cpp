@@ -4,7 +4,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDebug>
-#include <QDir>
+#include <QDate>
 #include <QStandardItemModel>
 
 MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
@@ -43,7 +43,7 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     //Simulation mode button signals and slots
     connect(ui->playSimButton, SIGNAL (released()), this, SLOT (playSimButtonClick()));
     connect(ui->speedSimButton, SIGNAL (released()), this, SLOT (speedSimButtonClick()));
-    connect(ui->recordSimButton, SIGNAL (released()), this, SLOT (recordSimButtonClick()));
+    connect(ui->screenshotSimButton, SIGNAL (released()), this, SLOT (screenshotSimButtonClick()));
 
     //Simulation build tools widgets and slots
     connect(ui->importMapButton, SIGNAL (released()), this, SLOT (importMapButtonClick()));
@@ -112,10 +112,7 @@ void MainWindow::physicsStarted()
     ui->playSimButton->setIconSize(QSize(32,32));
 
     //disable options while simulation is running
-    ui->newSimButton->setEnabled(false);
-    ui->copySimButton->setEnabled(false);
     ui->saveSimButton->setEnabled(false);
-    ui->deleteSimButton->setEnabled(false);
     ui->mapModeButton->setEnabled(false);
     ui->robotModeButton->setEnabled(false);
     ui->buildToolsList->setEnabled(false);
@@ -129,10 +126,7 @@ void MainWindow::physicsStopped()
     ui->playSimButton->setIconSize(QSize(32,32));
 
     //enable options while simulation is running
-    ui->newSimButton->setEnabled(true);
-    ui->copySimButton->setEnabled(true);
     ui->saveSimButton->setEnabled(true);
-    ui->deleteSimButton->setEnabled(true);
     ui->mapModeButton->setEnabled(true);
     ui->robotModeButton->setEnabled(true);
     ui->buildToolsList->setEnabled(true);
@@ -152,7 +146,6 @@ void MainWindow::playSimButtonClick()
         emit userStartPhysics();
     }
 }
-
 void MainWindow::speedSimButtonClick()
 {
     if (speed == 1)
@@ -181,23 +174,22 @@ void MainWindow::speedSimButtonClick()
     }
     ui->speedSimButton->setIconSize(QSize(32,32));
 }
-void MainWindow::recordSimButtonClick()
+void MainWindow::screenshotSimButtonClick()
 {
-    //Reset Simulation Now
-    if (record)
-    {
-        record = false;
-        ui->recordSimButton->setToolTip("Record Simulation");
-        ui->recordSimButton->setIcon(QIcon(":/sim/RecordSimIcon"));
-    }
-    //Play Simulation Now
-    else
-    {
-        record = true;
-        ui->recordSimButton->setToolTip("Dont Record Simulation");
-        ui->recordSimButton->setIcon(QIcon(":/sim/DontRecordSimIcon"));
-    }
-    ui->recordSimButton->setIconSize(QSize(32,32));
+    visual->setStyleSheet("border: 2 solid red");
+    QPixmap pixmap(visual->size());
+    visual->render(&pixmap);
+    qint64 current = QDateTime::currentMSecsSinceEpoch();
+    //QString fileName = current.toString();
+
+    //std::stringstream ss;
+    //ss << current;
+    QString fileName = QString::number(current);
+
+    QFile file(fileName);
+    file.open(QIODevice::WriteOnly);
+    pixmap.save(&file, "PNG");
+    visual->setStyleSheet("");
 }
 
 //Show Menu Button Clicks
@@ -226,22 +218,13 @@ void MainWindow::importMapButtonClick()
     msgBox.setDefaultButton(QMessageBox::No);
     int ret = msgBox.exec();
 
-    QDir directory;
-
     switch (ret) {
       case QMessageBox::Yes:
-        /*
-    {
+      {
           // Save was clicked
-          QString path = QFileDialog::getExistingDirectory (this, tr("Directory"), directory.path());
-          if ( path.isNull() == false )
-          {
-              directory.setPath(path);
-          }
+          QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),"/home", tr("Images (*.png *.xpm *.jpg);;Map (*.map)"));
           break;
-    }
-    */
-        break;
+      }
       case QMessageBox::No:
           // Don't Save was clicked
           break;
@@ -268,20 +251,29 @@ void MainWindow::modelSelected(model_id id)
     }
 
     Robot_Properties* robot = models[selected];
-    PropertyView selectedProperties;
     QStandardItemModel* model;
 
-    model = new QStandardItemModel(12,2,this); //12 Rows and 2 Columns
+    model = new QStandardItemModel(robot->getAllProperties().size(),2,this); //N Rows and 2 Columns
     model->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
     model->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
     ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->propertiesTableView->setModel(model);
 
-    //for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++)
-       // connect(&iter.value(), viewModel, [](QVariant v){qDebug() << v;});
-
-    //foreach property in future *selectedObject parameter,
-    //ui->propertiesListView.add(property);
+    int i = 0;
+    for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++, i++)
+    {
+       QModelIndex ind = model->index(i, 0);
+       model->setData(ind, iter.key(), Qt::DisplayRole);
+       ind = model->index(i, 1);
+       bool readOnly = iter.value().info().readOnly;
+       qDebug() << iter.key() << iter.value().get();
+       model->setData(ind, iter.value().get(), readOnly ? Qt::DisplayRole : Qt::EditRole);
+       connect(&iter.value(), &PropertyView::valueSet, [i, model, ind, readOnly](QVariant v)
+       {
+           qDebug () << "Set model data " << v;
+           model->setData(ind, v, readOnly ? Qt::DisplayRole : Qt::EditRole);
+       });
+    }
 }
 
 //Add robot to the simulation world view
@@ -292,12 +284,12 @@ void MainWindow::robotAddedToSimulation(Robot_Properties* robot)
     models[modelNum] = robot;
     visual->modelAddedToScreen(robot->createRobotSensorsModel(), modelNum++);
 
+    //take out from here to end of function after update to get clickable world view objects
     selected = modelNum-1;
     Robot_Properties* robot2 = models[selected];
     QStandardItemModel* model;
 
-
-    model = new QStandardItemModel(robot2->getAllProperties().size(),2,this); //12 Rows and 2 Columns
+    model = new QStandardItemModel(robot2->getAllProperties().size(),2,this); //N Rows and 2 Columns
     model->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
     model->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
     ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -318,6 +310,7 @@ void MainWindow::robotAddedToSimulation(Robot_Properties* robot)
            model->setData(ind, v, readOnly ? Qt::DisplayRole : Qt::EditRole);
        });
     }
+    //yup, all the way to here - delete
 }
 
 void MainWindow::listBuildTools(int mode)

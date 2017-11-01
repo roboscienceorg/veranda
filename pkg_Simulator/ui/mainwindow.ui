@@ -122,27 +122,7 @@
           </item>
           <item>
            <widget class="QWidget" name="simModeMenuWidget" native="true">
-            <layout class="QHBoxLayout" name="simulationMenuLayout" stretch="0,0,0,0,0,0,0,0">
-             <item>
-              <widget class="QToolButton" name="newSimButton">
-               <property name="toolTip">
-                <string>New Simulation</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/generic/NewFileIcon</normaloff>:/generic/NewFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
+            <layout class="QHBoxLayout" name="simulationMenuLayout" stretch="0,0,0,0">
              <item>
               <widget class="QToolButton" name="saveSimButton">
                <property name="toolTip">
@@ -164,67 +144,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QToolButton" name="copySimButton">
-               <property name="toolTip">
-                <string>Copy Simulation</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/generic/CopyFileIcon</normaloff>:/generic/CopyFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="deleteSimButton">
-               <property name="toolTip">
-                <string>Delete Simulation</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/generic/DeleteFileIcon</normaloff>:/generic/DeleteFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="recordSimButton">
-               <property name="toolTip">
-                <string>Record Simulation</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/sim/RecordSimIcon</normaloff>:/sim/RecordSimIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="screenshotButton">
+              <widget class="QToolButton" name="screenshotSimButton">
                <property name="toolTip">
                 <string>Take Screenshot</string>
                </property>
@@ -284,26 +204,6 @@
            <widget class="QWidget" name="mapModeMenuWidget" native="true">
             <layout class="QHBoxLayout" name="mapModeMenuLayout">
              <item>
-              <widget class="QToolButton" name="newMapButton">
-               <property name="toolTip">
-                <string>New Map</string>
-               </property>
-               <property name="text">
-                <string>New</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/generic/NewFileIcon</normaloff>:/generic/NewFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
               <widget class="QToolButton" name="saveMapButton">
                <property name="toolTip">
                 <string>Import Image File as Map</string>
@@ -334,46 +234,6 @@
                <property name="icon">
                 <iconset resource="resources.qrc">
                  <normaloff>:/generic/ImportFileIcon</normaloff>:/generic/ImportFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="copyMapButton">
-               <property name="toolTip">
-                <string>Copy Map</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/generic/CopyFileIcon</normaloff>:/generic/CopyFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="deleteMapButton">
-               <property name="toolTip">
-                <string>Delete Map</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/generic/DeleteFileIcon</normaloff>:/generic/DeleteFileIcon</iconset>
                </property>
                <property name="iconSize">
                 <size>

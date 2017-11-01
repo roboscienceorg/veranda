@@ -69,7 +69,7 @@ private slots:
     void showMenuButtonClick();
     void playSimButtonClick();
     void speedSimButtonClick();
-    void recordSimButtonClick();
+    void screenshotSimButtonClick();
     void importMapButtonClick();
 
     //Slots for build tools and properties
