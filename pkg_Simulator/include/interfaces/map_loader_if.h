@@ -5,11 +5,12 @@
 #include <QVector>
 
 #include <Box2D/Box2D.h>
+#include "map.h"
 
 class MapLoader_If
 {
 public:
-    virtual QString loadMapFile(QString file, QVector<b2Shape*>& result) = 0;
+    virtual Map* loadMapFile(QString filename) = 0;
 };
 
 #endif // MAP_LOADER_IF_H

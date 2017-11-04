@@ -76,7 +76,8 @@ set(CPP_SRCS
     src/simulator_core.cpp
     src/robot.cpp
 
-    src/ui/emptysimwindow.cpp)
+    src/ui/emptysimwindow.cpp
+    src/map.cpp)
 
 ###########
 ## Build ##

@@ -19,7 +19,8 @@ SOURCES += \
     src/robot.cpp \
     \
     src/ui/emptysimwindow.cpp \
-    src/simulator_core.cpp
+    src/simulator_core.cpp \
+    src/map.cpp
 
 
 HEADERS += \
@@ -45,7 +46,8 @@ HEADERS += \
     include/simulator_core.h \
     include/sdsmt_simulator/sensor_plugin.h \
     include/sdsmt_simulator/drivetrain_plugin.h \
-    include/sdsmt_simulator/robotcomponent_if.h
+    include/sdsmt_simulator/robotcomponent_if.h \
+    include/map.h
 
 
 FORMS += \

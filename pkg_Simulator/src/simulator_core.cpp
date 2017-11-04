@@ -65,7 +65,8 @@ void SimulatorCore::start()
 void SimulatorCore::setSimMapFromFile(QString file)
 {
     QVector<b2Shape*> mapShapes;
-    QString error = _mapLoader->loadMapFile(file, mapShapes);
+    QString error;
+    _mapLoader->loadMapFile(file);
     if(!error.size())
     {
         emit mapObjectsLoaded(mapShapes);
