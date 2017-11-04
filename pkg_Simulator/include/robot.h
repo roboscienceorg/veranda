@@ -10,7 +10,7 @@
 
 #include <Box2D/Box2D.h>
 #include <QMap>
-#include <QMutex>
+#include <QDebug>
 
 typedef uint64_t robot_id;
 
@@ -19,6 +19,7 @@ class Robot : public PropertyObject_If
     Q_OBJECT
 
     double _x=0, _y=0, _theta=0;
+    double _x0=0, _y0=0, _theta0=0;
 
     b2Body* _bodyPhysics;
     QVector<b2Shape*> _model;
@@ -29,7 +30,7 @@ class Robot : public PropertyObject_If
     QMap<QString, PropertyView> _properties;
 
 public:
-    Robot(QVector<b2Shape*> body, DriveTrain_If* dt, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
+    Robot(QVector<b2Shape*> body, DriveTrain_If* dt, double x0, double y0, double theta0, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
 
     void setPhysicsBody(b2Body* body);
 

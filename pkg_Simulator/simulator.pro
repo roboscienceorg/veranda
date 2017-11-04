@@ -49,8 +49,7 @@ HEADERS += \
     include/sdsmt_simulator/sensor_plugin.h \
     include/sdsmt_simulator/drivetrain_plugin.h \
     include/sdsmt_simulator/robotcomponent_if.h \
-    include/sdsmt_simulator/properties_if.h \
-    include/sdsmt_simulator/shapes_if.h
+    include/sdsmt_simulator/properties_if.h
 
 FORMS    += \
     ui/mainwindow.ui \

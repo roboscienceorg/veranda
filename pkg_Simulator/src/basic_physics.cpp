@@ -69,7 +69,7 @@ void BasicPhysics::addRobot(Robot_Physics *robot)
 {
     b2BodyDef robotBodyDef;
     robotBodyDef.type = b2_dynamicBody;
-    robotBodyDef.position.Set(10.0f, 10.0f);
+    robotBodyDef.position.Set(0,0);
     b2Body* robotBody = world->CreateBody(&robotBodyDef);
 
     robot->setPhysicsBody(robotBody);

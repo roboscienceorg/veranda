@@ -46,6 +46,7 @@ public:
     virtual QVector<b2Shape*> getModel();
 
     virtual bool usesWorldCoords(){return true;}
+    virtual bool usesDegrees(){return false;}
 
     virtual QMap<QString, PropertyView>& getAllProperties(){
         return _properties;

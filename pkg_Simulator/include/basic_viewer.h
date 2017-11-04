@@ -12,6 +12,8 @@
 
 #include <Box2D/Box2D.h>
 
+constexpr uint64_t WORLD_SCALE = 20;
+
 class BasicViewer : public Simulator_Visual_If
 {
     Q_OBJECT

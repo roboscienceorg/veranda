@@ -16,6 +16,9 @@ public:
     //as being in world coordinates. Otherwise, they are in robot coordinates
     virtual bool usesWorldCoords() = 0;
 
+    //True if the theta and thetaDot values should be in degrees
+    virtual bool usesDegrees() = 0;
+
 signals:
     //Signals velocity that this drivetrain wants to go, in local coordinates
     void targetVelocity(double xDot, double yDot, double thetaDot);

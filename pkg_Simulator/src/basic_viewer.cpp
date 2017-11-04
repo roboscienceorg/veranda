@@ -32,25 +32,37 @@ void BasicViewer::modelAddedToScreen(ScreenModel_If* model, model_id id)
     //set the id to a model
     _models[id] = model;
 
+    double x, y, t;
+    model->getTransform(x, y, t);
+
     //b2Shape types are what comes from physics engine
     for(b2Shape* s : model->getModel())
     {
+        QGraphicsItem* newShape = nullptr;
         switch(s->m_type)
         {
             case b2Shape::Type::e_circle:
             {
                 b2CircleShape* circle = static_cast<b2CircleShape*>(s);
                 double r = circle->m_radius;
-                _shapes[model].push_back(_scene->addEllipse(circle->m_p.x-r, -(circle->m_p.y+r),
-                                            circle->m_radius*2, circle->m_radius*2));
+                newShape = _scene->addEllipse(circle->m_p.x-r * WORLD_SCALE, -(circle->m_p.y+r) * WORLD_SCALE,
+                                            circle->m_radius*2 * WORLD_SCALE, circle->m_radius*2 * WORLD_SCALE);
 
             }
+            break;
             case b2Shape::Type::e_edge:
             {
                 b2EdgeShape* edge = static_cast<b2EdgeShape*>(s);
-                _shapes[model].push_back(_scene->addLine(edge->m_vertex1.x, -edge->m_vertex1.y, edge->m_vertex2.x, -edge->m_vertex2.y));
+                newShape = _scene->addLine(edge->m_vertex1.x * WORLD_SCALE, -edge->m_vertex1.y * WORLD_SCALE,
+                                           edge->m_vertex2.x * WORLD_SCALE, -edge->m_vertex2.y * WORLD_SCALE);
             }
             break;
+        }
+        if(newShape)
+        {
+            _shapes[model].push_back(newShape);
+            newShape->moveBy(x * WORLD_SCALE, -y * WORLD_SCALE);
+            newShape->setRotation(-t);
         }
     }
     connect(model, &ScreenModel_If::transformChanged, this, &BasicViewer::modelMoved);
@@ -62,10 +74,17 @@ void BasicViewer::modelAddedToScreen(ScreenModel_If* model, model_id id)
 //location
 void BasicViewer::modelMoved(ScreenModel_If *m, double dx, double dy, double dt)
 {
+    double x, y, t;
+    m->getTransform(x, y, t);
+    x *= WORLD_SCALE;
+    y *= WORLD_SCALE;
+    dx *= WORLD_SCALE;
+    dy *= WORLD_SCALE;
+
     for(QGraphicsItem* i : _shapes[m])
     {
         i->moveBy(dx, -dy);
-        i->setRotation(i->rotation() + dt);
+        i->setRotation(-t);
     }
 }
 

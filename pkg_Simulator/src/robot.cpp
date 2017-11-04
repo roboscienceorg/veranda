@@ -2,8 +2,12 @@
 
 #include <QDebug>
 
-Robot::Robot(QVector<b2Shape *> body, DriveTrain_If* dt, QVector<Sensor_If*> sensors, QObject* parent) :
-    PropertyObject_If(parent), _drivetrain(dt)
+constexpr double PI = 3.14159265359;
+constexpr double RAD2DEG = 360.0/(2*PI);
+constexpr double DEG2RAD = 1.0/RAD2DEG;
+
+Robot::Robot(QVector<b2Shape *> body, DriveTrain_If* dt, double x0, double y0, double theta0, QVector<Sensor_If*> sensors, QObject* parent) :
+    PropertyObject_If(parent), _x0(x0), _y0(y0), _theta0(theta0*DEG2RAD), _drivetrain(dt)
 {
     connect(_drivetrain, &DriveTrain_If::targetVelocity, this, &Robot::targetVelocity);
 
@@ -36,6 +40,8 @@ void Robot::setPhysicsBody(b2Body* body)
         }
         body->SetLinearVelocity(b2Vec2(0,0));
         body->SetAngularVelocity(0);
+        body->SetTransform(b2Vec2(_x0, _y0), _theta0);
+        qDebug() << "Starting robot at " << _x0 << _y0 << _theta0;
     }
     _bodyPhysics = body;
 }
@@ -54,6 +60,26 @@ void Robot::targetVelocity(double x, double y, double theta)
 {
     if(_bodyPhysics)
     {
+        //Translate to world coordinate velocities
+        if(!_drivetrain->usesWorldCoords())
+        {
+            double sint = sin(_theta);
+            double cost = cos(_theta);
+
+            //qDebug() << "Robot velocity to world velocity" << _theta << sint << cost;
+            //qDebug() << x << y;
+
+            double x_ = cost*x + -sint*y;
+            y = sint*x + cost*y;
+            x = x_;
+
+            //qDebug() << x << y;
+        }
+        if(_drivetrain->usesDegrees())
+        {
+            theta *= DEG2RAD;
+        }
+
         _bodyPhysics->SetLinearVelocity(b2Vec2(x, y));
         _bodyPhysics->SetAngularVelocity(theta);
     }
@@ -70,8 +96,11 @@ void Robot::worldTicked(const double t, const b2World* world)
         _y = _bodyPhysics->GetWorldCenter().y;
         _theta = _bodyPhysics->GetAngle();
 
-        qDebug() << _x << _y << _theta;
+        while(_theta < 0) _theta += 2*PI;
+        while(_theta > 2*PI) _theta -= 2*PI;
 
-        _newPosition(_x, _y, _theta);
+        //qDebug() << _x << _y << _theta;
+
+        _newPosition(_x, _y, _theta*RAD2DEG);
     }
 }

@@ -33,7 +33,7 @@ class DiffDrive_Drivetrain : public DriveTrain_If
                                          "Rotational velocity of the craft"), QVariant(0));
 
     Property wheel_radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                                  "Radius of wheels"), QVariant(0),
+                                                  "Radius of wheels"), QVariant(1),
                                                 [](QVariant _old, QVariant _new)
                                                 {
                                                     bool good;
@@ -43,7 +43,7 @@ class DiffDrive_Drivetrain : public DriveTrain_If
                                                 });
 
     Property axle_length = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                                  "Length of full axle"), QVariant(0),
+                                                  "Length of full axle"), QVariant(1),
                                                 [](QVariant _old, QVariant _new)
                                                 {
                                                     bool good;
@@ -53,11 +53,12 @@ class DiffDrive_Drivetrain : public DriveTrain_If
                                                 });
 
     QMap<QString, PropertyView> _properties{
-        {"channels/input_velocities", PropertyView(&velocity_channel)},
-        {"velocity/x", PropertyView(&velocity_x)},
-        {"velocity/y", PropertyView(&velocity_y)},
-        {"velocity/theta", PropertyView(&velocity_theta)},
-        {"wheel_radius", PropertyView(&wheel_radius)}
+        {"channels/input_velocities", &velocity_channel},
+        {"velocity/x", &velocity_x},
+        {"velocity/y", &velocity_y},
+        {"velocity/theta", &velocity_theta},
+        {"wheel_radius", &wheel_radius},
+        {"axle_length", &axle_length}
     };
 
     void FK(const double& phi1, const double& phi2, double& xDot, double& yDot, double& thetaDot);
@@ -68,6 +69,7 @@ public:
     virtual QVector<b2Shape*> getModel();
 
     virtual bool usesWorldCoords(){return false;}
+    virtual bool usesDegrees(){return false;}
 
     virtual QMap<QString, PropertyView>& getAllProperties(){
         return _properties;

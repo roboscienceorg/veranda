@@ -70,11 +70,15 @@ void SimulatorCore::start()
 
     //Add default robot
     addSimRobotFromFile("");
+    addSimRobotFromFile("");
+    addSimRobotFromFile("");
 
     for(auto iter = _activeRobots.begin(); iter != _activeRobots.end(); iter++)
     {
         //qDebug() << "Set channel property";
-        iter.value()->getAllProperties()["Float Drive/channels/input_velocities"].set("robot0/world_velocity");
+        iter.value()->getAllProperties()["Diff Drive/channels/input_velocities"].set("robot0/wheel_velocities");
+        iter.value()->getAllProperties()["Diff Drive/axle_length"].set(1);
+        iter.value()->getAllProperties()["Diff Drive/wheel_radius"].set(0.2);
     }
 }
 
