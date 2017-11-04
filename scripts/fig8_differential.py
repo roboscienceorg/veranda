@@ -12,10 +12,10 @@ L = 1
 
 # Location Functions to form a figure 8 of the necessary size
 def x_t(t, scale=1.0):
-    return 30*math.sin(t/scale)
+    return 10*math.sin(t/scale)
 
 def y_t(t, scale=1.0):
-    return 30*math.sin(t/scale)*math.cos(t/scale)
+    return 10*math.sin(t/scale)*math.cos(t/scale)
 
 # Differential drive inverse kinematics
 def DD_IK(x_t, y_t, t, scale):
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         rospy.init_node('talker', anonymous=True)
         
         # Factor to scale down speed by
-        speedScale = 5
+        speedScale = 2
 
         # Start time at pi because that's the function lines up
         # with the robot starting location I've set

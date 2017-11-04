@@ -18,6 +18,10 @@ class Robot : public PropertyObject_If
 {
     Q_OBJECT
 
+    constexpr static double PI = 3.14159265359;
+    constexpr static double RAD2DEG = 360.0/(2*PI);
+    constexpr static double DEG2RAD = 1.0/RAD2DEG;
+
     double _x=0, _y=0, _theta=0;
     double _x0=0, _y0=0, _theta0=0;
 
@@ -38,7 +42,7 @@ public:
     const QVector<b2Shape*> getRobotModel(){return _model;}
 
     virtual QString propertyGroupName(){return "";}
-    void getTransform(double& x, double& y, double& theta){ x = _x; y = _y; theta = _theta;}
+    void getTransform(double& x, double& y, double& theta){ x = _x; y = _y; theta = _theta*RAD2DEG;}
 public slots:
     //Tells the robot to connect all its ROS topics
     void connectToROS();

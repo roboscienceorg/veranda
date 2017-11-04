@@ -30,7 +30,7 @@ QString BasicRobotLoader::loadRobotFile(QString file, Robot *&output)
             dt = _drivetrains.first()->createDrivetrain();
 
         //qDebug() << "Construct robot";
-        output = new Robot({circle, line}, dt, rand() % 200, rand() % 200, rand()%360);
+        output = new Robot({circle, line}, dt, rand() % 30, rand() % 30, rand()%360);
         return "";
     }
     return "No drivetrains defined";

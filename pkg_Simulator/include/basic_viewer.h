@@ -12,7 +12,7 @@
 
 #include <Box2D/Box2D.h>
 
-constexpr uint64_t WORLD_SCALE = 20;
+constexpr int64_t WORLD_SCALE = 20;
 
 class BasicViewer : public Simulator_Visual_If
 {
@@ -41,6 +41,7 @@ public slots:
 private slots:
     void modelMoved(ScreenModel_If* m, double dx, double dy, double dt);
     void mousePressEvent(QMouseEvent *event);
+    void resizeEvent(QResizeEvent* event);
 };
 
 #endif // BASIC_VIEWER_H

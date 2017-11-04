@@ -2,10 +2,6 @@
 
 #include <QDebug>
 
-constexpr double PI = 3.14159265359;
-constexpr double RAD2DEG = 360.0/(2*PI);
-constexpr double DEG2RAD = 1.0/RAD2DEG;
-
 Robot::Robot(QVector<b2Shape *> body, DriveTrain_If* dt, double x0, double y0, double theta0, QVector<Sensor_If*> sensors, QObject* parent) :
     PropertyObject_If(parent), _x0(x0), _y0(y0), _theta0(theta0*DEG2RAD), _drivetrain(dt)
 {

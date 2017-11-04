@@ -6,6 +6,8 @@
 #include <QMouseEvent>
 #include <QMessageBox>
 
+#include <cmath>
+
 //ScreenModel_if - found in a header file
 
 //Constructor
@@ -13,11 +15,16 @@
 //makes the 
 BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
 {
+    QRect viewRect(-30*WORLD_SCALE, -30*WORLD_SCALE, 60*WORLD_SCALE, 60*WORLD_SCALE);
+
     _children = new QVBoxLayout(this);
 
     _scene = new QGraphicsScene(this);
+    _scene->setSceneRect(viewRect);
+
     _viewer = new QGraphicsView(_scene, this);
     _viewer->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+    _viewer->setSceneRect(viewRect);
 
     _children->addWidget(_viewer);
     setLayout(_children);
@@ -100,6 +107,20 @@ void BasicViewer::mousePressEvent(QMouseEvent *event)
        msgBox->show();
        mouseClickPosition = event->pos();
     }
+}
+
+void BasicViewer::resizeEvent(QResizeEvent *event)
+{
+    double w_acutal = geometry().width()*0.9;
+    double h_actual = geometry().height()*0.9;
+
+    double w_need = _scene->width();
+    double h_need = _scene->height();
+
+    qDebug() << w_acutal << h_actual << w_need << h_need;
+
+    double scale = std::min(w_acutal/w_need, h_actual/h_need);
+    _viewer->scale(scale, scale);
 }
 
 //for after the MVP 
