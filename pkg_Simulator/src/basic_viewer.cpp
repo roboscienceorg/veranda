@@ -111,16 +111,23 @@ void BasicViewer::mousePressEvent(QMouseEvent *event)
 
 void BasicViewer::resizeEvent(QResizeEvent *event)
 {
+    //It appears that QGraphicsView::fitInView is broken in
+    //Qt 5.5. This should be an acceptable alternative
+    //If we allow the user to pan and zoom, then this will
+    //likely need to change to keep track of zoom and pan parameters
+    //so they can correctly be part of this transform
     double w_acutal = geometry().width()*0.9;
     double h_actual = geometry().height()*0.9;
 
     double w_need = _scene->width();
     double h_need = _scene->height();
 
-    qDebug() << w_acutal << h_actual << w_need << h_need;
-
     double scale = std::min(w_acutal/w_need, h_actual/h_need);
-    _viewer->scale(scale, scale);
+
+    QTransform matrix;
+    matrix.scale(scale,
+                 scale);
+    _viewer->setTransform(matrix);
 }
 
 //for after the MVP 
