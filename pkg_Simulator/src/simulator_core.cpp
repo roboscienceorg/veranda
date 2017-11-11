@@ -13,9 +13,6 @@ QObject(parent),
 _mapLoader(mapLoad), _robotLoader(robotLoad),
 _physicsEngine(physics), _userInterface(ui)
 {
-    _physicsThread = new QThread(this);
-    _physicsEngine->moveToThread(_physicsThread);
-
     connect(_userInterface, &Simulator_Ui_If::userRemoveRobotFromSimulation, this, &SimulatorCore::removeSimRobot);
     connect(this, &SimulatorCore::robotRemoved, _userInterface, &Simulator_Ui_If::robotRemovedFromSimulation);
     connect(this, &SimulatorCore::robotRemoved, _physicsEngine, &Simulator_Physics_If::removeRobot);
@@ -27,38 +24,61 @@ _physicsEngine(physics), _userInterface(ui)
     connect(_userInterface, &Simulator_Ui_If::userSetMapInSimulation, this, &SimulatorCore::setSimMapFromFile);
     connect(this, &SimulatorCore::mapObjectsLoaded, _physicsEngine, &Simulator_Physics_If::newStaticShapes);
 
-    connect(_userInterface, &Simulator_Ui_If::userStartPhysics, _physicsEngine, &Simulator_Physics_If::start);
-    connect(_userInterface, &Simulator_Ui_If::userStopPhysics, _physicsEngine, &Simulator_Physics_If::stop);
-    connect(_userInterface, &Simulator_Ui_If::userSetPhysicsTick, _physicsEngine, &Simulator_Physics_If::setTick);
+    connect(this, &SimulatorCore::userStartPhysics, _physicsEngine, &Simulator_Physics_If::start);
+    connect(this, &SimulatorCore::userStopPhysics, _physicsEngine, &Simulator_Physics_If::stop);
+    connect(this, &SimulatorCore::userSetPhysicsTick, _physicsEngine, &Simulator_Physics_If::setTick);
+
+    connect(this, &SimulatorCore::physicsStarted, _userInterface, &Simulator_Ui_If::physicsStarted);
+    connect(this, &SimulatorCore::physicsStopped, _userInterface, &Simulator_Ui_If::physicsStopped);
+    connect(this, &SimulatorCore::physicsTickSet, _userInterface, &Simulator_Ui_If::physicsTickChanged);
+
+    connect(_userInterface, &Simulator_Ui_If::userStartPhysics, this, &SimulatorCore::userStartPhysics);
+    connect(_userInterface, &Simulator_Ui_If::userStopPhysics, this, &SimulatorCore::userStopPhysics);
+    connect(_userInterface, &Simulator_Ui_If::userSetPhysicsTick, this, &SimulatorCore::userSetPhysicsTick);
+
+    connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, this, &SimulatorCore::physicsStarted);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, this, &SimulatorCore::physicsStopped);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsTickSet, this, &SimulatorCore::physicsTickSet);
 
     connect(this, &SimulatorCore::errorMsg, _userInterface, &Simulator_Ui_If::errorMessage);
 }
 
 SimulatorCore::~SimulatorCore()
 {
-    //Stop physics engine
-    _physicsThread->quit();
-    _physicsThread->wait();
-
     //Destroy all remaining robots
     while(_activeRobots.size())
         removeSimRobot(_activeRobots.firstKey());
+
+    //Stop physics engine
+    userStopPhysics();
+    _physicsEngine->deleteLater();
+
+    //Destroy ui
+    _userInterface->deleteLater();
+
+    delete _robotLoader;
+    delete _mapLoader;
 }
 
 void SimulatorCore::start()
 {
-    qInfo() << "Start physics engine";
-    _physicsThread->start();
+    //Set default physics tick rate
+    userSetPhysicsTick(100.0, 1.0/100.0);
 
-    qInfo() << "Show main window";
+    //Show UI
     _userInterface->showMainWindow();
 
+    //Add default robot
+    addSimRobotFromFile("");
+    addSimRobotFromFile("");
     addSimRobotFromFile("");
 
     for(auto iter = _activeRobots.begin(); iter != _activeRobots.end(); iter++)
     {
-        iter.value()->setChannelList({"robot0/world_velocity"});
-        QTimer::singleShot(10, iter.value(), &Robot::connectToROS);
+        //qDebug() << "Set channel property";
+        iter.value()->getAllProperties()["Diff Drive/channels/input_velocities"].set("robot0/wheel_velocities");
+        iter.value()->getAllProperties()["Diff Drive/axle_length"].set(1);
+        iter.value()->getAllProperties()["Diff Drive/wheel_radius"].set(0.2);
     }
 }
 
@@ -83,12 +103,11 @@ void SimulatorCore::addSimRobotFromFile(QString file)
     QString error = _robotLoader->loadRobotFile(file, newBot);
     if(!error.size())
     {
+        connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, newBot, &Robot::connectToROS);
+        connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, newBot, &Robot::disconnectFromROS);
+
         Robot_Physics* phys_interface = new Robot_Physics(newBot, _nextRobotId);
         Robot_Properties* prop_interface = new Robot_Properties(newBot, _nextRobotId);
-
-        //Put robot in its own thread
-        QThread* rThread = new QThread(this);
-        newBot->moveToThread(rThread);
 
         //Send out robot interfaces
         emit robotAdded(phys_interface);
@@ -96,12 +115,13 @@ void SimulatorCore::addSimRobotFromFile(QString file)
 
         //Keep references to robot and thread
         _activeRobots[_nextRobotId] = newBot;
-        _robotThreads[_nextRobotId] = rThread;
-
-        //Start robot's thread
-        rThread->start();
 
         _nextRobotId++;
+
+        if(_physicsEngine->running())
+            newBot->connectToROS();
+        else
+            newBot->disconnectFromROS();
     }
     else
     {
@@ -116,17 +136,9 @@ void SimulatorCore::removeSimRobot(robot_id rId)
         //Signal that robot is no longer in simulation
         emit robotRemoved(rId);
 
-        //End thread the robot was running on
-        _robotThreads[rId]->quit();
-        _robotThreads[rId]->wait();
-
         //Delete robot object
         //This should delete all robot interfaces; they are children to it
         delete _activeRobots[rId];
         _activeRobots.remove(rId);
-
-        //Delete thread object
-        delete _robotThreads[rId];
-        _robotThreads.remove(rId);
     }
 }

@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/modes">
+        <file alias="MapIcon">images/MapMakerIcon.png</file>
+        <file alias="RobotIcon">images/RobotMakerIcon.png</file>
+        <file alias="SimulationIcon">images/SimulationIcon.png</file>
+    </qresource>
+    <qresource prefix="/generic">
+        <file alias="DeleteFileIcon">images/DeleteIcon.png</file>
+        <file alias="NewFileIcon">images/NewFileIcon.png</file>
+        <file alias="CopyFileIcon">images/CopyFileIcon.png</file>
+        <file alias="SaveFileIcon">images/SaveFileIcon.png</file>
+        <file alias="ImportFileIcon">images/ImportFileIcon.png</file>
+        <file alias="DeleteAllFileIcon">images/DeleteAllIcon.png</file>
+    </qresource>
+    <qresource prefix="/sim">
+        <file alias="PlaySimIcon">images/PlayIcon.png</file>
+        <file alias="StopSimIcon">images/StopIcon.png</file>
+        <file alias="SpeedOneSimIcon">images/SpeedOneIcon.png</file>
+        <file alias="SpeedTwoSimIcon">images/SpeedTwoIcon.png</file>
+        <file alias="SpeedThreeSimIcon">images/SpeedThreeIcon.png</file>
+        <file alias="SpeedHalfSimIcon">images/SpeedHalfIcon.png</file>
+        <file alias="ScreenshotSimIcon">images/ScreenshotIcon.png</file>
+        <file alias="RecordSimIcon">images/RecordIcon.png</file>
+        <file alias="DontRecordSimIcon">images/DontRecordIcon.png</file>
+    </qresource>
+</RCC>

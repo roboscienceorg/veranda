@@ -12,12 +12,14 @@
 
 #include <Box2D/Box2D.h>
 
+constexpr int64_t WORLD_SCALE = 20;
+
 class BasicViewer : public Simulator_Visual_If
 {
     Q_OBJECT
 
     QMap<model_id, ScreenModel_If*> _models;
-    QMap<ScreenModel_If*, QGraphicsEllipseItem*> _shapes;
+    QMap<ScreenModel_If*, QVector<QGraphicsItem*>> _shapes;
 
     QTimer _refresh;
 
@@ -27,6 +29,7 @@ class BasicViewer : public Simulator_Visual_If
 
 public:
     BasicViewer(QWidget* parent = nullptr);
+    QPointF mouseClickPosition;
 
 public slots:
     void modelAddedToScreen(ScreenModel_If* model, model_id id) override;
@@ -36,7 +39,9 @@ public slots:
     void modelSelected(model_id id) override;
 
 private slots:
-    void modelMoved(ScreenModel_If* m);
+    void modelMoved(ScreenModel_If* m, double dx, double dy, double dt);
+    void mousePressEvent(QMouseEvent *event);
+    void resizeEvent(QResizeEvent* event);
 };
 
 #endif // BASIC_VIEWER_H

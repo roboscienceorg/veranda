@@ -9,36 +9,40 @@
 #include "interfaces/screen_model_if.h"
 
 #include <Box2D/Box2D.h>
+#include <QMap>
+#include <QDebug>
 
 typedef uint64_t robot_id;
 
-class Robot : public QObject
+class Robot : public PropertyObject_If
 {
     Q_OBJECT
 
-    double _x=0, _y=0, _theta=0;
+    constexpr static double PI = 3.14159265359;
+    constexpr static double RAD2DEG = 360.0/(2*PI);
+    constexpr static double DEG2RAD = 1.0/RAD2DEG;
 
-    b2Shape* _body;
+    double _x=0, _y=0, _theta=0;
+    double _x0=0, _y0=0, _theta0=0;
+
+    b2Body* _bodyPhysics;
     QVector<b2Shape*> _model;
 
     DriveTrain_If* _drivetrain;
+    QVector<Sensor_If*> _sensors;
+
+    QMap<QString, PropertyView> _properties;
 
 public:
-    Robot(b2Shape* body, DriveTrain_If* dt, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
+    Robot(QVector<b2Shape*> body, DriveTrain_If* dt, double x0, double y0, double theta0, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
 
-    const b2Shape* getRobotBody();
-    const QVector<b2Shape*>& getRobotModel();
+    void setPhysicsBody(b2Body* body);
 
-    //Gets descriptions for the channels this
-    //mediator uses; should map 1-1 to the return of getChannelList
-    virtual QVector<QString> getChannelDescriptions();
+    QMap<QString, PropertyView>& getAllProperties(){ return _properties; }
+    const QVector<b2Shape*> getRobotModel(){return _model;}
 
-    //Gets the current names of ROS topics to use
-    virtual QVector<QString> getChannelList();
-
-    //Sets the names of ROS topics to use
-    virtual void setChannelList(const QVector<QString> &channels);
-
+    virtual QString propertyGroupName(){return "";}
+    void getTransform(double& x, double& y, double& theta){ x = _x; y = _y; theta = _theta*RAD2DEG;}
 public slots:
     //Tells the robot to connect all its ROS topics
     void connectToROS();
@@ -46,20 +50,12 @@ public slots:
     //Tells the robot to disconnect all its ROS topics
     void disconnectFromROS();
 
-    //Tells the robot the speed it's actually going, in global coordinates
-    //Should be used for feedback to control code
-    void actualVelocity(double xDot, double yDot, double thetaDot);
-
-    //Tells the robot it's world-space position
-    void actualPosition(double x, double y, double theta);
-
     //Tells the robot that the world has updated
-    void worldTicked();
+    void worldTicked(const double t, const b2World *world);
+
+    void targetVelocity(double x, double y, double theta);
 
 signals:
-    //Signals velocity that this robot wants to go, in global coordinates
-    void targetVelocity(double xDot, double yDot, double thetaDot);
-
     void _newPosition(double x, double y, double theta);
 };
 
@@ -80,18 +76,19 @@ class RobotBaseScreenModel : public ScreenModel_If
 {
     Q_OBJECT
 
-    b2Shape* robotBody;
+    QVector<b2Shape*> model;
     b2BlockAllocator alloc;
 
     double _x, _y, _theta;
 public:
     RobotBaseScreenModel(Robot* robot)
     {
-        robotBody = robot->getRobotBody()->Clone(&alloc);
+        model = robot->getRobotModel();
         connect(robot, &Robot::_newPosition, this, &RobotBaseScreenModel::robotMoved);
+        robot->getTransform(_x, _y, _theta);
     }
 
-    QVector<b2Shape*> getModel(){return QVector<b2Shape*>{robotBody};}
+    QVector<b2Shape*> getModel(){return model;}
     void getTransform(double& x, double& y, double& theta)
     {
         x = _x;
@@ -105,11 +102,15 @@ public:
 private slots:
     void robotMoved(double x, double y, double theta)
     {
+        double dx = x - _x;
+        double dy = y - _y;
+        double dt = theta - _theta;
+
         _x = x;
         _y = y;
         _theta = theta;
 
-        transformChanged(this);
+        transformChanged(this, dx, dy, dt);
     }
 };
 

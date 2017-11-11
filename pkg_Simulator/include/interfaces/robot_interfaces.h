@@ -29,7 +29,6 @@ protected:
 
 public:
     Robot_Interface(Robot* observed, robot_id id) : _observed(observed), _id(id){}
-    Robot_Interface(Robot_Interface* interface) : _observed(interface->_observed), _id(interface->_id){}
 
     robot_id getRobotId() { return _id; }
 };
@@ -38,19 +37,9 @@ class Robot_Physics : public QObject, public Robot_Interface
 {
     Q_OBJECT
 
-    const b2Shape* _body;
-
     void _init()
     {
-        qRegisterMetaType<robot_id>("robot_id");
-
-        connect(this, &Robot_Physics::setActualPosition, _observed, &Robot::actualPosition);
-        connect(this, &Robot_Physics::setActualVelocity, _observed, &Robot::actualVelocity);
         connect(this, &Robot_Physics::notifyWorldTicked, _observed, &Robot::worldTicked);
-
-        connect(_observed, &Robot::targetVelocity, [this](double x, double y, double z){targetVelocityChanged(_id, x, y, z);});
-
-        _body = _observed->getRobotBody();
     }
 
 public:
@@ -59,52 +48,29 @@ public:
         _init();
     }
 
-    Robot_Physics(Robot_Physics* interface) : QObject(interface->_observed), Robot_Interface(interface)
+    //Sets b2Body for robot; robot populates with fixtures
+    void setPhysicsBody(b2Body* body)
     {
-        _init();
+        _observed->setPhysicsBody(body);
     }
 
-    const b2Shape* getBodyShape(){ return _body; }
-
 signals:
-   /****************************************************************
-    * Connect For Data From Robot
-    ****************************************************************/
-
-    //Signals velocity that this robot wants to go, in global coordinates
-    void targetVelocityChanged(robot_id, double xDot, double yDot, double thetaDot);
-
-    /****************************************************************
-     * Call To Update Robot
-     ****************************************************************/
-
-    //Tells the robot the speed it's actually going, in global coordinates
-    //Should be used for feedback to control code
-    void setActualVelocity(double xDot, double yDot, double thetaDot);
-
-    //Tells the robot it's world-space position
-    void setActualPosition(double x, double y, double theta);
-
     //Tells the robot that the world has updated
-    void notifyWorldTicked();
+    void notifyWorldTicked(const double t, const b2World*);
 };
 
-class Robot_Properties : public QObject, public Robot_Interface
+class Robot_Properties : public PropertyObject_If, public Robot_Interface
 {
     Q_OBJECT
 
     void _init()
     {
-
+        connect(this, &Robot_Properties::disconnectRobotFromROS, _observed, &Robot::disconnectFromROS);
+        connect(this, &Robot_Properties::connectRobotToROS, _observed, &Robot::connectToROS);
     }
 
 public:
-    Robot_Properties(Robot* observed, robot_id id) : QObject(observed), Robot_Interface(observed, id)
-    {
-        _init();
-    }
-
-    Robot_Properties(Robot_Properties* interface) : QObject(interface->_observed), Robot_Interface(interface)
+    Robot_Properties(Robot* observed, robot_id id, QObject* parent=nullptr) : PropertyObject_If(observed), Robot_Interface(observed, id)
     {
         _init();
     }
@@ -119,19 +85,10 @@ public:
         return new RobotSensorsScreenModel(_observed);
     }
 
+    QString propertyGroupName(){ return _observed->propertyGroupName(); }
+    QMap<QString, PropertyView>& getAllProperties(){ return _observed->getAllProperties(); }
+
 signals:
-    /****************************************************************
-     * From Robot
-     ****************************************************************/
-
-    void robotPropertiesChanged(QVariantMap properties);
-
-    /****************************************************************
-     * To Robot
-     ****************************************************************/
-
-    void setRobotProperty(QString property, QVariant value);
-
     void disconnectRobotFromROS();
     void connectRobotToROS();
 };

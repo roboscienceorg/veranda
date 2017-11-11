@@ -23,7 +23,7 @@
 #include "basic_robotloader.h"
 #include "basic_ui.h"
 #include "basic_viewer.h"
-#include "ui/emptysimwindow.h"
+#include "ui/mainwindow.h"
 #include "sdsmt_simulator/drivetrain_plugin.h"
 #include "sdsmt_simulator/sensor_plugin.h"
 
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
    /*************************************
     * Setup simulator
     *************************************/
-    emptysimwindow::visualizerFactory visuals =
+    MainWindow::visualizerFactory visuals =
     []()
     {
         return new BasicViewer();
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
     RobotLoader_If* robotLoader = new BasicRobotLoader(driveTrainPlugins, sensorPlugins);
 
     Simulator_Physics_If* physics = new BasicPhysics();
-    Simulator_Ui_If* userinterface = new emptysimwindow(visuals);
+    Simulator_Ui_If* userinterface = new MainWindow(visuals);
 
     SimulatorCore sim(mapLoader, robotLoader, physics, userinterface, &app);
 
@@ -121,15 +121,7 @@ int main(int argc, char** argv)
     * Run application
     ******************/
     //Start main app
-    int ret = app.exec();
-
-   /*******************
-    * Clean up
-    *******************/
-    delete mapLoader;
-    delete robotLoader;
-    delete physics;
-    delete userinterface;
+    int ret = app.exec();\
 
     return ret;
 }

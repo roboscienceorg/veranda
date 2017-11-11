@@ -15,6 +15,8 @@ class Simulator_Physics_If : public QObject
 public:
     Simulator_Physics_If(QObject* parent = nullptr) : QObject(parent){}
 
+    virtual bool running() = 0;
+
 public slots:
     virtual void start() = 0;
     virtual void stop() = 0;
@@ -34,6 +36,11 @@ public slots:
 
     //Removes a robot from simulation
     virtual void removeRobot(robot_id rId) = 0;
+
+signals:
+    void physicsStarted();
+    void physicsStopped();
+    void physicsTickSet(double, double);
 };
 
 #endif // SIMULATOR_PHYSICS_H

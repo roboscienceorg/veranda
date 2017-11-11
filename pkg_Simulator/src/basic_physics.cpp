@@ -1,5 +1,5 @@
 #include "basic_physics.h"
-
+#include <QDebug>
 BasicPhysics::BasicPhysics(QObject *parent) : Simulator_Physics_If(parent)
 {
     //No gravity for top down simulation
@@ -20,11 +20,15 @@ void BasicPhysics::start()
     tick->setTimerType(Qt::PreciseTimer);
 
     tick->start();
+
+    emit physicsStarted();
 }
 
 void BasicPhysics::stop()
 {
     tick->stop();
+
+    emit physicsStopped();
 }
 
 void BasicPhysics::clear()
@@ -38,6 +42,10 @@ void BasicPhysics::setTick(double rate_hz, double duration_s)
 {
     tickRate = rate_hz;
     stepTime = duration_s;
+
+    //TODO :: Update QTimer with new rate settings
+
+    emit physicsTickSet(tickRate, stepTime);
 }
 
 void BasicPhysics::newStaticShapes(QVector<b2Shape *> shapes)
@@ -59,21 +67,19 @@ void BasicPhysics::newStaticShapes(QVector<b2Shape *> shapes)
 
 void BasicPhysics::addRobot(Robot_Physics *robot)
 {
-    connect(robot, &Robot_Physics::targetVelocityChanged, this, &BasicPhysics::changeTargetVelocity);
-
     b2BodyDef robotBodyDef;
     robotBodyDef.type = b2_dynamicBody;
-    robotBodyDef.position.Set(10.0f, 10.0f);
+    robotBodyDef.position.Set(0,0);
     b2Body* robotBody = world->CreateBody(&robotBodyDef);
-    b2FixtureDef robotFixtureDef;
-    robotFixtureDef.shape = robot->getBodyShape();
-    robotFixtureDef.density = 1.0f;
-    robotFixtureDef.friction = 0.0f; //CONSIDER CHANGING
-    robotBody->CreateFixture(&robotFixtureDef);
+
+    robot->setPhysicsBody(robotBody);
+
     robotWorldData r;
     r.robot = robot;
     r.robotBody = robotBody;
     robots.push_back(r);
+
+    robot->notifyWorldTicked(0, world);
 }
 
 void BasicPhysics::removeRobot(robot_id rId)
@@ -81,18 +87,9 @@ void BasicPhysics::removeRobot(robot_id rId)
     for(int i = 0; i < robots.size(); i++)
         if(robots[i].robot->getRobotId() == rId)
         {
+            robots[i].robot->setPhysicsBody(nullptr);
             world->DestroyBody(robots[i].robotBody);
             robots.erase(robots.begin() + i);
-        }
-}
-
-void BasicPhysics::changeTargetVelocity(robot_id rId, double xDot, double yDot, double thetaDot)
-{
-    for(int i = 0; i < robots.size(); i++)
-        if(robots[i].robot->getRobotId() == rId)
-        {
-            b2Vec2 v(xDot, yDot);
-            robots[i].robotBody->SetLinearVelocity(v);
         }
 }
 
@@ -101,8 +98,6 @@ void BasicPhysics::step()
     world->Step(stepTime, 8, 3); //suggested values for velocity and position iterations
     for(int i = 0; i < robots.size(); i++)
     {
-        b2Vec2 v = robots[i].robotBody->GetPosition();
-        robots[i].robot->setActualPosition(v.x, v.y, 0.0f);
-        robots[i].robot->notifyWorldTicked();
+        robots[i].robot->notifyWorldTicked(stepTime, world);
     }
 }

@@ -10,10 +10,10 @@ L = 0.1
 
 # Location Functions to form a figure 8 of the necessary size
 def x_t(t, scale=1.0):
-    return 100*math.sin(t/scale)
+    return 100
 
 def y_t(t, scale=1.0):
-    return 100*math.cos(t*2/scale)
+    return 100
 
 # Publishes a set of wheel velocities
 # in the format required by the STDR
