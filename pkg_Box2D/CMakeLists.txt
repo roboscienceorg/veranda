@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(sdsmt_simulator_box2d)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11 -fPIC)
 
 ## TODO If possible: Figure out how to mark Qt as a dependency
 catkin_package(
