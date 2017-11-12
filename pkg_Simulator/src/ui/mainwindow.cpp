@@ -7,16 +7,17 @@
 #include <QDir>
 #include <QStandardItemModel>
 
-MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
+#include <stdexcept>
+#include <string>
+
+MainWindow::MainWindow(visualizerFactory factory, MapLoader_If *mapLoad, RobotLoader_If *robotLoad, QWidget *parent) :
     Simulator_Ui_If(parent),
+    makeWidget(factory), mapLoader(mapLoad), robotLoader(robotLoad),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    makeWidget = factory;
-
     speed = 1;
-    modelNum = 0;
     play = false;
 
     //Initialize Widget Settings
@@ -32,6 +33,8 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     visual = makeWidget();
     ui->worldViewLayout->addWidget(visual);
     ui->propertiesTableView->verticalHeader()->setVisible(false);
+    connect(visual, SIGNAL(userSelectedObject(object_id)), this, SLOT(objectSelected(object_id)));
+    connect(this, SIGNAL(objectIsSelected(object_id)), visual, SLOT(objectSelected(object_id)));
 
     //Main window button signals and slots
     connect(ui->showBuildObjectsButton, SIGNAL (released()), this, SLOT (showBuildObjectsButtonClick()));
@@ -50,11 +53,19 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
 
     //Build tools list and world view slots
     connect(visual, SIGNAL (userSelectedModel(model_id id)), this, SLOT (modelSelected(model_id id)));
+
+    propertiesModel = new QStandardItemModel(0,2,this); //12 Rows and 2 Columns
+    propertiesModel->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
+    propertiesModel->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
+    ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->propertiesTableView->setModel(propertiesModel);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete mapLoader;
+    delete robotLoader;
 }
 
 //Menu Mode Button Clicks
@@ -226,21 +237,28 @@ void MainWindow::importMapButtonClick()
     msgBox.setDefaultButton(QMessageBox::No);
     int ret = msgBox.exec();
 
-    QDir directory;
-
     switch (ret) {
       case QMessageBox::Yes:
-        /*
     {
           // Save was clicked
-          QString path = QFileDialog::getExistingDirectory (this, tr("Directory"), directory.path());
-          if ( path.isNull() == false )
+          QString path = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", tr("Images (*.png *.jpg);;Json files (*.json)"));
+
+          if(path.length())
           {
-              directory.setPath(path);
+              Map* map = mapLoader->loadMapFile(path);
+              if(map)
+              {
+                  //Clear out simulation
+                  for(auto iter = worldObjects.begin(); iter != worldObjects.end(); iter++)
+                    userRemoveWorldObjectFromSimulation(iter.key());
+
+                  //Add map into new simulation
+                  userAddWorldObjectToSimulation(map);
+              }
           }
+
           break;
     }
-    */
         break;
       case QMessageBox::No:
           // Don't Save was clicked
@@ -251,84 +269,75 @@ void MainWindow::importMapButtonClick()
     }
 }
 
-//World View Slots
-void MainWindow::modelSelected(model_id id)
+void MainWindow::nothingSelected()
 {
-    try
+    propertiesModel->setRowCount(0);
+    nothingIsSelected();
+}
+
+void MainWindow::objectSelected(object_id id)
+{
+    if(worldObjects.contains(id))
     {
+        nothingSelected();
+
         selected = id;
+        WorldObjectProperties_If* obj = worldObjects[id];
+        QStandardItemModel* model = propertiesModel;
+
+        QMap<QString, PropertyView>& objProps = obj->getAllProperties();
+        model->setRowCount(objProps.size());
+
+        int i = 0;
+        for(auto iter = objProps.begin(); iter != objProps.end(); iter++, i++)
+        {
+           QModelIndex ind;
+
+           //Set key
+           ind = model->index(i, 0);
+           model->setData(ind, iter.key());
+
+           //Init value
+           ind = model->index(i, 1);
+           model->setData(ind, iter.value().get());
+
+           //Update value when it changes
+           connect(&iter.value(), &PropertyView::valueSet, [i, model, ind](QVariant v)
+           {
+               model->setData(ind, v);
+           });
+
+           displayed_properties[i] = iter.key();
+        }
+
+        connect(model, &QStandardItemModel::dataChanged, [this, obj, model](QModelIndex tl, QModelIndex br)
+        {
+           for(int i = tl.row(); i <= br.row(); i++)
+               obj->getAllProperties()[displayed_properties[i]].set(model->data(model->index(i, 1)));
+        });
+
+        objectIsSelected(id);
     }
-    catch (std::exception & e)
-    {
-      // do something with what...
-    }
-    catch (...)
-    {
-      // someone threw something undecypherable
-    }
-
-    Robot_Properties* robot = models[selected];
-    PropertyView selectedProperties;
-    QStandardItemModel* model;
-
-    model = new QStandardItemModel(12,2,this); //12 Rows and 2 Columns
-    model->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
-    model->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
-    ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->propertiesTableView->setModel(model);
-
-    //for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++)
-       // connect(&iter.value(), viewModel, [](QVariant v){qDebug() << v;});
-
-    //foreach property in future *selectedObject parameter,
-    //ui->propertiesListView.add(property);
 }
 
 //Add robot to the simulation world view
-void MainWindow::robotAddedToSimulation(Robot_Properties* robot)
+void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties_If* object, object_id oId)
 {
-    models[modelNum] = robot;
-    visual->modelAddedToScreen(robot->createRobotBaseModel(), modelNum++);
-    models[modelNum] = robot;
-    visual->modelAddedToScreen(robot->createRobotSensorsModel(), modelNum++);
+    if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
 
-    selected = modelNum-1;
-    Robot_Properties* robot2 = models[selected];
-    QStandardItemModel* model;
+    worldObjects[oId] = object;
 
-    model = new QStandardItemModel(robot2->getAllProperties().size(),2,this); //12 Rows and 2 Columns
-    model->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
-    model->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
-    ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->propertiesTableView->setModel(model);
+    visual->objectAddedToScreen(object->getModels(), oId);
 
-    int i = 0;
-    for(auto iter = robot2->getAllProperties().begin(); iter != robot2->getAllProperties().end(); iter++, i++)
-    {
-       QModelIndex ind;
+    objectSelected(oId);
+}
 
-       //Set key
-       ind = model->index(i, 0);
-       model->setData(ind, iter.key());
-
-       //Init value
-       ind = model->index(i, 1);
-       model->setData(ind, iter.value().get());
-
-       //Update value when it changes
-       connect(&iter.value(), &PropertyView::valueSet, [i, model, ind](QVariant v)
-       {
-           model->setData(ind, v);
-       });
-
-       displayed_properties[i] = iter.key();
-    }
-
-    connect(model, &QStandardItemModel::dataChanged, [this, robot2, model](QModelIndex tl, QModelIndex br)
-    {
-       for(int i = tl.row(); i <= br.row(); i++)
-           robot2->getAllProperties()[displayed_properties[i]].set(model->data(model->index(i, 1)));
-    });
+void MainWindow::worldObjectRemovedFromSimulation(object_id oId)
+{
+    visual->objectRemovedFromScreen(oId);
+    worldObjects.remove(oId);
+    if(selected == oId)
+        nothingSelected();
 }
 
 void MainWindow::listBuildTools(int mode)

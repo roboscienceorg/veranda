@@ -19,6 +19,6 @@ public:
     BasicRobotLoader(const QMap<QString, DriveTrain_Plugin_If*>& drivePlugs, const QMap<QString, Sensor_Plugin_If*>& sensorPlugs);
     ~BasicRobotLoader(){}
 
-    virtual QString loadRobotFile(QString file, Robot*& output) override;
+    virtual Robot* loadRobotFile(QString file) override;
 };
 #endif // BASIC_ROBOTLOADER_H

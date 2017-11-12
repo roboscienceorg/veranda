@@ -1,5 +1,9 @@
 #include "basic_physics.h"
 #include <QDebug>
+
+#include <string>
+#include <stdexcept>
+
 BasicPhysics::BasicPhysics(QObject *parent) : Simulator_Physics_If(parent)
 {
     //No gravity for top down simulation
@@ -48,56 +52,71 @@ void BasicPhysics::setTick(double rate_hz, double duration_s)
     emit physicsTickSet(tickRate, stepTime);
 }
 
-void BasicPhysics::newStaticShapes(QVector<b2Shape *> shapes)
+void BasicPhysics::addWorldObject(WorldObjectPhysics_If* obj, object_id oId)
 {
-    clear();
-    for(int i = 0; i < shapes.size(); i++)
+    if(objects.contains(oId)) throw std::logic_error("object with id " + std::to_string(oId) + " already exists");
+
+    objectWorldData& worldDat = objects[oId];
+    worldDat.obj = obj;
+
+    connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics_If::worldTicked);
+
+    for(int i=0; i<obj->staticBodiesRequired(); i++)
     {
-        b2BodyDef staticBodyDef;
-        b2Vec2 position;
-        if(shapes[i]->GetType() == 0)
-            position = static_cast<b2CircleShape*>(shapes[i])->m_p;
-        else
-            position = static_cast<b2PolygonShape*>(shapes[i])->m_centroid;
-        staticBodyDef.position.Set(position.x, position.y);
-        b2Body* staticBody = world->CreateBody(&staticBodyDef);
-        staticBody->CreateFixture(shapes[i], 0.0f);
+        b2BodyDef robotBodyDef;
+        robotBodyDef.type = b2_staticBody;
+        robotBodyDef.position.Set(0,0);
+
+        b2Body* body = world->CreateBody(&robotBodyDef);
+        worldDat.staticBodies.push_back(body);
     }
+
+    for(int i=0; i<obj->dynamicBodiesRequired();i++)
+    {
+        b2BodyDef robotBodyDef;
+        robotBodyDef.type = b2_dynamicBody;
+        robotBodyDef.position.Set(0,0);
+
+        b2Body* body = world->CreateBody(&robotBodyDef);
+        worldDat.dynamicBodies.push_back(body);
+    }
+
+    obj->setStaticBodies(worldDat.staticBodies);
+    QVector<b2JointDef*> joints = obj->setDynamicBodies(worldDat.dynamicBodies);
+    for(b2JointDef* j : joints)
+    {
+        b2Joint* joint = world->CreateJoint(j);
+        worldDat.joints.push_back(joint);
+    }
+
+    obj->worldTicked(world, 0);
 }
 
-void BasicPhysics::addRobot(Robot_Physics *robot)
+void BasicPhysics::removeWorldObject(object_id oId)
 {
-    b2BodyDef robotBodyDef;
-    robotBodyDef.type = b2_dynamicBody;
-    robotBodyDef.position.Set(0,0);
-    b2Body* robotBody = world->CreateBody(&robotBodyDef);
+    if(objects.contains(oId))
+    {
+        objectWorldData& dat = objects[oId];
 
-    robot->setPhysicsBody(robotBody);
+        dat.obj->clearDynamicBodies();
+        dat.obj->clearStaticBodies();
 
-    robotWorldData r;
-    r.robot = robot;
-    r.robotBody = robotBody;
-    robots.push_back(r);
+        for(b2Joint* j : dat.joints)
+            world->DestroyJoint(j);
 
-    robot->notifyWorldTicked(0, world);
-}
+        for(b2Body* s : dat.staticBodies)
+            world->DestroyBody(s);
 
-void BasicPhysics::removeRobot(robot_id rId)
-{
-    for(int i = 0; i < robots.size(); i++)
-        if(robots[i].robot->getRobotId() == rId)
-        {
-            robots[i].robot->setPhysicsBody(nullptr);
-            world->DestroyBody(robots[i].robotBody);
-            robots.erase(robots.begin() + i);
-        }
+        for(b2Body* d : dat.dynamicBodies)
+            world->DestroyBody(d);
+
+       objects.remove(oId);
+    }
 }
 
 void BasicPhysics::step()
 {
     world->Step(stepTime, 8, 3); //suggested values for velocity and position iterations
-    for(int i = 0; i < robots.size(); i++)
-    {
-        robots[i].robot->notifyWorldTicked(stepTime, world);
-    }
+
+    emit worldTick(world, stepTime);
 }

@@ -11,7 +11,7 @@ BasicRobotLoader::BasicRobotLoader(const QMap<QString, DriveTrain_Plugin_If*>& d
     srand(time(nullptr));
 }
 
-QString BasicRobotLoader::loadRobotFile(QString file, Robot *&output)
+Robot *BasicRobotLoader::loadRobotFile(QString file)
 {
     if(_drivetrains.size())
     {
@@ -30,8 +30,7 @@ QString BasicRobotLoader::loadRobotFile(QString file, Robot *&output)
             dt = _drivetrains.first()->createDrivetrain();
 
         //qDebug() << "Construct robot";
-        output = new Robot({circle, line}, dt, rand() % 30, rand() % 30, rand()%360);
-        return "";
+        return new Robot({circle, line}, dt, rand() % 30, rand() % 30, rand()%360);
     }
-    return "No drivetrains defined";
+    return nullptr;
 }

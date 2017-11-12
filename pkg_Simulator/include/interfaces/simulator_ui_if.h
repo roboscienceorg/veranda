@@ -10,7 +10,7 @@
 
 #include <Box2D/Box2D.h>
 
-#include "robot_interfaces.h"
+#include "world_object_if.h"
 
 class Simulator_Ui_If : public QMainWindow
 {
@@ -39,38 +39,18 @@ signals:
     void userStopPhysics();
     void userStartPhysics();
 
-    //Signal that the user wants to create a robot from file
-    //and add it
-    //If the robot is successfully added, this object will
-    //have a call to it's robotAddedToSimulation() slot
-    void userAddRobotIntoSimulation(QString robotFilePath);
-
-    //Signal that the user wants a robot removed from
-    //simulation
-    //If the robot is successfully removed, this object
-    //will have a call to its robotRemovedFromSimulation() slot
-    void userRemoveRobotFromSimulation(robot_id rId);
-
-    //Signal that the user switched the simulation map
-    void userSetMapInSimulation(QString mapFilePath);
-
-    //Signal that they user wants to view properties
-    //for a robot
-    void userSelectedRobot(robot_id rId);
+    //User requests that something be added to or removed from
+    //the simulation
+    void userAddWorldObjectToSimulation(WorldObject_If* obj);
+    void userRemoveWorldObjectFromSimulation(object_id oId);
 
 public slots:
-    //Simulator core added a robot to simulation
-    //Do not delete the robot interface when the robot is removed; it will be handled elsewhere
-    virtual void robotAddedToSimulation(Robot_Properties* robot) = 0;
+    //Simulator core added something to the simulation
+    //Do not delete the world object when it is removed; that will be handled elsewhere
+    virtual void worldObjectAddedToSimulation(WorldObjectProperties_If* object, object_id oId) = 0;
 
-    //Simulator core removed a robot from simulation
-    virtual void robotRemovedFromSimulation(robot_id rId) = 0;
-
-    //A robot was selected as the 'current' robot
-    virtual void robotSelected(robot_id rId) = 0;
-
-    //TODO: Need some way to specify which map to ui
-    virtual void mapSetInSimulation() = 0;
+    //Simulator core removed something from simulation
+    virtual void worldObjectRemovedFromSimulation(object_id oId) = 0;
 
     //Slots to indicate that physics settings changed
     virtual void physicsTickChanged(double rate_hz, double duration_s) = 0;

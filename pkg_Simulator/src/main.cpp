@@ -21,7 +21,6 @@
 #include "basic_maploader.h"
 #include "basic_physics.h"
 #include "basic_robotloader.h"
-#include "basic_ui.h"
 #include "basic_viewer.h"
 #include "ui/mainwindow.h"
 #include "sdsmt_simulator/drivetrain_plugin.h"
@@ -104,16 +103,16 @@ int main(int argc, char** argv)
     MainWindow::visualizerFactory visuals =
     []()
     {
-        return new BasicViewer();
+        return new BasicViewer;
     };
 
-    MapLoader_If* mapLoader = new BasicMapLoader();
+    MapLoader_If* mapLoader = new BasicMapLoader;
     RobotLoader_If* robotLoader = new BasicRobotLoader(driveTrainPlugins, sensorPlugins);
 
-    Simulator_Physics_If* physics = new BasicPhysics();
-    Simulator_Ui_If* userinterface = new MainWindow(visuals);
+    Simulator_Physics_If* physics = new BasicPhysics;
+    Simulator_Ui_If* userinterface = new MainWindow(visuals, mapLoader, robotLoader);
 
-    SimulatorCore sim(mapLoader, robotLoader, physics, userinterface, &app);
+    SimulatorCore sim(physics, userinterface, &app);
 
     sim.start();
 
@@ -121,7 +120,7 @@ int main(int argc, char** argv)
     * Run application
     ******************/
     //Start main app
-    int ret = app.exec();\
+    int ret = app.exec();
 
     return ret;
 }

@@ -19,8 +19,8 @@ void Floating_Drivetrain::_channelChanged(QVariant channel)
     //qDebug() << "Floating drivetrain channel changed to " << channel;
     if(_connected)
     {
-        disconnectFromROS();
-        connectToROS();
+        disconnectChannels();
+        connectChannels();
     }
 }
 
@@ -31,25 +31,21 @@ void Floating_Drivetrain::actualVelocity(double xDot, double yDot, double thetaD
     velocity_theta.set(thetaDot);
 }
 
-void Floating_Drivetrain::connectToROS()
+void Floating_Drivetrain::connectChannels()
 {
     if(_connected)
-        disconnectFromROS();
+        disconnectChannels();
 
     _listenChannel = _rosNode.subscribe(velocity_channel.get().toString().toStdString(), 10, &Floating_Drivetrain::_incomingMessageSi, this);
     _connected = true;
 }
 
-void Floating_Drivetrain::disconnectFromROS()
+void Floating_Drivetrain::disconnectChannels()
 {
     _listenChannel.shutdown();
     _connected = false;
 }
 
-QVector<b2Shape*> Floating_Drivetrain::getModel()
-{
-
-}
 
 void Floating_Drivetrain::_incomingMessageSl(std_msgs::Float64MultiArray data)
 {

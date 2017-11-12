@@ -2,11 +2,12 @@
 #define SDSMT_SIMULATOR_H
 
 #include "interfaces/map_loader_if.h"
-#include "interfaces/robot_interfaces.h"
 #include "interfaces/robot_loader_if.h"
 #include "interfaces/simulator_physics_if.h"
 #include "interfaces/simulator_ui_if.h"
+#include "interfaces/world_object_if.h"
 #include "interfaces/simulator_visual_if.h"
+#include "map.h"
 
 #include <QObject>
 #include <QMap>
@@ -18,30 +19,24 @@ class SimulatorCore : public QObject
 {
     Q_OBJECT
 
-    MapLoader_If* _mapLoader;
-    RobotLoader_If* _robotLoader;
-
     Simulator_Physics_If* _physicsEngine;
     Simulator_Ui_If* _userInterface;
 
-    robot_id _nextRobotId = 0;
-    QMap<robot_id, Robot*> _activeRobots;
+    object_id _nextObject = 1;
+    QMap<object_id, WorldObject_If*> _worldObjects;
 
 public:
-    SimulatorCore(MapLoader_If* mapLoad, RobotLoader_If* robotLoad,
-                    Simulator_Physics_If* physics, Simulator_Ui_If* ui,
-                    QObject* parent = nullptr);
+    SimulatorCore(Simulator_Physics_If* physics, Simulator_Ui_If* ui,
+                   QObject* parent = nullptr);
     ~SimulatorCore();
 
     void start();
 
 signals:
-    void robotRemoved(robot_id rId);
+    void objectRemoved(object_id rId);
 
-    void robotAdded(Robot_Physics* interface);
-    void robotAdded(Robot_Properties* interface);
-
-    void mapObjectsLoaded(QVector<b2Shape*> shapes);
+    void objectAdded(WorldObjectPhysics_If* interface, object_id id);
+    void objectAdded(WorldObjectProperties_If* interface, object_id id);
 
     void errorMsg(QString);
 
@@ -54,10 +49,8 @@ signals:
     void physicsTickSet(double, double);
 
 public slots:
-    void setSimMapFromFile(QString file);
-
-    void addSimRobotFromFile(QString file);
-    void removeSimRobot(robot_id rId);
+    void addSimObject(WorldObject_If* obj);
+    void removeSimObject(object_id oId);
 };
 
 #endif // SDSMT_SIMULATOR_H

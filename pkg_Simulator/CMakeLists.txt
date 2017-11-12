@@ -47,41 +47,38 @@ set(MOC_HDRS
     include/sdsmt_simulator/sensor_if.h
     include/sdsmt_simulator/robotcomponent_if.h
     include/sdsmt_simulator/properties_if.h
+    include/sdsmt_simulator/model.h
 
-    include/interfaces/robot_interfaces.h
     include/interfaces/simulator_physics_if.h
     include/interfaces/simulator_ui_if.h
     include/interfaces/simulator_visual_if.h
-    include/interfaces/screen_model_if.h
+    include/interfaces/world_object_if.h
 
     include/basic_physics.h
-    include/basic_ui.h
     include/basic_viewer.h
     include/simulator_core.h
     include/robot.h
+    include/map.h
 
-    include/ui/emptysimwindow.h
-    include/ui/mainwindow.h)
+    include/ui/mainwindow.h
+    )
 
 ## .ui qt widgets form files
 set(UI_FILES
-    ui/emptysimwindow.ui
     ui/mainwindow.ui)
 
 ## Any other source files
 set(CPP_SRCS
-    src/main.cpp
     src/basic_maploader.cpp
     src/basic_physics.cpp
     src/basic_robotloader.cpp
-    src/basic_ui.cpp
     src/basic_viewer.cpp
     src/simulator_core.cpp
     src/robot.cpp
 
-    src/ui/emptysimwindow.cpp
     src/map.cpp
     src/ui/mainwindow.cpp
+    src/main.cpp
     )
 
 set(RCC_FILES ui/resources.qrc)

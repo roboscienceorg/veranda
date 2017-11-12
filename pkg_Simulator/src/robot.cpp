@@ -3,58 +3,93 @@
 #include <QDebug>
 
 Robot::Robot(QVector<b2Shape *> body, DriveTrain_If* dt, double x0, double y0, double theta0, QVector<Sensor_If*> sensors, QObject* parent) :
-    PropertyObject_If(parent), _x0(x0), _y0(y0), _theta0(theta0*DEG2RAD), _drivetrain(dt)
+    WorldObject_If(parent), _x0(x0), _y0(y0), _theta0(theta0*DEG2RAD), _drivetrain(dt)
 {
-    connect(_drivetrain, &DriveTrain_If::targetVelocity, this, &Robot::targetVelocity);
+    _model = new Model({}, body, this);
+    _allModels.push_back(_model);
 
-    _model = body;
+    connect(_drivetrain, &DriveTrain_If::targetVelocity, this, &Robot::targetVelocity);
+    _bodiesRequired += dt->dynamicBodiesRequired();
 
     QMap<QString, PropertyView> props = dt->getAllProperties();
     for(auto iter = props.begin(); iter != props.end(); iter++)
+    {
         _properties.insert(dt->propertyGroupName() + "/" + iter.key(), iter.value());
+    }
+    _model->addChildren(_drivetrain->getModels());
 
     for(Sensor_If* s : sensors)
     {
+        _bodiesRequired += s->dynamicBodiesRequired();
+
         props = s->getAllProperties();
         for(auto iter = props.begin(); iter != props.end(); iter++)
             _properties.insert(s->propertyGroupName() + "/" + iter.key(), iter.value());
+        _model->addChildren(s->getModels());
     }
 }
 
-void Robot::setPhysicsBody(b2Body* body)
+void Robot::clearDynamicBodies()
 {
-    if(body != nullptr)
+    _drivetrain->clearDynamicBodies();
+    for(Sensor_If* s : _sensors)
+        s->clearDynamicBodies();
+    _mainBody = nullptr;
+}
+
+QVector<b2JointDef *> Robot::setDynamicBodies(QVector<b2Body*>& bodies)
+{
+    QVector<b2JointDef*> joints;
+
+    QVector<b2Body*> tmp;
+    int i=0;
+    for(int j=0; j< _drivetrain->dynamicBodiesRequired(); j++, i++)
+        tmp.push_back(bodies.at(j));
+    joints += _drivetrain->setDynamicBodies(tmp);
+
+    for(Sensor_If* s : _sensors)
     {
-        for(b2Shape* s : _model)
-        {
-            b2FixtureDef bodyDef;
-            bodyDef.shape = s;
-            bodyDef.density = 1.0;
-            bodyDef.friction = 0.0;
-
-            body->CreateFixture(&bodyDef);
-        }
-        body->SetLinearVelocity(b2Vec2(0,0));
-        body->SetAngularVelocity(0);
-        body->SetTransform(b2Vec2(_x0, _y0), _theta0);
-        qDebug() << "Starting robot at " << _x0 << _y0 << _theta0;
+        tmp.clear();
+        for(int j=0; j<s->dynamicBodiesRequired(); j++, i++)
+            tmp.push_back(bodies.at(j));
+        joints += s->setDynamicBodies(tmp);
     }
-    _bodyPhysics = body;
+
+    _mainBody = bodies.at(i);
+    for(b2Shape* s : _model->shapes())
+    {
+        b2FixtureDef bodyDef;
+        bodyDef.shape = s;
+        bodyDef.density = 1.0;
+        bodyDef.friction = 0.0;
+
+        _mainBody->CreateFixture(&bodyDef);
+    }
+    _mainBody->SetLinearVelocity(b2Vec2(0,0));
+    _mainBody->SetAngularVelocity(0);
+    _mainBody->SetTransform(b2Vec2(_x0, _y0), _theta0);
+    qDebug() << "Starting robot at " << _x0 << _y0 << _theta0;
+
+    return joints;
 }
 
-void Robot::connectToROS()
+void Robot::connectChannels()
 {
-    _drivetrain->connectToROS();
+    _drivetrain->connectChannels();
+    for(Sensor_If* s : _sensors)
+        s->connectChannels();
 }
 
-void Robot::disconnectFromROS()
+void Robot::disconnectChannels()
 {
-    _drivetrain->disconnectFromROS();
+    _drivetrain->disconnectChannels();
+    for(Sensor_If* s : _sensors)
+        s->disconnectChannels();
 }
 
 void Robot::targetVelocity(double x, double y, double theta)
 {
-    if(_bodyPhysics)
+    if(_mainBody)
     {
         //Translate to world coordinate velocities
         if(!_drivetrain->usesWorldCoords())
@@ -76,27 +111,27 @@ void Robot::targetVelocity(double x, double y, double theta)
             theta *= DEG2RAD;
         }
 
-        _bodyPhysics->SetLinearVelocity(b2Vec2(x, y));
-        _bodyPhysics->SetAngularVelocity(theta);
+        _mainBody->SetLinearVelocity(b2Vec2(x, y));
+        _mainBody->SetAngularVelocity(theta);
     }
 }
 
-void Robot::worldTicked(const double t, const b2World* world)
+void Robot::worldTicked(const b2World* world, const double& t)
 {
-    if(_bodyPhysics)
+    if(_mainBody)
     {
-        _drivetrain->worldTicked(t, world, _bodyPhysics);
-        for(Sensor_If* s : _sensors) s->worldTicked(t, world, _bodyPhysics);
+        _drivetrain->worldTicked(world, t);
+        for(Sensor_If* s : _sensors) s->worldTicked(world, t);
 
-        _x = _bodyPhysics->GetWorldCenter().x;
-        _y = _bodyPhysics->GetWorldCenter().y;
-        _theta = _bodyPhysics->GetAngle();
+        _x = _mainBody->GetWorldCenter().x;
+        _y = _mainBody->GetWorldCenter().y;
+        _theta = _mainBody->GetAngle();
 
         while(_theta < 0) _theta += 2*PI;
         while(_theta > 2*PI) _theta -= 2*PI;
 
         //qDebug() << _x << _y << _theta;
 
-        _newPosition(_x, _y, _theta*RAD2DEG);
+        _model->setTransform(_x, _y, _theta*RAD2DEG);
     }
 }

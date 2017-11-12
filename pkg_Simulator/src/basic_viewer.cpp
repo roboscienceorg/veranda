@@ -6,6 +6,11 @@
 #include <QMouseEvent>
 #include <QMessageBox>
 
+#include <QGraphicsEllipseItem>
+#include <QGraphicsLineItem>
+#include <QGraphicsPolygonItem>
+#include <QGraphicsItemGroup>
+
 #include <cmath>
 
 //ScreenModel_if - found in a header file
@@ -30,69 +35,108 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     setLayout(_children);
 }
 
+QGraphicsItem* BasicViewer::drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
+{
+    QGraphicsItem* newShape = nullptr;
+    switch(s->m_type)
+    {
+        case b2Shape::Type::e_circle:
+        {
+            b2CircleShape* circle = static_cast<b2CircleShape*>(s);
+            double r = circle->m_radius;
+            newShape = new QGraphicsEllipseItem(circle->m_p.x-r * WORLD_SCALE, -(circle->m_p.y+r) * WORLD_SCALE,
+                                                circle->m_radius*2 * WORLD_SCALE, circle->m_radius*2 * WORLD_SCALE, itemParent);
+
+        }
+        break;
+        case b2Shape::Type::e_edge:
+        {
+            b2EdgeShape* edge = static_cast<b2EdgeShape*>(s);
+            newShape = new QGraphicsLineItem(edge->m_vertex1.x * WORLD_SCALE, -edge->m_vertex1.y * WORLD_SCALE,
+                                             edge->m_vertex2.x * WORLD_SCALE, -edge->m_vertex2.y * WORLD_SCALE, itemParent);
+        }
+        break;
+    }
+    return newShape;
+}
+
+QGraphicsItem* BasicViewer::drawModel(Model* m, QGraphicsItem* parent)
+{
+    QGraphicsItemGroup* baseItem = new QGraphicsItemGroup(parent);
+
+    //Draw all shapes as children of the base item
+    for(b2Shape* s : m->shapes())
+        baseItem->addToGroup(drawb2Shape(s));
+
+    //Draw all children models, making them children shape objects
+    //to transform to relative coordinates
+    for(Model* m_sub : m->children())
+        drawModel(m_sub, baseItem);
+
+    //Set location of model
+    double x, y, t;
+    m->getTransform(x, y, t);
+    baseItem->moveBy(x * WORLD_SCALE, -y*WORLD_SCALE);
+    baseItem->setRotation(-t);
+
+    return baseItem;
+}
+
 //Something new was added to the world view
 //It needs to get added to the graphics scene and indexed
 //When the model updates, (transformChanged) the graphics shape
 //needs to be moved within the scene
-void BasicViewer::modelAddedToScreen(ScreenModel_If* model, model_id id)
+void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 {
-    //set the id to a model
-    _models[id] = model;
+    _models[id] = objects;
 
-    double x, y, t;
-    model->getTransform(x, y, t);
-
-    //b2Shape types are what comes from physics engine
-    for(b2Shape* s : model->getModel())
+    for(Model* m : objects)
     {
-        QGraphicsItem* newShape = nullptr;
-        switch(s->m_type)
-        {
-            case b2Shape::Type::e_circle:
-            {
-                b2CircleShape* circle = static_cast<b2CircleShape*>(s);
-                double r = circle->m_radius;
-                newShape = _scene->addEllipse(circle->m_p.x-r * WORLD_SCALE, -(circle->m_p.y+r) * WORLD_SCALE,
-                                            circle->m_radius*2 * WORLD_SCALE, circle->m_radius*2 * WORLD_SCALE);
+        QGraphicsItem* graphic = drawModel(m);
+        _shapes[m] = graphic;
 
-            }
-            break;
-            case b2Shape::Type::e_edge:
-            {
-                b2EdgeShape* edge = static_cast<b2EdgeShape*>(s);
-                newShape = _scene->addLine(edge->m_vertex1.x * WORLD_SCALE, -edge->m_vertex1.y * WORLD_SCALE,
-                                           edge->m_vertex2.x * WORLD_SCALE, -edge->m_vertex2.y * WORLD_SCALE);
-            }
-            break;
-        }
-        if(newShape)
-        {
-            _shapes[model].push_back(newShape);
-            newShape->moveBy(x * WORLD_SCALE, -y * WORLD_SCALE);
-            newShape->setRotation(-t);
-        }
+        //If the model or one of its submodels changes, redraw the whole thing
+        connect(m, &Model::modelChanged, this, &BasicViewer::modelChanged);
+        connect(m, &Model::childModelChanged, this, &BasicViewer::modelChanged);
+        connect(m, &Model::childTransformChanged, this, &BasicViewer::modelChanged);
+
+        //If the base model moves, update the transform
+        connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
     }
-    connect(model, &ScreenModel_If::transformChanged, this, &BasicViewer::modelMoved);
-
 }
 
 
 //Updates a graphics scene object to have a new
 //location
-void BasicViewer::modelMoved(ScreenModel_If *m, double dx, double dy, double dt)
+void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
 {
     double x, y, t;
     m->getTransform(x, y, t);
+
     x *= WORLD_SCALE;
     y *= WORLD_SCALE;
+
     dx *= WORLD_SCALE;
     dy *= WORLD_SCALE;
 
-    for(QGraphicsItem* i : _shapes[m])
-    {
-        i->moveBy(dx, -dy);
-        i->setRotation(-t);
-    }
+    _shapes[m]->moveBy(dx, -dy);
+    _shapes[m]->setRotation(-t);
+}
+
+void BasicViewer::modelChanged(Model *m)
+{
+    _scene->removeItem(_shapes[m]);
+
+    QGraphicsItem* graphic = drawModel(m);
+    _shapes[m] = graphic;
+
+    //If the model or one of its submodels changes, redraw the whole thing
+    connect(m, &Model::modelChanged, this, &BasicViewer::modelChanged);
+    connect(m, &Model::childModelChanged, this, &BasicViewer::modelChanged);
+    connect(m, &Model::childTransformChanged, this, &BasicViewer::modelChanged);
+
+    //If the base model moves, update the transform
+    connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
 }
 
 //World View Clicked
@@ -131,29 +175,29 @@ void BasicViewer::resizeEvent(QResizeEvent *event)
 }
 
 //for after the MVP 
-//The model identified by model_id is no longer on the world
-void BasicViewer::modelRemovedFromScreen(model_id id)
+//The object identified by object_id is no longer on the world
+void BasicViewer::objectRemovedFromScreen(object_id id)
 {
    //
 
 }
 
-//The model identified by model_id is in the world, but should not be drawn
+//The object identified by object_id is in the world, but should not be drawn
 //for users not wanting to see their sensors drawn
-void BasicViewer::modelDisabled(model_id id)
+void BasicViewer::objectDisabled(object_id id)
 {
 
 }
 
-//The model identified by model_id is in the world and should be drawn
-void BasicViewer::modelEnabled(model_id id)
+//The object identified by object_id is in the world and should be drawn
+void BasicViewer::objectEnabled(object_id id)
 {
 
 }
 
-//The model identified by model_id has been selcted
+//The object identified by object_id has been selcted
 //maybe we draw a selection box around it?
-void BasicViewer::modelSelected(model_id id)
+void BasicViewer::objectSelected(object_id id)
 {
 
 }

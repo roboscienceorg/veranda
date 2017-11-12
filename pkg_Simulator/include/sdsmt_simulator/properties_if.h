@@ -7,6 +7,10 @@
 #include <QDebug>
 #include <functional>
 
+#include "model.h"
+
+typedef uint64_t object_id;
+
 class PropertyInfo
 {
 public:
@@ -129,17 +133,6 @@ public:
 signals:
     void valueSet(QVariant);
     void requestValue(QVariant);
-};
-
-class PropertyObject_If : public QObject
-{
-    Q_OBJECT
-
-public:
-    PropertyObject_If(QObject* parent=nullptr) : QObject(parent){}
-
-    virtual QMap<QString, PropertyView>& getAllProperties() = 0;
-    virtual QString propertyGroupName() = 0;
 };
 
 #endif // PROPERTIES_H

@@ -12,14 +12,12 @@ INCLUDEPATH += include \
 SOURCES += \
     src/main.cpp \
     src/basic_viewer.cpp \
-    src/basic_ui.cpp \
     src/basic_physics.cpp \
     src/basic_maploader.cpp \
     src/basic_robotloader.cpp \
     src/robot.cpp \
 \
     src/ui/mainwindow.cpp \
-    src/ui/emptysimwindow.cpp \
     src/simulator_core.cpp \
     src/map.cpp
 
@@ -32,18 +30,13 @@ HEADERS += \
     include/interfaces/simulator_ui_if.h \
     include/interfaces/simulator_physics_if.h \
     include/interfaces/robot_loader_if.h \
-    include/interfaces/robot_interfaces.h \
-    include/interfaces/screen_model_if.h \
 \
     include/basic_physics.h \
-    include/basic_ui.h \
     include/basic_viewer.h \
     include/basic_maploader.h \
     include/basic_robotloader.h \
-    include/ui/emptysimwindow.h \
 \
     include/robot.h \
-    include/interfaces/screen_model_if.h \
     include/ui/mainwindow.h \
 \
     include/simulator_core.h \
@@ -51,7 +44,9 @@ HEADERS += \
     include/sdsmt_simulator/drivetrain_plugin.h \
     include/sdsmt_simulator/robotcomponent_if.h \
     include/map.h \
-    include/sdsmt_simulator/properties_if.h
+    include/sdsmt_simulator/properties_if.h \
+    include/sdsmt_simulator/model.h \
+    include/interfaces/world_object_if.h
 
 FORMS    += \
     ui/mainwindow.ui \

@@ -6,23 +6,22 @@
 
 using namespace std;
 
-SimulatorCore::SimulatorCore(MapLoader_If *mapLoad, RobotLoader_If *robotLoad,
-                                 Simulator_Physics_If *physics, Simulator_Ui_If *ui,
+SimulatorCore::SimulatorCore(Simulator_Physics_If *physics, Simulator_Ui_If *ui,
                                  QObject *parent) :
 QObject(parent),
-_mapLoader(mapLoad), _robotLoader(robotLoad),
 _physicsEngine(physics), _userInterface(ui)
 {
-    connect(_userInterface, &Simulator_Ui_If::userRemoveRobotFromSimulation, this, &SimulatorCore::removeSimRobot);
-    connect(this, &SimulatorCore::robotRemoved, _userInterface, &Simulator_Ui_If::robotRemovedFromSimulation);
-    connect(this, &SimulatorCore::robotRemoved, _physicsEngine, &Simulator_Physics_If::removeRobot);
+    qRegisterMetaType<object_id>("object_id");
 
-    connect(_userInterface, &Simulator_Ui_If::userAddRobotIntoSimulation, this, &SimulatorCore::addSimRobotFromFile);
-    connect(this, static_cast<void (SimulatorCore::*)(Robot_Physics*)>(&SimulatorCore::robotAdded), _physicsEngine, &Simulator_Physics_If::addRobot);
-    connect(this, static_cast<void (SimulatorCore::*)(Robot_Properties*)>(&SimulatorCore::robotAdded), _userInterface, &Simulator_Ui_If::robotAddedToSimulation);
+    connect(_userInterface, &Simulator_Ui_If::userRemoveWorldObjectFromSimulation, this, &SimulatorCore::removeSimObject);
+    connect(this, &SimulatorCore::objectRemoved, _userInterface, &Simulator_Ui_If::worldObjectRemovedFromSimulation);
+    connect(this, &SimulatorCore::objectRemoved, _physicsEngine, &Simulator_Physics_If::removeWorldObject);
 
-    connect(_userInterface, &Simulator_Ui_If::userSetMapInSimulation, this, &SimulatorCore::setSimMapFromFile);
-    connect(this, &SimulatorCore::mapObjectsLoaded, _physicsEngine, &Simulator_Physics_If::newStaticShapes);
+    connect(_userInterface, &Simulator_Ui_If::userAddWorldObjectToSimulation, this, &SimulatorCore::addSimObject);
+    connect(this, static_cast<void (SimulatorCore::*)(WorldObjectPhysics_If*, object_id)>(&SimulatorCore::objectAdded),
+            _physicsEngine, &Simulator_Physics_If::addWorldObject);
+    connect(this, static_cast<void (SimulatorCore::*)(WorldObjectProperties_If*, object_id)>(&SimulatorCore::objectAdded),
+            _userInterface, &Simulator_Ui_If::worldObjectAddedToSimulation);
 
     connect(this, &SimulatorCore::userStartPhysics, _physicsEngine, &Simulator_Physics_If::start);
     connect(this, &SimulatorCore::userStopPhysics, _physicsEngine, &Simulator_Physics_If::stop);
@@ -45,9 +44,9 @@ _physicsEngine(physics), _userInterface(ui)
 
 SimulatorCore::~SimulatorCore()
 {
-    //Destroy all remaining robots
-    while(_activeRobots.size())
-        removeSimRobot(_activeRobots.firstKey());
+    //Destroy all remaining objects
+    while(_worldObjects.size())
+        removeSimObject(_worldObjects.firstKey());
 
     //Stop physics engine
     userStopPhysics();
@@ -55,9 +54,6 @@ SimulatorCore::~SimulatorCore()
 
     //Destroy ui
     _userInterface->deleteLater();
-
-    delete _robotLoader;
-    delete _mapLoader;
 }
 
 void SimulatorCore::start()
@@ -67,78 +63,42 @@ void SimulatorCore::start()
 
     //Show UI
     _userInterface->showMainWindow();
-
-    //Add default robot
-    addSimRobotFromFile("");
-    addSimRobotFromFile("");
-    addSimRobotFromFile("");
-
-    for(auto iter = _activeRobots.begin(); iter != _activeRobots.end(); iter++)
-    {
-        //qDebug() << "Set channel property";
-        iter.value()->getAllProperties()["Diff Drive/channels/input_velocities"].set("robot0/wheel_velocities");
-        iter.value()->getAllProperties()["Diff Drive/axle_length"].set(1);
-        iter.value()->getAllProperties()["Diff Drive/wheel_radius"].set(0.2);
-    }
 }
 
-void SimulatorCore::setSimMapFromFile(QString file)
+
+void SimulatorCore::addSimObject(WorldObject_If* obj)
 {
-    QVector<b2Shape*> mapShapes;
-    QString error;
-    _mapLoader->loadMapFile(file);
-    if(!error.size())
-    {
-        emit mapObjectsLoaded(mapShapes);
-    }
+    connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &WorldObject_If::connectChannels);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &WorldObject_If::disconnectChannels);
+
+    WorldObjectPhysics_If* phys_interface = new WorldObjectPhysics_If(obj, obj);
+    WorldObjectProperties_If* prop_interface = new WorldObjectProperties_If(obj, obj);
+
+    //Send out object interfaces
+    emit objectAdded(phys_interface, _nextObject);
+    emit objectAdded(prop_interface, _nextObject);
+
+    //Keep references to robot and thread
+    _worldObjects[_nextObject] = obj;
+
+    _nextObject++;
+
+    if(_physicsEngine->running())
+        obj->connectChannels();
     else
-    {
-        emit errorMsg("Map " + file + " failed to load: " + error);
-    }
+        obj->disconnectChannels();
 }
 
-void SimulatorCore::addSimRobotFromFile(QString file)
+void SimulatorCore::removeSimObject(object_id oId)
 {
-    Robot* newBot;
-    QString error = _robotLoader->loadRobotFile(file, newBot);
-    if(!error.size())
+    if(_worldObjects.contains(oId))
     {
-        connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, newBot, &Robot::connectToROS);
-        connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, newBot, &Robot::disconnectFromROS);
+        //Signal that object is no longer in simulation
+        emit objectRemoved(oId);
 
-        Robot_Physics* phys_interface = new Robot_Physics(newBot, _nextRobotId);
-        Robot_Properties* prop_interface = new Robot_Properties(newBot, _nextRobotId);
-
-        //Send out robot interfaces
-        emit robotAdded(phys_interface);
-        emit robotAdded(prop_interface);
-
-        //Keep references to robot and thread
-        _activeRobots[_nextRobotId] = newBot;
-
-        _nextRobotId++;
-
-        if(_physicsEngine->running())
-            newBot->connectToROS();
-        else
-            newBot->disconnectFromROS();
-    }
-    else
-    {
-        emit errorMsg("Robot " + file + " failed to load: " + error);
-    }
-}
-
-void SimulatorCore::removeSimRobot(robot_id rId)
-{
-    if(_activeRobots.contains(rId))
-    {
-        //Signal that robot is no longer in simulation
-        emit robotRemoved(rId);
-
-        //Delete robot object
-        //This should delete all robot interfaces; they are children to it
-        delete _activeRobots[rId];
-        _activeRobots.remove(rId);
+        //Delete object
+        //This should delete all object interfaces; they are children to it
+        delete _worldObjects[oId];
+        _worldObjects.remove(oId);
     }
 }

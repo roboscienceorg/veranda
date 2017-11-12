@@ -6,7 +6,7 @@
 
 #include <Box2D/Box2D.h>
 
-#include "robot_interfaces.h"
+#include "world_object_if.h"
 
 class Simulator_Physics_If : public QObject
 {
@@ -25,17 +25,11 @@ public slots:
     //Set tick rate and duration
     virtual void setTick(double rate_hz, double duration_s) = 0;
 
-    //Sets the static shapes in the simulation
-    virtual void newStaticShapes(QVector<b2Shape*> shapes) = 0;
-
-    //Adds a new robot to the simulation
-    //The simulator should add the robot body as a dynamic shape
-    //And connect signals to the robot slots
-    //Do not delete the robot interface when the robot is removed; it will be handled elsewhere
-    virtual void addRobot(Robot_Physics* robot) = 0;
+    //Adds world objects to simulation
+    virtual void addWorldObject(WorldObjectPhysics_If* obj, object_id oId) = 0;
 
     //Removes a robot from simulation
-    virtual void removeRobot(robot_id rId) = 0;
+    virtual void removeWorldObject(object_id oId) = 0;
 
 signals:
     void physicsStarted();

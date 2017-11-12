@@ -2,6 +2,7 @@
 #define BASIC_VIEWER_H
 
 #include "interfaces/simulator_visual_if.h"
+#include "sdsmt_simulator/model.h"
 
 #include <QMap>
 #include <QTimer>
@@ -18,8 +19,8 @@ class BasicViewer : public Simulator_Visual_If
 {
     Q_OBJECT
 
-    QMap<model_id, ScreenModel_If*> _models;
-    QMap<ScreenModel_If*, QVector<QGraphicsItem*>> _shapes;
+    QMap<object_id, QVector<Model*>> _models;
+    QMap<Model*, QGraphicsItem*> _shapes;
 
     QTimer _refresh;
 
@@ -27,19 +28,24 @@ class BasicViewer : public Simulator_Visual_If
     QGraphicsScene* _scene;
     QLayout* _children;
 
+    QGraphicsItem* drawb2Shape(b2Shape* s, QGraphicsItem* itemParent = nullptr);
+    QGraphicsItem* drawModel(Model* m, QGraphicsItem* parent=nullptr);
+
 public:
     BasicViewer(QWidget* parent = nullptr);
     QPointF mouseClickPosition;
 
 public slots:
-    void modelAddedToScreen(ScreenModel_If* model, model_id id) override;
-    void modelRemovedFromScreen(model_id id) override;
-    void modelDisabled(model_id id) override;
-    void modelEnabled(model_id id) override;
-    void modelSelected(model_id id) override;
+    void objectAddedToScreen(QVector<Model *> objects, object_id id) override;
+    void objectRemovedFromScreen(object_id id) override;
+    void objectDisabled(object_id id) override;
+    void objectEnabled(object_id id) override;
+    void objectSelected(object_id id) override;
 
 private slots:
-    void modelMoved(ScreenModel_If* m, double dx, double dy, double dt);
+    void modelMoved(Model* m, double dx, double dy, double dt);
+    void modelChanged(Model* m);
+
     void mousePressEvent(QMouseEvent *event);
     void resizeEvent(QResizeEvent* event);
 };

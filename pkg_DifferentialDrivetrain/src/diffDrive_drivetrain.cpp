@@ -14,8 +14,8 @@ void DiffDrive_Drivetrain::_channelChanged(QVariant)
 {
     if(_connected)
     {
-        disconnectFromROS();
-        connectToROS();
+        disconnectChannels();
+        connectChannels();
     }
 }
 
@@ -26,24 +26,19 @@ void DiffDrive_Drivetrain::actualVelocity(double xDot, double yDot, double theta
     velocity_theta.set(thetaDot);
 }
 
-void DiffDrive_Drivetrain::connectToROS()
+void DiffDrive_Drivetrain::connectChannels()
 {
     if(_connected)
-        disconnectFromROS();
+        disconnectChannels();
 
     _listenChannel = _rosNode.subscribe(velocity_channel.get().toString().toStdString(), 10, &DiffDrive_Drivetrain::_incomingMessageSi, this);
     _connected = true;
 }
 
-void DiffDrive_Drivetrain::disconnectFromROS()
+void DiffDrive_Drivetrain::disconnectChannels()
 {
     _listenChannel.shutdown();
     _connected = false;
-}
-
-QVector<b2Shape*> DiffDrive_Drivetrain::getModel()
-{
-
 }
 
 void DiffDrive_Drivetrain::_incomingMessageSl(std_msgs::Float64MultiArray data)

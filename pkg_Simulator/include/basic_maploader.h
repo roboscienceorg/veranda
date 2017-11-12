@@ -12,6 +12,11 @@
 
 class BasicMapLoader : public MapLoader_If
 {
+public:
+    BasicMapLoader(){}
+    ~BasicMapLoader(){}
+
+    virtual Map* loadMapObject(QJsonObject world) override;
     virtual Map* loadMapFile(QString filename) override;
 };
 

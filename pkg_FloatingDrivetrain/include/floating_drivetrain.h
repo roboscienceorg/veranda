@@ -43,7 +43,7 @@ class Floating_Drivetrain : public DriveTrain_If
 public:
     Floating_Drivetrain(QObject* parent=nullptr);
 
-    virtual QVector<b2Shape*> getModel();
+    virtual WorldObject_If* clone(QObject* newParent=nullptr){ return nullptr; }
 
     virtual bool usesWorldCoords(){return true;}
     virtual bool usesDegrees(){return false;}
@@ -67,11 +67,12 @@ public slots:
     virtual void actualVelocity(double xDot, double yDot, double thetaDot);
 
     //Connects to all ROS topics
-    virtual void connectToROS();
+    virtual void connectChannels();
 
     //Disconnects all ROS topics
-    virtual void disconnectFromROS();
-    virtual void worldTicked(const double t, const b2World*, const b2Body*){}
+    virtual void disconnectChannels();
+
+    virtual void worldTicked(const b2World*, const double&){}
 };
 
 #endif // FLOATER_DRIVETRAIN_H

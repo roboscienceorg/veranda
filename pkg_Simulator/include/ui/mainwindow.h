@@ -5,9 +5,9 @@
 #include <QStandardItem>
 
 #include "interfaces/simulator_ui_if.h"
-#include "interfaces/robot_interfaces.h"
 #include "interfaces/simulator_visual_if.h"
-
+#include "interfaces/map_loader_if.h"
+#include "interfaces/robot_loader_if.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,32 +25,31 @@ private:
     visualizerFactory makeWidget;
     Simulator_Visual_If* visual;
 
+    MapLoader_If* mapLoader;
+    RobotLoader_If* robotLoader;
+
     int speed;
     bool play;
     bool record;
-    model_id modelNum;
-    model_id selected;
-    QMap<model_id, Robot_Properties*> models;
+    object_id selected;
+
+    QStandardItemModel* propertiesModel = nullptr;
+
+    QMap<object_id, WorldObjectProperties_If*> worldObjects;
 
     QMap<uint64_t, QString> displayed_properties;
 
 public:
-    explicit MainWindow(visualizerFactory factory, QWidget *parent = 0);
+    explicit MainWindow(visualizerFactory factory, MapLoader_If* mapLoad, RobotLoader_If* robotLoad, QWidget *parent = 0);
     ~MainWindow();
 
 public slots:
-    //Simulator core added a robot to simulation
-    //Do not delete the robot interface when the robot is removed; it will be handled elsewhere
-    void robotAddedToSimulation(Robot_Properties* robot);
+    //Simulator core added something to the simulation
+    //Do not delete the world object when it is removed; that will be handled elsewhere
+    virtual void worldObjectAddedToSimulation(WorldObjectProperties_If* object, object_id oId);
 
-    //Simulator core removed a robot from simulation
-    void robotRemovedFromSimulation(robot_id rId){}
-
-    //A robot was selected as the 'current' robot
-    void robotSelected(robot_id rId){}
-
-    //TODO: Need some way to specify which map to ui
-    void mapSetInSimulation(){}
+    //Simulator core removed something from simulation
+    virtual void worldObjectRemovedFromSimulation(object_id oId);
 
     //Slots to indicate that physics settings changed
     void physicsTickChanged(double rate_hz, double duration_s){}
@@ -61,7 +60,21 @@ public slots:
     void errorMessage(QString error){}
 
     //Slot to show main window
-    void showMainWindow(){ show(); }
+    void showMainWindow(){
+        show();
+
+        for(int i=0; i<3; i++)
+        {
+            Robot* r = robotLoader->loadRobotFile("");
+            if(r)
+            {
+                r->getAllProperties()["Diff Drive/channels/input_velocities"].set("robot0/wheel_velocities");
+                r->getAllProperties()["Diff Drive/axle_length"].set(1);
+                r->getAllProperties()["Diff Drive/wheel_radius"].set(0.2);
+                userAddWorldObjectToSimulation(r);
+            }
+        }
+    }
 
 private slots:
 
@@ -77,11 +90,16 @@ private slots:
     void importMapButtonClick();
 
     //Slots for build tools and properties
-    void modelSelected(model_id id);
+    void objectSelected(object_id id);
+    void nothingSelected();
     void listBuildTools(int mode);
 
 private:
     Ui::MainWindow *ui;
+
+signals:
+    void objectIsSelected(object_id id);
+    void nothingIsSelected();
 };
 
 #endif // MAINWINDOW_H

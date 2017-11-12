@@ -5,22 +5,23 @@
 #include <QTimer>
 
 #include <QObject>
-
-struct robotWorldData{
-    b2Body *robotBody;
-    Robot_Physics *robot;
-    double xDot;
-    double yDot;
-    double thetaDot;
-};
+#include <QMap>
 
 class BasicPhysics : public Simulator_Physics_If
 {
     Q_OBJECT
 
+    struct objectWorldData{
+        QVector<b2Body*> staticBodies;
+        QVector<b2Body*> dynamicBodies;
+        QVector<b2Joint*> joints;
+
+        WorldObjectPhysics_If *obj;
+    };
+
     b2World *world;
 
-    QVector<robotWorldData> robots;
+    QMap<object_id, objectWorldData> objects;
 
     QTimer* tick = nullptr;
 
@@ -41,19 +42,16 @@ public slots:
     //Set tick rate and duration
     virtual void setTick(double rate_hz, double duration_s) override;
 
-    //Sets the static shapes in the simulation
-    virtual void newStaticShapes(QVector<b2Shape*> shapes) override;
-
-    //Adds a new robot to the simulation
-    //The simulator should add the robot body as a dynamic shape
-    //And connect signals to the robot slots
-    //Do not delete the robot interface when the robot is removed; it will be handled elsewhere
-    virtual void addRobot(Robot_Physics* robot) override;
+    //Adds world objects to simulation
+    virtual void addWorldObject(WorldObjectPhysics_If* obj, object_id oId) override;
 
     //Removes a robot from simulation
-    virtual void removeRobot(robot_id rId) override;
+    virtual void removeWorldObject(object_id oId) override;
 
     void step();
+
+signals:
+    void worldTick(const b2World*, const double);
 };
 
 #endif // BASIC_PHYSICS_H
