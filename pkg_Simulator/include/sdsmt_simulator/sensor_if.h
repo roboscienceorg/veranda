@@ -14,8 +14,5 @@ class Sensor_If : public RobotComponent_If
 
 public:
     Sensor_If(QObject* parent = nullptr) : RobotComponent_If(parent){}
-
-signals:
-    void visualChanged(QVector<b2Shape*> visualObjects);
 };
 #endif // SENSOR_H

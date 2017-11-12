@@ -36,6 +36,24 @@ class Property : public QObject
     QVariant _value;
 
 public:
+    static QVariant double_validator(QVariant _old, QVariant _new)
+    {
+        bool valid;
+        _new.toDouble(&valid);
+        if(valid)
+            return _new;
+        return _old;
+    }
+
+    static QVariant int_validator(QVariant _old, QVariant _new)
+    {
+        bool valid;
+        _new.toInt(&valid);
+        if(valid)
+            return _new;
+        return _old;
+    }
+
     Property(PropertyInfo info = PropertyInfo(), QVariant defaultValue="",
             const std::function<QVariant(QVariant, QVariant)> validator = [](QVariant, QVariant _new){ return _new; },
             QObject* parent=nullptr) :
