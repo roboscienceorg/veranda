@@ -30,11 +30,14 @@ class BasicViewer : public Simulator_Visual_If
 
     QGraphicsItem* drawb2Shape(b2Shape* s, QGraphicsItem* itemParent = nullptr);
     QGraphicsItem* drawModel(Model* m, QGraphicsItem* parent=nullptr);
+    void rescale();
+
+    QPointF mouseClickPosition;
 
 public:
     BasicViewer(QWidget* parent = nullptr);
-    QPointF mouseClickPosition;
 
+    void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
 public slots:
     void objectAddedToScreen(QVector<Model *> objects, object_id id) override;
     void objectRemovedFromScreen(object_id id) override;

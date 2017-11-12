@@ -90,6 +90,14 @@ void SimulatorCore::addSimObject(WorldObject_If* obj)
         obj->connectChannels();
     else
         obj->disconnectChannels();
+
+    Map* asMap = qobject_cast<Map*>(obj);
+    if(asMap)
+    {
+        double xMin, xMax, yMin, yMax;
+        asMap->getBounds(xMin, yMin, xMax, yMax);
+        _userInterface->setWorldBounds(xMin, xMax, yMin, yMax);
+    }
 }
 
 void SimulatorCore::removeSimObject(object_id oId)

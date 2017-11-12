@@ -20,19 +20,16 @@
 //makes the 
 BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
 {
-    QRect viewRect(-30*WORLD_SCALE, -30*WORLD_SCALE, 60*WORLD_SCALE, 60*WORLD_SCALE);
-
     _children = new QVBoxLayout(this);
 
     _scene = new QGraphicsScene(this);
-    _scene->setSceneRect(viewRect);
-
     _viewer = new QGraphicsView(_scene, this);
     _viewer->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
-    _viewer->setSceneRect(viewRect);
 
     _children->addWidget(_viewer);
     setLayout(_children);
+
+    setWorldBounds(-30, 30, -30, 30);
 }
 
 QGraphicsItem* BasicViewer::drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
@@ -169,6 +166,11 @@ void BasicViewer::mousePressEvent(QMouseEvent *event)
 
 void BasicViewer::resizeEvent(QResizeEvent *event)
 {
+    rescale();
+}
+
+void BasicViewer::rescale()
+{
     //It appears that QGraphicsView::fitInView is broken in
     //Qt 5.5. This should be an acceptable alternative
     //If we allow the user to pan and zoom, then this will
@@ -186,6 +188,15 @@ void BasicViewer::resizeEvent(QResizeEvent *event)
     matrix.scale(scale,
                  scale);
     _viewer->setTransform(matrix);
+}
+
+void BasicViewer::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
+{
+    QRect viewRect(xMin*WORLD_SCALE, -yMax*WORLD_SCALE, (xMax-xMin)*WORLD_SCALE, (yMax-yMin)*WORLD_SCALE);
+    _scene->setSceneRect(viewRect);
+    _viewer->setSceneRect(viewRect);
+
+    rescale();
 }
 
 //for after the MVP 

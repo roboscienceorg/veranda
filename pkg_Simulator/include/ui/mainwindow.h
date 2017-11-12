@@ -59,10 +59,13 @@ public slots:
     //Slot to throw an error message to the user
     void errorMessage(QString error){}
 
+    void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
+
     //Slot to show main window
     void showMainWindow(){
         show();
 
+        qDebug() << "Populating default robots...";
         for(int i=0; i<3; i++)
         {
             Robot* r = robotLoader->loadRobotFile("");

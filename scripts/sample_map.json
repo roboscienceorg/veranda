@@ -1,8 +1,8 @@
 {
-    "xMin": -5,
-    "xMax": 5,
-    "yMin": -5,
-    "yMax": 5,
+    "xMin": -20,
+    "xMax": 20,
+    "yMin": -20,
+    "yMax": 20,
     "xOrigin": 0,
     "yOrigin": 0,
 

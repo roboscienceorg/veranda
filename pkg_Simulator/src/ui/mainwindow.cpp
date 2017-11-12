@@ -319,6 +319,25 @@ void MainWindow::objectSelected(object_id id)
     }
 }
 
+void MainWindow::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
+{
+    visual->setWorldBounds(xMin, xMax, yMin, yMax);
+
+    qDebug() << "Populating default robots...";
+    for(int i=0; i<3; i++)
+    {
+        Robot* r = robotLoader->loadRobotFile("");
+        if(r)
+        {
+            r->getAllProperties()["Diff Drive/channels/input_velocities"].set("robot0/wheel_velocities");
+            r->getAllProperties()["Diff Drive/axle_length"].set(1);
+            r->getAllProperties()["Diff Drive/wheel_radius"].set(0.2);
+            userAddWorldObjectToSimulation(r);
+            delete r;
+        }
+    }
+}
+
 //Add robot to the simulation world view
 void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties_If* object, object_id oId)
 {

@@ -61,6 +61,8 @@ public slots:
     virtual void errorMessage(QString error) = 0;
 
     virtual void showMainWindow() = 0;
+
+    virtual void setWorldBounds(double xMin, double xMax, double yMin, double yMax) = 0;
 };
 
 #endif // SIMULATOR_UI_H
