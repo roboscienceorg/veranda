@@ -1,4 +1,6 @@
 #include "map.h"
+#include "sdsmt_simulator/cloneshape.h"
+
 #include <QVector>
 
 Map::Map(QObject *parent) : WorldObject_If(parent)
@@ -120,4 +122,20 @@ void Map::setStaticBodies(QVector<b2Body*>& bodies)
 
         bodies[i]->CreateFixture(&fixDef);
     }
+}
+
+WorldObject_If* Map::clone(QObject* newParent)
+{
+    Map* newMap = new Map(newParent);
+
+    newMap->xMax.set(xMax.get());
+    newMap->xMin.set(xMin.get());
+    newMap->yMax.set(yMax.get());
+    newMap->yMin.set(yMin.get());
+    newMap->xOrigin.set(xOrigin.get());
+    newMap->yOrigin.set(yOrigin.get());
+
+    newMap->setStaticBodies(staticBodies);
+
+    return newMap;
 }

@@ -90,7 +90,11 @@ public:
 
     void removeShapes(QVector<b2Shape*> oldShapes)
     {
-        for(b2Shape* s : oldShapes) _shapes.removeAll(s);
+        for(b2Shape* s : oldShapes)
+        {
+            _shapes.removeAll(s);
+            delete s;
+        }
         modelChanged(this);
     }
 };

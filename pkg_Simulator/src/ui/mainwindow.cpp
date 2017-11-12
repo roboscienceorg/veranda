@@ -52,8 +52,6 @@ MainWindow::MainWindow(visualizerFactory factory, MapLoader_If *mapLoad, RobotLo
     connect(ui->importMapButton, SIGNAL (released()), this, SLOT (importMapButtonClick()));
 
     //Build tools list and world view slots
-    connect(visual, SIGNAL (userSelectedModel(model_id id)), this, SLOT (modelSelected(model_id id)));
-
     propertiesModel = new QStandardItemModel(0,2,this); //12 Rows and 2 Columns
     propertiesModel->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
     propertiesModel->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
@@ -241,7 +239,7 @@ void MainWindow::importMapButtonClick()
       case QMessageBox::Yes:
     {
           // Save was clicked
-          QString path = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", tr("Images (*.png *.jpg);;Json files (*.json)"));
+          QString path = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", tr("Json files (*.json);;Images (*.png *.jpg)"));
 
           if(path.length())
           {
@@ -249,8 +247,8 @@ void MainWindow::importMapButtonClick()
               if(map)
               {
                   //Clear out simulation
-                  for(auto iter = worldObjects.begin(); iter != worldObjects.end(); iter++)
-                    userRemoveWorldObjectFromSimulation(iter.key());
+                  while(worldObjects.size())
+                      userRemoveWorldObjectFromSimulation(worldObjects.firstKey());
 
                   //Add map into new simulation
                   userAddWorldObjectToSimulation(map);
@@ -272,6 +270,7 @@ void MainWindow::importMapButtonClick()
 void MainWindow::nothingSelected()
 {
     propertiesModel->setRowCount(0);
+    disconnect(propertiesModel, &QStandardItemModel::dataChanged, 0, 0);
     nothingIsSelected();
 }
 

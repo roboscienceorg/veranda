@@ -61,7 +61,7 @@ public:
     bool setStaticBodies(QVector<b2PolygonShape *> polygons);
 
     //Virtual clone
-    virtual WorldObject_If* clone(QObject* newParent=nullptr){ return nullptr; }
+    virtual WorldObject_If* clone(QObject* newParent=nullptr);
 
     //Interfaces for UI to display properties
     virtual QMap<QString, PropertyView>& getAllProperties(){ return properties; }

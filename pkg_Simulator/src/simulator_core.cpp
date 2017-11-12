@@ -68,6 +68,9 @@ void SimulatorCore::start()
 
 void SimulatorCore::addSimObject(WorldObject_If* obj)
 {
+    //Clone object to have local copy for distributing
+    obj = obj->clone();
+
     connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &WorldObject_If::connectChannels);
     connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &WorldObject_If::disconnectChannels);
 

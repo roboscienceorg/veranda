@@ -49,6 +49,8 @@ public:
 
     }
 
+    ~Property(){}
+
     const QVariant& get()
     { return _value; }
 
@@ -93,9 +95,15 @@ class PropertyView : public QObject
         if(_origin)
         {
             connect(_origin, &Property::valueSet, this, &PropertyView::valueSet);
-            connect(_origin, &Property::destroyed, [this](){_origin = nullptr;});
+            connect(_origin, &Property::destroyed, this, &PropertyView::_invalidate);
             connect(this, &PropertyView::requestValue, _origin, &Property::_set);
         }
+    }
+
+private slots:
+    void _invalidate()
+    {
+        _origin = nullptr;
     }
 
 public:

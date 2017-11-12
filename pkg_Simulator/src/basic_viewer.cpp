@@ -56,6 +56,16 @@ QGraphicsItem* BasicViewer::drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
                                              edge->m_vertex2.x * WORLD_SCALE, -edge->m_vertex2.y * WORLD_SCALE, itemParent);
         }
         break;
+        case b2Shape::Type::e_polygon:
+        {
+            b2PolygonShape* poly = static_cast<b2PolygonShape*>(s);
+
+            QPolygonF qpoly;
+            for(b2Vec2* vert = poly->m_vertices; vert != poly->m_vertices + poly->m_count; vert++)
+                qpoly.append(QPointF(vert->x*WORLD_SCALE, -vert->y*WORLD_SCALE));
+
+            newShape = new QGraphicsPolygonItem(qpoly, itemParent);
+        }
     }
     return newShape;
 }
@@ -102,6 +112,8 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 
         //If the base model moves, update the transform
         connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
+
+        _scene->addItem(graphic);
     }
 }
 
@@ -137,6 +149,8 @@ void BasicViewer::modelChanged(Model *m)
 
     //If the base model moves, update the transform
     connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
+
+    _scene->addItem(graphic);
 }
 
 //World View Clicked
@@ -178,8 +192,15 @@ void BasicViewer::resizeEvent(QResizeEvent *event)
 //The object identified by object_id is no longer on the world
 void BasicViewer::objectRemovedFromScreen(object_id id)
 {
-   //
-
+    if(_models.contains(id))
+    {
+        for(Model* m : _models[id])
+        {
+            _scene->removeItem(_shapes[m]);
+            _shapes.remove(m);
+        }
+        _models.remove(id);
+    }
 }
 
 //The object identified by object_id is in the world, but should not be drawn

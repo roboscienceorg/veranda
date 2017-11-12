@@ -7,6 +7,7 @@
 #include "sdsmt_simulator/drivetrain_if.h"
 
 #include "sdsmt_simulator/model.h"
+#include "sdsmt_simulator/cloneshape.h"
 #include "interfaces/world_object_if.h"
 
 #include <Box2D/Box2D.h>
@@ -37,9 +38,10 @@ class Robot : public WorldObject_If
 
 public:
     Robot(QVector<b2Shape*> body, DriveTrain_If* dt, double x0, double y0, double theta0, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
+    ~Robot();
 
     //Virtual clone
-    virtual WorldObject_If* clone(QObject* newParent=nullptr){ return nullptr; }
+    virtual WorldObject_If* clone(QObject* newParent=nullptr);
 
     //Tells the physics engine how many bodies are needed
     virtual uint64_t staticBodiesRequired(){ return 0; }

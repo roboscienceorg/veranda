@@ -10,6 +10,16 @@ DiffDrive_Drivetrain::DiffDrive_Drivetrain(QObject *parent) : DriveTrain_If(pare
     qRegisterMetaType<std_msgs::Float64MultiArray>("std_msgs::Float64MultiArray");
 }
 
+WorldObject_If* DiffDrive_Drivetrain::clone(QObject *newParent)
+{
+    DiffDrive_Drivetrain* out = new DiffDrive_Drivetrain(newParent);
+    out->velocity_channel.set(velocity_channel.get());
+    out->wheel_radius.set(wheel_radius.get());
+    out->axle_length.set(axle_length.get());
+
+    return out;
+}
+
 void DiffDrive_Drivetrain::_channelChanged(QVariant)
 {
     if(_connected)

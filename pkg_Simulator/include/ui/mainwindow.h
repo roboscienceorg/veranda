@@ -72,6 +72,7 @@ public slots:
                 r->getAllProperties()["Diff Drive/axle_length"].set(1);
                 r->getAllProperties()["Diff Drive/wheel_radius"].set(0.2);
                 userAddWorldObjectToSimulation(r);
+                delete r;
             }
         }
     }

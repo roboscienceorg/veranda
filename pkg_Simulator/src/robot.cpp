@@ -10,6 +10,7 @@ Robot::Robot(QVector<b2Shape *> body, DriveTrain_If* dt, double x0, double y0, d
 
     connect(_drivetrain, &DriveTrain_If::targetVelocity, this, &Robot::targetVelocity);
     _bodiesRequired += dt->dynamicBodiesRequired();
+    _drivetrain->setParent(this);
 
     QMap<QString, PropertyView> props = dt->getAllProperties();
     for(auto iter = props.begin(); iter != props.end(); iter++)
@@ -21,12 +22,33 @@ Robot::Robot(QVector<b2Shape *> body, DriveTrain_If* dt, double x0, double y0, d
     for(Sensor_If* s : sensors)
     {
         _bodiesRequired += s->dynamicBodiesRequired();
+        s->setParent(this);
 
         props = s->getAllProperties();
         for(auto iter = props.begin(); iter != props.end(); iter++)
             _properties.insert(s->propertyGroupName() + "/" + iter.key(), iter.value());
         _model->addChildren(s->getModels());
     }
+}
+
+Robot::~Robot()
+{
+
+}
+
+WorldObject_If* Robot::clone(QObject *newParent)
+{
+    DriveTrain_If* newDt = static_cast<DriveTrain_If*>(_drivetrain->clone());
+
+    QVector<Sensor_If*> newSensors;
+    for(Sensor_If* s : _sensors)
+        newSensors.push_back(static_cast<Sensor_If*>(s->clone()));
+
+    QVector<b2Shape*> newBody;
+    for(b2Shape* s : _model->shapes())
+        newBody.push_back(cloneShape(s));
+
+    return new Robot(newBody, newDt, _x0, _y0, _theta0*RAD2DEG, newSensors, newParent);
 }
 
 void Robot::clearDynamicBodies()
