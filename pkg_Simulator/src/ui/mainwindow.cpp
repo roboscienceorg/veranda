@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QStandardItemModel>
+#include <QThread>
 
 #include <stdexcept>
 #include <string>
@@ -321,6 +322,10 @@ void MainWindow::objectSelected(object_id id)
 
 void MainWindow::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
 {
+    if(xMin > xMax) std::swap(xMin, xMax);
+    if(yMin > yMax) std::swap(yMin, yMax);
+
+    qDebug() << "Adjusting world size" << xMin << yMin << "->" << xMax << yMax;
     visual->setWorldBounds(xMin, xMax, yMin, yMax);
 
     qDebug() << "Populating default robots...";
@@ -329,9 +334,15 @@ void MainWindow::setWorldBounds(double xMin, double xMax, double yMin, double yM
         Robot* r = robotLoader->loadRobotFile("");
         if(r)
         {
+            r->setOrientation(rand() % int(xMax - xMin) + xMin, rand() % int(yMax - yMin) + yMin, rand()%360);
             r->getAllProperties()["Diff Drive/channels/input_velocities"].set("robot0/wheel_velocities");
             r->getAllProperties()["Diff Drive/axle_length"].set(1);
             r->getAllProperties()["Diff Drive/wheel_radius"].set(0.2);
+
+            r->getAllProperties()["Touch Ring/channels/output_touches"].set("robot0/touch_ring");
+            r->getAllProperties()["Touch Ring/sensor_count"].set(20);
+            r->getAllProperties()["Touch Ring/angle_end"].set(360);
+            r->getAllProperties()["Touch Ring/ring_radius"].set(0.5);
             userAddWorldObjectToSimulation(r);
             delete r;
         }

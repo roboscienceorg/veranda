@@ -16,6 +16,9 @@ class RobotComponent_If : public WorldObject_If
 
 public:
     RobotComponent_If(QObject* parent=nullptr) : WorldObject_If(parent){}
+
+signals:
+    void massChanged();
 };
 
 

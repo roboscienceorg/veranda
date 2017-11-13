@@ -29,8 +29,14 @@ Robot *BasicRobotLoader::loadRobotFile(QString file)
         else
             dt = _drivetrains.first()->createDrivetrain();
 
+        QVector<Sensor_If*> sensors;
+        if(_sensors.contains("org.sdsmt.2dSim.sensor.touchring"))
+        {
+            sensors.push_back(_sensors["org.sdsmt.2dSim.sensor.touchring"]->createSensor());
+        }
+
         //qDebug() << "Construct robot";
-        return new Robot({circle, line}, dt, rand() % 30, rand() % 30, rand()%360);
+        return new Robot({circle, line}, dt, sensors);
     }
     return nullptr;
 }

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <QDebug>
 #include <QTimer>
+#include <QThread>
 
 using namespace std;
 

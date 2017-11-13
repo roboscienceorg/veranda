@@ -2,8 +2,8 @@
 
 #include <QDebug>
 
-Robot::Robot(QVector<b2Shape *> body, DriveTrain_If* dt, double x0, double y0, double theta0, QVector<Sensor_If*> sensors, QObject* parent) :
-    WorldObject_If(parent), _x0(x0), _y0(y0), _theta0(theta0*DEG2RAD), _drivetrain(dt)
+Robot::Robot(QVector<b2Shape *> body, DriveTrain_If* dt, QVector<Sensor_If*> sensors, QObject* parent) :
+    WorldObject_If(parent), _mainShapes(body), _drivetrain(dt), _sensors(sensors)
 {
     _model = new Model({}, body, this);
     _allModels.push_back(_model);
@@ -11,29 +11,38 @@ Robot::Robot(QVector<b2Shape *> body, DriveTrain_If* dt, double x0, double y0, d
     connect(_drivetrain, &DriveTrain_If::targetVelocity, this, &Robot::targetVelocity);
     _bodiesRequired += dt->dynamicBodiesRequired();
     _drivetrain->setParent(this);
+    connect(_drivetrain, &DriveTrain_If::massChanged, this, &Robot::computeMass);
 
     QMap<QString, PropertyView> props = dt->getAllProperties();
     for(auto iter = props.begin(); iter != props.end(); iter++)
     {
         _properties.insert(dt->propertyGroupName() + "/" + iter.key(), iter.value());
     }
-    _model->addChildren(_drivetrain->getModels());
+    _allModels += _drivetrain->getModels();
 
-    for(Sensor_If* s : sensors)
+    for(Sensor_If* s : _sensors)
     {
         _bodiesRequired += s->dynamicBodiesRequired();
         s->setParent(this);
+        connect(s, &Sensor_If::massChanged, this, &Robot::computeMass);
 
         props = s->getAllProperties();
         for(auto iter = props.begin(); iter != props.end(); iter++)
             _properties.insert(s->propertyGroupName() + "/" + iter.key(), iter.value());
-        _model->addChildren(s->getModels());
+        _allModels += s->getModels();
     }
 }
 
 Robot::~Robot()
 {
+    qDeleteAll(_mainShapes);
+}
 
+void Robot::setOrientation(double x0, double y0, double theta0)
+{
+    _x0 = x0;
+    _y0 = y0;
+    _theta0 = theta0 * DEG2RAD;
 }
 
 WorldObject_If* Robot::clone(QObject *newParent)
@@ -48,32 +57,67 @@ WorldObject_If* Robot::clone(QObject *newParent)
     for(b2Shape* s : _model->shapes())
         newBody.push_back(cloneShape(s));
 
-    return new Robot(newBody, newDt, _x0, _y0, _theta0*RAD2DEG, newSensors, newParent);
+    Robot* out = new Robot(newBody, newDt, newSensors, newParent);
+    out->setOrientation(_x0, _y0, _theta0*RAD2DEG);
+    return out;
 }
 
 void Robot::clearDynamicBodies()
 {
+    _mainBody = nullptr;
+    _allBodies.clear();
     _drivetrain->clearDynamicBodies();
     for(Sensor_If* s : _sensors)
         s->clearDynamicBodies();
-    _mainBody = nullptr;
+}
+
+b2JointDef* Robot::_defineJoint(b2Body* a, b2Body* b)
+{
+    b2WeldJointDef* out = new b2WeldJointDef;
+    out->Initialize(a, b, a->GetPosition());
+    out->collideConnected = false;
+    out->frequencyHz = 0;
+    return out;
+}
+
+void Robot::computeMass()
+{
+    if(_mainBody)
+    {
+        _mainBody->ResetMassData();
+        totalMass = _mainBody->GetMass();
+        for(b2Body* b : _allBodies)
+        {
+            b->ResetMassData();
+            totalMass += b->GetMass();
+        }
+
+        qDebug() << "Robot mass: " << totalMass;
+    }
 }
 
 QVector<b2JointDef *> Robot::setDynamicBodies(QVector<b2Body*>& bodies)
 {
+    _allBodies = bodies;
     QVector<b2JointDef*> joints;
 
     QVector<b2Body*> tmp;
     int i=0;
     for(int j=0; j< _drivetrain->dynamicBodiesRequired(); j++, i++)
-        tmp.push_back(bodies.at(j));
+    {
+        bodies.at(i)->SetTransform(b2Vec2(_x0, _y0), _theta0);
+        tmp.push_back(bodies.at(i));
+    }
     joints += _drivetrain->setDynamicBodies(tmp);
 
     for(Sensor_If* s : _sensors)
     {
         tmp.clear();
         for(int j=0; j<s->dynamicBodiesRequired(); j++, i++)
-            tmp.push_back(bodies.at(j));
+        {
+            bodies.at(i)->SetTransform(b2Vec2(_x0, _y0), _theta0);
+            tmp.push_back(bodies.at(i));
+        }
         joints += s->setDynamicBodies(tmp);
     }
 
@@ -87,9 +131,17 @@ QVector<b2JointDef *> Robot::setDynamicBodies(QVector<b2Body*>& bodies)
 
         _mainBody->CreateFixture(&bodyDef);
     }
-    _mainBody->SetLinearVelocity(b2Vec2(0,0));
-    _mainBody->SetAngularVelocity(0);
+
+    computeMass();
+
     _mainBody->SetTransform(b2Vec2(_x0, _y0), _theta0);
+
+    //Weld all sensor and drivetrain bodies to main body
+    for(int j = 0; j < i; j++)
+    {
+        joints.push_back(_defineJoint(_mainBody, bodies[j]));
+    }
+
     qDebug() << "Starting robot at " << _x0 << _y0 << _theta0;
 
     return joints;
@@ -111,7 +163,7 @@ void Robot::disconnectChannels()
 
 void Robot::targetVelocity(double x, double y, double theta)
 {
-    if(_mainBody)
+    if(_mainBody && _lastTick != 0)
     {
         //Translate to world coordinate velocities
         if(!_drivetrain->usesWorldCoords())
@@ -133,8 +185,18 @@ void Robot::targetVelocity(double x, double y, double theta)
             theta *= DEG2RAD;
         }
 
-        _mainBody->SetLinearVelocity(b2Vec2(x, y));
-        _mainBody->SetAngularVelocity(theta);
+        b2Vec2 currLinVelocity = _mainBody->GetLinearVelocity();
+        b2Vec2 impulseLin((x - currLinVelocity.x), (y - currLinVelocity.y));
+        _mainBody->ApplyLinearImpulseToCenter(impulseLin, true);
+
+        double currAngVelocity = _mainBody->GetAngularVelocity();
+        double impulseAng = _mainBody->GetInertia() * (theta - currAngVelocity);
+        _mainBody->ApplyAngularImpulse(impulseAng, true);
+
+        /*qDebug() << "Target velocity:" << x << y << theta;
+        qDebug() << "Current velocity:" << currLinVelocity.x << currLinVelocity.y << currAngVelocity;
+        qDebug() << "Diff velocity:" << (x - currLinVelocity.x) << (y - currLinVelocity.y) << (theta - currAngVelocity);
+        qDebug() << "Apply impulses:" << impulseLin.x << impulseLin.y << impulseAng;*/
     }
 }
 
@@ -155,5 +217,7 @@ void Robot::worldTicked(const b2World* world, const double& t)
         //qDebug() << _x << _y << _theta;
 
         _model->setTransform(_x, _y, _theta*RAD2DEG);
+
+        _lastTick = t;
     }
 }

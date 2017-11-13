@@ -65,19 +65,7 @@ public slots:
     void showMainWindow(){
         show();
 
-        qDebug() << "Populating default robots...";
-        for(int i=0; i<3; i++)
-        {
-            Robot* r = robotLoader->loadRobotFile("");
-            if(r)
-            {
-                r->getAllProperties()["Diff Drive/channels/input_velocities"].set("robot0/wheel_velocities");
-                r->getAllProperties()["Diff Drive/axle_length"].set(1);
-                r->getAllProperties()["Diff Drive/wheel_radius"].set(0.2);
-                userAddWorldObjectToSimulation(r);
-                delete r;
-            }
-        }
+        setWorldBounds(-30, 30, -30, 30);
     }
 
 private slots:

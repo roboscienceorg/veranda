@@ -87,6 +87,7 @@ void BasicPhysics::addWorldObject(WorldObjectPhysics_If* obj, object_id oId)
     {
         b2Joint* joint = world->CreateJoint(j);
         worldDat.joints.push_back(joint);
+        delete j;
     }
 
     obj->worldTicked(world, 0);

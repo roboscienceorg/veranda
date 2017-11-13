@@ -11,6 +11,8 @@
 #include <QGraphicsPolygonItem>
 #include <QGraphicsItemGroup>
 
+#include <QThread>
+
 #include <cmath>
 
 //ScreenModel_if - found in a header file
@@ -41,9 +43,8 @@ QGraphicsItem* BasicViewer::drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
         {
             b2CircleShape* circle = static_cast<b2CircleShape*>(s);
             double r = circle->m_radius;
-            newShape = new QGraphicsEllipseItem(circle->m_p.x-r * WORLD_SCALE, -(circle->m_p.y+r) * WORLD_SCALE,
+            newShape = new QGraphicsEllipseItem((circle->m_p.x-r) * WORLD_SCALE, -(circle->m_p.y+r) * WORLD_SCALE,
                                                 circle->m_radius*2 * WORLD_SCALE, circle->m_radius*2 * WORLD_SCALE, itemParent);
-
         }
         break;
         case b2Shape::Type::e_edge:
@@ -138,14 +139,6 @@ void BasicViewer::modelChanged(Model *m)
 
     QGraphicsItem* graphic = drawModel(m);
     _shapes[m] = graphic;
-
-    //If the model or one of its submodels changes, redraw the whole thing
-    connect(m, &Model::modelChanged, this, &BasicViewer::modelChanged);
-    connect(m, &Model::childModelChanged, this, &BasicViewer::modelChanged);
-    connect(m, &Model::childTransformChanged, this, &BasicViewer::modelChanged);
-
-    //If the base model moves, update the transform
-    connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
 
     _scene->addItem(graphic);
 }

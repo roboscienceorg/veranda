@@ -24,21 +24,29 @@ class Robot : public WorldObject_If
 
     double _x=0, _y=0, _theta=0;
     double _x0=0, _y0=0, _theta0=0;
+    double _lastTick = 0;
 
     uint64_t _bodiesRequired = 1;
 
-    b2Body* _mainBody;
-    Model* _model;
+    b2Body* _mainBody = nullptr;
+    Model* _model = nullptr;
     QVector<Model*> _allModels;
+    QVector<b2Body*> _allBodies;
+    QVector<b2Shape*> _mainShapes;
+    double totalMass;
 
     DriveTrain_If* _drivetrain;
     QVector<Sensor_If*> _sensors;
 
     QMap<QString, PropertyView> _properties;
 
+    b2JointDef* _defineJoint(b2Body* a, b2Body* b);
+
 public:
-    Robot(QVector<b2Shape*> body, DriveTrain_If* dt, double x0, double y0, double theta0, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
+    Robot(QVector<b2Shape*> body, DriveTrain_If* dt, QVector<Sensor_If*> sensors = QVector<Sensor_If*>(), QObject* parent = nullptr);
     ~Robot();
+
+    void setOrientation(double x0, double y0, double theta0);
 
     //Virtual clone
     virtual WorldObject_If* clone(QObject* newParent=nullptr);
@@ -67,7 +75,9 @@ public slots:
     //Tells the robot that the world has updated
     virtual void worldTicked(const b2World* world, const double& t);
 
+private slots:
     void targetVelocity(double x, double y, double theta);
+    void computeMass();
 };
 
 #endif // ROBOT_H

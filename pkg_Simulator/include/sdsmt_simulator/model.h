@@ -36,7 +36,6 @@ public:
     ~Model()
     {
         qDeleteAll(_children);
-        qDeleteAll(_shapes);
     }
 
     const QVector<b2Shape*>& shapes(){ return _shapes; }
@@ -60,42 +59,53 @@ public:
 
     void addChildren(QVector<Model*> newChildren)
     {
-        for(Model* s : newChildren)
+        if(newChildren.size())
         {
-            connect(s, &Model::modelChanged, [this](Model* c){childModelChanged(this, c);});
-            connect(s, &Model::childModelChanged, [this](Model* c, Model* cc){childModelChanged(this, cc);});
+            for(Model* s : newChildren)
+            {
+                connect(s, &Model::modelChanged, [this](Model* c){childModelChanged(this, c);});
+                connect(s, &Model::childModelChanged, [this](Model* c, Model* cc){childModelChanged(this, cc);});
 
-            connect(s, &Model::transformChanged, [this](Model* c){childModelChanged(this, c);});
-            connect(s, &Model::childTransformChanged, [this](Model* c, Model* cc){childModelChanged(this, cc);});
-            _children.push_back(s);
+                connect(s, &Model::transformChanged, [this](Model* c){childModelChanged(this, c);});
+                connect(s, &Model::childTransformChanged, [this](Model* c, Model* cc){childModelChanged(this, cc);});
+                _children.push_back(s);
+            }
+            modelChanged(this);
         }
-        modelChanged(this);
     }
 
     void removeChildren(QVector<Model*> oldChildren)
     {
-        for(Model* s : oldChildren)
+        if(oldChildren.size())
         {
-            _children.removeAll(s);
-            disconnect(s, 0, this, 0);
+            for(Model* s : oldChildren)
+            {
+                _children.removeAll(s);
+                disconnect(s, 0, this, 0);
+            }
+            modelChanged(this);
         }
-        modelChanged(this);
     }
 
     void addShapes(QVector<b2Shape*> newShapes)
     {
-        for(b2Shape* s : newShapes) _shapes.push_back(s);
-        modelChanged(this);
+        if(newShapes.size())
+        {
+            for(b2Shape* s : newShapes)
+                _shapes.push_back(s);
+            modelChanged(this);
+        }
     }
 
     void removeShapes(QVector<b2Shape*> oldShapes)
     {
-        for(b2Shape* s : oldShapes)
+        if(oldShapes.size())
         {
-            _shapes.removeAll(s);
-            delete s;
+            for(b2Shape* s : oldShapes)
+                _shapes.removeAll(s);
+
+            modelChanged(this);
         }
-        modelChanged(this);
     }
 };
 

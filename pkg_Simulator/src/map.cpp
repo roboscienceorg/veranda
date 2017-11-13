@@ -10,7 +10,10 @@ Map::Map(QObject *parent) : WorldObject_If(parent)
 
 Map::~Map()
 {
+    QVector<b2Shape*> prevShapes = model->shapes();
+    model->removeShapes(prevShapes);
     delete model;
+    qDeleteAll(prevShapes);
 }
 
 bool Map::setXMin(double i)
@@ -97,8 +100,10 @@ void Map::_buildModel()
         shapes.push_back(adjusted);
     }
 
-    model->removeShapes(model->shapes());
+    QVector<b2Shape*> prevShapes = model->shapes();
+    model->removeShapes(prevShapes);
     model->addShapes(shapes);
+    qDeleteAll(prevShapes);
 }
 
 bool Map::setStaticBodies(QVector<b2PolygonShape *> polygons)
