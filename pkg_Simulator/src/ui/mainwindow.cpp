@@ -4,10 +4,10 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDebug>
-#include <QDir>
+#include <QDate>
 #include <QStandardItemModel>
 #include <QThread>
-
+#include <QListWidgetItem>
 #include <stdexcept>
 #include <string>
 
@@ -47,7 +47,7 @@ MainWindow::MainWindow(visualizerFactory factory, MapLoader_If *mapLoad, RobotLo
     //Simulation mode button signals and slots
     connect(ui->playSimButton, SIGNAL (released()), this, SLOT (playSimButtonClick()));
     connect(ui->speedSimButton, SIGNAL (released()), this, SLOT (speedSimButtonClick()));
-    connect(ui->recordSimButton, SIGNAL (released()), this, SLOT (recordSimButtonClick()));
+    connect(ui->screenshotSimButton, SIGNAL (released()), this, SLOT (screenshotSimButtonClick()));
 
     //Simulation build tools widgets and slots
     connect(ui->importMapButton, SIGNAL (released()), this, SLOT (importMapButtonClick()));
@@ -58,6 +58,9 @@ MainWindow::MainWindow(visualizerFactory factory, MapLoader_If *mapLoad, RobotLo
     propertiesModel->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
     ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->propertiesTableView->setModel(propertiesModel);
+
+    connect(ui->robotsWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(robotItemClicked(QListWidgetItem*)));
+    connect(visual, SIGNAL (userSelectedModel(model_id id)), this, SLOT (modelSelected(model_id id)));
 }
 
 MainWindow::~MainWindow()
@@ -122,10 +125,7 @@ void MainWindow::physicsStarted()
     ui->playSimButton->setIconSize(QSize(32,32));
 
     //disable options while simulation is running
-    ui->newSimButton->setEnabled(false);
-    ui->copySimButton->setEnabled(false);
     ui->saveSimButton->setEnabled(false);
-    ui->deleteSimButton->setEnabled(false);
     ui->mapModeButton->setEnabled(false);
     ui->robotModeButton->setEnabled(false);
     ui->buildToolsList->setEnabled(false);
@@ -139,10 +139,7 @@ void MainWindow::physicsStopped()
     ui->playSimButton->setIconSize(QSize(32,32));
 
     //enable options while simulation is running
-    ui->newSimButton->setEnabled(true);
-    ui->copySimButton->setEnabled(true);
     ui->saveSimButton->setEnabled(true);
-    ui->deleteSimButton->setEnabled(true);
     ui->mapModeButton->setEnabled(true);
     ui->robotModeButton->setEnabled(true);
     ui->buildToolsList->setEnabled(true);
@@ -162,7 +159,6 @@ void MainWindow::playSimButtonClick()
         emit userStartPhysics();
     }
 }
-
 void MainWindow::speedSimButtonClick()
 {
     if (speed == 1)
@@ -191,23 +187,22 @@ void MainWindow::speedSimButtonClick()
     }
     ui->speedSimButton->setIconSize(QSize(32,32));
 }
-void MainWindow::recordSimButtonClick()
+void MainWindow::screenshotSimButtonClick()
 {
-    //Reset Simulation Now
-    if (record)
-    {
-        record = false;
-        ui->recordSimButton->setToolTip("Record Simulation");
-        ui->recordSimButton->setIcon(QIcon(":/sim/RecordSimIcon"));
-    }
-    //Play Simulation Now
-    else
-    {
-        record = true;
-        ui->recordSimButton->setToolTip("Dont Record Simulation");
-        ui->recordSimButton->setIcon(QIcon(":/sim/DontRecordSimIcon"));
-    }
-    ui->recordSimButton->setIconSize(QSize(32,32));
+    visual->setStyleSheet("border: 2 solid red");
+    QPixmap pixmap(visual->size());
+    visual->render(&pixmap);
+    qint64 current = QDateTime::currentMSecsSinceEpoch();
+    //QString fileName = current.toString();
+
+    //std::stringstream ss;
+    //ss << current;
+    QString fileName = QString::number(current);
+
+    QFile file(fileName);
+    file.open(QIODevice::WriteOnly);
+    pixmap.save(&file, "PNG");
+    visual->setStyleSheet("");
 }
 
 //Show Menu Button Clicks
@@ -259,6 +254,7 @@ void MainWindow::importMapButtonClick()
           break;
     }
         break;
+
       case QMessageBox::No:
           // Don't Save was clicked
           break;
@@ -359,6 +355,7 @@ void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties_If* object, 
     visual->objectAddedToScreen(object->getModels(), oId);
 
     objectSelected(oId);
+    drawActiveObjectsList();
 }
 
 void MainWindow::worldObjectRemovedFromSimulation(object_id oId)
@@ -367,8 +364,30 @@ void MainWindow::worldObjectRemovedFromSimulation(object_id oId)
     worldObjects.remove(oId);
     if(selected == oId)
         nothingSelected();
+    drawActiveObjectsList();
 }
 
+void MainWindow::drawActiveObjectsList()
+{
+    ui->robotsWidget->clear();
+
+    for(int i = 0; i < worldObjects.size(); i++)
+    {
+        QString str= QString::number(i);
+        ui->robotsWidget->addItem(str);
+    }
+}
+
+void MainWindow::robotItemClicked(QListWidgetItem* item)
+{
+    for(int kl = 1; kl < sizeof(worldObjects) - 1; kl++)
+    {
+        if (ui->robotsWidget->item(kl) == item)
+        {
+            objectSelected(kl);
+        }
+    }
+}
 void MainWindow::listBuildTools(int mode)
 {
     //for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++)

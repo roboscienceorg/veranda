@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QStandardItem>
+#include <QListWidgetItem>
 
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/simulator_visual_if.h"
@@ -60,6 +61,7 @@ public slots:
     void errorMessage(QString error){}
 
     void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
+    void drawActiveObjectsList();
 
     //Slot to show main window
     void showMainWindow(){
@@ -78,13 +80,14 @@ private slots:
     void showMenuButtonClick();
     void playSimButtonClick();
     void speedSimButtonClick();
-    void recordSimButtonClick();
+    void screenshotSimButtonClick();
     void importMapButtonClick();
 
     //Slots for build tools and properties
     void objectSelected(object_id id);
     void nothingSelected();
     void listBuildTools(int mode);
+    void robotItemClicked(QListWidgetItem* item);
 
 private:
     Ui::MainWindow *ui;
