@@ -467,7 +467,26 @@
        </item>
        <item>
         <widget class="QWidget" name="buildToolsWidget" native="true">
-         <layout class="QVBoxLayout" name="buildToolsLayout">
+         <layout class="QVBoxLayout" name="buildToolsLayout" stretch="0,0,0,1">
+          <item>
+           <widget class="QLabel" name="activeObjectsLabel">
+            <property name="frameShape">
+             <enum>QFrame::Panel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <property name="text">
+             <string>Active Objects</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QListWidget" name="robotsWidget"/>
+          </item>
           <item>
            <widget class="QLabel" name="buildToolsLabel">
             <property name="frameShape">

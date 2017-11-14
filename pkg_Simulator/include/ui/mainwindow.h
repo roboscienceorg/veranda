@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QListWidgetItem>
 
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/robot_interfaces.h"
@@ -75,6 +76,7 @@ private slots:
     //Slots for build tools and properties
     void modelSelected(model_id id);
     void listBuildTools(int mode);
+    void robotItemClicked(QListWidgetItem* item);
 
 private:
     Ui::MainWindow *ui;

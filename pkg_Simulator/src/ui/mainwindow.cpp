@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QDate>
 #include <QStandardItemModel>
+#include <QListWidgetItem>
 
 MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     Simulator_Ui_If(parent),
@@ -49,6 +50,7 @@ MainWindow::MainWindow(visualizerFactory factory, QWidget *parent) :
     connect(ui->importMapButton, SIGNAL (released()), this, SLOT (importMapButtonClick()));
 
     //Build tools list and world view slots
+    connect(ui->robotsWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(robotItemClicked(QListWidgetItem*)));
     connect(visual, SIGNAL (userSelectedModel(model_id id)), this, SLOT (modelSelected(model_id id)));
 }
 
@@ -311,8 +313,48 @@ void MainWindow::robotAddedToSimulation(Robot_Properties* robot)
        });
     }
     //yup, all the way to here - delete
-}
 
+    for(i = 0; i < modelNum - 1; i++)
+    {
+        //QListWidgetItem* item;
+        //item = new QListWidgetItem(ui->robotsWidget);
+        QString str= QString::number(i);
+        ui->robotsWidget->addItem(str);
+    }
+}
+void MainWindow::robotItemClicked(QListWidgetItem* item)
+{
+    for(int kl = 0; kl < modelNum - 1; kl++)
+    {
+        if (ui->robotsWidget->item(kl) == item)
+        {
+            Robot_Properties* robot = models[kl];
+            QStandardItemModel* model;
+
+            model = new QStandardItemModel(robot->getAllProperties().size(),2,this); //N Rows and 2 Columns
+            model->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
+            model->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
+            ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+            ui->propertiesTableView->setModel(model);
+
+            int i = 0;
+            for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++, i++)
+            {
+               QModelIndex ind = model->index(i, 0);
+               model->setData(ind, iter.key(), Qt::DisplayRole);
+               ind = model->index(i, 1);
+               bool readOnly = iter.value().info().readOnly;
+               qDebug() << iter.key() << iter.value().get();
+               model->setData(ind, iter.value().get(), readOnly ? Qt::DisplayRole : Qt::EditRole);
+               connect(&iter.value(), &PropertyView::valueSet, [i, model, ind, readOnly](QVariant v)
+               {
+                   qDebug () << "Set model data " << v;
+                   model->setData(ind, v, readOnly ? Qt::DisplayRole : Qt::EditRole);
+               });
+            }
+        }
+    }
+}
 void MainWindow::listBuildTools(int mode)
 {
     //for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++)
