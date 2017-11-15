@@ -28,11 +28,11 @@
       <layout class="QHBoxLayout" name="menuLayout">
        <item>
         <widget class="QWidget" name="menuWidget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,1">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <widget class="QToolButton" name="simModeButton">
+             <widget class="QToolButton" name="simulatorButton">
               <property name="toolTip">
                <string>Simulation Mode</string>
               </property>
@@ -41,38 +41,18 @@
               </property>
               <property name="icon">
                <iconset resource="resources.qrc">
-                <normaloff>:/modes/SimulationIcon</normaloff>:/modes/SimulationIcon</iconset>
+                <normaloff>:/modes/SimulatorIcon</normaloff>:/modes/SimulatorIcon</iconset>
               </property>
               <property name="iconSize">
                <size>
-                <width>118</width>
-                <height>118</height>
+                <width>128</width>
+                <height>128</height>
                </size>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="mapModeButton">
-              <property name="toolTip">
-               <string>Map Mode</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="resources.qrc">
-                <normaloff>:/modes/MapIcon</normaloff>:/modes/MapIcon</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>118</width>
-                <height>118</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="robotModeButton">
+             <widget class="QToolButton" name="designerButton">
               <property name="toolTip">
                <string>Robot Mode</string>
               </property>
@@ -81,12 +61,12 @@
               </property>
               <property name="icon">
                <iconset resource="resources.qrc">
-                <normaloff>:/modes/RobotIcon</normaloff>:/modes/RobotIcon</iconset>
+                <normaloff>:/modes/DesignerIcon</normaloff>:/modes/DesignerIcon</iconset>
               </property>
               <property name="iconSize">
                <size>
-                <width>118</width>
-                <height>118</height>
+                <width>128</width>
+                <height>128</height>
                </size>
               </property>
              </widget>
@@ -113,7 +93,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>Map Mode</string>
+             <string>Simulator</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -121,8 +101,28 @@
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="simModeMenuWidget" native="true">
-            <layout class="QHBoxLayout" name="simulationMenuLayout" stretch="0,0,0,0">
+           <widget class="QWidget" name="simulatorMenuWidget" native="true">
+            <layout class="QHBoxLayout" name="simulationMenuLayout" stretch="0,0,0,0,0,0,0">
+             <item>
+              <widget class="QToolButton" name="joystickButton">
+               <property name="toolTip">
+                <string>New Joystick</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/sim/JoystickIcon</normaloff>:/sim/JoystickIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
              <item>
               <widget class="QToolButton" name="saveSimButton">
                <property name="toolTip">
@@ -133,7 +133,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/generic/SaveFileIcon</normaloff>:/generic/SaveFileIcon</iconset>
+                 <normaloff>:/sim/SaveFileIcon</normaloff>:/sim/SaveFileIcon</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -154,6 +154,46 @@
                <property name="icon">
                 <iconset resource="resources.qrc">
                  <normaloff>:/sim/ScreenshotSimIcon</normaloff>:/sim/ScreenshotSimIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="importMapButton">
+               <property name="toolTip">
+                <string>Import Map</string>
+               </property>
+               <property name="text">
+                <string>Import Map</string>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/sim/ImportMapIcon</normaloff>:/sim/ImportMapIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="restartSimButton">
+               <property name="toolTip">
+                <string>Restart Sim</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/sim/RestartSimIcon</normaloff>:/sim/RestartSimIcon</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -201,19 +241,19 @@
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="mapModeMenuWidget" native="true">
-            <layout class="QHBoxLayout" name="mapModeMenuLayout">
+           <widget class="QWidget" name="designerMenuWidget" native="true">
+            <layout class="QHBoxLayout" name="robotModeMenuLayout">
              <item>
-              <widget class="QToolButton" name="saveMapButton">
+              <widget class="QToolButton" name="newObjectButton">
                <property name="toolTip">
-                <string>Import Image File as Map</string>
+                <string>New Object</string>
                </property>
                <property name="text">
-                <string>Imp</string>
+                <string>...</string>
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/generic/SaveFileIcon</normaloff>:/generic/SaveFileIcon</iconset>
+                 <normaloff>:/des/NewFileIcon</normaloff>:/des/NewFileIcon</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -224,16 +264,76 @@
               </widget>
              </item>
              <item>
-              <widget class="QToolButton" name="importMapButton">
+              <widget class="QToolButton" name="saveObjectButton">
                <property name="toolTip">
-                <string>Save Map</string>
+                <string>Export Object to Simulator</string>
                </property>
                <property name="text">
-                <string>Sav</string>
+                <string>...</string>
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/generic/ImportFileIcon</normaloff>:/generic/ImportFileIcon</iconset>
+                 <normaloff>:/des/ExportFileIcon</normaloff>:/des/ExportFileIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="leftObjectButton">
+               <property name="toolTip">
+                <string>Previous Object</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/des/MoveLeftIcon</normaloff>:/des/MoveLeftIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="rightObjectButton">
+               <property name="toolTip">
+                <string>Next Object</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/des/MoveRightIcon</normaloff>:/des/MoveRightIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="deleteObjectButton">
+               <property name="toolTip">
+                <string>Delete Object</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/des/DeleteFileIcon</normaloff>:/des/DeleteFileIcon</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -247,90 +347,23 @@
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="robotModeMenuWidget" native="true">
-            <layout class="QHBoxLayout" name="robotModeMenuLayout">
-             <item>
-              <widget class="QToolButton" name="newRobotButton">
-               <property name="toolTip">
-                <string>New Robot</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/generic/NewFileIcon</normaloff>:/generic/NewFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="saveRobotButton">
-               <property name="toolTip">
-                <string>Save Robot</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/generic/SaveFileIcon</normaloff>:/generic/SaveFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="copyRobotButton">
-               <property name="toolTip">
-                <string>Copy Robot</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/generic/CopyFileIcon</normaloff>:/generic/CopyFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="deleteRobotButton">
-               <property name="toolTip">
-                <string>Delete Robot</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/generic/DeleteFileIcon</normaloff>:/generic/DeleteFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
+           <widget class="QLabel" name="activeObjectsLabel">
+            <property name="frameShape">
+             <enum>QFrame::Panel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <property name="text">
+             <string>Active Objects</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QListWidget" name="robotsWidget"/>
           </item>
           <item>
            <widget class="QLabel" name="propertiesLabel">
@@ -341,7 +374,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>Selected Object Properties</string>
+             <string>Simulator Object Properties</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -467,26 +500,7 @@
        </item>
        <item>
         <widget class="QWidget" name="buildToolsWidget" native="true">
-         <layout class="QVBoxLayout" name="buildToolsLayout" stretch="0,0,0,1">
-          <item>
-           <widget class="QLabel" name="activeObjectsLabel">
-            <property name="frameShape">
-             <enum>QFrame::Panel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <property name="text">
-             <string>Active Objects</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QListWidget" name="robotsWidget"/>
-          </item>
+         <layout class="QVBoxLayout" name="buildToolsLayout" stretch="0,1">
           <item>
            <widget class="QLabel" name="buildToolsLabel">
             <property name="frameShape">
