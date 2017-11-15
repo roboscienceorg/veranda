@@ -3,42 +3,121 @@
 
 \chapter{Sprint Results and Prototypes}
 
-This chapter is for recording the results of each sprint and documenting the evolving product.    It is a historical record of what you accomplished in 464/465.   This should be organized according to Sprints.  It should have the basic description of the sprint deliverable and what was accomplished.  Screen shots, photos, captures from video, etc should be used.   Expect this to be a long chapter.    
+\section{Sprint 0 Report}
+All work before Sept. 21st
+\subsection{Sprint Backlog}
+\begin{itemize}
+	\item Choose a physics engine
+	\item Find usable material in STDR
+\end{itemize}
+\subsection{Results of testing}
+\begin{itemize}
+	\item Decided to use Box2D as physics engine
+	\item Decided to start from scratch rather than try to complete STDR
+\end{itemize}
+
 
 \section{Sprint 1 Report}
+Sept. 21st - Oct. 5th
 \subsection{Sprint Backlog}
+\begin{itemize}
+	\item Create main menu UI
+	\item Create wireframe examples of full UI
+	\item Create an example QT Widget for drawing shapes
+	\item Create an example Box2D project
+	\item Determine how to use Catkin to build a Qt Widgets project
+	\item Design first draft of software architecture
+	\item Write software contract
+\end{itemize}
 \subsection{Deliverable}
+\begin{itemize}
+	\item Wireframe examples of what UI might look like
+	\item Example Box2D program
+	\item Draft of software contract
+	\item A number of example projects utilizing both ROS and Qt
+\end{itemize}
 \subsection{Results of testing}
-\subsection{Successes and Failures}
-\subsection{Modifications required (product backlog, design, requirements, etc)}
+\begin{itemize}
+	\item Reached conclusion that Qt Graphics Framework should be used over OpenGL
+\end{itemize}
 \subsection{Sprint Review}
+The four wireframes produced during the spring were discussed with the client. It was decided that a single-window approach should be taken, rather than a multi-window approach. This approach is intended to make the simulator feel like a game design engine; this is desirable because the main users of the application will likely be familiar with game design applications.
 \subsection{Sprint Retrospective}
-\subsection{Sprint Analytics} 
-Place your burndown charts, team velocity information, etc here if they are not discussed above.
+General consensus was that it felt like the project was moving too slowly, but that once the MVP was finished, things would progress more quickly.
 
 
 \section{Sprint 2 Report}
+Oct. 5th - Oct. 19
 \subsection{Sprint Backlog}
+\begin{itemize}
+	\item Finish MVP interfaces for physics engine
+	\item Finish MVP interfaces for UI
+	\item UI Prototype
+\end{itemize}
 \subsection{Deliverable}
-\subsection{Results of testing}
-\subsection{Successes and Failures}
-\subsection{Modifications required (product backlog, design, requirements, etc)}
+\begin{itemize}
+	\item MVP: Spawns a single robot which is able to have its velocity controlled directly
+	\item Python script to control the single robot
+\end{itemize}
 \subsection{Sprint Review}
-\subsection{Sprint Retrospective}
-\subsection{Sprint Analytics} 
-Place your burndown charts, team velocity information, etc here if they are not discussed above.
-
+Client was very pleased with the progress. Next desired features were robots being able to rotate and start somewhere other than the center of the map.
 
 \section{Sprint 3 Report}
+Oct 19th - Nov. 2nd
 \subsection{Sprint Backlog}
+\begin{itemize}
+	\item Allow for robots spawning at non-center of map
+	\item Allow for robots to rotate while moving
+	\item Be able to display and change robot properties
+	\item Find a way to pass shapes around threads
+\end{itemize}
 \subsection{Deliverable}
+\begin{itemize}
+	\item Demo of new features
+	\begin{itemize}
+		\item Multiple robots spawning randomly on map with random orientation
+		\item Robots using differential drive kinematics
+		\item Python script to drive differential drive robots in figure 8
+		\item Being able to see and modify properties of robot (velocity, differential drive parameters...)
+	\end{itemize}
+\end{itemize}
 \subsection{Results of testing}
-\subsection{Successes and Failures}
-\subsection{Modifications required (product backlog, design, requirements, etc)}
+\begin{itemize}
+	\item Decision was made to abandon multi-threaded design.
+	\begin{itemize}
+		\item Box2D does not play nicely with multiple threads
+		\item It is ok if the simulation lags due to all computation in one thread because eventually timestamps will be published and control code will use that rather than its own internal clock
+	\end{itemize}
+\end{itemize}
 \subsection{Sprint Review}
-\subsection{Sprint Retrospective}
-\subsection{Sprint Analytics} 
-Place your burndown charts, team velocity information, etc here if they are not discussed above.
+Client was again pleased with progress. Next target features were identified as obstacles and some sort of sensor equipment so that the application could potentially be used in a class project.
 
+\section{Sprint 4 Report}
+Nov. 2nd - Nov. 16th
+\subsection{Sprint Backlog}
+\begin{itemize}
+	\item Decide between kinematics and full-simulation
+	\item Allow selection of robot from main view
+	\item Prototype joystick UI
+	\item LIDAR plugin
+	\item Touch sensor plugin
+	\item Load obstacle files
+\end{itemize}
+\subsection{Deliverable}
+\begin{itemize}
+	\item Demo of new features
+	\begin{itemize}
+		\item Multiple robots spawning randomly on map with random orientation
+		\item Robots using differential drive kinematics
+		\item Python script to drive differential drive robots in figure 8
+		\item Being able to see and modify properties of robot (velocity, differential drive parameters...)
+	\end{itemize}
+\end{itemize}
+\subsection{Successes and Failures}
+\begin{itemize}
+	\item Touch sensor and obstacles took longer than expected to implement and required major changes in object interfaces. As a result, selection of robots by clicking on their image was delayed and LIDAR plugin was not written.
+\end{itemize}
+\subsection{Modifications required (product backlog, design, requirements, etc)}
+While the touch sensor plugin was being written, it was discovered that Box2D can be leveraged to model a top-down vehicle. As a result, it was decided that this method of modeling robots should be used instead of kinematic modeling.
 \vdots
 
