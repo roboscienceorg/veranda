@@ -19,7 +19,8 @@ SOURCES += \
 \
     src/ui/mainwindow.cpp \
     src/simulator_core.cpp \
-    src/map.cpp
+    src/map.cpp \
+    src/world_object.cpp
 
 HEADERS += \
     include/sdsmt_simulator/sensor_if.h \
@@ -37,6 +38,7 @@ HEADERS += \
     include/basic_robotloader.h \
 \
     include/robot.h \
+    include/world_object.h \
     include/ui/mainwindow.h \
 \
     include/simulator_core.h \
@@ -47,7 +49,8 @@ HEADERS += \
     include/sdsmt_simulator/properties_if.h \
     include/sdsmt_simulator/model.h \
     include/sdsmt_simulator/cloneshape.h \
-    include/interfaces/old_world_object_if.h
+    include/interfaces/old_world_object_if.h \
+    include/sdsmt_simulator/world_object_component_if.h
 
 FORMS    += \
     ui/mainwindow.ui \

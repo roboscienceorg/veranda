@@ -143,10 +143,10 @@ public:
         return *this;
     }
 
-    void set(const QVariant& value)
+    void set(const QVariant& value, bool force = false)
     {
         //qDebug() << "Set " << _origin << "from" << this;
-        if(_origin && !_origin->info().readOnly)
+        if(_origin && (!_origin->info().readOnly || force))
             requestValue(value);
     }
 

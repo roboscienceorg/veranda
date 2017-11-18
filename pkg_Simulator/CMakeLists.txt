@@ -48,6 +48,7 @@ set(MOC_HDRS
     include/sdsmt_simulator/robotcomponent_if.h
     include/sdsmt_simulator/properties_if.h
     include/sdsmt_simulator/model.h
+    include/sdsmt_simulator/world_object_component_if.h
 
     include/interfaces/simulator_physics_if.h
     include/interfaces/simulator_ui_if.h
@@ -59,6 +60,7 @@ set(MOC_HDRS
     include/simulator_core.h
     include/robot.h
     include/map.h
+    include/world_object.h
 
     include/ui/mainwindow.h
     )
@@ -75,6 +77,7 @@ set(CPP_SRCS
     src/basic_viewer.cpp
     src/simulator_core.cpp
     src/robot.cpp
+    src/world_object.cpp
 
     src/map.cpp
     src/ui/mainwindow.cpp
