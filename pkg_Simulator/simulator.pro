@@ -46,8 +46,8 @@ HEADERS += \
     include/map.h \
     include/sdsmt_simulator/properties_if.h \
     include/sdsmt_simulator/model.h \
-    include/interfaces/world_object_if.h \
-    include/sdsmt_simulator/cloneshape.h
+    include/sdsmt_simulator/cloneshape.h \
+    include/interfaces/old_world_object_if.h
 
 FORMS    += \
     ui/mainwindow.ui \

@@ -86,7 +86,7 @@ class Touch_Sensor : public Sensor_If
 public:
     Touch_Sensor(QObject* parent=nullptr);
 
-    WorldObject_If* clone(QObject *newParent);
+    depracatedWorldObject_If* clone(QObject *newParent);
 
     virtual QMap<QString, PropertyView>& getAllProperties(){
         return _properties;

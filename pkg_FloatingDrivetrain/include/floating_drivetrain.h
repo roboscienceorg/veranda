@@ -43,7 +43,7 @@ class Floating_Drivetrain : public DriveTrain_If
 public:
     Floating_Drivetrain(QObject* parent=nullptr);
 
-    virtual WorldObject_If* clone(QObject* newParent=nullptr);
+    virtual depracatedWorldObject_If* clone(QObject* newParent=nullptr);
 
     virtual bool usesWorldCoords(){return true;}
     virtual bool usesDegrees(){return false;}

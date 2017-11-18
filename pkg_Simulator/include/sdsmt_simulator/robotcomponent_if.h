@@ -8,14 +8,14 @@
 #include <Box2D/Box2D.h>
 
 #include "model.h"
-#include "interfaces/world_object_if.h"
+#include "interfaces/old_world_object_if.h"
 
-class RobotComponent_If : public WorldObject_If
+class RobotComponent_If : public depracatedWorldObject_If
 {
     Q_OBJECT
 
 public:
-    RobotComponent_If(QObject* parent=nullptr) : WorldObject_If(parent){}
+    RobotComponent_If(QObject* parent=nullptr) : depracatedWorldObject_If(parent){}
 
 signals:
     void massChanged();

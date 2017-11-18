@@ -10,7 +10,7 @@ DiffDrive_Drivetrain::DiffDrive_Drivetrain(QObject *parent) : DriveTrain_If(pare
     qRegisterMetaType<std_msgs::Float64MultiArray>("std_msgs::Float64MultiArray");
 }
 
-WorldObject_If* DiffDrive_Drivetrain::clone(QObject *newParent)
+depracatedWorldObject_If* DiffDrive_Drivetrain::clone(QObject *newParent)
 {
     DiffDrive_Drivetrain* out = new DiffDrive_Drivetrain(newParent);
     out->velocity_channel.set(velocity_channel.get());

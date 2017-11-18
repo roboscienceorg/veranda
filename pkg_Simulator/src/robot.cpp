@@ -3,7 +3,7 @@
 #include <QDebug>
 
 Robot::Robot(QVector<b2Shape *> body, DriveTrain_If* dt, QVector<Sensor_If*> sensors, QObject* parent) :
-    WorldObject_If(parent), _mainShapes(body), _drivetrain(dt), _sensors(sensors)
+    depracatedWorldObject_If(parent), _mainShapes(body), _drivetrain(dt), _sensors(sensors)
 {
     _model = new Model({}, body, this);
     _allModels.push_back(_model);
@@ -45,7 +45,7 @@ void Robot::setOrientation(double x0, double y0, double theta0)
     _theta0 = theta0 * DEG2RAD;
 }
 
-WorldObject_If* Robot::clone(QObject *newParent)
+depracatedWorldObject_If* Robot::clone(QObject *newParent)
 {
     DriveTrain_If* newDt = static_cast<DriveTrain_If*>(_drivetrain->clone());
 

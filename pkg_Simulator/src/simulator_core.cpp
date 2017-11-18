@@ -67,13 +67,13 @@ void SimulatorCore::start()
 }
 
 
-void SimulatorCore::addSimObject(WorldObject_If* obj)
+void SimulatorCore::addSimObject(depracatedWorldObject_If* obj)
 {
     //Clone object to have local copy for distributing
     obj = obj->clone();
 
-    connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &WorldObject_If::connectChannels);
-    connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &WorldObject_If::disconnectChannels);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &depracatedWorldObject_If::connectChannels);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &depracatedWorldObject_If::disconnectChannels);
 
     WorldObjectPhysics_If* phys_interface = new WorldObjectPhysics_If(obj, obj);
     WorldObjectProperties_If* prop_interface = new WorldObjectProperties_If(obj, obj);

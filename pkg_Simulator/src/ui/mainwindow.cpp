@@ -248,6 +248,7 @@ void MainWindow::importMapButtonClick()
 
                   //Add map into new simulation
                   userAddWorldObjectToSimulation(map);
+                  delete map;
               }
           }
 

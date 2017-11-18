@@ -9,15 +9,15 @@
 #include "sdsmt_simulator/model.h"
 #include "sdsmt_simulator/properties_if.h"
 
-class WorldObject_If : public QObject
+class depracatedWorldObject_If : public QObject
 {
     Q_OBJECT
 
 public:
-    WorldObject_If(QObject* parent=nullptr) : QObject(parent){}
+    depracatedWorldObject_If(QObject* parent=nullptr) : QObject(parent){}
 
     //Virtual clone
-    virtual WorldObject_If* clone(QObject* newParent=nullptr) = 0;
+    virtual depracatedWorldObject_If* clone(QObject* newParent=nullptr) = 0;
 
     //Interfaces for UI to display properties
     virtual QMap<QString, PropertyView>& getAllProperties() = 0;
@@ -48,10 +48,10 @@ public slots:
 class WorldObjectProperties_If : public QObject
 {
     Q_OBJECT
-    WorldObject_If* _obj;
+    depracatedWorldObject_If* _obj;
 
 public:
-    WorldObjectProperties_If(WorldObject_If* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
+    WorldObjectProperties_If(depracatedWorldObject_If* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
 
     //Interfaces for UI to display properties
     virtual QMap<QString, PropertyView>& getAllProperties(){return _obj->getAllProperties();}
@@ -69,10 +69,10 @@ class WorldObjectPhysics_If : public QObject
 {
     Q_OBJECT
 
-    WorldObject_If* _obj;
+    depracatedWorldObject_If* _obj;
 
 public:
-    WorldObjectPhysics_If(WorldObject_If* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
+    WorldObjectPhysics_If(depracatedWorldObject_If* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
 
     //Tells the physics engine how many bodies are needed
     uint64_t staticBodiesRequired() { return _obj->staticBodiesRequired(); }

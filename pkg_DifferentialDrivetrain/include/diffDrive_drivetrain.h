@@ -66,7 +66,7 @@ class DiffDrive_Drivetrain : public DriveTrain_If
 public:
     DiffDrive_Drivetrain(QObject* parent=nullptr);
 
-    WorldObject_If* clone(QObject *newParent);
+    depracatedWorldObject_If* clone(QObject *newParent);
 
     virtual bool usesWorldCoords(){return false;}
     virtual bool usesDegrees(){return false;}

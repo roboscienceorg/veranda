@@ -8,13 +8,13 @@
 
 #include "sdsmt_simulator/model.h"
 #include "sdsmt_simulator/cloneshape.h"
-#include "interfaces/world_object_if.h"
+#include "interfaces/old_world_object_if.h"
 
 #include <Box2D/Box2D.h>
 #include <QMap>
 #include <QDebug>
 
-class Robot : public WorldObject_If
+class Robot : public depracatedWorldObject_If
 {
     Q_OBJECT
 
@@ -49,7 +49,7 @@ public:
     void setOrientation(double x0, double y0, double theta0);
 
     //Virtual clone
-    virtual WorldObject_If* clone(QObject* newParent=nullptr);
+    virtual depracatedWorldObject_If* clone(QObject* newParent=nullptr);
 
     //Tells the physics engine how many bodies are needed
     virtual uint64_t staticBodiesRequired(){ return 0; }

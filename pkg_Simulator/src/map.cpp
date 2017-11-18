@@ -3,7 +3,7 @@
 
 #include <QVector>
 
-Map::Map(QObject *parent) : WorldObject_If(parent)
+Map::Map(QObject *parent) : depracatedWorldObject_If(parent)
 {
     model = new Model({}, {}, this);
 }
@@ -129,7 +129,7 @@ void Map::setStaticBodies(QVector<b2Body*>& bodies)
     }
 }
 
-WorldObject_If* Map::clone(QObject* newParent)
+depracatedWorldObject_If* Map::clone(QObject* newParent)
 {
     Map* newMap = new Map(newParent);
 

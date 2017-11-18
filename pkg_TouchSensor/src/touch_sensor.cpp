@@ -39,7 +39,7 @@ void Touch_Sensor::_updateDataMessageDimensions()
     data.data.resize(buttons, 0);
 }
 
-WorldObject_If* Touch_Sensor::clone(QObject *newParent)
+depracatedWorldObject_If *Touch_Sensor::clone(QObject *newParent)
 {
     Touch_Sensor* out = new Touch_Sensor(newParent);
 

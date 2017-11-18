@@ -5,9 +5,9 @@
 #include <Box2D/Box2D.h>
 #include <QMap>
 
-#include "interfaces/world_object_if.h"
+#include "interfaces/old_world_object_if.h"
 
-class Map : public WorldObject_If
+class Map : public depracatedWorldObject_If
 {
     Q_OBJECT
 
@@ -61,7 +61,7 @@ public:
     bool setStaticBodies(QVector<b2PolygonShape *> polygons);
 
     //Virtual clone
-    virtual WorldObject_If* clone(QObject* newParent=nullptr);
+    virtual depracatedWorldObject_If* clone(QObject* newParent=nullptr);
 
     //Interfaces for UI to display properties
     virtual QMap<QString, PropertyView>& getAllProperties(){ return properties; }

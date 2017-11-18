@@ -14,7 +14,7 @@ Floating_Drivetrain::Floating_Drivetrain(QObject *parent) : DriveTrain_If(parent
         //qDebug() << &p;
 }
 
-WorldObject_If* Floating_Drivetrain::clone(QObject *newParent)
+depracatedWorldObject_If *Floating_Drivetrain::clone(QObject *newParent)
 {
     Floating_Drivetrain* out = new Floating_Drivetrain(newParent);
     out->velocity_channel.set(velocity_channel.get());

@@ -6,7 +6,7 @@
 
 #include <Box2D/Box2D.h>
 
-#include "world_object_if.h"
+#include "old_world_object_if.h"
 
 class Simulator_Physics_If : public QObject
 {
