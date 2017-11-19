@@ -107,6 +107,7 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 
         QGraphicsItem* graphic = _drawModel(m);
         _shapes[m] = graphic;
+        _shapeToModel[graphic] = m;
 
         //If the model or one of its submodels changes, redraw the whole thing
         connect(m, &Model::modelChanged, this, &BasicViewer::modelChanged);
@@ -144,10 +145,12 @@ void BasicViewer::modelChanged(Model *m)
     object_id oid = _modelToObject[m];
 
     _scene->removeItem(_shapes[m]);
+    _shapeToModel.remove(_shapes[m]);
     delete _shapes[m];
 
     QGraphicsItem* graphic = _drawModel(m);
     _shapes[m] = graphic;
+    _shapeToModel[graphic] = m;
 
     QColor newColor = _color(_drawLevels[oid], _currSelection == oid);
     _setOutlineColor(graphic, newColor);
@@ -160,11 +163,13 @@ void BasicViewer::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
-       QMessageBox *msgBox ;
-       msgBox = new QMessageBox();
-       msgBox->setWindowTitle("Hello");
-       msgBox->setText("You Clicked Left Mouse Button");
-       msgBox->show();
+        QPointF hit = event->localPos();
+        QGraphicsItem* shape = _viewer->itemAt((int)(hit.x()+0.5), (int)(hit.y() + 0.5));
+        while(shape->parentItem())
+            shape = shape->parentItem();
+        Model* m = _shapeToModel[shape];
+        object_id oid = _modelToObject[m];
+        userSelectedObject(oid);
     }
 }
 
@@ -213,6 +218,7 @@ void BasicViewer::objectRemovedFromScreen(object_id id)
         {
             //Stop drawing shapes
             _scene->removeItem(_shapes[m]);
+            _shapeToModel.remove(_shapes[m]);
             delete _shapes[m];
 
             //Stop tracking shape

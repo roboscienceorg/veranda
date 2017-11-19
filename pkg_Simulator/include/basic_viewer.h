@@ -26,6 +26,7 @@ class BasicViewer : public Simulator_Visual_If
 
     //Top-level parent shape for objects
     QMap<Model*, QGraphicsItem*> _shapes;
+    QMap<QGraphicsItem*, Model*> _shapeToModel;
 
     //Keep track of what is drawn
     QMap<object_id, DrawLevel> _drawLevels;
