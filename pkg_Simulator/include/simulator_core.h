@@ -5,7 +5,7 @@
 #include "interfaces/robot_loader_if.h"
 #include "interfaces/simulator_physics_if.h"
 #include "interfaces/simulator_ui_if.h"
-#include "interfaces/old_world_object_if.h"
+#include "world_object.h"
 #include "interfaces/simulator_visual_if.h"
 #include "map.h"
 
@@ -23,7 +23,7 @@ class SimulatorCore : public QObject
     Simulator_Ui_If* _userInterface;
 
     object_id _nextObject = 1;
-    QMap<object_id, depracatedWorldObject_If*> _worldObjects;
+    QMap<object_id, WorldObject*> _worldObjects;
 
 public:
     SimulatorCore(Simulator_Physics_If* physics, Simulator_Ui_If* ui,
@@ -35,8 +35,8 @@ public:
 signals:
     void objectRemoved(object_id rId);
 
-    void objectAdded(WorldObjectPhysics_If* interface, object_id id);
-    void objectAdded(WorldObjectProperties_If* interface, object_id id);
+    //void objectAdded(WorldObjectPhysics* interface, object_id id);
+    void objectAdded(WorldObjectProperties* interface, object_id id);
 
     void errorMsg(QString);
 
@@ -49,7 +49,7 @@ signals:
     void physicsTickSet(double, double);
 
 public slots:
-    void addSimObject(depracatedWorldObject_If* obj);
+    void addSimObject(WorldObject* obj);
     void removeSimObject(object_id oId);
 };
 

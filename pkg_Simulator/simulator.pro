@@ -46,11 +46,11 @@ HEADERS += \
     include/sdsmt_simulator/drivetrain_plugin.h \
     include/sdsmt_simulator/robotcomponent_if.h \
     include/map.h \
-    include/sdsmt_simulator/properties_if.h \
     include/sdsmt_simulator/model.h \
     include/sdsmt_simulator/cloneshape.h \
     include/interfaces/old_world_object_if.h \
-    include/sdsmt_simulator/world_object_component_if.h
+    include/sdsmt_simulator/world_object_component_if.h \
+    include/sdsmt_simulator/property.h
 
 FORMS    += \
     ui/mainwindow.ui \

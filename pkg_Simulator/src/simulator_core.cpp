@@ -19,9 +19,9 @@ _physicsEngine(physics), _userInterface(ui)
     connect(this, &SimulatorCore::objectRemoved, _physicsEngine, &Simulator_Physics_If::removeWorldObject);
 
     connect(_userInterface, &Simulator_Ui_If::userAddWorldObjectToSimulation, this, &SimulatorCore::addSimObject);
-    connect(this, static_cast<void (SimulatorCore::*)(WorldObjectPhysics_If*, object_id)>(&SimulatorCore::objectAdded),
-            _physicsEngine, &Simulator_Physics_If::addWorldObject);
-    connect(this, static_cast<void (SimulatorCore::*)(WorldObjectProperties_If*, object_id)>(&SimulatorCore::objectAdded),
+    //connect(this, static_cast<void (SimulatorCore::*)(WorldObjectPhysics*, object_id)>(&SimulatorCore::objectAdded),
+    //        _physicsEngine, &Simulator_Physics_If::addWorldObject);
+    connect(this, static_cast<void (SimulatorCore::*)(WorldObjectProperties*, object_id)>(&SimulatorCore::objectAdded),
             _userInterface, &Simulator_Ui_If::worldObjectAddedToSimulation);
 
     connect(this, &SimulatorCore::userStartPhysics, _physicsEngine, &Simulator_Physics_If::start);
@@ -67,19 +67,19 @@ void SimulatorCore::start()
 }
 
 
-void SimulatorCore::addSimObject(depracatedWorldObject_If* obj)
+void SimulatorCore::addSimObject(WorldObject *obj)
 {
     //Clone object to have local copy for distributing
     obj = obj->clone();
 
-    connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &depracatedWorldObject_If::connectChannels);
-    connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &depracatedWorldObject_If::disconnectChannels);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &WorldObject::connectChannels);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &WorldObject::disconnectChannels);
 
-    WorldObjectPhysics_If* phys_interface = new WorldObjectPhysics_If(obj, obj);
-    WorldObjectProperties_If* prop_interface = new WorldObjectProperties_If(obj, obj);
+    //WorldObjectPhysics* phys_interface = new WorldObjectPhysics(obj, obj);
+    WorldObjectProperties* prop_interface = new WorldObjectProperties(obj, obj);
 
     //Send out object interfaces
-    emit objectAdded(phys_interface, _nextObject);
+    //emit objectAdded(phys_interface, _nextObject);
     emit objectAdded(prop_interface, _nextObject);
 
     //Keep references to robot and thread
@@ -92,13 +92,13 @@ void SimulatorCore::addSimObject(depracatedWorldObject_If* obj)
     else
         obj->disconnectChannels();
 
-    Map* asMap = qobject_cast<Map*>(obj);
+    /*Map* asMap = qobject_cast<Map*>(obj);
     if(asMap)
     {
         double xMin, xMax, yMin, yMax;
         asMap->getBounds(xMin, yMin, xMax, yMax);
         _userInterface->setWorldBounds(xMin, xMax, yMin, yMax);
-    }
+    }*/
 }
 
 void SimulatorCore::removeSimObject(object_id oId)

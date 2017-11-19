@@ -6,7 +6,7 @@
 #include <QMap>
 
 #include "sdsmt_simulator/model.h"
-#include "sdsmt_simulator/properties_if.h"
+#include "sdsmt_simulator/property.h"
 
 class WorldObjectComponent_If : public QObject
 {

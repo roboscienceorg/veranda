@@ -5,7 +5,6 @@
 #include "std_msgs/Float64MultiArray.h"
 
 #include <sdsmt_simulator/drivetrain_if.h>
-#include <sdsmt_simulator/properties_if.h>
 
 #include <QVector>
 #include <QString>

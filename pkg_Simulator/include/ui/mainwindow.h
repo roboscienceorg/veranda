@@ -36,7 +36,7 @@ private:
 
     QStandardItemModel* propertiesModel = nullptr;
 
-    QMap<object_id, WorldObjectProperties_If*> worldObjects;
+    QMap<object_id, WorldObjectProperties*> worldObjects;
 
     QMap<uint64_t, QString> displayed_properties;
 
@@ -47,7 +47,7 @@ public:
 public slots:
     //Simulator core added something to the simulation
     //Do not delete the world object when it is removed; that will be handled elsewhere
-    virtual void worldObjectAddedToSimulation(WorldObjectProperties_If* object, object_id oId);
+    virtual void worldObjectAddedToSimulation(WorldObjectProperties* object, object_id oId);
 
     //Simulator core removed something from simulation
     virtual void worldObjectRemovedFromSimulation(object_id oId);

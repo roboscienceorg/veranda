@@ -1,5 +1,5 @@
-#ifndef WORLD_OBJECT_IF_H
-#define WORLD_OBJECT_IF_H
+#ifndef OLD_WORLD_OBJECT_IF_H
+#define OLD_WORLD_OBJECT_IF_H
 
 #include <QObject>
 #include <QVector>
@@ -7,7 +7,7 @@
 #include <Box2D/Box2D.h>
 
 #include "sdsmt_simulator/model.h"
-#include "sdsmt_simulator/properties_if.h"
+#include "sdsmt_simulator/property.h"
 
 class depracatedWorldObject_If : public QObject
 {

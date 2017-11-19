@@ -10,7 +10,7 @@
 
 #include <Box2D/Box2D.h>
 
-#include "old_world_object_if.h"
+#include "world_object.h"
 
 class Simulator_Ui_If : public QMainWindow
 {
@@ -41,13 +41,13 @@ signals:
 
     //User requests that something be added to or removed from
     //the simulation
-    void userAddWorldObjectToSimulation(depracatedWorldObject_If* obj);
+    void userAddWorldObjectToSimulation(WorldObject* obj);
     void userRemoveWorldObjectFromSimulation(object_id oId);
 
 public slots:
     //Simulator core added something to the simulation
     //Do not delete the world object when it is removed; that will be handled elsewhere
-    virtual void worldObjectAddedToSimulation(WorldObjectProperties_If* object, object_id oId) = 0;
+    virtual void worldObjectAddedToSimulation(WorldObjectProperties* object, object_id oId) = 0;
 
     //Simulator core removed something from simulation
     virtual void worldObjectRemovedFromSimulation(object_id oId) = 0;

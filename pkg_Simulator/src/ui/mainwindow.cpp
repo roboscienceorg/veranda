@@ -239,7 +239,7 @@ void MainWindow::importMapButtonClick()
 
           if(path.length())
           {
-              Map* map = mapLoader->loadMapFile(path);
+              /*Map* map = mapLoader->loadMapFile(path);
               if(map)
               {
                   //Clear out simulation
@@ -249,7 +249,7 @@ void MainWindow::importMapButtonClick()
                   //Add map into new simulation
                   userAddWorldObjectToSimulation(map);
                   delete map;
-              }
+              }*/
           }
 
           break;
@@ -279,10 +279,10 @@ void MainWindow::objectSelected(object_id id)
         nothingSelected();
 
         selected = id;
-        WorldObjectProperties_If* obj = worldObjects[id];
+        WorldObjectProperties* obj = worldObjects[id];
         QStandardItemModel* model = propertiesModel;
 
-        QMap<QString, PropertyView>& objProps = obj->getAllProperties();
+        QMap<QString, PropertyView> objProps = obj->getProperties();
         model->setRowCount(objProps.size());
 
         int i = 0;
@@ -310,7 +310,7 @@ void MainWindow::objectSelected(object_id id)
         connect(model, &QStandardItemModel::dataChanged, [this, obj, model](QModelIndex tl, QModelIndex br)
         {
            for(int i = tl.row(); i <= br.row(); i++)
-               obj->getAllProperties()[displayed_properties[i]].set(model->data(model->index(i, 1)));
+               obj->getProperties()[displayed_properties[i]].set(model->data(model->index(i, 1)));
         });
 
         objectIsSelected(id);
@@ -325,29 +325,12 @@ void MainWindow::setWorldBounds(double xMin, double xMax, double yMin, double yM
     qDebug() << "Adjusting world size" << xMin << yMin << "->" << xMax << yMax;
     visual->setWorldBounds(xMin, xMax, yMin, yMax);
 
-    qDebug() << "Populating default robots...";
-    for(int i=0; i<3; i++)
-    {
-        Robot* r = robotLoader->loadRobotFile("");
-        if(r)
-        {
-            r->setOrientation(rand() % int(xMax - xMin) + xMin, rand() % int(yMax - yMin) + yMin, rand()%360);
-            r->getAllProperties()["Diff Drive/channels/input_velocities"].set("robot0/wheel_velocities");
-            r->getAllProperties()["Diff Drive/axle_length"].set(1);
-            r->getAllProperties()["Diff Drive/wheel_radius"].set(0.2);
+   // qDebug() << "Populating default robots...";
 
-            r->getAllProperties()["Touch Ring/channels/output_touches"].set("robot0/touch_ring");
-            r->getAllProperties()["Touch Ring/sensor_count"].set(20);
-            r->getAllProperties()["Touch Ring/angle_end"].set(360);
-            r->getAllProperties()["Touch Ring/ring_radius"].set(0.5);
-            userAddWorldObjectToSimulation(r);
-            delete r;
-        }
-    }
 }
 
 //Add robot to the simulation world view
-void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties_If* object, object_id oId)
+void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties *object, object_id oId)
 {
     if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
 
@@ -391,6 +374,6 @@ void MainWindow::robotItemClicked(QListWidgetItem* item)
 }
 void MainWindow::listBuildTools(int mode)
 {
-    //for(auto iter = robot->getAllProperties().begin(); iter != robot->getAllProperties().end(); iter++)
+    //for(auto iter = robot->getProperties().begin(); iter != robot->getProperties().end(); iter++)
         //connect(&iter.value(), &PropertyView::valueSet, [](QVariant v){qDebug() << v;});
 }

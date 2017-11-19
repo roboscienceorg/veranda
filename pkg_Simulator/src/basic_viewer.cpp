@@ -34,7 +34,7 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     setWorldBounds(-30, 30, -30, 30);
 }
 
-QGraphicsItem* BasicViewer::drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
+QGraphicsItem* BasicViewer::_drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
 {
     QGraphicsItem* newShape = nullptr;
     switch(s->m_type)
@@ -68,18 +68,18 @@ QGraphicsItem* BasicViewer::drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
     return newShape;
 }
 
-QGraphicsItem* BasicViewer::drawModel(Model* m, QGraphicsItem* parent)
+QGraphicsItem* BasicViewer::_drawModel(Model* m, QGraphicsItem* parent)
 {
     QGraphicsItemGroup* baseItem = new QGraphicsItemGroup(parent);
 
     //Draw all shapes as children of the base item
     for(b2Shape* s : m->shapes())
-        baseItem->addToGroup(drawb2Shape(s));
+        baseItem->addToGroup(_drawb2Shape(s));
 
     //Draw all children models, making them children shape objects
     //to transform to relative coordinates
     for(Model* m_sub : m->children())
-        drawModel(m_sub, baseItem);
+        _drawModel(m_sub, baseItem);
 
     //Set location of model
     double x, y, t;
@@ -98,9 +98,14 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 {
     _models[id] = objects;
 
+    QColor newColor = _color(Solid, false);
+    _drawLevels[id] = Solid;
+
     for(Model* m : objects)
     {
-        QGraphicsItem* graphic = drawModel(m);
+        _modelToObject[m] = id;
+
+        QGraphicsItem* graphic = _drawModel(m);
         _shapes[m] = graphic;
 
         //If the model or one of its submodels changes, redraw the whole thing
@@ -111,8 +116,9 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
         //If the base model moves, update the transform
         connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
 
+        _setOutlineColor(graphic, newColor);
         _scene->addItem(graphic);
-    }
+    }    
 }
 
 
@@ -135,10 +141,16 @@ void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
 
 void BasicViewer::modelChanged(Model *m)
 {
-    _scene->removeItem(_shapes[m]);
+    object_id oid = _modelToObject[m];
 
-    QGraphicsItem* graphic = drawModel(m);
+    _scene->removeItem(_shapes[m]);
+    delete _shapes[m];
+
+    QGraphicsItem* graphic = _drawModel(m);
     _shapes[m] = graphic;
+
+    QColor newColor = _color(_drawLevels[oid], _currSelection == oid);
+    _setOutlineColor(graphic, newColor);
 
     _scene->addItem(graphic);
 }
@@ -153,16 +165,15 @@ void BasicViewer::mousePressEvent(QMouseEvent *event)
        msgBox->setWindowTitle("Hello");
        msgBox->setText("You Clicked Left Mouse Button");
        msgBox->show();
-       mouseClickPosition = event->pos();
     }
 }
 
 void BasicViewer::resizeEvent(QResizeEvent *event)
 {
-    rescale();
+    _rescale();
 }
 
-void BasicViewer::rescale()
+void BasicViewer::_rescale()
 {
     //It appears that QGraphicsView::fitInView is broken in
     //Qt 5.5. This should be an acceptable alternative
@@ -189,7 +200,7 @@ void BasicViewer::setWorldBounds(double xMin, double xMax, double yMin, double y
     _scene->setSceneRect(viewRect);
     _viewer->setSceneRect(viewRect);
 
-    rescale();
+    _rescale();
 }
 
 //for after the MVP 
@@ -200,29 +211,87 @@ void BasicViewer::objectRemovedFromScreen(object_id id)
     {
         for(Model* m : _models[id])
         {
+            //Stop drawing shapes
             _scene->removeItem(_shapes[m]);
+            delete _shapes[m];
+
+            //Stop tracking shape
             _shapes.remove(m);
+
+            //Stop tracking model
+            disconnect(m, 0, this, 0);
         }
         _models.remove(id);
+        _drawLevels.remove(id);
     }
+    if(_currSelection == id) _currSelection = 0;
 }
 
 //The object identified by object_id is in the world, but should not be drawn
 //for users not wanting to see their sensors drawn
-void BasicViewer::objectDisabled(object_id id)
+void BasicViewer::objectDrawLevelSet(object_id id, DrawLevel level)
 {
-
-}
-
-//The object identified by object_id is in the world and should be drawn
-void BasicViewer::objectEnabled(object_id id)
-{
-
+    _drawLevels[id] = level;
+    QColor newColor = _color(level, _currSelection == id);
+    for(Model* m : _models[id])
+        _setOutlineColor(_shapes[m], newColor);
 }
 
 //The object identified by object_id has been selcted
 //maybe we draw a selection box around it?
 void BasicViewer::objectSelected(object_id id)
 {
+    QColor newColor;
+    if(id != _currSelection)
+    {
+        if(_currSelection != 0)
+        {
+            newColor = _color(_drawLevels[_currSelection], false);
+            for(Model* m : _models[_currSelection])
+                _setOutlineColor(_shapes[m], newColor);
+        }
 
+        _currSelection = id;
+        newColor = _color(_drawLevels[_currSelection], true);
+        for(Model* m : _models[_currSelection])
+            _setOutlineColor(_shapes[m], newColor);
+    }
+}
+
+//Returns a color given drawlevel and state of selected
+QColor BasicViewer::_color(DrawLevel level, bool selected)
+{
+    QColor out;
+
+    if(selected)
+        out.setRgb(37, 249, 83);
+
+    switch(level)
+    {
+        case Solid:
+            out.setAlpha(255);
+        break;
+        case Transparent:
+            out.setAlpha(125);
+        break;
+        case Off:
+            out.setAlpha(0);
+        break;
+    }
+
+    return out;
+}
+
+//Sets a graphics item and all it's children to a specific color pen
+void BasicViewer::_setOutlineColor(QGraphicsItem* item, const QColor& color)
+{
+    QAbstractGraphicsShapeItem* asShape = qgraphicsitem_cast<QAbstractGraphicsShapeItem*>(item);
+
+    if(asShape)
+    {
+        asShape->setPen(QPen(color));
+    }
+
+    for(QGraphicsItem* i : item->childItems())
+        _setOutlineColor(i, color);
 }

@@ -8,7 +8,7 @@
 
 #include "sdsmt_simulator/world_object_component_if.h"
 #include "sdsmt_simulator/model.h"
-#include "sdsmt_simulator/properties_if.h"
+#include "sdsmt_simulator/property.h"
 
 class WorldObject : public QObject
 {
@@ -50,4 +50,30 @@ public slots:
     void disconnectChannels();
 };
 
+class WorldObjectProperties : public QObject
+{
+    Q_OBJECT
+
+    WorldObject* _obj;
+public:
+    WorldObjectProperties(WorldObject* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
+
+    //Drawing Interactions
+    QVector<Model*> getModels()
+    { return _obj->getModels(); }
+
+    //UI Interactions
+    QMap<QString, PropertyView> getProperties()
+    { return _obj->getProperties(); }
+
+    bool usesChannels()
+    { return _obj->usesChannels(); }
+
+public slots:
+    void connectChannels()
+    { _obj->connectChannels(); }
+
+    void disconnectChannels()
+    { _obj->disconnectChannels(); }
+};
 #endif // WORLD_OBJECT_IF_H

@@ -1,7 +1,7 @@
 #ifndef ROBOTCOMPONENT_IF_H
 #define ROBOTCOMPONENT_IF_H
 
-#include "properties_if.h"
+#include "property.h"
 
 #include <QObject>
 
