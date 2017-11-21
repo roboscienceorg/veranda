@@ -3,42 +3,109 @@
 
 \chapter{Sprint Results and Prototypes}
 
-This chapter is for recording the results of each sprint and documenting the evolving product.    It is a historical record of what you accomplished in 464/465.   This should be organized according to Sprints.  It should have the basic description of the sprint deliverable and what was accomplished.  Screen shots, photos, captures from video, etc should be used.   Expect this to be a long chapter.    
+This chapter discusses the results of each sprint and documents the evolving product.    It covers the decisions and progress made in our 2D Robot Simulator during the first semester of our Senior Design class and is organized by Sprints, ranging from the first sprint to the sixth.    
 
 \section{Sprint 1 Report}
 \subsection{Sprint Backlog}
+
+The backlog for this sprint consisted of establishing a backlog. The client initially requested that we alter the functionality of the existing 2D Robot Simulator called STDR. During sprint one, however, the team established that it would be more effective to move toward the client's change requests by simply starting a new software entirely. The STDR was used for reference and to assist in setting up our architecture such that it would be more versatile and allow for future plug-ins. Some examples of things included in the backlog we established are supporting multiple robot shapes, being able to build robots from the program, and considering physics options like sticky wheels and moving map objects. These early user stories drove the creation of wireframes in this sprint, and ultimately the choices of the architecture design and tools used.
+
 \subsection{Deliverable}
+
+At our first couple of client meetings, we discussed uses and overview of the product and delivered wireframes for a product GUI. The deliverables were those wireframes and a Trello backlog of user stories.
+
 \subsection{Results of testing}
+
+Testing in this sprint consisted of team members examining the STDR simulator. The "physics" for a robot moving in the STDR simulator consisted of GUI functions which tested the robots' pixels for proximity to map objects' pixels and halted robots when they collided with anything. There was no physics engine being used. There was also only support for hard-coded sensors and robots.
+
 \subsection{Successes and Failures}
+
+We met the sprint one goals by the end of our two-week sprint. We established a backlog of user stories on Trello and all team members created GUI wireframes which were later used to make an initial GUI in sprint two and ultimately and MVP in sprint four. By the end of the sprint we had a good idea of how we wanted to partition the work and the architectural layers of the software. We had also begun making decisions as to which physics engine to use and how to design the world view.
+
 \subsection{Modifications required (product backlog, design, requirements, etc)}
+
+As this was the first sprint, there were no modifications from previous sprint work or decisions. However, we veered from the initial client request to alter the STDR simulator, as we decided to start a new software from scratch which would implement the use of a physics engine and support future plug-ins.
+
 \subsection{Sprint Review}
+
+Sprint one was a success in that we established Ubuntu 16.04 as an environment for our development, all team members installed necessary softwares like Qt Creator and ROS, and we created wireframes and a backlog for the product. 
+
 \subsection{Sprint Retrospective}
+
+In retrospect, the team felt very good about progress made during this sprint. We had planned to do research during the sprint, (on the STDR, architecture, IDE, physics engine, and world view widget,) and by the end of the sprint we had enough user stories and information to start writing code. Therefore we exceeded our sprint one goals and promptly set the product in motion.
+
 \subsection{Sprint Analytics} 
-Place your burndown charts, team velocity information, etc here if they are not discussed above.
+
+Include pic of STDR with caption on physics underachievement/snap of code if possible with 
 
 
 \section{Sprint 2 Report}
 \subsection{Sprint Backlog}
+
+The backlog for sprint two included creating a clickable GUI using QT widgets and making design decision. The GUI was to be written in QT Creator such as to include a tab-like design with a simulator, a robot designer, and a map designer. Design decions included choosing a physics engine, choosing a widget type for the world view, and promoting use of the architectural layers designed in the first sprint. The physics engine chosen was Box 2D, which the physics engine expert dictated had enough options to get what our product needed without going overboard on physics capabilities we would never need to implement. The world view designer decided to use a modified Basic Viewer to display robots and map objects.
+
 \subsection{Deliverable}
+
+During client meetings for this sprint, we showed a clickable demo of the GUI and discussed the design decisions made. The client pointed us in the right direction to get an MVP working: focusing on only circular robots and ignoring map objects until further decisions such as file types could be made. Box 2D had to be expirimented with, and the team member in charge of that showed a simulated demo during this sprint of two objects colliding. 
+
 \subsection{Results of testing}
+
+Testing for this sprint was "as viewed" by the team members. The GUI designer tested clickability of buttons and display of neccessary menus. The physics engine expert tested a numerical output of two objects colliding. During this sprint, we established that our product will--for the most part--have to be tested by users. Much of the code would not be able to be unit tested due to it being GUI code or having infinite input parameter options.
+
 \subsection{Successes and Failures}
+
+In this sprint we succeeded in producing a clickable GUI and a small physics demonstration. We also established some of the interfaces which would later be used to communicate via slots and signals between the GUI, world view, and physics simulator. We did not end up with an MVP, nor were any of the project partitions actually communicating by the end of the sprint.
+
 \subsection{Modifications required (product backlog, design, requirements, etc)}
+
+There were no modifications to the product from the first sprint to the second sprint except that initially we planned to use an Open GL widget for the world view but our designated researcher found that to be more difficult. We stuck with our architecture and had very little contact with the STDR simulator during this sprint.
+
 \subsection{Sprint Review}
+
+Sprint two was a success in that we produced a clickable UI demo and a physics simulation example. Though we did not end up with many deliverables, we established the research foundation needed to make professional design decisions and set up our four partitions, (physics, backend, world view, UI,) to prepare for the MVP.
+
 \subsection{Sprint Retrospective}
+
+In retrospect, the team felt substantial progress was made during this sprint. We made up for some of the research not backlogged in the first sprint and had some code written in time for our client meetings.
+
 \subsection{Sprint Analytics} 
-Place your burndown charts, team velocity information, etc here if they are not discussed above.
+Put initial GUI images here, from first presentation, with captions about simulator vs map designer vs robot designer
 
 
 \section{Sprint 3 Report}
 \subsection{Sprint Backlog}
+
+The backlog for this sprint involved producing an MVP. Unfortunately, that goal had to be put on-hold in order to prepare for the first senior design presentation.
+
 \subsection{Deliverable}
 \subsection{Results of testing}
 \subsection{Successes and Failures}
 \subsection{Modifications required (product backlog, design, requirements, etc)}
 \subsection{Sprint Review}
+
+no MVP
 \subsection{Sprint Retrospective}
 \subsection{Sprint Analytics} 
-Place your burndown charts, team velocity information, etc here if they are not discussed above.
+presentation : score? PPT slide? wut?
+
+\section{Sprint 4 Report}
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included producing an MVP, which was originally a goal for sprint three.
+
+\subsection{Deliverable}
+
+In sprint four, we delivered a minimum viable product (MVP).
+
+\subsection{Results of testing}
+\subsection{Successes and Failures}
+\subsection{Modifications required (product backlog, design, requirements, etc)}
+\subsection{Sprint Review}
+
+no MVP
+\subsection{Sprint Retrospective}
+\subsection{Sprint Analytics} 
+image of MVP with the robot 
 
 \vdots
 
