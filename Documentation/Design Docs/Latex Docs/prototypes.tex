@@ -168,7 +168,7 @@ Put initial GUI images here, from first presentation, with captions about simula
 Oct. 19th - Nov. 2nd
 \subsection{Sprint Backlog}
 
-The backlog for this sprint involved enhancing the MVP and creating our first client presentation.
+The backlog for this sprint involved enhancing the MVP and creating our first client presentation. The MVP allowed for the spawning of a single robot in the center of the world view, so a goal in this sprint was to spawn multiple robots at random orientations and in random locations across the map. We also wanted to be able to display properties for these robots, and select and change the properties displayed.
 
 \begin{itemize}
 	\item Allow for robots spawning at non-center of map
@@ -178,6 +178,9 @@ The backlog for this sprint involved enhancing the MVP and creating our first cl
 \end{itemize}
 
 \subsection{Deliverable}
+
+The deliverable for this sprint was a prototype consisting of three robots which spawned at random locations in various orientations and moved in giant fiure-8's accross the world view. This was paired with the addition of viewing robot properties for one of the robots. The spawned robots were hard-coded. The progress was shown as a demo in a client meeting.
+
 \begin{itemize}
 	\item Demo of new features
 	\begin{itemize}
@@ -189,6 +192,8 @@ The backlog for this sprint involved enhancing the MVP and creating our first cl
 \end{itemize}
 
 \subsection{Results of testing}
+During this sprint, we made a major architectural decision based on experimentation with integrating Box2D and threads. It was determined that continuing the multi-threaded architecture would be difficult and result in many future bugs. 
+
 \begin{itemize}
 	\item Decision was made to abandon multi-threaded design.
 	\begin{itemize}
@@ -197,9 +202,20 @@ The backlog for this sprint involved enhancing the MVP and creating our first cl
 	\end{itemize}
 \end{itemize}
 
+\subsection{Successes and Failures}
+
+In this sprint we succeeded in improving the MVP. We were able to show the client a product where three robots spawned in random locations with random orientations and moved about the world view, sometimes collided. We failed to implement a goal of making those robots selectable such that a specific robot's properties could be set.
+
+\subsection{Modifications required (product backlog, design, requirements, etc)}
+
+There was an architectural modification in this sprint: the switch from multi-threading to a single thread. This was known to have the potential for a slower program but we justified it with ease of code and lack of bugs. We expected the lag would be a minor issue.
+
 \subsection{Sprint Review}
-Presentation was successful.
+Our first team presentation was successful. The client was happy with the prototypes of our MVP and improved MVP. The team felt that good progress was made and despite the delay of switching from multi-threading to a single thread, we were able to get back on track and ready for sprint four.
+
 \subsection{Sprint Retrospective}
+In retrospect, there was no way to know without applying the project that the original multi-threaded approach wasn't going to work out. Luckily we came to this conclusion in sprint three with plenty of time to correct the architecture. Everything else in this sprint went smoothly, team coding sessions emerged as a form of integrating project partitions and proved successful.
+
 \subsection{Sprint Analytics} 
 presentation : score? PPT slide?
 
@@ -207,10 +223,11 @@ presentation : score? PPT slide?
 Nov. 2nd - Nov. 16th
 \subsection{Sprint Backlog}
 
-The backlog for this sprint included
+The backlog for this sprint included allowing selection of robots from the world view and a side menu in the UI, implementing LIDAR and touch sensor plugins, loading of obstacle (map) files, and a prototype joystick for the UI. We also had to decide on a direction for the physics aspect of the project because the MVP invovled a hard-coded robot a with specific design and we were ready to start looking at alterior robot possibilities.
+
 \begin{itemize}
-	\item Decide between kinematics and full-simulation
-	\item Allow selection of robot from main view
+	\item Decide between kinematics and full-simulation physics
+	\item Allow selection of robot from main view and UI menu
 	\item Prototype joystick UI
 	\item LIDAR plugin
 	\item Touch sensor plugin
@@ -219,24 +236,90 @@ The backlog for this sprint included
 
 \subsection{Deliverable}
 
-In sprint four, we delivered a minimum viable product (MVP).
+In sprint four, we delivered the ability to select a robot from a menu in the UI and load obstacle files. The touch sensor implementation plus an obstacle file of four squares emulating a "room" assisted in confirming the correct response from collisions. We presented the physics decision to move away from the hard-coded differential drive and the client informed us of some possible changes.
+
 \begin{itemize}
 	\item Demo of new features
 	\begin{itemize}
-		\item Multiple robots spawning randomly on map with random orientation
-		\item Robots using differential drive kinematics
-		\item Python script to drive differential drive robots in figure 8
-		\item Being able to see and modify properties of robot (velocity, differential drive parameters...)
+		\item Physics decision
+		\item Ability to select a robot from a UI menu
+		\item Ability to load obstacle files
+		\item Confirmed collisions
+		\item Touch sensor implementation
 	\end{itemize}
 \end{itemize}
 
 \subsection{Results of testing}
+
+Implementing the differential drive with collisions alerted us to the fact that we needed to rip, root, and reboot the physics aspect of the project. Loading the obstacle files required use of some of the interfaces created in sprint one.
+
 \subsection{Successes and Failures}
-Touch sensor and obstacles took longer than expected to implement and required major changes in object interfaces. As a result, selection of robots by clicking on their image was delayed and LIDAR plugin was not written.
+
+Touch sensors and obstacles took longer than expected to implement and required major changes in object interfaces. As a result, the ability to select a robot by clicking its image was delayed and the LIDAR plugin was not written. The joystick prototype was not completed. The client also mentioned ROS II as a possible development issue, given that we would want our software to be compatible with the newest ROS version but that version is not yet available to use.
+
 \subsection{Modifications required (product backlog, design, requirements, etc)}
-While the touch sensor plugin was being written, it was discovered that Box2D can be leveraged to model a top-down vehicle. As a result, it was decided that this method of modeling robots should be used instead of kinematic modeling.
+
+While the touch sensor plugin was being written, it was discovered that Box2D can be leveraged to model a top-down vehicle. As a result, it was decided that this method of modeling robots should be used instead of kinematic modeling. The original robots spawned in the sprint two and three demos used a kinematic differential drive. The client warned us to watch out for possible changes from ROS to ROS II and we also discussed changing the foundation of differentiating between map objects and robots. We decided the product would be more useful if robots and map objects were created and treated the same way. Thus, we set out to redo the UI such that "Simulation Mode" would become a "Simulator" while "Map Mode" and "Robot Mode" would merge to become a single "Designer". This would allow for the creation of non-static map obects such as moving doors and doors with sensors. Overall, this would make the software more versatile.
+
 \subsection{Sprint Review}
-Client was again pleased with progress. Next target features were identified as obstacles and some sort of sensor equipment so that the application could potentially be used in a class project.
+
+The client was again pleased with progress made. Our next target features were identified as implementing obstacles and some sort of sensor equipment so that the application could potentially be used in a class project. This along with revamping the UI, fixing the hard-coded kinematic physics, and implementing the Designer for world view objects lead the direction we took moving into sprint five.
+
 \subsection{Sprint Retrospective}
+
+In retrospect, sprint four was pivotal as a post-MVP turning point for the product. We had enough code written to determine what was working and what was not, and made decisions that would ultimately push the product to be as versatile as possible.
+
 \subsection{Sprint Analytics} 
-image of MVP with the robot 
+wut
+
+ 
+\section{Prototypes}
+
+\subsection{STDR Simulator}
+
+The STDR was the original 2D robot simulator the client was using in robotics classes. The team was asked to modify it as our senior design project, but after careful deliberation we decided it would be more effective to start a new project. Visible in the figure below is a simulation of two robots implementing many sensors to navigate a maze.
+
+\begin{figure}[!htb]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{./Images/Sprint0_STDR}
+\end{center}
+\caption{The original STDR 2D robot simulator, which the client initially wanted the team to modify.  \label{stdr}}
+\end{figure}
+
+\subsection{Clickable UI}
+
+The clickable UI prototype consisted of buttons and slots partitioned into three sections: Simulation Mode, Map Mode, and Robot Mode. The intention during production of this prototype was to emulate a video game designer and produce a visual deliverable for the client. A blank black widget is visible where the world view is supposed to be, as this prototype did not have the world view integrated into the UI.\newline\newline\newline
+\newline\newline\newline
+\newline\newline\newline
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_SimulationMode}
+\end{center}
+\caption{The clickable UI with Simulation Mode, currently set in Simulation Mode.  \label{clickableuisimulation}}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_MapMode}
+\end{center}
+\caption{The clickable UI, currently set in Map Mode. \label{clickableuimap}}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_NoMenus}
+\end{center}
+\caption{The clickable UI with side menus "minimized", a design decision based on the possible need to view robots moving on a larger map more easily. \label{clickableuinomenus}}
+\end{figure}
+
+\subsection{Modified MVP}
+
+The original MVP consisted of a single robot spawning in the center of the world view and moving in a figure-8 with no obstacles to collide with. Here is the modified MVP from sprint four, in which three robots get spawned randomly throughout the world view. Also pictured is the "room" made up of four map objects which are static squares loaded from an obstacle file. Properties for one of the robots are listed on the menu to the left.
+
+\begin{figure}[!htb]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{./Images/Sprint3_hasBox_originalUI}
+\end{center}
+\caption{The MVP of our product, with a loaded map of four squares and three differential drive robots spawned at random locations in various orientations in the world view. \label{mvp}}
+\end{figure}
