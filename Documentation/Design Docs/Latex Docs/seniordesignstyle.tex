@@ -14,7 +14,7 @@
 \usepackage[all]{xy}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
-\usepackage[hidelinks]{hyperref}
+\usepackage{hyperref}
 \usepackage{verbatim}
 \usepackage{algorithm}
 \usepackage{algorithmic}
@@ -46,11 +46,17 @@
 \usepackage[T1]{fontenc}
 
 
-\definecolor{SDColor1}{rgb}{0,0,0}
-\definecolor{SDColor2}{rgb}{0,0,0}
-\definecolor{SDColor3}{rgb}{0,0,0}
-\definecolor{SDColor4}{rgb}{0,0,0}
-\definecolor{SDColor5}{rgb}{0,0,0}
+%\definecolor{SDColor1}{rgb}{0,0,0}
+%\definecolor{SDColor2}{rgb}{0,0,0}
+%\definecolor{SDColor3}{rgb}{0,0,0}
+%\definecolor{SDColor4}{rgb}{0,0,0}
+%\definecolor{SDColor5}{rgb}{0,0,0}
+
+\definecolor{SDColor1}{rgb}{.204,.353,.541}
+\definecolor{SDColor2}{rgb}{.31,.506,.741}
+\definecolor{SDColor3}{rgb}{0.18,0.35,0.59}
+\definecolor{SDColor4}{rgb}{0.44,0.59,0.82}
+\definecolor{SDColor5}{rgb}{0.2,0.2,0.2}
 
 %%%  --- Here are some other colors.  Keep it conservative --- %%%
 
@@ -69,6 +75,12 @@
 %\definecolor{SDColor4}{rgb}{.63,.32,.18}
 %\definecolor{SDColor5}{rgb}{.45,.15,.15}
 %
+
+\hypersetup{
+    colorlinks = true,
+	urlcolor = SDColor1,
+	linkcolor = SDColor5
+}
 
 
 %% Custom colors for code listing environment
