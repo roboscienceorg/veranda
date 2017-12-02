@@ -230,7 +230,8 @@ The core application itself has minimum communication through ROS, it mainly sta
  \section{Architecture and System Design} 	
  \subsection{Design Decisions}
   	The simulation underwent a number of design changes during its development. This section will discuss what drove the major design decisions associated with this project.
- \subsubsection*{UI}
+ \subsubsection*{User Experience}
+ \subsubsection*{User Interface}
  	When building a cross-platform user interface in C++, there are only a few options available. When discussing this, the following ideas were brought up: Pure OpenGL, Qt QML, and Qt Widgets. The final decision was Qt Widgets, which will be discussed below.
  	
  	A pure OpenGL solution was not selected due mainly due to the difficulty of implementation and the amount of work that would have to go into a UI of that nature. If using Qt were not an option, pure OpenGL may have been selected; however, having the Qt library available makes it hard to justify the amount of extra development that a pure OpenGL solution would add.
@@ -246,8 +247,6 @@ The core application itself has minimum communication through ROS, it mainly sta
  	One of the main failings of STDR was its lack of a physics engine. It was decided early on that a known physics engine should be used, or one should be written for this project so that at least basic collision detection could be simulated.
  	
  	A number of different engines were investigated, including Box2D and Chipmunk2D. In the end, Box2D was chosen because it is simple and lightweight while also providing all of the functionality necessary for this simulator. Other physics engines would have been too bulky or difficult to use, and writing a custom physics engine would have extended the development considerably and likely would have resulted in worse performance.
- 
- \subsection{UX}
 
 %\section{Notable Algorithms} 
  %\subsubsection{Importing Images}
@@ -446,7 +445,8 @@ After construction, shapes and children models can be added and removed with the
  \end{enumerate}
  \hrule
   \subsubsection*{World Object Component Plugin Interface}
-  This interface defines how plugins containing World Object Components should look. Plugins are loaded using the Qt Plugin Loader; information on the plugin system can be found at \href{http://doc.qt.io/qt-5/plugins-howto.html#the-low-level-api-extending-qt-applications}{http://doc.qt.io/qt-5/plugins-howto.html}. The only purpose of these plugins is to create instances of the World Object Component they contain. These instances will be cloned or added into World Objects.
+  This interface defines how plugins containing World Object Components should look. Plugins are loaded using the Qt Plugin Loader; information on the plugin system can be found at \href{http://doc.qt.io/qt-5/plugins-howto.html#the-low-level-api-extending-qt-applications}{http://doc.qt.io/qt-5/plugins-howto.html}. 
+  The only purpose of these plugins is to create instances of the World Object Component they contain. These instances will be cloned or added into World Objects.
  \begin{figure}
  	\begin{center}
  	\includegraphics[scale=0.5]{./images_design/uml/ComponentPlugin}
@@ -464,7 +464,13 @@ After construction, shapes and children models can be added and removed with the
  \end{itemize}
  
  \subsubsection*{World Object Added}
- 	World Object additions are generally initiated by the UI. When the user wants to add an Object to the simulation, the UI signals to the core indicating what Object should be added. The core copies the World Object and stores the copy with an index. The Object and its index are sent back to the UI and Physics engine wrapped in interfaces which can be used to access methods of the new World Object. More information on these interfaces can be found in the World Object class details below.
+ 	World Object additions are generally initiated by the UI. When the user wants to add an Object to the simulation, the UI signals to the core indicating what Object should be added. The core copies the World Object and stores the copy with an index. The Object and its index are sent back to the UI and Physics engine wrapped in interfaces which can be used to access methods of the new World Object.
+ 	
+ 	\begin{figure}[h]
+ 		\centering
+ 		\includegraphics[width=\textwidth]{./images_design/uml/event_addObject}
+ 		\caption{Data flow when a new object is added to the simulation\label{uml:addevent}}
+ 	\end{figure}
  	
  	When the Physics engine receives a new World Object, it passes the b2World object
 of the simulation to it so that the Object can add bodies and shapes to the physics engine.
@@ -474,6 +480,12 @@ of the simulation to it so that the Object can add bodies and shapes to the phys
  \subsubsection*{World Object Removed}
  The process of removing a World Object is very similar to that of creating one. The UI signals to the core that the user would like to remove an Object; this Object is identified by the index that was assigned when it was added to the simulation. The core then signals back to the UI and Physics that this Object is removed and deletes the associated Object from the heap.
  
+ 	\begin{figure}[h]
+ 		\centering
+ 		\includegraphics[width=\textwidth]{./images_design/uml/event_removeObject}
+ 		\caption{Data flow when an object is removed from the simulation\label{uml:removeevent}}
+ 	\end{figure} 
+ 
  When the Physics engine receives this signal, it passes the b2World to the Object again so that the Object can remove any Box2D bodies and joints that it created.
  
  When the UI receives this signal, it un-caches the Object's list of Properties and notifies the world view widget to stop drawing the Models associated with the object.
@@ -481,10 +493,22 @@ of the simulation to it so that the Object can add bodies and shapes to the phys
  \subsubsection*{World Ticked}
  World ticks are generated by the physics engine on a timer. The default tick rate is 100 per second, and each tick moves the simulation forward $\frac{1}{100}$ of a second.
  
- When the world tick signal is received by a World Object, it checks the location of its Box2D body, and, if it moved, updates its Model, causing a redraw in the world view widget. Likewise, when a Component of an Object receives this signal, it may also update its own Model. Additionally, Components can take this moment to modify the simulation by applying forces on their Box2D bodies.
+ When a Component of an Object receives this signal, it may update its own Model, which would redraw the screen with the change. Additionally, Components can take this moment to modify the simulation by applying forces on their Box2D bodies or send messages to external applications through ROS.
+ 
+  	\begin{figure}[h]
+ 		\centering
+ 		\includegraphics[width=\textwidth]{./images_design/uml/event_tick}
+ 		\caption{Data flow of a simulation tick\label{uml:tickevent}}
+ 	\end{figure}
  
  \subsubsection*{External Communication}
- The most common example of external communication is robot control code signaling that wheel velocities should change. When World Object Components receive an external communication of this nature, they can apply forces on their associated Box2D body to affect the simulation. This change will be applied on the next tick to happen after the force is applied.
+ The most common example of external communication is robot control code signaling that wheel velocities should change. When World Object Components receive an external communication of this nature, they can apply forces on their associated Box2D body to affect the simulation and update their models. This change will be applied on the next tick to happen after the force is applied.
+ 
+  	\begin{figure}[h]
+ 		\centering
+ 		\includegraphics[width=\textwidth]{./images_design/uml/event_data}
+ 		\caption{Data flow of a ROS message being received\label{uml:dataevent}}
+ 	\end{figure}
  
 \subsection{Simulator Core}
 
@@ -494,26 +518,29 @@ of the simulation to it so that the Object can add bodies and shapes to the phys
 \end{itemize}
 
 \subsubsection*{Overview}
-The simulator core is, as the name suggests, the main piece of the simulation. It organizes and marshals the other parts of the system and ensures that data flows in the correct paths. The main purpose of the simulator core is to connect the UI to the Physics engine and keep them synchronized so that what's shown on screen reflects what's simulated in the physics engine. See UML Figure \ref{uml:simcore} for a list of data members and functions in the simulator core.
+The simulator core is, as the name suggests, the main piece of the simulation. It organizes the other parts of the system and ensures that data flows in the correct paths. The main purpose of the simulator core is to connect the UI to the Physics engine and keep them synchronized so that what's shown on screen reflects what's simulated in the physics engine. See UML Figure \ref{uml:simcore} for a list of data members and functions in the simulator core. The specific data connections set up by the core are shown in Figure \ref{uml:dataflow_simcore}.
 
  
- \begin{figure}
+ \begin{figure}[h]
  	\begin{center}
  	\includegraphics[scale=0.5]{./images_design/uml/SimCore}
  	\caption{UML of Simulator Core\label{uml:simcore}}
  	\end{center}
  \end{figure}
 
-\subsubsection*{Data Flow Diagram}
-
- \begin{figure}
+ \begin{figure}[h]
  	\begin{center}
  	\includegraphics[scale=0.5]{./images_design/uml/DataFlow_simcore}
- 	\caption{Data Flow in Simulator Core\label{uml:dataflow_simcore}}
+ 	\caption{Data connections created by the Simulator Core\label{uml:dataflow_simcore}}
  	\end{center}
  \end{figure} 
 
 \subsubsection*{Design Details}
+\begin{itemize}
+	\item World Objects are assigned an unsigned index when they are added. These indexes count up from 1. 0 can safely be used elsewhere as a placeholder for None.
+	\item Added World Objects are cloned, so the original copy must be deleted correctly wherever it exists.
+	\item The Simulator\_Ui\_If* and Simulator\_Physics\_If* that the are used to construct the core will be deleted by the core.
+\end{itemize}
 
 \subsection{Physics Engine}
 
@@ -526,7 +553,7 @@ The simulator core is, as the name suggests, the main piece of the simulation. I
 \subsubsection*{Component  Overview}
 The physics engine is responsible for updating the world state at regular intervals. When objects are first added to the world, they should be initialized in the physics engine, and until they are removed from the world they should be simulated along with the rest of the objects. The physics engine should be capable of starting, stopping, changing rate, and adding or removing an object while in any state. The current physics engine is the 'BasicPhysics' object found in UML Figure \ref{uml:physics}. The interface that it follows is found in UML Figure \ref{uml:phys_if}
 
- \begin{figure}
+ \begin{figure}[h]
  	\begin{center}
  	\includegraphics[scale=0.5]{./images_design/uml/BasicPhysics}
  	\caption{UML of Physics Engine\label{uml:physics}}
@@ -543,6 +570,10 @@ The physics engine is responsible for updating the world state at regular interv
  \end{figure}
 
 \subsubsection*{Design Details}
+\begin{enumerate}
+	\item Two things happen on every tick: The world updates (b2World::Step), then all world objects are notified of the tick
+	\item The QTimer is started and stopped with QTimer::start, QTimer::stop. This means that if processing a tick takes longer than the set interval, the timer events will start to stack up. It may be necessary to look at a different method of ticking to prevent this.
+\end{enumerate}
 
 \subsection{User Interface}
  \begin{figure}
