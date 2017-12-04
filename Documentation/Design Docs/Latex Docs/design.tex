@@ -231,6 +231,17 @@ The core application itself has minimum communication through ROS, it mainly sta
  \subsection{Design Decisions}
   	The simulation underwent a number of design changes during its development. This section will discuss what drove the major design decisions associated with this project.
  \subsubsection*{User Experience}
+	The biggest design decision that went into the User Experience was deciding whether we wanted to have multiple windows (i.e. the object designers and the simulator are in separate windows) or if we want to make our application a single window which changes depending on the what the user is doing.  
+	
+	We began by coming up with concept drawings. 
+	
+	//add in the pictures. 
+ 
+What we really wanted was to give our simulator a video game-like feel. This decision came about because almost everyone is familiar with video games and making the user experience similar would make learning how to use it far easier and faster. 
+
+We chose to go with the single window application because it was cleaner and there was no need to have multiple windows when the user wouldn't be doing both at the same time. 
+ 
+ 
  \subsubsection*{User Interface}
  	When building a cross-platform user interface in C++, there are only a few options available. When discussing this, the following ideas were brought up: Pure OpenGL, Qt QML, and Qt Widgets. The final decision was Qt Widgets, which will be discussed below.
  	
