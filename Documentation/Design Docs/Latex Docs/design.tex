@@ -231,15 +231,18 @@ The core application itself has minimum communication through ROS, it mainly sta
  \subsection{Design Decisions}
   	The simulation underwent a number of design changes during its development. This section will discuss what drove the major design decisions associated with this project.
  \subsubsection*{User Experience}
-	The biggest design decision that went into the User Experience was deciding whether we wanted to have multiple windows (i.e. the object designers and the simulator are in separate windows) or if we want to make our application a single window which changes depending on the what the user is doing.  
+	Because this application is mainly for students just being introduced to robotics and will be a tool for education, we wanted to make the simulator as user friendly as possible. We decided to try for a video game-like feel, as most individuals are familiar with video games which would mean familiarity from the get-go and should make it easy to learn. 
 	
-	We began by coming up with concept drawings. 
+	The biggest design decision we had to make for the user experience aspect of the project was whether we wanted to use a single window for everything (simulation, robot builder and map builder) or if wanted ot have multiple windows. We began with a few concepts and wire frames. 
 	
-	//add in the pictures. 
- 
-What we really wanted was to give our simulator a video game-like feel. This decision came about because almost everyone is familiar with video games and making the user experience similar would make learning how to use it far easier and faster. 
+add pictures here
+	
+	The chalkboard drawing shows an early concept for a single window interface, while the wireframes show ideas for a multiple window interface. 
+	
+add pros and cons for both
+	
 
-We chose to go with the single window application because it was cleaner and there was no need to have multiple windows when the user wouldn't be doing both at the same time. 
+We chose to go with the single window application because it was cleaner and there was no need to bog down our application with multiple windows when the user is unable to build/change the map or robot while in simulation.  
  
  
  \subsubsection*{User Interface}
