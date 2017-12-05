@@ -231,6 +231,48 @@ The core application itself has minimum communication through ROS, it mainly sta
  \subsection{Design Decisions}
   	The simulation underwent a number of design changes during its development. This section will discuss what drove the major design decisions associated with this project.
  \subsubsection*{User Experience}
+	Because this application is mainly for students just being introduced to robotics and will be a tool for education, we wanted to make the simulator as user friendly as possible. We decided to try for a video game-like feel, as most individuals are familiar with video games which would mean familiarity from the get-go and should make it easy to learn. 
+	
+	The biggest design decision we had to make for the user experience aspect of the project was whether we wanted to use a single window for everything (simulation, robot builder and map builder) or if wanted ot have multiple windows. We began with a few concepts and wire frames. 
+	
+\begin{figure}
+	\begin{center}
+	\includegraphics[width=\textwidth]{./images_design/Sams.jpg}
+	\caption{Single Window Concept}
+	\label{fig:singlewindowconcept}
+	\end{center}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+	\includegraphics[width=\textwidth]{./images_design/MainScreen.png}
+	\caption{Multi-Window Start Window}
+	\label{fig:mwindowStart}
+	\end{center}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+	\includegraphics[width=\textwidth]{./images_design/RobotDesign.png}
+	\caption{Multi-Window Robot Designer}
+	\label{fig:mwindowRobot}
+	\end{center}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+	\includegraphics[width=\textwidth]{./images_design/Simulation.png}
+	\caption{Multi-Window Simulation}
+	\label{fig:mwindowSimulation}
+	\end{center}
+\end{figure}
+
+	
+	The chalkboard drawing \ref{fig:singlewindowconcept} shows an early concept for a single window interface, while the wireframes \ref{fig:mwindowStart} \ref{fig:mwindowRobot} \ref{fig:mwindowSimulation} show an idea for a multiple window interface. 
+
+We chose to go with the single window application because it was cleaner and there was no need to bog down our application with multiple windows when the user is unable to build/change the map or robot while in simulation.  
+ 
+ 
  \subsubsection*{User Interface}
  	When building a cross-platform user interface in C++, there are only a few options available. When discussing this, the following ideas were brought up: Pure OpenGL, Qt QML, and Qt Widgets. The final decision was Qt Widgets, which will be discussed below.
  	
@@ -282,7 +324,7 @@ After construction, shapes and children models can be added and removed with the
  Figure \ref{uml:dataflow_model} depicts the series of notifications which result from moving or modifying a Model and its child Models.
  \begin{figure}[h]
  	\begin{center}
- 	\includegraphics[width=\textwidth]{./images_design/uml/dataflow_Model}
+ 	\includegraphics[width=\textwidth]{./images_design/uml/DataFlow_Model}
  	\caption{Flow of data using Models. When the Model owner updates a model: If that model is a child, it notifies its parent; if it is the parent, it notifies the observer.\label{uml:dataflow_model}}
  	\end{center}
  \end{figure}   
