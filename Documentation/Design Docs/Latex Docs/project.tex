@@ -59,25 +59,211 @@ representation given below.
 Gantt chart or other type of visual representation of the project timeline.
 
 \section{Development Environment}
-The basic purpose for this section is to give a developer all of the necessary 
-information to setup their development environment to run, test, and/or develop. 
+As mentioned before, the target environment for this project is Ubuntu 16.04, and the target version of ROS is Kinetic Kame.
+
+The following list of items are the bare minimum for developing this project:
+\begin{itemize}
+	\item Ubuntu 16.04
+	\item g++ 4.8 or newer
+	\item ROS Kinetic Kame
+	\item Qt 5.5 headers and libraries
+\end{itemize}
+
+\subsection{Ubuntu}
+An image for Ubuntu may be downloaded at \url{https://www.ubuntu.com/download/desktop}. It is not required that this image be run a specific way; this project should work whether Ubuntu is the main OS or a run in a Virtual Machine.
+
+\subsection{Qt}
+At the time of writing this document, Qt 5.5 headers and libraries are included in the Ubuntu image; this is technically all that is required (in terms of Qt) for development. If developers would prefer to have the full Qt environment installed, or these libraries and headers stop being standard, Open-Source Qt can be downloaded at \url{https://www.qt.io/download-qt-for-application-development}
+
+\subsection{ROS Kinetic}
+All development is done in a ROS Catkin build environment. Details about setting up Catkin and CMake are stated below. Information about installing ROS Kinetic on Ubuntu can be found at \url{http://wiki.ros.org/kinetic/Installation/Ubuntu}. This project was developed using the \lstinline|ros-kinetic-full-desktop| installation.
 
 
 \section{Development IDE and Tools}
-Describe which IDE and provide links to installs and/or reference material. 
+\subsection{Qt Creator}
+No specific development IDE is required for this project; however, we chose to use Qt Creator. It should be noted that Qt Creator was not used to build and run the project, just to develop it. It is useful to use Qt Creator in this fashion because it is able to do syntax highlighting and auto-correction for some Qt-Specific code elements. The Qt Creator IDE can be installed through the open-source installer found at \url{https://www.qt.io/download-qt-for-application-development}. A number of Qt \lstinline|.pro| files exist in the project which can be used to open the project in Qt Creator. IMPORTANT: These files can not be used to build the project. See section \ref{sec:buildenv} for details on the build environment.
 
+\subsection{\LaTeX Documentation}
+This documentation was written using \LaTeX and compiles under the TexLive distribution. The tool TexMaker was used as and IDE for developing the document.
+The TexLive page, which contains installation details for various OS's, can be found at \url{https://www.tug.org/texlive/}. TexMaker can be installed from \url{http://www.xm1math.net/texmaker/}. This document requires more than a minimum TexLive install; we recommend installing all available packages.
+
+\subsection{Git Tools}
+This project is managed by a Git repository. Details about the repository itself are below. Various tools exist for working with Git repositories on different OS's. At a bare minimum, the Git client is required. Information on how to install Git can be found at \url{https://git-scm.com/}. A couple of tools which were used to interface with Git during this project are Git Gui, the built-in UI(\url{https://git-scm.com/docs/git-gui}) and SourceTree, and Windows/Mac UI by Atlassian (\url{https://www.sourcetreeapp.com/}).
 \section{Source  Control}
 Which source control system is/was used?  How was it setup?  How does a developer 
 connect to it? 
 
 \section{Dependencies}
-Describe all dependencies associated with developing the system. 
+While it is not a dependency for building and running the simulation, the Python Interpreter is highly recommended as development tool. One of the main avenues of testing the simulation is through ROS control nodes which publish control commands for robots. These nodes can be written in C++, but writing simple nodes for specific tests is generally faster in Python. A number of Python scripts are included in this project specifically for this purpose. To run them all, you will need to have installed the following in addition to ROS
+\begin{itemize}
+	\item Python
+	\item Numpy
+\end{itemize}
+The included scripts were developed using Python 2 and Numpy for Python 2; however, we do not know of any reason the scripts should not work with Python 3 and Numpy for Python 3.
+Before running one of these scripts, you must source ROS in your terminal.
+\begin{lstlisting}
+> source /opt/ros/kinetic/setup.bash
+> python [script]
+\end{lstlisting}
 
-\section{Build  Environment}
-How are the packages built?  Are there build scripts? 
+Information on installing Python and Numpy can be found at \url{https://www.python.org/} and \url{https://www.scipy.org/install.html}.
+
+\section{Build  Environment} \label{sec:buildenv}
+ROS includes a package management and build system called Catkin. Catkin is built on top of CMake, and provides some facilities for automatically linking ROS projects together.
+All development for this project should be done within a Catkin Workspace. Details about how to create a workspace can be found at \url{http://wiki.ros.org/catkin/Tutorials/create_a_workspace}. 
+
+\subsection{The Catkin Workspace}
+Once a workspace is set up, the project should be cloned into \lstinline|[workspace]/src|.
+Catkin and ROS provide a number of scripts which can be sourced to properly set up the build environment. In any terminal used to build this project, the script \lstinline|/opt/ros/kinetic/setup.bash| must be sourced (\lstinline|source /opt/ros/kinetic/setup.bash|). The project can then be built by running \lstinline|catkin_make| from the top directory of the workspace.
+
+\subsection{ROS Packages}
+Every package in the ROS ecosystem contains a package.xml file which provides some metadata for the package and a list of package dependencies. This allows Catkin to ensure that all package dependencies are resolved when a workspace is built. Since this project separates Box2D and the Simulator into separate packages, the line \lstinline|<depend>sdsmt_simulator_box2d</depend>| can be found in the package.xml file for the Simulator, indicating the dependency.  More information on the package.xml file can be found at \url{http://wiki.ros.org/catkin/package.xml}
+
+\subsection{CMakeLists.txt}
+Every package in the ROS ecosystem also contains a CMakeLists.txt file. This is used by CMake to correctly build, link, and deploy packages. General information about CMake can be found at \url{https://cmake.org/}.
+
+\subsubsection*{Building Qt with CMake}
+CMake provides a number of special functions specifically for building Qt projects. In a purely Qt project, the \lstinline|qmake| utility would be used to build instead of CMake or just Make. These special functions properly link Qt and include headers, process Qt-Specific macros, and convert non-C++ data files to a compile-able format. Details on these special functions can be found in the Qt Documentation at \url{http://doc.qt.io/qt-5/cmake-manual.html}
+
+\subsubsection*{Building ROS Projects with CMake}
+Catkin adds a special function \lstinline|catkin_package| which can be used in the CMakeLists.txt file. This function is used to correctly identify what portions of the package should be accessible for inclusion and linkage in other ROS packages. More details on this function can be found in the ROS documentation at \url{http://wiki.ros.org/catkin/CMakeLists.txt#catkin_package.28.29}
+\subsubsection*{Box2D CMakeLists.txt Notes}
+Box2D is built as a separate package from the Simulator application for a few reasons
+\begin{itemize}
+	\item Makes it easier to include and use in other packages (like plugins)
+	\item Reduces clutter in the file tree of the simulator package
+	\item Helps optimize Catkin Build process
+\end{itemize}
+
+Important things to note from the CMakeLists.txt file
+\begin{itemize}
+	\item It is built as a static library with C++11 and -fPIC
+	\begin{lstlisting}
+add_compile_options(-std=c++11 -fPIC)
+	\end{lstlisting}
+	\item The file tree had to be restructured slightly so that exporting the headers to other ROS packages would work correctly. The entire \lstinline|include| directory of that package is exported.
+
+	\begin{lstlisting}
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES sdsmt_simulator_box2d
+)
+	\end{lstlisting}
+	As a result, it can be included in other packages as if it were part of that project's file tree.
+	\begin{lstlisting}
+#include <Box2D/Box2D.h>
+	\end{lstlisting}
+\end{itemize}
+\subsubsection*{Simulator CMakeLists.txt Notes}
+\begin{itemize}
+	\item It is dependent upon the Box2D package included in this project
+	\begin{lstlisting}
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  std_msgs
+  sdsmt_simulator_box2d
+)
+
+...
+
+catkin_package(
+  INCLUDE_DIRS include
+  CATKIN_DEPENDS
+    roscpp
+    std_msgs
+    sdsmt_simulator_box2d
+)
+	\end{lstlisting}
+	\item All headers specific to building plugins are in the directory \lstinline|include/sdsmt_simulator| so that they can be exported by Catkin according to the ROS standard.
+	\item It is built with C++11
+	\begin{lstlisting}
+add_compile_options(-std=c++11)
+	\end{lstlisting}
+	\item Source files are split into four categories
+	\begin{enumerate}
+		\item MOC\_HDRS are header files which the Qt MOC must be run on to generate C++ source
+		\item UI\_FILES are Qt .ui forms files which need to be wrapped in C++
+		\item CPP\_SRCS are all the .cpp files in the project
+		\item RCC\_FILES are Qt resource .qrc files that also need to be wrapped in C++
+	\end{enumerate}
+	\begin{lstlisting}
+## Files that have any Qt macros or keywords in them
+## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
+set(MOC_HDRS
+    include/sdsmt_simulator/drivetrain_if.h
+    ...
+    include/interfaces/simulator_physics_if.h
+    ...
+    include/basic_physics.h
+    ...
+    )
+
+## .ui qt widgets form files
+set(UI_FILES
+    ui/mainwindow.ui
+    ...
+    )
+
+## Any other source files
+set(CPP_SRCS
+    src/basic_maploader.cpp
+    ...
+    )
+
+set(RCC_FILES ui/resources.qrc)
+
+...
+
+## Run MOC on files with Qt Keywords and Macros
+qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
+
+## Wrap .ui files as cpp files
+qt5_wrap_ui(UI_SRCS ${UI_FILES})
+
+## Wrap .qrc files as cpp files
+qt5_add_resources(RCC_SRCS ${RCC_FILES})
+	\end{lstlisting}
+	\item It is dependent on a number of Qt Modules
+	\begin{lstlisting}
+find_package(Qt5 REQUIRED COMPONENTS
+  Core
+  Widgets
+  Gui
+)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+
+include_directories( ${CMAKE_BINARY_DIR} )
+
+...
+
+add_executable(sdsmt_simulator ${UI_SRCS} ${CPP_SRCS} ${MOC_SRCS} ${RCC_SRCS})
+qt5_use_modules(sdsmt_simulator Core Gui Widgets)
+	\end{lstlisting}
+\end{itemize}
 
 \section{Development Machine Setup}
-If warranted, provide a list of steps and details associated with setting up a 
-machine for use by a developer. 
+The recommended machine setup steps are as follows:
+\begin{enumerate}
+	\item Download Ubuntu 16.04
+	\item Install Ubuntu 16.04 as a native OS or Virtual Machine
+	\item Start Ubuntu 16.04
+	\item Ensure g++ 4.8 or later is installed
+	\item Install ROS Kinetic
+	\item Install the Qt 5.5 Dev kit and Qt Creator
+	\item Install Git
+	\item Create a Catkin Workspace
+	\item Clone the project repository into \lstinline|[workspace]/src|
+	\item Run \lstinline|catkin_make| from the top workspace directory
+\end{enumerate}
+At this point, if the project builds, your system is set up for development.
 
-
+Optional Steps
+\begin{enumerate}
+	\item Verify Python 2 is installed
+	\item Install Numpy for Python 2
+	\item Install the full TexLive distribution
+	\item Install TexMaker
+	\item Install a Git client UI
+\end{enumerate}
