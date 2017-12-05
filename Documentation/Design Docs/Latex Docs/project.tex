@@ -9,6 +9,8 @@ Andrew Stelter was in charge of backend design, implementation, and debugging. T
 Ryley Sutton was in charge of the world view design, implementation, and debugging. This is the section in the center of the project where the simulation, map, and robot can be viewed. She selected Qt graphics framework which supports interaction between 2D objects as well as allows for easy rotating. This was chosen over OpenGL because it was readily available, developed to be used in Qt by Qt easily and most importantly was better documented for use with Qt for easier learning.  
 Samuel Williams was in charge of the physics design, implementation, and debugging. He selected Box 2D as the physics engine for the project to handle movements and collisions of all world view objects: robot or map object.
 
+Specific details on why eah of these design decisions were made are available at the beginning of the Design and Implementation section of this document (Section 4).
+
 
 \section{Project  Management Approach}
 For this project, an adapted agile approach was taken. Our sprints were two weeks long, which we judged to be the best length based on our schedules as students and on the complexity of the project overall. Team meetings were scheduled once weekly, sometimes with bonus 'coding sessions', and client meetings were also scheduled once weekly. 
@@ -54,14 +56,127 @@ A flexible framework for writing robot software. It is a collection of tools, li
 A simple robot simulator, and a predecessor to this project. The goal of this project from the start was to improve on the STDR, and although we decided to write our own program from scratch, the STDR has often been used for reference and comparison.
 
 \subsection{SDSMT - South Dakota School of Mines and Technology}
-The university at which this project was developed. All authors are students of SDSMT (sometimes SDSM&T).
+The university at which this project was developed. All authors are students of SDSMT.
 
 \section{Sprint Schedule}
-The sprint schedule.  Can be tables or graphs.   This can be a list of dates with the visual 
-representation given below.
+\begin{center}
+	\begin{tabular}{r l l}
+		Sprint & Start Date & End Date \\ \hline
+		Sprint 0 & Sep 7 & Sep 21 \\
+		Sprint 1 & Sep 21 & Oct 5 \\
+		Sprint 2 & Oct 5 & Oct 19 \\
+		Sprint 3 & Oct 19 & Nov 2 \\
+		Sprint 4 & Nov 2 & Nov 16 \\
+		Sprint 5 & Nov 16 & Nov 30 \\
+		Sprint 6 & Nov 30 & Jan 11 \\
+		Sprint 7 & Jan 11 & Jan 25 \\
+		Sprint 8 & Jan 25 & Feb 8 \\
+		Sprint 9 & Feb 8 & Feb 22 \\
+		Sprint 10 & Feb 22 & Mar 8 \\
+		Sprint 11 & Mar 8 & Mar 22 \\
+		Sprint 12 & Mar 22 & Apr 5 \\
+		Sprint 13 & Apr 5 & Apr 19 \\
+		Sprint 14 & Apr 19 & May 3 \\
+	\end{tabular}
+\end{center}
 
 \section{Timeline}
-Gantt chart or other type of visual representation of the project timeline.
+
+\subsection{Sprint 0}
+\begin{itemize}
+	\item Set up team members in Ubuntu environment
+	\item Decide whether or not to use STDR simulator 
+ 	\item Determine development tools
+\end{itemize}
+
+\subsection{Sprint 1}
+\begin{itemize}
+	\item Create backlog of user stories
+	\item Create UI wireframes
+ 	\item Begin structuring architectural layers
+\end{itemize}
+
+\subsection{Sprint 2}
+\begin{itemize}
+	\item Create MVP
+	\item Create interfaces for partition communication 
+\end{itemize}
+
+\subsection{Sprint 3}
+\begin{itemize}
+	\item Allow for robots spawning at non-center of map
+	\item Allow for robots to rotate while moving
+ 	\item Be able to display and change robot properties
+ 	\item Find a way to pass shapes around threads
+\end{itemize}
+
+\subsection{Sprint 4}
+\begin{itemize}
+	\item Decide between kinematics and full-simulation physics
+	\item Allow selection of robot from main view and UI menu
+	\item Touch sensor plugin
+ 	\item Load obstacle files
+\end{itemize}
+
+\subsection{Sprint 5}
+\begin{itemize}
+	\item Documentation
+	\item Presentation
+ 	\item Ethics quiz
+ 	\item Team evaluation
+\end{itemize}
+
+\subsection{Sprint 6}
+\begin{itemize}
+	\item Image loading
+	\item Replace kinematics with forces for determining robot motion
+ 	\item Object loading and saving
+ 	\item Addition of LIDAR sensor
+ 	\item Additoin of other easy sensors
+ 	\item Addition of time warp feature
+ 	\item Addition of joystick module
+ 	\item Full draft of plans for Spring semester
+\end{itemize}
+
+\subsection{Sprint 7}
+\begin{itemize}
+	\item To be determined
+\end{itemize}
+
+\subsection{Sprint 8}
+\begin{itemize}
+	\item To be determined
+\end{itemize}
+
+\subsection{Sprint 9}
+\begin{itemize}
+	\item To be determined
+\end{itemize}
+
+\subsection{Sprint 10}
+\begin{itemize}
+	\item To be determined
+\end{itemize}
+
+\subsection{Sprint 11}
+\begin{itemize}
+	\item To be determined
+\end{itemize}
+
+\subsection{Sprint 12}
+\begin{itemize}
+	\item To be determined
+\end{itemize}
+
+\subsection{Sprint 13}
+\begin{itemize}
+	\item To be determined
+\end{itemize}
+
+\subsection{Sprint 14}
+\begin{itemize}
+	\item To be determined
+\end{itemize}
 
 \section{Development Environment}
 The basic purpose for this section is to give a developer all of the necessary 
@@ -72,8 +187,11 @@ information to setup their development environment to run, test, and/or develop.
 Describe which IDE and provide links to installs and/or reference material. 
 
 \section{Source  Control}
-Which source control system is/was used?  How was it setup?  How does a developer 
-connect to it? 
+A private GitHub repository is currently being used for the source control for this project. The repository will eventually be made public, but is currently only accessible by our development team and our clients.
+
+Branches are occasionally made for work on large features, but considerable work is also done in the master branch.
+
+Our main files include one for documentation, one for maps, one for scripts, and several packages which are broken up into src files and include files.
 
 \section{Dependencies}
 Describe all dependencies associated with developing the system. 
