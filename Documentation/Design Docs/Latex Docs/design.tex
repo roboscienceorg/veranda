@@ -231,7 +231,7 @@ The core application itself has minimum communication through ROS, it mainly sta
  \subsection{Design Decisions}
   	The simulation underwent a number of design changes during its development. This section will discuss what drove the major design decisions associated with this project.
  \subsubsection*{User Experience}
-	Because this application is mainly for students just being introduced to robotics and will be a tool for education, we wanted to make the simulator as user friendly as possible. We decided to try for a video game-like feel, as most individuals are familiar with video games which would mean familiarity from the get-go and should make it easy to learn. 
+	Because this application is mainly for students just being introduced to robotics and will be a tool for education, we wanted to make the simulator as user friendly as possible. We decided to try for a video game-like feel, as most individuals are familiar with video games which would make it easy to learn. 
 	
 	The biggest design decision we had to make for the user experience aspect of the project was whether we wanted to use a single window for everything (simulation, robot builder and map builder) or if we wanted to have multiple windows. We began with a few concepts and wire frames. 
 	
@@ -384,7 +384,7 @@ After construction, shapes and children models can be added and removed with the
 		\item Finalize new iteractions between World Object and Physics Engine
 	\end{enumerate}
 \hrule
-	World Objects, upon construction, consolidate all of the models and properties of its components. When getModels() or getProperties() is used to access the World Object, these consolidated lists are returned.
+	World Objects, upon construction, consolidate all of the models and properties of their components. When getModels() or getProperties() is used to access the World Object, these consolidated lists are returned.
 	
 	It is possible that some of a World Object's components will use external communications, such as ROS. The usesChannels() accessor is used to determine if this is the case, and the connectChannels() and disconnectChannels() slots are used to start or stop communctions of any components which do this.
 	
@@ -610,10 +610,10 @@ The physics engine is responsible for updating the world state at regular interv
  \end{figure}
 
 \subsubsection*{Design Details}
-\begin{enumerate}
+\begin{itemize}
 	\item Two things happen on every tick: The world updates (b2World::Step), then all world objects are notified of the tick
 	\item The QTimer is started and stopped with QTimer::start, QTimer::stop. This means that if processing a tick takes longer than the set interval, the timer events will start to stack up. It may be necessary to look at a different method of ticking to prevent this.
-\end{enumerate}
+\end{itemize}
 
 \subsection{User Interface}
 \subsubsection*{Technologies Used}
@@ -689,12 +689,12 @@ TODO
  \end{enumerate}
  
  \subsubsection*{Design Details}
- \begin{enumerate}
+ \begin{itemize}
  	\item All events that affect the simulation backend (the physics or core) follow a circular data path. The UI generates an event and emits it $\rightarrow$ The affected object receives the event, acts on it, and sends a response $\rightarrow$ The UI receives that response and updates so the user knows what happened.
  	\item Object properties are shown through a Model-View controller. When an object is selected, its properties are loaded into the model and connected to the dataChanged signals it emits. When the user changes the data in the model, the property views read the new data and attempt to set it on the original Property object if the property is read-only.
  	\item The UI is constructed with a factory function for making the world view widget. This can be done because the widget follows a specific interface and allows for rewriting the world view without changing any of the rest of the application.
  	\item BUG: Currently, the user can change a read-only property on screen (this does not change the original property value, but the screen shows incorrect data)
- \end{enumerate}
+ \end{itemize}
 \subsection{World View}
 \subsubsection*{Technologies Used}
 \begin{itemize}
