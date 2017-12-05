@@ -2,25 +2,71 @@
 
 
 \chapter{System and Unit Testing Design}
-
-This section describes the approach taken with regard to system and unit testing.    This chapter does not describe the outcome of those tests.  That will be described in the prototypes chapter.     
+This section describes the approach taken with regard to system and unit testing.    This chapter does not describe the outcome of those tests.  That will be described in the prototypes chapter.  
 
 \section{Overview}
-Provides a brief overview of the testing approach, testing frameworks, and general 
-how testing is/will be done to provide a measure of success for the system. 
+The testing approach for this project is largely exploratory because the project is so graphically driven. These tests are basically comprised of simply observing the application after making changes, and determining whether or not those changes are reflected in the application.
 
-Each requirement (user story component) should be tested.    A review of objectives and
-constraints might be needed here.  
+There are also some unit tests for aspects of the project that can be tested algorithmically.
+
+Much of our exploratory testing will be performed by beta users in the future.
 
 \section{Dependencies}
-Describe the basic dependencies which should include unit testing frameworks and 
-reference material. 
+We plan to use Catch unit testing framework for our unit testing.
 
 
 \section{Test design and setup}
-Describe how test cases were developed/designed, setup, and how they connect to the requirements.  This section can 
-be extremely involved if a complete list of test cases was warranted for the system.   One 
-approach is to list each requirement, module, or component and describe the test.
+This section will describe how test cases were developed/designed, setup, and how they connect to the requirements.
+
+\subsection{Application Window Opens Correctly}
+Upon starting the program, a Qt window should open up in the foreground of the users screen. This was tested through simple observation.
+
+\subsection{Application Window Closes Correctly}
+Upon clicking on the 'x' in the top right corner of the application window, it should be exited completely. This was tested through simple observation.
+
+\subsection{User Interaction Generates Signals}
+The user clicking buttons should generate signals which can cause events to be initiated by our code. In order to confirm that this works, slots were set up to listen to signals from the buttons which would cause visually obvious changes to occur within the application window. Then, these buttons were clicked, and it was confirmed that the correct changes happened.
+
+\subsection{Application Window Resizes Correctly}
+Resizing the window should be allowed, but should not cause graphical components to overlap, move outside the window, or shrink or grow to be unusually large or small on their x or y axis. This was tested by resizing the window first to be tall and thin, then short and thin, then short and wide, then tall and wide. It was confirmed that no unusual behaviors occured in any of these configurations.
+
+\subsection{Robots Appear On Screen}
+Each robot generated within the physics engine should also be visible within the simulation, assuming that the x and y coordinates of that robot are within the boundaries of the world view. To test this, a robot was generated at coordinates that should have put it in the center of the world view, and then it was confirmed that the world view now drew a circle at that location.
+
+\subsection{Obstacles Appear On Screen}
+Each obstacle generated within the physics engine should also be visible within the simulation, assuming that some part of the obstacle is within the boundaries of the world view. To test this, an obstacle was generated such that it was entirely within the world view, and then it was confirmed that the world view now drew the obstacle at that location.
+
+\subsection{Application Receives Wheel Speeds}
+The application should be able to receive wheel speeds from a seperate program, which it will use to apply forces to the robot within the physics simulation. To confirm that this work, we ... 
+
+\subsection{Control Code Moves Robots}
+Wheel speeds received from a separate program should move a robot in the active simulation accordingly. To test this, we set up the wheel speed generator to drive a robot in a figure-8. Then, with kinematic equations, these wheel speeds were converted to the velocity of the robot, which was handed to the physics simulation. The desired result was our simulated robot driving in a figure-8 after starting up the simulation. This was quite easy to evaluate visually.
+
+\subsection{Collisions Function Correctly}
+If a robot tries to move into or through another robot or an obstacle, it should fail to do so. Instead, it should stop just short, and its velocity in the direction of the thing it's colliding with should be set to zero. Then, it can try again in the next time step. To test this, obstacles were set just inside each edge of the world view, so that the robot, spawned in the center of the world view would be boxed in. Then, the aforementioned figure-8 code was run and the robot was observed running into, but not entering each of the obstacles many, many times. 
+
+In order to confirm that this would also work with other robots, three were all generated at different locations within the box of obstacles and were set to run with the same figure-8 control code. They were quickly observed colliding, and behaving in an acceptable manner.
+
+\subsection{Multiple Robots Can Exists at Once}
+Many robots should be able to exist at once, in different locations. To test this, three robots were loaded at different locations in the physics simulation, within the bounds of the world view, then it was confirmed that three circles appeared within the world view.
+
+\subsection{Changing Robot Properties in GUI Effects Simulation}
+Changing the properties of a robot should have an immediate effect on the simulation. To test this, a property with a visually obvious result, specifically, the radius of the robot's touch sensor, was changed and it was observed that the size of touch sensor's indicator circle also changed.
+
+\subsection{Touch Sensors Function Correctly}
+Touch sensors should indicate when the robot they're attached to gets within a certain distance of another object in the world. To test this, a circle is being drawn to indicate a touch sensor. As the radius of the touch sensor is changed, the size of the circle can also be observed changing. Wherever an obstacle is detected by the touch sensor, it draws another much smaller circle along its radius. The robot was set to drive in a figure-8, and these circles were observed appearing and dissappearing as they should.
+
+\subsection{Selecting an Object in the Active Objects Menu Should Display the Properties of That Object}
+When a row in the active objects menu that is not already highlighted is clicked by the user, it should become highlighted, and the properties being displayed in the Simulator Object Properties table should change to reflect the properties of the newly selected object. To test this, two robots with different touch sensor radius sizes were place into the world, and it was observed that when the robots were switched between in the active objects menu, the touch sensor radius also changed in the simulator object properties table.
+
+\subsection{When Switching Between Map and Designer Mode, the Map and Designer Mode Buttons Should Change Colors}
+In map mode, the map mode button should be grey and the designer mode button should be blue. In designer mode, these colors should be swapped. To test this, the mode of operation switched back and forth from map mode to designer mode many times, and the colors were observed chaning as intended.
+
+\subsection{When Switching Between Map and Designer Mode, the Build Tools Should Change}
+In map mode, the widget on the far right side of the screen should display map build tools, and in display mode, that widget should display designer build tools. To test this, the mode of operation was changed many times, and the widget was observed changing as intended.
+
+\subsection{When Switching Between Map and Designer Mode, Available Buttons Should Change}
+In map mode, there should be seven map design buttons below the mode of operation buttons, and in designer mode, there should be five designer buttons. To test this, the mode of operation was changed many times, and the buttons were observed changing as intended.
 
 The unit test framework is described here.   
 
