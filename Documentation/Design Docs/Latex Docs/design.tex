@@ -718,11 +718,11 @@ QObject::connect(&app, &QCoreApplication::aboutToQuit,
 	\end{lstlisting}
 	\item The directory above the executable is checked for plugins because that is, by default, where Catkin places shared libraries
 \end{itemize}
-\section{Building a Plugin}
+\section{Plugins}
 One of the main advantages to the design of this project is that it can be extended through WorldObjectComponent Plugins. Unfortunately, because it is a ROS package, the project (and any such plugins) must be built with Catkin and CMake. A number of plugins have been included with the project to provide much basic functionality, and those plugins can be used as examples of how plugins should be set up; however, not all plugins will follow the same patterns, so this section will describe the existing plugins as well as some of the requirements to build and use a plugin.
 \subsection{Touch Sensor Ring}
 The touch sensor ring plugin mimics a right of touch sensors with a specific radius. It is intended to be used on circular robots, so that its radius can be set to the same as the robot. 
-	The sensor ring can be set to sense a specific section of the circle, and the number of sensors used can be specified. Whenever the state of one of the buttons changes, a ROS message is published. Extra circles are drawn on the world visualization to show which touch sensors are triggered. An example of this can be seen in Figure \ref{fig:touchsensorexample}.
+	The sensor ring can be set to sense a specific section of the circle, and the number of sensors used can be specified. Whenever the state of one of the buttons changes, a ROS message is published. Extra circles are drawn on the world visualization to show which touch sensors are triggered. An example of this can be seen in Figure \ref{fig:touchsensorexample}. Details of the properties exposed by the plugin and the ROS messages it utilizes can be found in tables \ref{tab:touch_ring_props} and \ref{tab:touch_ring_msgs}
 	
 	\begin{figure}[h]
 		\centering
@@ -730,22 +730,28 @@ The touch sensor ring plugin mimics a right of touch sensors with a specific rad
 		\caption{Example of the touch sensor ring sensing something. The large circle is a robot, the small circle is the touched sensor point.}
 		\label{fig:touchsensorexample}
 	\end{figure}
-\subsubsection*{Properties}
-\begin{tabular}{c|c|c}
-Property Name & Data Type & Description\\ \hline \hline
-channels/output\_channel & String & The ROS topic to output sensor messages to\\ \hline
-angle\_start & Double (0-360) & Angle that the sensed section starts at\\ \hline
-angle\_end & Double (0-360) & Angle that the sensed section ends at\\ \hline
-ring\_radius & Double & Radius of the touch sensor ring\\ \hline
-sensor\_count & Integer & \makecell{Number of sensors spaced evenly in the slice\\ of the circle defined by angle\_start and angle\_end}
-\end{tabular}
-
-\subsubsection*{Messages}
-\begin{tabular}{c|c|c|c}
-ROS Topic & Message Type & In/Out & Description\\ \hline \hline
-channels/output\_channel & std\_msgs::ByteMultiArray & Out & \makecell{1-Dimensional vector with one\\ element for each touch sensor on\\ the ring. Untriggered buttons\\ are set to 0, triggered\\ ones are non-0.}
-\end{tabular}
-
+\begin{table}[h!]
+	\centering
+	\caption{Properties exposed by the Touch Sensor Ring plugin}
+	\label{tab:touch_ring_props}
+	\begin{tabular}{c|c|c}
+	Property Name & Data Type & Description\\ \hline \hline
+	channels/output\_channel & String & The ROS topic to output sensor messages to\\ \hline
+	angle\_start & Double (0-360) & Angle that the sensed section starts at\\ \hline
+	angle\_end & Double (0-360) & Angle that the sensed section ends at\\ \hline
+	ring\_radius & Double & Radius of the touch sensor ring\\ \hline
+	sensor\_count & Integer & \makecell{Number of sensors spaced evenly in the slice\\ of the circle defined by angle\_start and angle\_end}
+	\end{tabular}
+\end{table}
+\begin{table}[h!]
+	\centering
+	\caption{ROS Messages used by the Touch Sensor Ring Plugin}
+	\label{tab:touch_ring_msgs}
+	\begin{tabular}{c|c|c|c}
+	ROS Topic & Message Type & In/Out & Description\\ \hline \hline
+	channels/output\_channel & std\_msgs::ByteMultiArray & Out & \makecell{1-Dimensional vector with one\\ element for each touch sensor on\\ the ring. Untriggered buttons\\ are set to 0, triggered\\ ones are non-0.}
+	\end{tabular}
+\end{table}
 \subsubsection*{Design Details}
 \begin{itemize}
 	\item All the required circle shapes for the touch sensors are generated at the start. They are added to and removed from the model when they become active or inactive.
