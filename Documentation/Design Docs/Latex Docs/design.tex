@@ -8,7 +8,6 @@
 	\item Provide an easy-to-use 2D simulation environment
 	\item Simulate realistic physics as best as possible
 	\item Allow for easy modification and extension of the simulation
-	\item Allow for saving simulations to be re-loaded at a later time
 	\item Allow for design of custom robots to use in the simulation
 \end{itemize}
 
@@ -16,7 +15,6 @@
 There are six major components in this system
 \begin{itemize}
 	\item Application core
-	\item Genera User Interface
 	\item World Visualization
 	\item Physics Engine
 	\item File Read/Write
@@ -55,13 +53,13 @@ Forces can be applied to the simulated objects at any point in time, by any part
 \subsection{User Interface}
 The User Interface consists of all portions of the UI which are not the visualization of what is actually being simulated. The UI is responsible for things like providing the user with ways to load and save files, start and stop the simulation, and edit the properties of the simulated objects.
 
-While the visualization of the of the simulated activity is, technically speaking, part of the UI, it is accessed through a UI and thus can be developed independently and the UI general is agnostic to how it looks and behaves. We will reference the visualization in this document in terns such "World Visual", or "Visualization Widget".
+While the visualization of the simulated activity is, technically speaking, part of the UI, it is accessed through a UI and thus can be developed independently and the UI general is agnostic to how it looks and behaves. We will reference the visualization in this document in terns such "World Visual", or "Visualization Widget".
 
 \subsection{World Visualization}
 The World Visualization is a widget in the UI which is responsible for portraying the simulated activity. Its communication is strictly with the general UI, as it is a child object of it. The UI is expected to tell this visual when objects are added and removed, as well as what models belong with those objects.
 
 \subsection{File Read/Write}
-The File Read/Write component is utilized by the general UI. When the user selects a file, the Read/Write component loads or save a world object or collection of world objects in that file. If the file is malformed, it returns an error that the UI can display.
+The File Read/Write component is utilized by the general UI. When the user selects a file, the Read/Write component loads or saves a world object or collection of world objects in that file. If the file is malformed, it returns an error that the UI can display.
 
 \subsection{Plugin System}
 The Plugin System keeps the core application logic separate from the specific capabilities of the simulated objects. Plugins provide the components which make up the objects simulated. Using this design allows users to write their own components for the simulation if some desired feature is missing.
@@ -80,12 +78,12 @@ The Plugin System keeps the core application logic separate from the specific ca
 		\item Widgets Library
 		\item Graphics Framework
 	\end{itemize}
-	Information about the project can be found at \url{http://doc.qt.io/}. Some of the core concepts of these features are describe in the following sections.
+	Information about the project can be found at \url{http://doc.qt.io/}. Some of the core concepts of these features are described in the following sections.
 	
 	An example containing QObjects and Signals and Slots can be seen in listing \ref{lst:qobjexample} below.
 	
 \subsubsection*{Event Loop}
-	The central part of Qt is the Event Loop. When a Qt application is started, it generally enters an event loop which spins during idle time. When an event happens, it is queued until the start of the next iteration of the event loop. Each iteration of the event loop, all pending events are delivered to their receivers to be handled.
+	The central part of Qt is the Event Loop. When a Qt application is started, it generally enters an event loop which spins during idle time. When an event happens, it is queued until the start of the next iteration of the event loop. During each iteration of the event loop, all pending events are delivered to their receivers to be handled.
 	
 	\begin{lstlisting}[caption={Pseudocode for the Qt Event Loop}]
 while(application_running)
@@ -231,9 +229,9 @@ The core application itself has minimum communication through ROS, it mainly sta
  \subsection{Design Decisions}
   	The simulation underwent a number of design changes during its development. This section will discuss what drove the major design decisions associated with this project.
  \subsubsection*{User Experience}
-	Because this application is mainly for students just being introduced to robotics and will be a tool for education, we wanted to make the simulator as user friendly as possible. We decided to try for a video game-like feel, as most individuals are familiar with video games which would mean familiarity from the get-go and should make it easy to learn. 
+	Because this application is mainly for students just being introduced to robotics and will be a tool for education, we wanted to make the simulator as user friendly as possible. We decided to try for a video game-like feel, as most individuals are familiar with video games which would make it easy to learn. 
 	
-	The biggest design decision we had to make for the user experience aspect of the project was whether we wanted to use a single window for everything (simulation, robot builder and map builder) or if wanted ot have multiple windows. We began with a few concepts and wire frames. 
+	The biggest design decision we had to make for the user experience aspect of the project was whether we wanted to use a single window for everything (simulation, robot builder and map builder) or if we wanted to have multiple windows. We began with a few concepts and wire frames. 
 	
 \begin{figure}
 	\begin{center}
@@ -276,14 +274,14 @@ We chose to go with the single window application because it was cleaner and the
  \subsubsection*{User Interface}
  	When building a cross-platform user interface in C++, there are only a few options available. When discussing this, the following ideas were brought up: Pure OpenGL, Qt QML, and Qt Widgets. The final decision was Qt Widgets, which will be discussed below.
  	
- 	A pure OpenGL solution was not selected due mainly due to the difficulty of implementation and the amount of work that would have to go into a UI of that nature. If using Qt were not an option, pure OpenGL may have been selected; however, having the Qt library available makes it hard to justify the amount of extra development that a pure OpenGL solution would add.
+ 	A pure OpenGL solution was not selected due mainly to the difficulty of implementation and the amount of work that would have to go into a UI of that nature. If using Qt were not an option, pure OpenGL may have been selected; however, having the Qt library available makes it hard to justify the amount of extra development that a pure OpenGL solution would add.
  	
- 	When writing a UI in Qt, there are two main options for the core library: Widgets and QML. Qt Widgets has been around longer and is generally used to produce applications that look and feel 'like a desktop program'. The Widgets library contains many commonly used pieces which can be organized into a UI, similarly to how C\# Forms or Java Swing works. Qt QML is a newer library which is being actively developed with Qt. QML separates the UI entirely from the business logic by running the UI in a custom javascript interpreter. The main advantages to QML are that it's very easy to develop QML UIs without any business logic and it's currently receiving the bulk of support in new versions of Qt. QML would have been the first choice for the project UI, but it is difficult to use on an fresh system. Widgets projects require just a set of shared objects to run, but QML projects require a number of shared objects as well as some basic QML code files which are parsed at runtime. These additional files are not usually present in the base library installation of Qt, so using QML would have meant that the end user would need to resolve extra dependencies to run the application.
+ 	When writing a UI in Qt, there are two main options for the core library: Widgets and QML. Qt Widgets has been around longer and is generally used to produce applications that look and feel 'like a desktop program'. The Widgets library contains many commonly used pieces which can be organized into a UI, similarly to how C\# Forms or Java Swing works. Qt QML is a newer library which is being actively developed with Qt. QML separates the UI entirely from the business logic by running the UI in a custom javascript interpreter. The main advantages to QML are that it's very easy to develop QML UIs without any business logic and it's currently receiving the bulk of support in new versions of Qt. QML would have been the first choice for the project UI, but it is difficult to use on a fresh system. Widgets projects require just a set of shared objects to run, but QML projects require a number of shared objects as well as some basic QML code files which are parsed at runtime. These additional files are not usually present in the base library installation of Qt, so using QML would have meant that the end user would need to resolve extra dependencies to run the application.
  	
  	\subsubsection*{World Visualization}
  	Within the Qt Widgets library, there are a number of different ways build a widget with a drawing canvas that shapes can be shown on. The most primitive method is to create an OpenGL drawing window which is contained in the widget. The other main option is to use the Qt Graphics Framework, which is an abstraction layer for drawing 2D objects on a background with OpenGL.
  	
- 	Again, it was decided that the pure OpenGL solution would ad unnecessary development time, and an alternative should be used. Not only does the graphics framework provide easy methods for drawing primitive shapes on a canvas, but it also allows for parent-child relationships between the models, which in turn allows shapes to be defined with relative transforms to each other instead of everything needing to be in world coordinates.
+ 	Again, it was decided that the pure OpenGL solution would add unnecessary development time, and an alternative should be used. Not only does the graphics framework provide easy methods for drawing primitive shapes on a canvas, but it also allows for parent-child relationships between the models, which in turn allows shapes to be defined with relative transforms to each other instead of everything needing to be in world coordinates.
  	
  	\subsubsection*{Physics}
  	One of the main failings of STDR was its lack of a physics engine. It was decided early on that a known physics engine should be used, or one should be written for this project so that at least basic collision detection could be simulated.
@@ -296,7 +294,7 @@ We chose to go with the single window application because it was cleaner and the
  \newpage
 \subsection{Classes}
   \subsubsection*{Model}
-  The Model class is a container for shapes; it is designed to be used communicate what should be drawn on the screen. When models change or move, signals are emitted so that the image drawn can update to reflect the changes.
+  The Model class is a container for shapes; it is designed to be used to communicate what should be drawn on the screen. When models change or move, signals are emitted so that the image drawn can update to reflect the changes.
   
  	The UML of the Model class can be seen in UML Figure \ref{uml:model}. The Model class provides constructors to initialize it with any number of child Models and/or shapes and exposes accessor methods for both.
 
@@ -356,7 +354,7 @@ After construction, shapes and children models can be added and removed with the
  	
  	The value of a property is accessed and mutated though the methods set() and get(). get() returns the current value. set() validates a new value using the validation function and stores whatever value is returned. Whenever the set() function is called, the valueSet() signal is emitted with the value that was set. This happens even if the stored value does not change.
  	
- 	The PropertyView object contains all of the same public functions as a Property; however it is constructed with only a Property, which it observes. When the set() function is called on a PropertyView, the requestValue() signal is emitted, and original Property handles that signal and validates the new value. The valueSet() signal in a PropertyView is tied to the same signal in its observed property so that any owner of a PropertyView will know when the value changes.
+ 	The PropertyView object contains all of the same public functions as a Property; however it is constructed with only a Property, which it observes. When the set() function is called on a PropertyView, the requestValue() signal is emitted, and the original Property handles that signal and validates the new value. The valueSet() signal in a PropertyView is tied to the same signal in its observed property so that any owner of a PropertyView will know when the value changes.
  	
  	The internal slot \_invalidate() is called when the observed Property is destroyed to prevent a null reference. If any accessors are called after this happens, they will return default-constructed values. It is intended that the owner of a PropertyView will receive some indication that the PropertyView should no longer be tracked from another source.
  	
@@ -365,7 +363,7 @@ After construction, shapes and children models can be added and removed with the
  \begin{figure}[h]
  	\begin{center}
  	\includegraphics[scale=0.5]{./images_design/uml/DataFlow_Property}
- 	\caption{Data flow of Properties, their owners, and their observers. Note that that any time a value is set (Either through a PropertyView or directly) the data is validated before the new value is sent to the owner and any observers.\label{uml:dataflow_property}}
+ 	\caption{Data flow of Properties, their owners, and their observers. Note that any time a value is set (Either through a PropertyView or directly) the data is validated before the new value is sent to the owner and any observers.\label{uml:dataflow_property}}
  	\end{center}
  \end{figure} 
  	
@@ -384,7 +382,7 @@ After construction, shapes and children models can be added and removed with the
 		\item Finalize new iteractions between World Object and Physics Engine
 	\end{enumerate}
 \hrule
-	World Objects, upon construction, consolidate all of the models and properties of its components. When getModels() or getProperties() is used to access the World Object, these consolidated lists are returned.
+	World Objects, upon construction, consolidate all of the models and properties of their components. When getModels() or getProperties() is used to access the World Object, these consolidated lists are returned.
 	
 	It is possible that some of a World Object's components will use external communications, such as ROS. The usesChannels() accessor is used to determine if this is the case, and the connectChannels() and disconnectChannels() slots are used to start or stop communctions of any components which do this.
 	
@@ -428,7 +426,7 @@ After construction, shapes and children models can be added and removed with the
   \end{itemize}
   
   \subsubsection*{UI Interface}
-  A UI for for this simulation is expected to provide users with the following features
+  A UI for this simulation is expected to provide users with the following features
   \begin{itemize}
   	\item Add/Remove elements from the simulation
   	\item Start/Stop/Time Warp the simulation
@@ -451,12 +449,12 @@ After construction, shapes and children models can be added and removed with the
   This interface provides methods which allow
   \begin{itemize}
   	\item Setting the size of the world
-  	\item Added and removing models associated with an object
+  	\item Adding and removing models associated with an object
   	\item Changing how models for an object are drawn
   	\item Selecting objects and indicating selection
   \end{itemize}
   
-  As with the general UI interface, the Visual Widget should not update selected object when the user click event happens, but instead should signal that the user selected an object and wait for the objectSelected() method call.
+  As with the general UI interface, the Visual Widget should not update selected objects when the user click event happens, but instead should signal that the user selected an object and wait for the objectSelected() method call.
  \begin{figure}[h]
  	\begin{center}
  	\includegraphics[scale=0.5]{./images_design/uml/Visual_If}
@@ -464,7 +462,7 @@ After construction, shapes and children models can be added and removed with the
  	\end{center}
  \end{figure}
   \subsubsection*{File Handler Interface}
-  Like the View Widget Interface, this interfaces as a requirement of the UI implemented for this project. One of the goals of the application is to be able to load and save robots, maps, and simulations. Because all of these things are represented as a World Object or collection of World Objects, a single file interface is needed. The File I/O object should be able to load and save files with 1-n world objects contained in them.
+  Like the View Widget Interface, this interface is a requirement of the UI implemented for this project. One of the goals of the application is to be able to load and save robots, maps, and simulations. Because all of these things are represented as a World Object or collection of World Objects, a single file interface is needed. The File I/O object should be able to load and save files with 1-n world objects contained in them.
    \begin{figure}
  	\begin{center}
  	\includegraphics[scale=0.5]{./images_design/uml/FileHandler_If}
@@ -479,7 +477,7 @@ After construction, shapes and children models can be added and removed with the
  	\caption{UML of World Component class interface\label{uml:worldcomponent_if}}
  	\end{center}
  \end{figure} 
- World Object Components are also the applications main points of contact to the outside world. Components may register as many publish and subscription channels in ROS as they need. At any point, they need to be able to stop listening (disconnectChannels()) or start listening(connectChannels()) on these topics. If the component does not use any channels, it should return \textit{false} in the usesChannels() method so that the system knows that these calls are unnecessary for this component.
+ World Object Components are also the application's main points of contact to the outside world. Components may register as many publish and subscribe channels in ROS as they need. At any point, they need to be able to stop listening (disconnectChannels()) or start listening(connectChannels()) on these topics. If the component does not use any channels, it should return \textit{false} in the usesChannels() method so that the system knows that these calls are unnecessary for this component.
  \hrule
  TODO
  \begin{enumerate}
@@ -581,7 +579,7 @@ The simulator core is, as the name suggests, the main piece of the simulation. I
 \begin{itemize}
 	\item World Objects are assigned an unsigned index when they are added. These indexes count up from 1. 0 can safely be used elsewhere as a placeholder for None.
 	\item Added World Objects are cloned, so the original copy must be deleted correctly wherever it exists.
-	\item The Simulator\_Ui\_If* and Simulator\_Physics\_If* that the are used to construct the core will be deleted by the core.
+	\item The Simulator\_Ui\_If* and Simulator\_Physics\_If* that are used to construct the core will be deleted by the core.
 \end{itemize}
 
 \subsection{Physics Engine}
@@ -685,12 +683,12 @@ TODO
  	\item Opens a simulation, image (map), or world object file.
  	\item Time Warp
  	\item Resets the simulation
- 	\item Stats/Pauses the simulation
+ 	\item Starts/Pauses the simulation
  \end{enumerate}
  
  \subsubsection*{Design Details}
  \begin{enumerate}
- 	\item All events that affect the simulation backend (the physics or core) follow a circular data path. The UI generates an event and emits it $\rightarrow$ The affect object receives the event, acts on it, and sends a response $\rightarrow$ The UI receives that response and updates so the user knows what happened.
+ 	\item All events that affected the simulation backend (the physics or core) follow a circular data path. The UI generates an event and emits it $\rightarrow$ The affect object receives the event, acts on it, and sends a response $\rightarrow$ The UI receives that response and updates so the user knows what happened.
  	\item Object properties are shown through a Model-View controller. When an object is selected, its properties are loaded into the model and connected to the dataChanged signals it emits. When the user changes the data in the model, the property views read the new data and attempt to set it on the original Property object if the property is read-only.
  	\item The UI is constructed with a factory function for making the world view widget. This can be done because the widget follows a specific interface and allows for rewriting the world view without changing any of the rest of the application.
  	\item BUG: Currently, the user can change a read-only property on screen (this does not change the original property value, but the screen shows incorrect data)
@@ -763,7 +761,7 @@ QObject::connect(&app, &QCoreApplication::aboutToQuit,
 \section{Plugins}
 One of the main advantages to the design of this project is that it can be extended through WorldObjectComponent Plugins. Unfortunately, because it is a ROS package, the project (and any such plugins) must be built with Catkin and CMake. A number of plugins have been included with the project to provide much basic functionality, and those plugins can be used as examples of how plugins should be set up; however, not all plugins will follow the same patterns, so this section will describe the existing plugins as well as some of the requirements to build and use a plugin.
 \subsection{Touch Sensor Ring}
-The touch sensor ring plugin mimics a right of touch sensors with a specific radius. It is intended to be used on circular robots, so that its radius can be set to the same as the robot. 
+The touch sensor ring plugin mimics a ring of touch sensors with a specific radius. It is intended to be used on circular robots, so that its radius can be set to the same as the robot. 
 	The sensor ring can be set to sense a specific section of the circle, and the number of sensors used can be specified. Whenever the state of one of the buttons changes, a ROS message is published. Extra circles are drawn on the world visualization to show which touch sensors are triggered. An example of this can be seen in Figure \ref{fig:touchsensorexample}. Details of the properties exposed by the plugin and the ROS messages it utilizes can be found in tables \ref{tab:touch_ring_props} and \ref{tab:touch_ring_msgs}
 	
 	\begin{figure}[h]
@@ -850,6 +848,6 @@ target_link_libraries(touch_sensor_plugin
 )
 \end{lstlisting}
 
-The last detail is the the plugin must be deployed in the directory above the simulator executable. This happens by default when the simulator and plugin packages are in the same package and \lstinline|catkin_make| is used to build them. However, if they are in separate workspaces or one has been installed to a more permanent directory (either manually or with \lstinline|catkin_make install|) then extra care will need to be taken to ensure that this last requirement is met.
+The last detail is that the plugin must be deployed in the directory above the simulator executable. This happens by default when the simulator and plugin packages are in the same package and \lstinline|catkin_make| is used to build them. However, if they are in separate workspaces or one has been installed to a more permanent directory (either manually or with \lstinline|catkin_make install|) then extra care will need to be taken to ensure that this last requirement is met.
 
 \end{itemize}
