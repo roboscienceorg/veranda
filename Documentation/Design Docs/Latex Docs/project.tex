@@ -52,6 +52,8 @@ industry or domain specific terms and acronyms as well as system specific.
 \subsection{ROS - Robot Operating System}
 A flexible framework for writing robot software. It is a collection of tools, libraries, and conventions that aim to simplify the task of creating complex and robust robot behavior across a wide variety of robotic platforms.
 
+One of the main features ROS provides is a messaging system for inter-process communication.
+
 \subsection{STDR - Simple Two Dimensional Robot Simulator}
 A simple robot simulator, and a predecessor to this project. The goal of this project from the start was to improve on the STDR, and although we decided to write our own program from scratch, the STDR has often been used for reference and comparison.
 
@@ -59,8 +61,9 @@ A simple robot simulator, and a predecessor to this project. The goal of this pr
 The university at which this project was developed. All authors are students of SDSMT.
 
 \section{Sprint Schedule}
+\begin{table}
 \begin{center}
-	\begin{tabular}{r l l}
+	\begin{tabular}{r | l l}
 		Sprint & Start Date & End Date \\ \hline
 		Sprint 0 & Sep 7 & Sep 21 \\
 		Sprint 1 & Sep 21 & Oct 5 \\
@@ -79,9 +82,11 @@ The university at which this project was developed. All authors are students of 
 		Sprint 14 & Apr 19 & May 3 \\
 	\end{tabular}
 \end{center}
+\caption{Anticipated start and end dates of all planned sprints}
+\end{table}
 
 \section{Timeline}
-
+All timeline data beyond Sprint 6 is subject to change based on scheduling of events in CSC 465.
 \subsection{Sprint 0}
 \begin{itemize}
 	\item Set up team members in Ubuntu environment
@@ -126,13 +131,13 @@ The university at which this project was developed. All authors are students of 
  	\item Team evaluation
 \end{itemize}
 
-\subsection{Sprint 6}
+\subsection{Sprint 6 - Winter Break}
 \begin{itemize}
 	\item Image loading
 	\item Replace kinematics with forces for determining robot motion
  	\item Object loading and saving
  	\item Addition of LIDAR sensor
- 	\item Additoin of other easy sensors
+ 	\item Addition of other easy sensors
  	\item Addition of time warp feature
  	\item Addition of joystick module
  	\item Full draft of plans for Spring semester
@@ -140,42 +145,53 @@ The university at which this project was developed. All authors are students of 
 
 \subsection{Sprint 7}
 \begin{itemize}
-	\item To be determined
+	\item Develop usable prototype of object designer
+	\item Finish integrating image file loader
+	\item Present Client with joystick interface
 \end{itemize}
 
 \subsection{Sprint 8}
 \begin{itemize}
-	\item To be determined
+	\item Finalize object designer with Client feedback
+	\item Design additional plugins if requested by Client
+	\item Design default Robots and World Objects to include in project
 \end{itemize}
 
 \subsection{Sprint 9}
 \begin{itemize}
-	\item To be determined
+	\item Begin Testing and Validation
+	\item Write User Manual
+	\item Evaluate integration of Gazebo file format and Robot Designer project from past class
 \end{itemize}
 
 \subsection{Sprint 10}
 \begin{itemize}
-	\item To be determined
+	\item Testing and Validation
+	\item Finish Draft of Documentation, internal and external
 \end{itemize}
 
 \subsection{Sprint 11}
 \begin{itemize}
-	\item To be determined
+	\item Testing and Validation
+	\item Client Presentation 3?
 \end{itemize}
 
 \subsection{Sprint 12}
 \begin{itemize}
-	\item To be determined
+	\item Testing and Validation
+	\item Design Fair Presentation
 \end{itemize}
 
 \subsection{Sprint 13}
 \begin{itemize}
-	\item To be determined
+	\item Testing and Validation
+	\item Design Fair Presentation
 \end{itemize}
 
 \subsection{Sprint 14}
 \begin{itemize}
-	\item To be determined
+	\item Design Fair?
+	\item Final Client Evaluation
 \end{itemize}
 
 \section{Development Environment}
@@ -212,9 +228,54 @@ This project is managed by a Git repository. Details about the repository itself
 \section{Source  Control}
 A private GitHub repository is currently being used for the source control for this project. The repository will eventually be made public, but is currently only accessible by our development team and our clients.
 
-Branches are occasionally made for work on large features, but considerable work is also done in the master branch.
+There are two main branches: \lstinline|Documentation| and \lstinline|master|. The Documentation branch is used strictly for the development of this document. The master branch will contain the most recent working version of the product. All features will be added on branches off of master and merged back into master only when they are complete. This is similar to how Git Flow works.
 
-Our main files include one for documentation, one for maps, one for scripts, and several packages which are broken up into src files and include files.
+\begin{figure}
+\centering
+\begin{subfigure}{0.3\textwidth}
+\dirtree{%
+.1 sdsmt\_simulator/.
+.2 Documentation/.
+.3 Contract/.
+.3 Design Docs/.
+.4 Latex Docs/.
+.3 Architecture V1.docx.
+.2 maps/.
+.2 scripts/.
+.2 pkg\_Box2D/.
+.3 CMakeLists.txt.
+.3 package.xml.
+.3 include/.
+.4 Box2D/.
+.5 Box2D.h.
+.5 Collision/.
+.5 Common/.
+.5 Dynamics/.
+.5 Rope/.
+.2 pkg\_Simulator/.
+.3 CMakeLists.txt.
+.3 package.xml.
+.3 simulator.pro.
+.3 src/.
+.3 ui/.
+.3 include/.
+.4 ui/.
+.4 sdsmt\_simulator/.
+.4 interfaces/.
+.2 pkg\_TouchSensor/.
+.3 CMakeLists.txt.
+.3 package.xml.
+.3 touch\_sensor.pro.
+.3 include/.
+.3 src/.
+}
+\end{subfigure}
+\caption{Directory Tree of the project with notable files included}
+\label{fig:dirtree}
+\end{figure}
+
+As you can see in Figure \ref{fig:dirtree}, each package within the project is contained in its own directory, which is named beginning with \lstinline|pkg_|. There are directories for example control scripts and maps, and there is a directory containing all project documentation files. The Documentation files consist of the client contract, all \LaTeX files and images needed to build this document, and early design diagrams of the system.
+You will notice that \lstinline|pkg_Simulator/include| is broken up into a number of pieces. Header files for any concrete types which are not exported to Catkin reside directly in \lstinline|pkg_Simulator/include|. Headers for types which have an associated .ui form file reside in \lstinline|pkg_Simulator/include/ui|. All interfaces which are not exported reside in \lstinline|pkg_Simulator/include/interfaces|. All headers which are exported to Catkin to be used in plugins reside in \lstinline|pkg_Simulator/include/sdsmt_simulator|. This directory is named the same as the project in accordance to Catkin and ROS conventions.
 
 \section{Dependencies}
 While it is not a dependency for building and running the simulation, the Python Interpreter is highly recommended as development tool. One of the main avenues of testing the simulation is through ROS control nodes which publish control commands for robots. These nodes can be written in C++, but writing simple nodes for specific tests is generally faster in Python. A number of Python scripts are included in this project specifically for this purpose. To run them all, you will need to have installed the following in addition to ROS

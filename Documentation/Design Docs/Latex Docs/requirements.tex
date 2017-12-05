@@ -76,11 +76,13 @@ In the future, the client may want to simulate robots in a setting which cannot 
 Software will run as a collection of nodes in ROS Kinetic. This means that it must follow ROS package conventions and be compiled through catkin build system on Ubuntu 16.04.
 
 \subsection{Project  Management Methodology}
-The project will be managed using the Agile methodology. Due to the fact that all members of the team are full-time college students, there will only be group meetings twice a week, and at least one of them will be at a time that the Client can attend. Sprints will be two weeks long, beginning and ending on Thursday.
+The project will be managed using an Agile methodology very close to the Scrum Framework. Due to the fact that all members of the team are full-time college students, there will only be group meetings twice a week, and at least one of them will be at a time that the Client can attend. Sprints will be two weeks long, beginning and ending on Thursday.
 
 The project will reside in a private GitHub repository; this repo will contain both the project source code and documentation files.
 
 The backlog will be maintained via a Trello board. All tickets will start in the ``Todo: Future" category and will be moved into the ``Todo: Current Sprint" category at the start of the sprint during which they are to be completed. Tickets in progress should be moved to the ``In Progress" category, and completed work should be moved to the ``Code Review" category. Code will be reviewed during weekly meetings, without the client. After the code associated with a ticket is reviewed and approved, the ticket will be moved to the ``Done" category.
+
+Because the schedules of all team members are highly volatile, the team did not feel that traditional sprint analytics (burndown charts, velocity measurements, and story point counts) would be effective measurements of success. The project will be kept on track using an overall timeline of project milestones, and backlog work will be shuffled between team members during sprints based upon availability.
 
 \section{Product Backlog}
  
@@ -134,6 +136,3 @@ Samuel Williams and Ryley Sutton researched various 2D physics simulation librar
 
 \subsection{Proof of Concept}
 Andrew Stelter constructed a number of projects utilizing ROS alongside various Qt applications. The goal of these projects was to find any issues the catkin build system might have with Qt, and determine the best way to build a project using both of these libraries, which require separate event loops. He advised the team to use Qt 5.5, as it is part of the default Ubuntu 16.04 distribution, and to use Qt Widgets for the UI instead of QML because he was unable to find a way to successfully build and run QML applications on a fresh Ubuntu system with out installing Qt separate from ROS.
-
-\section{Supporting Material}
-
