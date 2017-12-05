@@ -231,6 +231,20 @@ The core application itself has minimum communication through ROS, it mainly sta
  \subsection{Design Decisions}
   	The simulation underwent a number of design changes during its development. This section will discuss what drove the major design decisions associated with this project.
  \subsubsection*{User Experience}
+	Because this application is mainly for students just being introduced to robotics and will be a tool for education, we wanted to make the simulator as user friendly as possible. We decided to try for a video game-like feel, as most individuals are familiar with video games which would mean familiarity from the get-go and should make it easy to learn. 
+	
+	The biggest design decision we had to make for the user experience aspect of the project was whether we wanted to use a single window for everything (simulation, robot builder and map builder) or if wanted ot have multiple windows. We began with a few concepts and wire frames. 
+	
+add pictures here
+	
+	The chalkboard drawing shows an early concept for a single window interface, while the wireframes show ideas for a multiple window interface. 
+	
+add pros and cons for both
+	
+
+We chose to go with the single window application because it was cleaner and there was no need to bog down our application with multiple windows when the user is unable to build/change the map or robot while in simulation.  
+ 
+ 
  \subsubsection*{User Interface}
  	When building a cross-platform user interface in C++, there are only a few options available. When discussing this, the following ideas were brought up: Pure OpenGL, Qt QML, and Qt Widgets. The final decision was Qt Widgets, which will be discussed below.
  	
