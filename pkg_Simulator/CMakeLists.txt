@@ -71,9 +71,7 @@ set(UI_FILES
 
 ## Any other source files
 set(CPP_SRCS
-    src/basic_maploader.cpp
     src/basic_physics.cpp
-    src/basic_robotloader.cpp
     src/basic_viewer.cpp
     src/simulator_core.cpp
     src/robot.cpp

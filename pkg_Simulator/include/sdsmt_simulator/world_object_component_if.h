@@ -13,6 +13,8 @@ class WorldObjectComponent_If : public QObject
     Q_OBJECT
 
 public:
+    WorldObjectComponent_If(QObject* parent=nullptr) : QObject(parent){}
+
     //Constructs copy of component
     virtual WorldObjectComponent_If* clone(QObject* newParent=nullptr) = 0;
 

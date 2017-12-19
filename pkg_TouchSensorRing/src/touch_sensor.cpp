@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <cmath>
 
-Touch_Sensor::Touch_Sensor(QObject *parent) : Sensor_If(parent)
+Touch_Sensor::Touch_Sensor(QObject *parent) : WorldObjectComponent_If(parent)
 {
     //Update channel out
     connect(&output_channel, &Property::valueSet, this, &Touch_Sensor::_channelChanged);
@@ -39,7 +39,7 @@ void Touch_Sensor::_updateDataMessageDimensions()
     data.data.resize(buttons, 0);
 }
 
-depracatedWorldObject_If *Touch_Sensor::clone(QObject *newParent)
+WorldObjectComponent_If *Touch_Sensor::clone(QObject *newParent)
 {
     Touch_Sensor* out = new Touch_Sensor(newParent);
 
@@ -110,8 +110,6 @@ void Touch_Sensor::_attachSensorFixture()
         fixDef.density = 0.0001;
 
         sensorFix = sensorBody->CreateFixture(&fixDef);
-
-        massChanged();
     }
 }
 
@@ -219,12 +217,6 @@ void Touch_Sensor::_evaluateContact(b2Contact* c, QVector<int>& newTouches, QSet
             }
         }
     }
-}
-
-void Touch_Sensor::clearDynamicBodies()
-{
-    sensorBody = nullptr;
-    sensorFix = nullptr;
 }
 
 void Touch_Sensor::worldTicked(const b2World*, const double&)

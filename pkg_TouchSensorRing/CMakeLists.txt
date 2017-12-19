@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(sdsmt_simulator_differential_drive_drivetrain_plugin)
+project(sdsmt_simulator_touch_sensor_ring_plugin)
 
 add_compile_options(-std=c++11 -fPIC)
 
@@ -38,13 +38,13 @@ catkin_package(
 ## Files that have any Qt macros or keywords in them
 ## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
 set(MOC_HDRS
-    include/diffDrive_drivetrain.h
-    include/diffDrive_drivetrain_plugin.h)
+    include/touch_sensor.h
+    include/touch_sensor_plugin.h)
 
 ## Any other source files
 set(CPP_SRCS
-    src/diffDrive_drivetrain.cpp
-    src/diffDrive_drivetrain_plugin.cpp)
+    src/touch_sensor.cpp
+    src/touch_sensor_plugin.cpp)
 
 ###########
 ## Build ##
@@ -60,19 +60,19 @@ include_directories(
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 
 ## Build the executable
-add_library(diffDrive_drivetrain_plugin SHARED ${CPP_SRCS} ${MOC_SRCS})
+add_library(touch_sensor_ring_plugin SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to executable
 ## this will find all the headers and link all the libraries
-qt5_use_modules(diffDrive_drivetrain_plugin Core)
+qt5_use_modules(touch_sensor_ring_plugin Core)
 
 ## Link any other libraries
-target_link_libraries(diffDrive_drivetrain_plugin
+target_link_libraries(touch_sensor_ring_plugin
   ${catkin_LIBRARIES}
 )
 
 #############
 ## INSTALL ##
 #############
-install(TARGETS diffDrive_drivetrain_plugin
+install(TARGETS touch_sensor_ring_plugin
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})

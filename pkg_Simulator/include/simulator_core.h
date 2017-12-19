@@ -1,8 +1,6 @@
 #ifndef SDSMT_SIMULATOR_H
 #define SDSMT_SIMULATOR_H
 
-#include "interfaces/map_loader_if.h"
-#include "interfaces/robot_loader_if.h"
 #include "interfaces/simulator_physics_if.h"
 #include "interfaces/simulator_ui_if.h"
 #include "world_object.h"

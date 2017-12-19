@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>sdsmt_simulator_floating_drivetrain_plugin</name>
+  <name>sdsmt_simulator_touch_sensor_ring_plugin</name>
   <version>0.0.1</version>
-  <description>Basic Drivetrain Plugin</description>
+  <description>Ring of Touch Sensors Plugin</description>
 
   <maintainer email="andrew.stelter@mines.sdsmt.edu">Andrew Stelter</maintainer>
 

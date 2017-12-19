@@ -4,14 +4,14 @@
 #include "ros/ros.h"
 #include "std_msgs/ByteMultiArray.h"
 
-#include <sdsmt_simulator/sensor_if.h>
+#include <sdsmt_simulator/world_object_component_if.h>
 
 #include <QVector>
 #include <QString>
 #include <QSet>
 #include <QObject>
 
-class Touch_Sensor : public Sensor_If
+class Touch_Sensor : public WorldObjectComponent_If
 {
     Q_OBJECT
 
@@ -86,21 +86,26 @@ class Touch_Sensor : public Sensor_If
 public:
     Touch_Sensor(QObject* parent=nullptr);
 
-    depracatedWorldObject_If* clone(QObject *newParent);
+    WorldObjectComponent_If* clone(QObject *newParent);
 
-    virtual QMap<QString, PropertyView>& getAllProperties(){
+    virtual QMap<QString, PropertyView> getProperties(){
         return _properties;
     }
 
-    virtual QString propertyGroupName(){ return "Touch Ring"; }
+    virtual QString getPropertyGroup(){
+        return "Touch Ring";
+    }
 
-    QVector<Model*> getModels(){ return {buttons_model, touches_model}; }
+    QVector<Model*> getModels(){
+        return {buttons_model, touches_model};
+    }
 
-    uint64_t dynamicBodiesRequired(){ return 1; }
-    QVector<b2JointDef*> setDynamicBodies(QVector<b2Body *> & bodies);
-    void clearDynamicBodies();
+    bool usesChannels(){
+        return true;
+    }
 
 private slots:
+    QVector<b2JointDef*> setDynamicBodies(QVector<b2Body *> & bodies);
     void _channelChanged(QVariant);
     void _attachSensorFixture();
     void _buildModels();
