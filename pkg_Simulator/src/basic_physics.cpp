@@ -52,42 +52,45 @@ void BasicPhysics::setTick(double rate_hz, double duration_s)
     emit physicsTickSet(tickRate, stepTime);
 }
 
-void BasicPhysics::addWorldObject(WorldObjectPhysics_If* obj, object_id oId)
+void BasicPhysics::addWorldObject(newWorldObjectPhysics_If* obj, object_id oId)
 {
     if(objects.contains(oId)) throw std::logic_error("object with id " + std::to_string(oId) + " already exists");
 
     objectWorldData& worldDat = objects[oId];
     worldDat.obj = obj;
 
-    connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics_If::worldTicked);
+    connect(this, &BasicPhysics::worldTick, obj, &newWorldObjectPhysics_If::worldTicked);
+    
+    QVector<WorldObjectComponent_If*> components = obj->getComponents();
 
-    for(int i=0; i<obj->staticBodiesRequired(); i++)
+    b2BodyDef anchorDef;
+    anchorDef.type = b2_dynamicBody;
+    anchorDef.position.Set(0,0);
+    b2Body* anchor = world->CreateBody(&anchorDef);
+    worldDat.dynamicBodies.push_back(anchor);
+
+    for(WorldObjectComponent_If* c : components)
     {
-        b2BodyDef robotBodyDef;
-        robotBodyDef.type = b2_staticBody;
-        robotBodyDef.position.Set(0,0);
+        QMap<QString, PropertyView> properties = c->getProperties();
+        if(properties.contains("bodyType"))
+        {
+            b2BodyDef robotBodyDef;
+            robotBodyDef.type = (b2BodyType)properties["bodyType"].get().toInt();
+            robotBodyDef.position.Set(properties["x"].get().toFloat(),properties["y"].get().toFloat());
 
-        b2Body* body = world->CreateBody(&robotBodyDef);
-        worldDat.staticBodies.push_back(body);
+            b2Body* body = world->CreateBody(&robotBodyDef);
+            worldDat.dynamicBodies.push_back(body);
+        }
     }
 
-    for(int i=0; i<obj->dynamicBodiesRequired();i++)
+    for(b2Body* b : worldDat.dynamicBodies)
     {
-        b2BodyDef robotBodyDef;
-        robotBodyDef.type = b2_dynamicBody;
-        robotBodyDef.position.Set(0,0);
-
-        b2Body* body = world->CreateBody(&robotBodyDef);
-        worldDat.dynamicBodies.push_back(body);
-    }
-
-    obj->setStaticBodies(worldDat.staticBodies);
-    QVector<b2JointDef*> joints = obj->setDynamicBodies(worldDat.dynamicBodies);
-    for(b2JointDef* j : joints)
-    {
-        b2Joint* joint = world->CreateJoint(j);
+        b2JointDef jointDef;
+        jointDef.bodyA = anchor;
+        jointDef.bodyB = b;
+        jointDef.collideConnected = false;
+        b2Joint* joint = world->CreateJoint(&jointDef);
         worldDat.joints.push_back(joint);
-        delete j;
     }
 
     obj->worldTicked(world, 0);
@@ -98,9 +101,6 @@ void BasicPhysics::removeWorldObject(object_id oId)
     if(objects.contains(oId))
     {
         objectWorldData& dat = objects[oId];
-
-        dat.obj->clearDynamicBodies();
-        dat.obj->clearStaticBodies();
 
         for(b2Joint* j : dat.joints)
             world->DestroyJoint(j);

@@ -32,6 +32,9 @@ public:
     //Constructs copy of object
     WorldObject* clone(QObject* newParent=nullptr);
 
+    QVector<WorldObjectComponent_If*> getComponents()
+    {return _components; }
+
     //Drawing Interactions
     QVector<Model*> getModels()
     { return _models; }
