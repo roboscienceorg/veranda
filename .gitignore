@@ -12,6 +12,9 @@ msg/*Goal.msg
 msg/*Result.msg
 msg/_*.py
 
+# Qt build folders
+build-*/
+
 # Box2D documentation
 Box2D/Box2D/Box2D/Documentation
 
