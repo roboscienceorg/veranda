@@ -52,17 +52,20 @@ void BasicPhysics::setTick(double rate_hz, double duration_s)
     emit physicsTickSet(tickRate, stepTime);
 }
 
-void BasicPhysics::addWorldObject(newWorldObjectPhysics_If* obj, object_id oId)
+void BasicPhysics::addWorldObject(WorldObjectPhysics* obj, object_id oId)
 {
     if(objects.contains(oId)) throw std::logic_error("object with id " + std::to_string(oId) + " already exists");
 
     objectWorldData& worldDat = objects[oId];
     worldDat.obj = obj;
-
-    connect(this, &BasicPhysics::worldTick, obj, &newWorldObjectPhysics_If::worldTicked);
+    connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics::worldTicked);
     
-    QVector<WorldObjectComponent_If*> components = obj->getComponents();
+    obj->generateBodies(world);
 
+    //keeping this around as a comment for now
+    //because it may be nice to copy some of this code into
+    //world_object.generateBodies()
+    /*
     b2BodyDef anchorDef;
     anchorDef.type = b2_dynamicBody;
     anchorDef.position.Set(0,0);
@@ -92,6 +95,7 @@ void BasicPhysics::addWorldObject(newWorldObjectPhysics_If* obj, object_id oId)
         b2Joint* joint = world->CreateJoint(&jointDef);
         worldDat.joints.push_back(joint);
     }
+    */
 
     obj->worldTicked(world, 0);
 }

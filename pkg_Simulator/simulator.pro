@@ -49,7 +49,6 @@ HEADERS += \
     include/sdsmt_simulator/model.h \
     include/sdsmt_simulator/cloneshape.h \
     include/interfaces/old_world_object_if.h \
-    include/interfaces/new_world_object_if.h \
     include/sdsmt_simulator/world_object_component_if.h \
     include/sdsmt_simulator/property.h
 

@@ -6,7 +6,7 @@
 
 #include <Box2D/Box2D.h>
 
-#include "new_world_object_if.h"
+#include "../world_object.h"
 
 class Simulator_Physics_If : public QObject
 {
@@ -26,7 +26,7 @@ public slots:
     virtual void setTick(double rate_hz, double duration_s) = 0;
 
     //Adds world objects to simulation
-    virtual void addWorldObject(newWorldObjectPhysics_If* obj, object_id oId) = 0;
+    virtual void addWorldObject(WorldObjectPhysics* obj, object_id oId) = 0;
 
     //Removes a robot from simulation
     virtual void removeWorldObject(object_id oId) = 0;

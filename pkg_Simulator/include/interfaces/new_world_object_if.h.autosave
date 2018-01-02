@@ -65,23 +65,4 @@ public:
     virtual void disconnectChannels(){_obj->disconnectChannels();}
 };
 
-class newWorldObjectPhysics_If : public QObject
-{
-    Q_OBJECT
-
-    newWorldObject_If* _obj;
-
-public:
-    newWorldObjectPhysics_If(newWorldObject_If* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
-
-    virtual QVector<WorldObjectComponent_If*> getComponents(){return _obj->getComponents();}
-
-    virtual void clearDynamicBodies(){_obj->clearDynamicBodies();}
-    virtual void clearStaticBodies(){_obj->clearStaticBodies();}
-
-public slots:
-    //Interface to update on world ticks
-    virtual void worldTicked(const b2World* w, const double t){_obj->worldTicked(w, t);}
-};
-
 #endif // NEW_WORLD_OBJECT_H
