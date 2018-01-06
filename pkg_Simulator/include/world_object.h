@@ -10,6 +10,8 @@
 #include "sdsmt_simulator/model.h"
 #include "sdsmt_simulator/property.h"
 
+#include "Box2D/Box2D.h"
+
 class WorldObject : public QObject
 {
     Q_OBJECT
@@ -47,6 +49,7 @@ public:
     { return _useChannels; }
 
     //Physics Interactions
+    void worldTicked(const b2World* w, const double t){}
 
 public slots:
     void connectChannels();
@@ -78,5 +81,24 @@ public slots:
 
     void disconnectChannels()
     { _obj->disconnectChannels(); }
+};
+
+class WorldObjectPhysics : public QObject
+{
+    Q_OBJECT
+
+    WorldObject* _obj;
+
+public:
+    WorldObjectPhysics(WorldObject* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
+
+    virtual void generateBodies(b2World* world){}
+
+    virtual void clearDynamicBodies(){}
+    virtual void clearStaticBodies(){}
+
+public slots:
+    //Interface to update on world ticks
+    virtual void worldTicked(const b2World* w, const double t){_obj->worldTicked(w, t);}
 };
 #endif // WORLD_OBJECT_IF_H

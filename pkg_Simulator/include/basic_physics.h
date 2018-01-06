@@ -16,7 +16,7 @@ class BasicPhysics : public Simulator_Physics_If
         QVector<b2Body*> dynamicBodies;
         QVector<b2Joint*> joints;
 
-        newWorldObjectPhysics_If *obj;
+        WorldObjectPhysics *obj;
     };
 
     b2World *world;
@@ -43,7 +43,7 @@ public slots:
     virtual void setTick(double rate_hz, double duration_s) override;
 
     //Adds world objects to simulation
-    virtual void addWorldObject(newWorldObjectPhysics_If* obj, object_id oId) override;
+    virtual void addWorldObject(WorldObjectPhysics* obj, object_id oId) override;
 
     //Removes a robot from simulation
     virtual void removeWorldObject(object_id oId) override;
