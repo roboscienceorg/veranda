@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QVariant>
 #include <QDebug>
 #include <functional>
@@ -51,6 +52,16 @@ public:
         _new.toInt(&valid);
         if(valid)
             return _new;
+        return _old;
+    }
+
+    static QVariant bool_validator(QVariant _old, QVariant _new)
+    {
+        const static QStringList isTrue{"1", "true", "yes"};
+        const static QStringList isFalse{"0", "false", "no"};
+
+        if(isTrue.contains(_new.toString().toLower())) return true;
+        if(isFalse.contains(_new.toString().toLower())) return false;
         return _old;
     }
 

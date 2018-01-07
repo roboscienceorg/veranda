@@ -18,13 +18,11 @@
 #include <QTextStream>
 #include <QMap>
 
-#include "basic_maploader.h"
 #include "basic_physics.h"
-#include "basic_robotloader.h"
 #include "basic_viewer.h"
 #include "ui/mainwindow.h"
-#include "sdsmt_simulator/drivetrain_plugin.h"
-#include "sdsmt_simulator/sensor_plugin.h"
+#include "sdsmt_simulator/world_object_component_plugin.h"
+#include "sdsmt_simulator/world_object_file_handler_plugin.h"
 
 #include "simulator_core.h"
 
@@ -53,8 +51,9 @@ int main(int argc, char** argv)
    /*************************************
     * Load robot part plugins
     *************************************/
-    QMap<QString, DriveTrain_Plugin_If*> driveTrainPlugins;
-    QMap<QString, Sensor_Plugin_If*> sensorPlugins;
+    QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
+    QVector<WorldObjectLoader_If*> objectLoaders;
+    QVector<WorldObjectSaver_If*> objectSavers;
 
     QPluginLoader plugLoader;
 
@@ -77,15 +76,17 @@ int main(int argc, char** argv)
             QObject* plugin = plugLoader.instance();
             QString iid = plugLoader.metaData()["IID"].toString();
 
-            if(qobject_cast<DriveTrain_Plugin_If*>(plugin))
+            if(qobject_cast<WorldObjectComponent_Plugin_If*>(plugin))
             {
-                qInfo() << "Plugin type: Drivetrain";
-                driveTrainPlugins[iid] = qobject_cast<DriveTrain_Plugin_If*>(plugin);
+                qInfo() << "Component Plugin Accepted";
+                componentPlugins[iid] = qobject_cast<WorldObjectComponent_Plugin_If*>(plugin);
             }
-            else if(qobject_cast<Sensor_Plugin_If*>(plugin))
+            else if(qobject_cast<WorldObjectFileHandler_Plugin_If*>(plugin))
             {
-                qInfo() << "Plugin type: Sensor";
-                sensorPlugins[iid] = qobject_cast<Sensor_Plugin_If*>(plugin);
+                qInfo() << "Filehandler Plugin Accepted";
+                WorldObjectFileHandler_Plugin_If* p = qobject_cast<WorldObjectFileHandler_Plugin_If*>(plugin);
+                objectLoaders += p->getLoaders();
+                objectSavers += p->getSavers();
             }
             else
             {
@@ -106,11 +107,8 @@ int main(int argc, char** argv)
         return new BasicViewer;
     };
 
-    MapLoader_If* mapLoader = new BasicMapLoader;
-    RobotLoader_If* robotLoader = new BasicRobotLoader(driveTrainPlugins, sensorPlugins);
-
     Simulator_Physics_If* physics = new BasicPhysics;
-    Simulator_Ui_If* userinterface = new MainWindow(visuals, mapLoader, robotLoader);
+    Simulator_Ui_If* userinterface = new MainWindow(visuals, componentPlugins, objectLoaders, objectSavers);
 
     SimulatorCore sim(physics, userinterface, &app);
 

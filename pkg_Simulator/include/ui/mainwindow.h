@@ -7,8 +7,9 @@
 
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/simulator_visual_if.h"
-#include "interfaces/map_loader_if.h"
-#include "interfaces/robot_loader_if.h"
+#include "sdsmt_simulator/world_object_component_plugin.h"
+#include "sdsmt_simulator/world_object_loader_if.h"
+#include "sdsmt_simulator/world_object_saver_if.h"
 
 namespace Ui {
 class MainWindow;
@@ -26,8 +27,9 @@ private:
     visualizerFactory makeWidget;
     Simulator_Visual_If* visual;
 
-    MapLoader_If* mapLoader;
-    RobotLoader_If* robotLoader;
+    QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
+    QMap<QString, WorldObjectLoader_If*> objectLoaders;
+    QMap<QString, WorldObjectSaver_If*> objectSavers;
 
     int speed;
     bool play;
@@ -41,7 +43,8 @@ private:
     QMap<uint64_t, QString> displayed_properties;
 
 public:
-    explicit MainWindow(visualizerFactory factory, MapLoader_If* mapLoad, RobotLoader_If* robotLoad, QWidget *parent = 0);
+    explicit MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If*> components,
+                        QVector<WorldObjectLoader_If*> loaders, QVector<WorldObjectSaver_If*> savers, QWidget *parent = 0);
     ~MainWindow();
 
 public slots:

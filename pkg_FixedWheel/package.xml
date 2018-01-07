@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>sdsmt_simulator_differential_drive_drivetrain_plugin</name>
+  <name>sdsmt_simulator_fixed_wheel_plugin</name>
   <version>0.0.1</version>
-  <description>Differential Drive Drivetrain Plugin</description>
+  <description>Fixed Wheel Plugin</description>
 
   <maintainer email="andrew.stelter@mines.sdsmt.edu">Andrew Stelter</maintainer>
 

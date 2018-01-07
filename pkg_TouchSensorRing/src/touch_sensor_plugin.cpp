@@ -6,7 +6,7 @@ Touch_Sensor_Plugin::Touch_Sensor_Plugin()
 
 }
 
-Sensor_If* Touch_Sensor_Plugin::createSensor()
+WorldObjectComponent_If* Touch_Sensor_Plugin::createComponent()
 {
     return new Touch_Sensor;
 }

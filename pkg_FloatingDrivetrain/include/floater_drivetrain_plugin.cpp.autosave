@@ -1,6 +1,0 @@
-#include "floater_drivetrain_plugin.h"
-
-Floater_DriveTrain_Plugin::Floater_DriveTrain_Plugin()
-{
-
-}

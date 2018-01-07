@@ -49,7 +49,7 @@ public:
     { return _useChannels; }
 
     //Physics Interactions
-    void generateBodies(b2World* world, object_id oId){}
+    void generateBodies(b2World* world, object_id oId);
     void worldTicked(const b2World* w, const double t){}
 
 public slots:
@@ -93,7 +93,11 @@ class WorldObjectPhysics : public QObject
 public:
     WorldObjectPhysics(WorldObject* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
 
+<<<<<<< HEAD
     virtual void generateBodies(b2World* world, object_id oId){_obj->generateBodies(world, oId);}
+=======
+    virtual void generateBodies(b2World* world, object_id oid){_obj->generateBodies(world, oid);}
+>>>>>>> 08328b75ad7ba00c103e8a84656a20a0c32c7f3d
 
     virtual void clearDynamicBodies(){}
     virtual void clearStaticBodies(){}

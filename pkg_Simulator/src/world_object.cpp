@@ -79,8 +79,6 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
 
     for(int i = 0; i < components.size(); i++)
         components[i]->generateBodies(world, oId, anchor);
-
-    return fixtures;
 }
 
 void WorldObject::connectChannels()

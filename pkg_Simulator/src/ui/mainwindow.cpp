@@ -11,12 +11,21 @@
 #include <stdexcept>
 #include <string>
 
-MainWindow::MainWindow(visualizerFactory factory, MapLoader_If *mapLoad, RobotLoader_If *robotLoad, QWidget *parent) :
+MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If *> components,
+                       QVector<WorldObjectLoader_If*> loaders, QVector<WorldObjectSaver_If*> savers, QWidget *parent) :
     Simulator_Ui_If(parent),
-    makeWidget(factory), mapLoader(mapLoad), robotLoader(robotLoad),
+    makeWidget(factory), componentPlugins(components),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    for(WorldObjectLoader_If* l : loaders)
+        for(QString e : l->fileExts())
+            objectLoaders[e] = l;
+
+    for(WorldObjectSaver_If* s : savers)
+        for(QString e : s->fileExts())
+            objectSavers[e] = s;
 
     speed = 1;
     play = false;
@@ -66,8 +75,6 @@ MainWindow::MainWindow(visualizerFactory factory, MapLoader_If *mapLoad, RobotLo
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete mapLoader;
-    delete robotLoader;
 }
 
 //Menu Mode Button Clicks

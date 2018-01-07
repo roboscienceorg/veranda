@@ -26,11 +26,9 @@ HEADERS += \
     include/sdsmt_simulator/sensor_if.h \
     include/sdsmt_simulator/drivetrain_if.h \
 \
-    include/interfaces/map_loader_if.h \
     include/interfaces/simulator_visual_if.h \
     include/interfaces/simulator_ui_if.h \
     include/interfaces/simulator_physics_if.h \
-    include/interfaces/robot_loader_if.h \
 \
     include/basic_physics.h \
     include/basic_viewer.h \
@@ -42,15 +40,17 @@ HEADERS += \
     include/ui/mainwindow.h \
 \
     include/simulator_core.h \
-    include/sdsmt_simulator/sensor_plugin.h \
-    include/sdsmt_simulator/drivetrain_plugin.h \
     include/sdsmt_simulator/robotcomponent_if.h \
     include/map.h \
     include/sdsmt_simulator/model.h \
     include/sdsmt_simulator/cloneshape.h \
     include/interfaces/old_world_object_if.h \
     include/sdsmt_simulator/world_object_component_if.h \
-    include/sdsmt_simulator/property.h
+    include/sdsmt_simulator/property.h \
+    include/sdsmt_simulator/world_object_component_plugin.h \
+    include/sdsmt_simulator/world_object_loader_if.h \
+    include/sdsmt_simulator/world_object_saver_if.h \
+    include/sdsmt_simulator/world_object_file_handler_plugin.h
 
 FORMS    += \
     ui/mainwindow.ui \

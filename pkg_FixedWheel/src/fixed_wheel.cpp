@@ -1,25 +1,23 @@
-#include "touch_sensor.h"
+#include "fixed_wheel.h"
 #include "std_msgs/ByteMultiArray.h"
 
 #include <QDebug>
 #include <cmath>
 
-Touch_Sensor::Touch_Sensor(QObject *parent) : Sensor_If(parent)
+Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent_If(parent)
 {
     //Update channel out
-    connect(&output_channel, &Property::valueSet, this, &Touch_Sensor::_channelChanged);
+    connect(&input_channel, &Property::valueSet, this, &Fixed_Wheel::_channelChanged);
 
     //Update box2d interface
-    connect(&radius, &Property::valueSet, this, &Touch_Sensor::_attachSensorFixture);
-
-    //Update output message dimensions
-    connect(&sensor_count, &Property::valueSet, this, &Touch_Sensor::_updateDataMessageDimensions);
+    connect(&radius, &Property::valueSet, this, &Fixed_Wheel::_attachWheelFixture);
+    connect(&width, &Property::valueSet, this, &Fixed_Wheel::_attachWheelFixture);
 
     //Update drawn model
-    connect(&radius, &Property::valueSet, this, &Touch_Sensor::_buildModels);
-    connect(&sensor_count, &Property::valueSet, this, &Touch_Sensor::_buildModels);
-    connect(&angle_start, &Property::valueSet, this, &Touch_Sensor::_buildModels);
-    connect(&angle_end, &Property::valueSet, this, &Touch_Sensor::_buildModels);
+    connect(&radius, &Property::valueSet, this, &Fixed_Wheel::_buildModels);
+    connect(&width, &Property::valueSet, this, &Fixed_Wheel::_buildModels);
+
+
 
     buttons_model = new Model({}, {}, this);
     touches_model = new Model({}, {}, this);
@@ -31,7 +29,7 @@ Touch_Sensor::Touch_Sensor(QObject *parent) : Sensor_If(parent)
     _updateDataMessageDimensions();
 }
 
-void Touch_Sensor::_updateDataMessageDimensions()
+void Fixed_Wheel::_updateDataMessageDimensions()
 {
     int buttons = sensor_count.get().toInt();
     data.layout.dim[0].stride = data.layout.dim[0].size = buttons;
@@ -39,9 +37,9 @@ void Touch_Sensor::_updateDataMessageDimensions()
     data.data.resize(buttons, 0);
 }
 
-depracatedWorldObject_If *Touch_Sensor::clone(QObject *newParent)
+WorldObjectComponent_If *Fixed_Wheel::clone(QObject *newParent)
 {
-    Touch_Sensor* out = new Touch_Sensor(newParent);
+    Fixed_Wheel* out = new Fixed_Wheel(newParent);
 
     out->output_channel.set(output_channel.get());
     out->angle_end.set(angle_end.get());
@@ -52,7 +50,7 @@ depracatedWorldObject_If *Touch_Sensor::clone(QObject *newParent)
     return out;
 }
 
-void Touch_Sensor::_channelChanged(QVariant)
+void Fixed_Wheel::_channelChanged(QVariant)
 {
     if(_connected)
     {
@@ -61,7 +59,7 @@ void Touch_Sensor::_channelChanged(QVariant)
     }
 }
 
-void Touch_Sensor::connectChannels()
+void Fixed_Wheel::connectChannels()
 {
     if(_connected)
         disconnectChannels();
@@ -71,13 +69,13 @@ void Touch_Sensor::connectChannels()
     _connected = true;
 }
 
-void Touch_Sensor::disconnectChannels()
+void Fixed_Wheel::disconnectChannels()
 {
     _sendChannel.shutdown();
     _connected = false;
 }
 
-QVector<b2JointDef*> Touch_Sensor::setDynamicBodies(QVector<b2Body *> & bodies)
+QVector<b2JointDef*> Fixed_Wheel::setDynamicBodies(QVector<b2Body *> & bodies)
 {
     sensorBody = bodies.at(0);
 
@@ -86,7 +84,7 @@ QVector<b2JointDef*> Touch_Sensor::setDynamicBodies(QVector<b2Body *> & bodies)
     return {};
 }
 
-void Touch_Sensor::_attachSensorFixture()
+void Fixed_Wheel::_attachSensorFixture()
 {
     //Can only add fixture if body defined
     if(sensorBody)
@@ -110,12 +108,10 @@ void Touch_Sensor::_attachSensorFixture()
         fixDef.density = 0.0001;
 
         sensorFix = sensorBody->CreateFixture(&fixDef);
-
-        massChanged();
     }
 }
 
-void Touch_Sensor::_buildModels()
+void Fixed_Wheel::_buildModels()
 {
     if(sensorBody)
     {
@@ -169,7 +165,7 @@ void Touch_Sensor::_buildModels()
     }
 }
 
-QVariant Touch_Sensor::_validate_angle(QVariant _old, QVariant _new)
+QVariant Fixed_Wheel::_validate_angle(QVariant _old, QVariant _new)
 {
     bool isDouble;
     double asDouble = _new.toDouble(&isDouble);
@@ -178,7 +174,7 @@ QVariant Touch_Sensor::_validate_angle(QVariant _old, QVariant _new)
     return _old;
 }
 
-void Touch_Sensor::_evaluateContact(b2Contact* c, QVector<int>& newTouches, QSet<int>& touchesNow)
+void Fixed_Wheel::_evaluateContact(b2Contact* c, QVector<int>& newTouches, QSet<int>& touchesNow)
 {
     b2WorldManifold man;
     c->GetWorldManifold(&man);
@@ -221,13 +217,7 @@ void Touch_Sensor::_evaluateContact(b2Contact* c, QVector<int>& newTouches, QSet
     }
 }
 
-void Touch_Sensor::clearDynamicBodies()
-{
-    sensorBody = nullptr;
-    sensorFix = nullptr;
-}
-
-void Touch_Sensor::worldTicked(const b2World*, const double&)
+void Fixed_Wheel::worldTicked(const b2World*, const double&)
 {
     if(sensorBody)
     {
