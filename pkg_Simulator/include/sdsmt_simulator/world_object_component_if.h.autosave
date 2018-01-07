@@ -13,8 +13,6 @@ class WorldObjectComponent_If : public QObject
     Q_OBJECT
 
 public:
-    WorldObjectComponent_If(QObject* parent=nullptr) : QObject(parent){}
-
     //Constructs copy of component
     virtual WorldObjectComponent_If* clone(QObject* newParent=nullptr) = 0;
 
@@ -27,7 +25,7 @@ public:
 
     virtual bool usesChannels() = 0;
 
-    virtual void generateBodies(b2World* world, b2Body* anchor) = 0;
+    virtual void generateBodies(b2World* world, object_id oId, b2Body* anchor) = 0;
 
 public slots:
     virtual void connectChannels() = 0;
