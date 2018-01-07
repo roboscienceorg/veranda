@@ -68,7 +68,7 @@ WorldObject* WorldObject::clone(QObject *newParent)
     return copy;
 }
 
-void WorldObject::generateBodies(b2World* world)
+void WorldObject::generateBodies(b2World* world, object_id oid)
 {
     QVector<WorldObjectComponent_If*> components = getComponents();
 
@@ -78,9 +78,7 @@ void WorldObject::generateBodies(b2World* world)
     b2Body* anchor = world->CreateBody(&anchorDef);
 
     for(int i = 0; i < components.size(); i++)
-        components[i]->generateBodies(world, anchor);
-
-    return fixtures;
+        components[i]->generateBodies(world, anchor, oid);
 }
 
 void WorldObject::connectChannels()

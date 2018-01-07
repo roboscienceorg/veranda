@@ -1,5 +1,5 @@
-#ifndef TOUCH_SENSOR_RING_PLUGIN_H
-#define TOUCH_SENSOR_RING_PLUGIN_H
+#ifndef FIXED_WHEEL_PLUGIN_H
+#define FIXED_WHEEL_PLUGIN_H
 
 #include <QObject>
 

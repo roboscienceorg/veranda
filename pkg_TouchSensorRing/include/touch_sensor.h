@@ -1,5 +1,5 @@
-#ifndef FLOATER_DRIVETRAIN_H
-#define FLOATER_DRIVETRAIN_H
+#ifndef TOUCH_SENSOR_RING_H
+#define TOUCH_SENSOR_RING_H
 
 #include "ros/ros.h"
 #include "std_msgs/ByteMultiArray.h"
