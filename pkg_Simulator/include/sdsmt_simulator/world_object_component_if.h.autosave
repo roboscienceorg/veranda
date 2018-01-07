@@ -25,7 +25,7 @@ public:
 
     virtual bool usesChannels() = 0;
 
-    virtual void generateBodies(b2World* world, b2Body* anchor) = 0;
+    virtual void generateBodies(b2World* world, object_id oId, b2Body* anchor) = 0;
 
 public slots:
     virtual void connectChannels() = 0;

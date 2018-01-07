@@ -9,7 +9,7 @@
 
 #include "model.h"
 
-typedef uint64_t object_id;
+typedef uint32_t object_id;
 
 class PropertyInfo
 {

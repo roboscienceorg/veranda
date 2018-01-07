@@ -60,18 +60,12 @@ void BasicPhysics::addWorldObject(WorldObjectPhysics* obj, object_id oId)
     worldDat.obj = obj;
     connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics::worldTicked);
     
-    obj->generateBodies(world);
+    obj->generateBodies(world, oId);
 
     //keeping this around as a comment for now
     //because it may be nice to copy some of this code into
     //world_object.generateBodies()
     /*
-    b2BodyDef anchorDef;
-    anchorDef.type = b2_dynamicBody;
-    anchorDef.position.Set(0,0);
-    b2Body* anchor = world->CreateBody(&anchorDef);
-    worldDat.dynamicBodies.push_back(anchor);
-
     for(WorldObjectComponent_If* c : components)
     {
         QMap<QString, PropertyView> properties = c->getProperties();
