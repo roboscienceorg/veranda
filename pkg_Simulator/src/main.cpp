@@ -54,6 +54,7 @@ int main(int argc, char** argv)
     QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
     QVector<WorldObjectLoader_If*> objectLoaders;
     QVector<WorldObjectSaver_If*> objectSavers;
+    WorldObjectLoader_If* defaultBots = nullptr;
 
     QPluginLoader plugLoader;
 
@@ -87,6 +88,9 @@ int main(int argc, char** argv)
                 WorldObjectFileHandler_Plugin_If* p = qobject_cast<WorldObjectFileHandler_Plugin_If*>(plugin);
                 objectLoaders += p->getLoaders();
                 objectSavers += p->getSavers();
+
+                if(iid == "org.sdsmt.sim.2d.fileHandlers.defaultBot")
+                    defaultBots = p->getLoaders()[0];
             }
             else
             {
@@ -112,6 +116,16 @@ int main(int argc, char** argv)
 
     SimulatorCore sim(physics, userinterface, &app);
 
+    if(defaultBots)
+    {
+        for(WorldObject* wo : defaultBots->loadFile("", componentPlugins))
+        {
+            sim.addSimObject(wo);
+            delete wo;
+        }
+    }
+
+    qDebug() << "Starting Simulation";
     sim.start();
 
    /******************

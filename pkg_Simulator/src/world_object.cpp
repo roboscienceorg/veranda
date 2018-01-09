@@ -98,3 +98,9 @@ void WorldObject::disconnectChannels()
             c->disconnectChannels();
     }
 }
+
+void WorldObject::worldTicked(const b2World* w, const double t)
+{
+    for(WorldObjectComponent_If* c : _components)
+        c->worldTicked(w, t);
+}

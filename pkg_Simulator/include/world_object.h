@@ -50,11 +50,11 @@ public:
 
     //Physics Interactions
     void generateBodies(b2World* world, object_id oId);
-    void worldTicked(const b2World* w, const double t){}
 
 public slots:
     void connectChannels();
     void disconnectChannels();
+    void worldTicked(const b2World* w, const double t);
 };
 
 class WorldObjectProperties : public QObject

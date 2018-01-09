@@ -19,35 +19,36 @@ class Touch_Sensor : public WorldObjectComponent_If
     constexpr static double RAD2DEG = 360.0/(2*PI);
     constexpr static double DEG2RAD = 1.0/RAD2DEG;
 
+    object_id objectId = 0;
     QString _outputChannel;
     bool _connected = false;
 
     ros::NodeHandle _rosNode;
     ros::Publisher _sendChannel;
 
-    static QVariant _validate_angle(QVariant _old, QVariant _new);
+    Property x_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X location of component within object"),
+                                QVariant(0.0), &Property::double_validator);
+
+    Property y_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y location of component within object"),
+                                QVariant(0.0), &Property::double_validator);
+
+    Property theta_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of component within object"),
+                                QVariant(0.0), &Property::angle_validator);
 
     Property output_channel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
                                                     "Output channel for touch messages"), "");
 
     Property angle_start = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                     "Start angle of the sensors(degrees)"), QVariant(0.0),
-                                    &_validate_angle);
+                                    &Property::angle_validator);
 
     Property angle_end = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                   "End angle of the sensors (degrees)"), QVariant(0.0),
-                                  &_validate_angle);
+                                  &Property::angle_validator);
 
     Property radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                "Radius of the touch sensor ring"), QVariant(1.0),
-                               [](QVariant _old, QVariant _new)
-                               {
-                                     bool valid;
-                                     int newVal = _new.toDouble(&valid);
-                                     if(valid && newVal >= 0)
-                                         return _new;
-                                     return _old;
-                               });
+                               &Property::abs_double_validator);
 
     Property sensor_count = Property(PropertyInfo(false, false, PropertyInfo::INT,
                                                   "Number of sensors on the ring"), QVariant(1),
@@ -62,6 +63,9 @@ class Touch_Sensor : public WorldObjectComponent_If
 
     QMap<QString, PropertyView> _properties{
         {"channels/output_touches", &output_channel},
+        {"x_local", &x_local},
+        {"y_local", &y_local},
+        {"theta_local", &theta_local},
         {"angle_start", &angle_start},
         {"angle_end", &angle_end},
         {"ring_radius", &radius},
@@ -73,6 +77,7 @@ class Touch_Sensor : public WorldObjectComponent_If
 
     b2Body* sensorBody = nullptr;
     b2Fixture* sensorFix = nullptr;
+    b2Joint* weldJoint = nullptr;
 
     //Data published
     std_msgs::ByteMultiArray data;
@@ -88,11 +93,11 @@ public:
 
     WorldObjectComponent_If* clone(QObject *newParent);
 
-    virtual QMap<QString, PropertyView> getProperties(){
+    QMap<QString, PropertyView> getProperties(){
         return _properties;
     }
 
-    virtual QString getPropertyGroup(){
+    QString getPropertyGroup(){
         return "Touch Ring";
     }
 
@@ -105,6 +110,7 @@ public:
     }
 
     void generateBodies(b2World *world, object_id oId, b2Body *anchor);
+    void clearBodies(b2World *world);
 
 private slots:
     void _channelChanged(QVariant);
@@ -120,7 +126,7 @@ public slots:
     //Disconnects all ROS topics
     virtual void disconnectChannels();
 
-    virtual void worldTicked(const b2World*, const double&);
+    virtual void worldTicked(const b2World*, const double);
 };
 
 #endif // FLOATER_DRIVETRAIN_H

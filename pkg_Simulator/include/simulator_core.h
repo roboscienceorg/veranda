@@ -33,7 +33,7 @@ public:
 signals:
     void objectRemoved(object_id rId);
 
-    //void objectAdded(WorldObjectPhysics* interface, object_id id);
+    void objectAdded(WorldObjectPhysics* interface, object_id id);
     void objectAdded(WorldObjectProperties* interface, object_id id);
 
     void errorMsg(QString);

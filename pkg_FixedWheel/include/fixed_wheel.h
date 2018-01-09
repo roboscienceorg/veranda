@@ -26,10 +26,10 @@ class Fixed_Wheel : public WorldObjectComponent_If
     ros::Subscriber _receiveChannel;
 
     Property x_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X location of component within object"),
-                                QVariant(0.0), &Property::abs_double_validator);
+                                QVariant(0.0), &Property::double_validator);
 
     Property y_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y location of component within object"),
-                                QVariant(0.0), &Property::abs_double_validator);
+                                QVariant(0.0), &Property::double_validator);
 
     Property theta_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of component within object"),
                                 QVariant(0.0), &Property::angle_validator);
@@ -63,11 +63,16 @@ class Fixed_Wheel : public WorldObjectComponent_If
         {"max_force", &max_force}
     };
 
+    object_id objectId;
+
     Model* wheel_model = nullptr;
     b2Shape* wheel_shape = nullptr;
 
     b2Body* wheelBody = nullptr;
     b2Fixture* wheelFix = nullptr;
+    b2Joint* weldJoint = nullptr;
+    b2Vec2 localWheelFrontUnit;
+    b2Vec2 localWheelLeftUnit;
 
     //Data published
     double curr_percent = 0;
@@ -95,6 +100,7 @@ public:
     }
 
     void generateBodies(b2World* world, object_id oId, b2Body* anchor);
+    void clearBodies(b2World *world);
 
 signals:
     void _receiveMessage(std_msgs::Float32 data);
@@ -116,7 +122,7 @@ public slots:
     //Disconnects all ROS topics
     virtual void disconnectChannels();
 
-    virtual void worldTicked(const b2World*, const double&);
+    virtual void worldTicked(const b2World*, const double);
 };
 
 #endif // FLOATER_DRIVETRAIN_H

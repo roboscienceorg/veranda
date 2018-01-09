@@ -28,10 +28,12 @@ public:
     virtual bool usesChannels() = 0;
 
     virtual void generateBodies(b2World* world, object_id oId, b2Body* anchor) = 0;
+    virtual void clearBodies(b2World* world) = 0;
 
 public slots:
     virtual void connectChannels() = 0;
     virtual void disconnectChannels() = 0;
+    virtual void worldTicked(const b2World* w, const double t) = 0;
 };
 
 #endif // WORLD_OBJECT_COMPONENT_H

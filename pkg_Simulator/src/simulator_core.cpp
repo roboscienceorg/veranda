@@ -19,8 +19,8 @@ _physicsEngine(physics), _userInterface(ui)
     connect(this, &SimulatorCore::objectRemoved, _physicsEngine, &Simulator_Physics_If::removeWorldObject);
 
     connect(_userInterface, &Simulator_Ui_If::userAddWorldObjectToSimulation, this, &SimulatorCore::addSimObject);
-    //connect(this, static_cast<void (SimulatorCore::*)(WorldObjectPhysics*, object_id)>(&SimulatorCore::objectAdded),
-    //        _physicsEngine, &Simulator_Physics_If::addWorldObject);
+    connect(this, static_cast<void (SimulatorCore::*)(WorldObjectPhysics*, object_id)>(&SimulatorCore::objectAdded),
+            _physicsEngine, &Simulator_Physics_If::addWorldObject);
     connect(this, static_cast<void (SimulatorCore::*)(WorldObjectProperties*, object_id)>(&SimulatorCore::objectAdded),
             _userInterface, &Simulator_Ui_If::worldObjectAddedToSimulation);
 
@@ -75,11 +75,11 @@ void SimulatorCore::addSimObject(WorldObject *obj)
     connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &WorldObject::connectChannels);
     connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &WorldObject::disconnectChannels);
 
-    //WorldObjectPhysics* phys_interface = new WorldObjectPhysics(obj, obj);
+    WorldObjectPhysics* phys_interface = new WorldObjectPhysics(obj, obj);
     WorldObjectProperties* prop_interface = new WorldObjectProperties(obj, obj);
 
     //Send out object interfaces
-    //emit objectAdded(phys_interface, _nextObject);
+    emit objectAdded(phys_interface, _nextObject);
     emit objectAdded(prop_interface, _nextObject);
 
     //Keep references to robot and thread

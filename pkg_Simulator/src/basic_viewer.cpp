@@ -60,7 +60,9 @@ QGraphicsItem* BasicViewer::_drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
 
             QPolygonF qpoly;
             for(b2Vec2* vert = poly->m_vertices; vert != poly->m_vertices + poly->m_count; vert++)
+            {
                 qpoly.append(QPointF(vert->x*WORLD_SCALE, -vert->y*WORLD_SCALE));
+            }
 
             newShape = new QGraphicsPolygonItem(qpoly, itemParent);
         }
@@ -165,7 +167,7 @@ void BasicViewer::mousePressEvent(QMouseEvent *event)
     {
         QPointF hit = event->localPos();
         QGraphicsItem* shape = _viewer->itemAt((int)(hit.x()+0.5), (int)(hit.y() + 0.5));
-        while(shape->parentItem())
+        while(shape && shape->parentItem())
             shape = shape->parentItem();
         Model* m = _shapeToModel[shape];
         object_id oid = _modelToObject[m];
@@ -267,7 +269,7 @@ void BasicViewer::objectSelected(object_id id)
 //Returns a color given drawlevel and state of selected
 QColor BasicViewer::_color(DrawLevel level, bool selected)
 {
-    QColor out;
+    QColor out(0, 0, 0);
 
     if(selected)
         out.setRgb(37, 249, 83);
@@ -295,7 +297,8 @@ void BasicViewer::_setOutlineColor(QGraphicsItem* item, const QColor& color)
 
     if(asShape)
     {
-        asShape->setPen(QPen(color));
+        //Unsure why, but this segfaults
+        //asShape->setPen(QPen(color));
     }
 
     for(QGraphicsItem* i : item->childItems())

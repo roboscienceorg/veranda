@@ -77,10 +77,39 @@ void Touch_Sensor::disconnectChannels()
     _connected = false;
 }
 
+void Touch_Sensor::clearBodies(b2World *world)
+{
+    if(nullptr != sensorBody)
+    {
+        world->DestroyJoint(weldJoint);
+        world->DestroyBody(sensorBody);
+
+        weldJoint = nullptr;
+        sensorBody = nullptr;
+        sensorFix = nullptr;
+    }
+}
+
 void Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
+    clearBodies(world);
+
     b2BodyDef bDef;
+    bDef.angle = theta_local.get().toDouble()*DEG2RAD;
+    bDef.position = b2Vec2(x_local.get().toDouble(), y_local.get().toDouble());
+    bDef.type = b2_dynamicBody;
     sensorBody = world->CreateBody(&bDef);
+
+    b2WeldJointDef weldDef;
+    auto anchorPt = anchor->GetWorldCenter();
+    weldDef.bodyA = anchor;
+    weldDef.bodyB = sensorBody;
+    weldDef.localAnchorA = anchor->GetLocalPoint(anchorPt);
+    weldDef.localAnchorB = sensorBody->GetLocalPoint(anchorPt);
+    weldDef.referenceAngle = sensorBody->GetAngle() - anchor->GetAngle();
+    weldJoint = world->CreateJoint(&weldDef);
+
+    objectId = oId;
 
     _attachSensorFixture();
     _buildModels();
@@ -107,7 +136,7 @@ void Touch_Sensor::_attachSensorFixture()
 
         fixDef.isSensor = false;
         fixDef.shape = &sensorRing;
-        fixDef.density = 0.0001;
+        fixDef.filter.groupIndex = -objectId;
 
         sensorFix = sensorBody->CreateFixture(&fixDef);
     }
@@ -115,65 +144,47 @@ void Touch_Sensor::_attachSensorFixture()
 
 void Touch_Sensor::_buildModels()
 {
-    if(sensorBody)
+    //Clear always-showing model
+    QVector<b2Shape*> oldModel = buttons_model->shapes();
+    buttons_model->removeShapes(oldModel);
+    qDeleteAll(oldModel);
+
+    //Build always-showing model...
+    b2CircleShape* ring = new b2CircleShape;
+    ring->m_radius = radius.get().toDouble();
+    ring->m_p = b2Vec2(0,0);
+    buttons_model->addShapes({ring});
+
+    //Clear sensor-hits shapes
+    touches_model->removeShapes(touches_model->shapes());
+    qDeleteAll(touch_image);
+
+    //Build new sensor-hits shapes
+    touch_image.clear();
+
+    int buttons = sensor_count.get().toInt();
+    double angleMin = angle_start.get().toDouble() * DEG2RAD;
+    double angleMax = angle_end.get().toDouble() * DEG2RAD;
+    double degPerTouch = (angleMax - angleMin) / buttons;
+    if(angleMax < angleMin)
+        degPerTouch = (angleMax + 2*PI - angleMin) / buttons;
+
+    double currAngle = angleMin + degPerTouch/2.0;
+    double touchRadius = radius.get().toDouble();
+    for(int i=0; i<buttons; i++, currAngle += degPerTouch)
     {
-        //Clear always-showing model
-        QVector<b2Shape*> oldModel = buttons_model->shapes();
-        buttons_model->removeShapes(oldModel);
-        qDeleteAll(oldModel);
+        b2CircleShape* hit = new b2CircleShape;
+        hit->m_radius = 0.25;
+        hit->m_p.x = touchRadius * std::cos(currAngle);
+        hit->m_p.y = touchRadius * std::sin(currAngle);
 
-        //Build always-showing model...
-        b2CircleShape* ring = new b2CircleShape;
-        ring->m_radius = radius.get().toDouble();
-        ring->m_p = b2Vec2(0,0);
-        buttons_model->addShapes({ring});
-
-        //Clear sensor-hits shapes
-        touches_model->removeShapes(touches_model->shapes());
-        qDeleteAll(touch_image);
-
-        //Build new sensor-hits shapes
-        touch_image.clear();
-
-        int buttons = sensor_count.get().toInt();
-        double angleMin = angle_start.get().toDouble() * DEG2RAD;
-        double angleMax = angle_end.get().toDouble() * DEG2RAD;
-        double degPerTouch = (angleMax - angleMin) / buttons;
-        if(angleMax < angleMin)
-            degPerTouch = (angleMax + 2*PI - angleMin) / buttons;
-
-        double currAngle = angleMin + degPerTouch/2.0;
-        double touchRadius = radius.get().toDouble();
-        for(int i=0; i<buttons; i++, currAngle += degPerTouch)
-        {
-            b2CircleShape* hit = new b2CircleShape;
-            hit->m_radius = 0.25;
-            hit->m_p.x = touchRadius * std::cos(currAngle);
-            hit->m_p.y = touchRadius * std::sin(currAngle);
-
-            touch_image.push_back(hit);
-        }
-
-        double x = sensorBody->GetWorldCenter().x;
-        double y = sensorBody->GetWorldCenter().y;
-        double t = sensorBody->GetAngle();
-        buttons_model->setTransform(x, y, t*RAD2DEG);
-        touches_model->setTransform(x, y, t*RAD2DEG);
-
-        //zero out all output data
-        active_touches.clear();
-        data.data.clear();
-        data.data.resize(buttons, 0);
+        touch_image.push_back(hit);
     }
-}
 
-QVariant Touch_Sensor::_validate_angle(QVariant _old, QVariant _new)
-{
-    bool isDouble;
-    double asDouble = _new.toDouble(&isDouble);
-    if(isDouble && asDouble >= 0 && asDouble <= 360)
-        return _new;
-    return _old;
+    //zero out all output data
+    active_touches.clear();
+    data.data.clear();
+    data.data.resize(buttons, 0);
 }
 
 void Touch_Sensor::_evaluateContact(b2Contact* c, QVector<int>& newTouches, QSet<int>& touchesNow)
@@ -219,7 +230,7 @@ void Touch_Sensor::_evaluateContact(b2Contact* c, QVector<int>& newTouches, QSet
     }
 }
 
-void Touch_Sensor::worldTicked(const b2World*, const double&)
+void Touch_Sensor::worldTicked(const b2World*, const double)
 {
     if(sensorBody)
     {
