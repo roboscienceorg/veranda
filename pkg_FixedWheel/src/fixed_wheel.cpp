@@ -21,7 +21,7 @@ Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent_If(parent)
     connect(&width, &Property::valueSet, this, &Fixed_Wheel::_buildModels);
 
     //Update current force when max force changes
-    connect(&max_force, &Property::valueSet, this, &Fixed_Wheel::_updateForce);
+    connect(&max_rps, &Property::valueSet, this, &Fixed_Wheel::_updateForce);
 
     //Signal slot connection to correctly thread incomming messages
     connect(this, &Fixed_Wheel::_receiveMessage, this, &Fixed_Wheel::_processMessage);
@@ -92,7 +92,7 @@ void Fixed_Wheel::_attachWheelFixture()
         wheelFix = wheelBody->CreateFixture(&fixDef);
 
         localWheelFrontUnit = b2Vec2(1, 0);
-        localWheelLeftUnit = b2Vec2(0, 1);
+        localWheelRightUnit = b2Vec2(0, 1);
     }
 }
 
@@ -103,7 +103,7 @@ WorldObjectComponent_If *Fixed_Wheel::clone(QObject *newParent)
     out->input_channel.set(input_channel.get());
     out->radius.set(radius.get());
     out->width.set(width.get());
-    out->max_force.set(max_force.get());
+    out->max_rps.set(max_rps.get());
     out->driven.set(driven.get());
     out->x_local.set(x_local.get());
     out->y_local.set(y_local.get());
@@ -150,14 +150,34 @@ void Fixed_Wheel::_buildModels()
 void Fixed_Wheel::worldTicked(const b2World*, const double)
 {
     qDebug() << "Wheel at " << wheelBody->GetPosition().x << ", " << wheelBody->GetPosition().y;
-    auto front = wheelBody->GetWorldPoint(localWheelFrontUnit);
-    qDebug() << "Front of wheel at " << front.x << ", " << front.y;
 
-    auto force = wheelBody->GetWorldPoint(localWheelFrontUnit);
-    force.x *= max_force.get().toDouble();
-    force.y *= max_force.get().toDouble();
-    wheelBody->ApplyForceToCenter(force, true);
-    qDebug() << "Apply force " << force.x << ", " << force.y;
+    b2Vec2 front = wheelBody->GetWorldVector(localWheelFrontUnit);
+    b2Vec2 right = wheelBody->GetWorldVector(localWheelRightUnit);
+
+    double rps = max_rps.get().toDouble();
+    qDebug() << "Target rps: " << rps;
+
+    //Circumference * ratio of 2PI to radians traveled
+    double linear_target = 2*PI*radius.get().toDouble() * (rps/(2*PI));
+    qDebug() << "Target linear velocity: " << linear_target << " m/s";
+
+    //Calculate lateral movement
+    b2Vec2 lateralVelocity = right * b2Dot( right, wheelBody->GetLinearVelocity() );
+
+    //Calculate linear movement
+    b2Vec2 forwardVelocity = front * b2Dot( front, wheelBody->GetLinearVelocity() );
+
+    qDebug() << "Current forward velocity: " << forwardVelocity.Length();
+    qDebug() << "Current lateral velocity: " << lateralVelocity.Length();
+
+    //Negate slip/slide
+    b2Vec2 impulse = -lateralVelocity * wheelBody->GetMass();
+    qDebug() << "Apply " << (-lateralVelocity).Length() << " lateral correction";
+    wheelBody->ApplyLinearImpulse( impulse, wheelBody->GetWorldCenter(), true );
+
+    impulse = front * (linear_target-forwardVelocity.Length()) * wheelBody->GetMass();
+    qDebug() << "Apply " << (linear_target-forwardVelocity.Length()) << " forward correction";
+    wheelBody->ApplyLinearImpulse( impulse, wheelBody->GetWorldCenter(), true );
 
     double x = wheelBody->GetWorldCenter().x;
     double y = wheelBody->GetWorldCenter().y;

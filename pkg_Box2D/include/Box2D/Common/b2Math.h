@@ -84,6 +84,11 @@ struct b2Vec2
 	{
 		x += v.x; y += v.y;
 	}
+
+        b2Vec2 operator +(const b2Vec2& v)
+        {
+                return b2Vec2(x+v.x, y+v.y);
+        }
 	
 	/// Subtract a vector from this vector.
 	void operator -= (const b2Vec2& v)
@@ -91,11 +96,21 @@ struct b2Vec2
 		x -= v.x; y -= v.y;
 	}
 
+        b2Vec2 operator -(const b2Vec2& v)
+        {
+                return b2Vec2(x-v.x, y-v.y);
+        }
+
 	/// Multiply this vector by a scalar.
 	void operator *= (float32 a)
 	{
 		x *= a; y *= a;
 	}
+
+        b2Vec2 operator *(float32 a)
+        {
+                return b2Vec2(x*a, y*a);
+        }
 
 	/// Get the length of this vector (the norm).
 	float32 Length() const

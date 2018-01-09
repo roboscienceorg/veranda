@@ -48,8 +48,8 @@ class Fixed_Wheel : public WorldObjectComponent_If
     Property driven = Property(PropertyInfo(false, false, PropertyInfo::BOOL, "Whether or not the wheel is driven"),
                                QVariant(false), &Property::bool_validator);
 
-    Property max_force = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                               "Maximum linear force the wheel can generate (Newtons?)"),
+    Property max_rps = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+                                               "Maximum radians per second the wheel can spin"),
                                                QVariant(1.0), &Property::abs_double_validator);
 
     QMap<QString, PropertyView> _properties{
@@ -60,7 +60,7 @@ class Fixed_Wheel : public WorldObjectComponent_If
         {"wheel_radius", &radius},
         {"wheel_width", &width},
         {"is_driven", &driven},
-        {"max_force", &max_force}
+        {"max_rps", &max_rps}
     };
 
     object_id objectId;
@@ -72,11 +72,11 @@ class Fixed_Wheel : public WorldObjectComponent_If
     b2Fixture* wheelFix = nullptr;
     b2Joint* weldJoint = nullptr;
     b2Vec2 localWheelFrontUnit;
-    b2Vec2 localWheelLeftUnit;
+    b2Vec2 localWheelRightUnit;
 
     //Data published
     double curr_percent = 0;
-    double curr_force = 0;
+    double curr_rps = 0;
 
 public:
     Fixed_Wheel(QObject* parent=nullptr);
@@ -112,7 +112,7 @@ private slots:
     void _buildModels();
     void _updateForce()
     {
-        curr_force = curr_percent*max_force.get().toDouble();
+        curr_rps = curr_percent*max_rps.get().toDouble();
     }
 
 public slots:

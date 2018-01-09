@@ -52,8 +52,8 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
         propsl["is_driven"].set(false, true);
         propsr["is_driven"].set(false, true);
 
-        propsl["max_force"].set(1, true);
-        propsr["max_force"].set(1, true);
+        propsl["max_rps"].set(3, true);
+        propsr["max_rps"].set(3, true);
 
         components.push_back(leftWheel);
         components.push_back(rightWheel);
