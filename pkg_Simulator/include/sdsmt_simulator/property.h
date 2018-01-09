@@ -65,6 +65,20 @@ public:
         return _old;
     }
 
+    static QVariant abs_double_validator(QVariant _old, QVariant _new)
+    {
+        return std::abs(double_validator(_old, _new).toDouble());
+    }
+
+    static QVariant angle_validator(QVariant _old, QVariant _new)
+    {
+        bool isDouble;
+        double asDouble = _new.toDouble(&isDouble);
+        if(isDouble && asDouble >= 0 && asDouble <= 360)
+            return _new;
+        return _old;
+    }
+
     Property(PropertyInfo info = PropertyInfo(), QVariant defaultValue="",
             const std::function<QVariant(QVariant, QVariant)> validator = [](QVariant, QVariant _new){ return _new; },
             QObject* parent=nullptr) :

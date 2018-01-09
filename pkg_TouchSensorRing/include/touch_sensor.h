@@ -104,8 +104,9 @@ public:
         return true;
     }
 
+    void generateBodies(b2World *world, object_id oId, b2Body *anchor);
+
 private slots:
-    QVector<b2JointDef*> setDynamicBodies(QVector<b2Body *> & bodies);
     void _channelChanged(QVariant);
     void _attachSensorFixture();
     void _buildModels();

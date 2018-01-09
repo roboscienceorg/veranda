@@ -77,13 +77,13 @@ void Touch_Sensor::disconnectChannels()
     _connected = false;
 }
 
-QVector<b2JointDef*> Touch_Sensor::setDynamicBodies(QVector<b2Body *> & bodies)
+void Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
-    sensorBody = bodies.at(0);
+    b2BodyDef bDef;
+    sensorBody = world->CreateBody(&bDef);
 
     _attachSensorFixture();
     _buildModels();
-    return {};
 }
 
 void Touch_Sensor::_attachSensorFixture()

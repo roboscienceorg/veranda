@@ -5,14 +5,14 @@
 
 #include <sdsmt_simulator/world_object_component_plugin.h>
 
-class Touch_Sensor_Plugin : public QObject, public WorldObjectComponent_Plugin_If
+class Fixed_Wheel_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.touchring")
+    Q_PLUGIN_METADATA(IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.fixedwheel")
     Q_INTERFACES(WorldObjectComponent_Plugin_If)
 
 public:
-    Touch_Sensor_Plugin();
+    Fixed_Wheel_Plugin();
     WorldObjectComponent_If* createComponent();
 
 };

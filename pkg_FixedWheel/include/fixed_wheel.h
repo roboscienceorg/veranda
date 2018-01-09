@@ -2,7 +2,7 @@
 #define FIXED_WHEEL_H
 
 #include "ros/ros.h"
-#include "std_msgs/ByteMultiArray.h"
+#include "std_msgs/Float32.h"
 
 #include <sdsmt_simulator/world_object_component_if.h>
 
@@ -25,26 +25,38 @@ class Fixed_Wheel : public WorldObjectComponent_If
     ros::NodeHandle _rosNode;
     ros::Subscriber _receiveChannel;
 
+    Property x_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X location of component within object"),
+                                QVariant(0.0), &Property::abs_double_validator);
+
+    Property y_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y location of component within object"),
+                                QVariant(0.0), &Property::abs_double_validator);
+
+    Property theta_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of component within object"),
+                                QVariant(0.0), &Property::angle_validator);
+
     Property input_channel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
                                                     "Input channel for drive speed"), "");
 
     Property radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                     "Wheel radius (meters)"), QVariant(0.1),
-                                    &Property::double_validator);
+                                    &Property::abs_double_validator);
 
     Property width = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                   "Wheel width (meters)"), QVariant(0.0),
-                                  &Property::double_validator);
+                                  &Property::abs_double_validator);
 
     Property driven = Property(PropertyInfo(false, false, PropertyInfo::BOOL, "Whether or not the wheel is driven"),
                                QVariant(false), &Property::bool_validator);
 
     Property max_force = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                                "Maximum linear force the wheel can generate (Newtons?)"),
-                                               QVariant(1.0), Property::double_validator);
+                                               QVariant(1.0), &Property::abs_double_validator);
 
     QMap<QString, PropertyView> _properties{
         {"channels/input_speed", &input_channel},
+        {"x_local", &x_local},
+        {"y_local", &y_local},
+        {"theta_local", &theta_local},
         {"wheel_radius", &radius},
         {"wheel_width", &width},
         {"is_driven", &driven},
@@ -52,15 +64,14 @@ class Fixed_Wheel : public WorldObjectComponent_If
     };
 
     Model* wheel_model = nullptr;
+    b2Shape* wheel_shape = nullptr;
 
     b2Body* wheelBody = nullptr;
     b2Fixture* wheelFix = nullptr;
 
     //Data published
-    double curr_speed;
-
-    //Track of what's shown
-    QSet<int> active_touches;
+    double curr_percent = 0;
+    double curr_force = 0;
 
 public:
     Fixed_Wheel(QObject* parent=nullptr);
@@ -83,11 +94,20 @@ public:
         return true;
     }
 
+    void generateBodies(b2World* world, object_id oId, b2Body* anchor);
+
+signals:
+    void _receiveMessage(std_msgs::Float32 data);
+
 private slots:
-    QVector<b2JointDef*> setDynamicBodies(QVector<b2Body *> & bodies);
-    void _channelChanged(QVariant);
+    void _processMessage(std_msgs::Float32 data);
+    void _refreshChannel(QVariant);
     void _attachWheelFixture();
     void _buildModels();
+    void _updateForce()
+    {
+        curr_force = curr_percent*max_force.get().toDouble();
+    }
 
 public slots:
     //Connects to all ROS topics

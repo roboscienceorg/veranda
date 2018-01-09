@@ -1,12 +1,12 @@
 #include "fixed_wheel_plugin.h"
 #include "fixed_wheel.h"
 
-Touch_Sensor_Plugin::Touch_Sensor_Plugin()
+Fixed_Wheel_Plugin::Fixed_Wheel_Plugin()
 {
 
 }
 
-WorldObjectComponent_If* Touch_Sensor_Plugin::createComponent()
+WorldObjectComponent_If* Fixed_Wheel_Plugin::createComponent()
 {
-    return new Touch_Sensor;
+    return new Fixed_Wheel;
 }
