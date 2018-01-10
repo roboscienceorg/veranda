@@ -83,7 +83,7 @@ void Fixed_Wheel::_attachWheelFixture()
         b2FixtureDef fixDef;
         b2PolygonShape wheel;
 
-        wheel.SetAsBox(radius.get().toDouble()*2, width.get().toDouble());
+        wheel.SetAsBox(radius.get().toDouble(), width.get().toDouble()/2.0);
 
         fixDef.isSensor = false;
         fixDef.shape = &wheel;
@@ -138,13 +138,19 @@ void Fixed_Wheel::disconnectChannels()
 
 void Fixed_Wheel::_buildModels()
 {
-    b2PolygonShape* sh = new b2PolygonShape;
-    sh->SetAsBox(radius.get().toDouble()*2, width.get().toDouble());
+    wheel_model->removeShapes(wheel_shapes);
+    qDeleteAll(wheel_shapes);
+    wheel_shapes.clear();
 
-    wheel_model->removeShapes(QVector<b2Shape*>{wheel_shape});
-    wheel_model->addShapes(QVector<b2Shape*>{sh});
-    delete wheel_shape;
-    wheel_shape = sh;
+    b2PolygonShape* sh = new b2PolygonShape;
+    sh->SetAsBox(radius.get().toDouble(), width.get().toDouble()/2.0);
+
+    b2EdgeShape* line = new b2EdgeShape;
+    line->m_vertex1 = b2Vec2(0, 0);
+    line->m_vertex2 = b2Vec2(radius.get().toDouble(), 0);
+
+    wheel_shapes = QVector<b2Shape*>{sh, line};
+    wheel_model->addShapes(wheel_shapes);
 }
 
 void Fixed_Wheel::worldTicked(const b2World*, const double)
@@ -171,13 +177,13 @@ void Fixed_Wheel::worldTicked(const b2World*, const double)
     qDebug() << "Current lateral velocity: " << lateralVelocity.Length();
 
     //Negate slip/slide
-    b2Vec2 impulse = -lateralVelocity * wheelBody->GetMass();
+    b2Vec2 impulse1 = -lateralVelocity * wheelBody->GetMass();
     qDebug() << "Apply " << (-lateralVelocity).Length() << " lateral correction";
-    wheelBody->ApplyLinearImpulse( impulse, wheelBody->GetWorldCenter(), true );
 
-    impulse = front * (linear_target-forwardVelocity.Length()) * wheelBody->GetMass();
+    b2Vec2 impulse2 = front * (linear_target-forwardVelocity.Length()) * wheelBody->GetMass();
     qDebug() << "Apply " << (linear_target-forwardVelocity.Length()) << " forward correction";
-    wheelBody->ApplyLinearImpulse( impulse, wheelBody->GetWorldCenter(), true );
+
+    //wheelBody->ApplyLinearImpulse( impulse1 + impulse2, wheelBody->GetWorldCenter(), true );
 
     double x = wheelBody->GetWorldCenter().x;
     double y = wheelBody->GetWorldCenter().y;

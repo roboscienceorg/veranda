@@ -21,7 +21,7 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
         props["ring_radius"].set(1, true);
         props["sensor_count"].set(10, true);
 
-        components.push_back(touchRing);
+        //components.push_back(touchRing);
     }
 
     if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.fixedwheel"))
@@ -34,8 +34,8 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
         QMap<QString, PropertyView> propsl = leftWheel->getProperties();
         QMap<QString, PropertyView> propsr = rightWheel->getProperties();
 
-        propsl["x_local"].set(-0.5, true);
-        propsr["x_local"].set(0.5, true);
+        propsl["x_local"].set(-1.5, true);
+        propsr["x_local"].set(1.5, true);
 
         propsl["y_local"].set(0, true);
         propsr["y_local"].set(0, true);
@@ -43,16 +43,16 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
         propsl["theta_local"].set(90, true);
         propsr["theta_local"].set(90, true);
 
-        propsl["wheel_radius"].set(0.25, true);
-        propsr["wheel_radius"].set(0.25, true);
+        propsl["wheel_radius"].set(0.75, true);
+        propsr["wheel_radius"].set(0.75, true);
 
-        propsl["wheel_width"].set(0.25, true);
-        propsr["wheel_width"].set(0.25, true);
+        propsl["wheel_width"].set(0.5, true);
+        propsr["wheel_width"].set(0.5, true);
 
         propsl["is_driven"].set(false, true);
         propsr["is_driven"].set(false, true);
 
-        propsl["max_rps"].set(3, true);
+        propsl["max_rps"].set(0, true);
         propsr["max_rps"].set(3, true);
 
         components.push_back(leftWheel);

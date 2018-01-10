@@ -22,6 +22,12 @@ class WorldObject : public QObject
 
     Property _objName;
 
+    Model* debugModel = nullptr;
+    Model* debugModel2 = nullptr;
+
+    b2Body* anchorBody = nullptr;
+    b2Body* tempBody = nullptr;
+
     QVector<Model*> _models;
     QMap<QString, PropertyView> _properties
     {
@@ -50,6 +56,8 @@ public:
 
     //Physics Interactions
     void generateBodies(b2World* world, object_id oId);
+
+    void clearBodies(b2World* world);
 
 public slots:
     void connectChannels();

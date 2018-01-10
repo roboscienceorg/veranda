@@ -66,7 +66,7 @@ class Fixed_Wheel : public WorldObjectComponent_If
     object_id objectId;
 
     Model* wheel_model = nullptr;
-    b2Shape* wheel_shape = nullptr;
+    QVector<b2Shape*> wheel_shapes;
 
     b2Body* wheelBody = nullptr;
     b2Fixture* wheelFix = nullptr;
