@@ -56,7 +56,7 @@ WorldObject::WorldObject(QVector<WorldObjectComponent_If *> components, QObject 
     }
 
     debugModel = new Model();
-    _models += debugModel;
+    //_models += debugModel;
 }
 
 WorldObject* WorldObject::clone(QObject *newParent)
@@ -67,6 +67,9 @@ WorldObject* WorldObject::clone(QObject *newParent)
 
     WorldObject* copy = new WorldObject(childClones, newParent);
     copy->_objName.set(_objName.get());
+    copy->_locX.set(_locX.get());
+    copy->_locY.set(_locY.get());
+    copy->_locTheta.set(_locTheta.get());
 
     return copy;
 }
@@ -89,6 +92,8 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
 {
     clearBodies(world);
 
+    qDebug() << "Creating object at " << _locX.get().toDouble() << ", " << _locY.get().toDouble() << " : " << _locTheta.get().toDouble();
+
     QVector<WorldObjectComponent_If*> components = getComponents();
 
     b2BodyDef anchorDef;
@@ -109,7 +114,16 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
     debugModel->addShapes(QVector<b2Shape*>{circ});
 
     for(int i = 0; i < components.size(); i++)
-        components[i]->generateBodies(world, oId, anchorBody);
+    {
+        QVector<b2Body*> componentBodies = components[i]->generateBodies(world, oId, anchorBody);
+
+        //Transform component bodies to starting orientation
+        for(b2Body* b : componentBodies)
+        _transformToStart(b);
+    }
+
+    //Transform main body to starting orientation
+    _transformToStart(anchorBody);
 }
 
 void WorldObject::connectChannels()
@@ -132,12 +146,32 @@ void WorldObject::disconnectChannels()
 
 void WorldObject::worldTicked(const b2World* w, const double t)
 {
-    debugModel->setTransform(anchorBody->GetPosition().x, anchorBody->GetPosition().y, anchorBody->GetAngle()*(180/(22.0/7)));
+    debugModel->setTransform(anchorBody->GetPosition().x, anchorBody->GetPosition().y, anchorBody->GetAngle()*RAD2DEG);
 
-    //qDebug() << "Main body speed: " << anchorBody->GetLinearVelocity().x << ", " << anchorBody->GetLinearVelocity().y;
+    _locX.set(anchorBody->GetPosition().x);
+    _locY.set(anchorBody->GetPosition().y);
+    _locTheta.set(anchorBody->GetAngle()*RAD2DEG);
 
     for(WorldObjectComponent_If* c : _components)
         c->worldTicked(w, t);
+}
 
-    //qDebug() << "";
+void WorldObject::_transformToStart(b2Body* body)
+{
+    double cosT = cos(_locTheta.get().toDouble()*DEG2RAD);
+    double sinT = sin(_locTheta.get().toDouble()*DEG2RAD);
+
+    b2Vec2 relativeLoc = body->GetWorldCenter();
+
+    //Apply rotation matrix
+    b2Vec2 newLoc;
+    newLoc.x = cosT * relativeLoc.x - sinT * relativeLoc.y;
+    newLoc.y = sinT * relativeLoc.x + cosT * relativeLoc.y;
+
+    //Offset
+    newLoc += b2Vec2(_locX.get().toDouble(), _locY.get().toDouble());
+
+    qDebug() << "Moved body from " << relativeLoc.x << ", " << relativeLoc.y << " : " << body->GetAngle();
+    qDebug() << "Result: " << newLoc.x << ", " << newLoc.y << " : " << body->GetAngle() + _locTheta.get().toDouble()*DEG2RAD;
+    body->SetTransform(newLoc, body->GetAngle() + _locTheta.get().toDouble()*DEG2RAD);
 }

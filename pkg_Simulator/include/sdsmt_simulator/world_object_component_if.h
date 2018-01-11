@@ -27,7 +27,7 @@ public:
 
     virtual bool usesChannels() = 0;
 
-    virtual void generateBodies(b2World* world, object_id oId, b2Body* anchor) = 0;
+    virtual QVector<b2Body*> generateBodies(b2World* world, object_id oId, b2Body* anchor) = 0;
     virtual void clearBodies(b2World* world) = 0;
 
 public slots:

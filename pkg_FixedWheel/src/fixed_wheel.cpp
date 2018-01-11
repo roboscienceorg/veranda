@@ -26,7 +26,7 @@ Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent_If(parent)
     _wheelModel = new Model({}, {}, this);
 }
 
-void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
+QVector<b2Body*> Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
 {
     clearBodies(world);
 
@@ -49,6 +49,8 @@ void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
 
     _attachWheelFixture();
     _buildModels();
+
+    return {_wheelBody};
 }
 
 void Fixed_Wheel::clearBodies(b2World *world)

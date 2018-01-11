@@ -102,7 +102,6 @@ public:
 
     void set(const QVariant& v)
     {
-        //qDebug() << "Setting property from origin" << this;
         _set(v);
     }
 

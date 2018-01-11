@@ -11,16 +11,31 @@
 #include "sdsmt_simulator/property.h"
 
 #include "Box2D/Box2D.h"
+#include <QVariant>
 
 class WorldObject : public QObject
 {
     Q_OBJECT
+
+    constexpr static double PI = 3.14159265359;
+    constexpr static double RAD2DEG = 360.0/(2*PI);
+    constexpr static double DEG2RAD = 1.0/RAD2DEG;
+
+    void _transformToStart(b2Body* body);
 
     QVector<WorldObjectComponent_If*> _components;
 
     bool _useChannels = false;
 
     Property _objName;
+    Property _locX = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X coord of the object"),
+                                QVariant(0.0), &Property::double_validator);
+
+    Property _locY = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y coord of the object"),
+                                QVariant(0.0), &Property::double_validator);
+
+    Property _locTheta = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of the object"),
+                                QVariant(0.0), &Property::angle_validator);
 
     Model* debugModel = nullptr;
     b2Body* anchorBody = nullptr;
@@ -28,7 +43,10 @@ class WorldObject : public QObject
     QVector<Model*> _models;
     QMap<QString, PropertyView> _properties
     {
-        {"name", &_objName}
+        {"name", &_objName},
+        {"X", &_locX},
+        {"Y", &_locY},
+        {"Theta", &_locTheta}
     };
 
 public:
@@ -45,7 +63,7 @@ public:
     { return _models; }
 
     //UI Interactions
-    QMap<QString, PropertyView> getProperties()
+    QMap<QString, PropertyView>& getProperties()
     { return _properties; }
 
     bool usesChannels()
@@ -75,7 +93,7 @@ public:
     { return _obj->getModels(); }
 
     //UI Interactions
-    QMap<QString, PropertyView> getProperties()
+    QMap<QString, PropertyView>& getProperties()
     { return _obj->getProperties(); }
 
     bool usesChannels()

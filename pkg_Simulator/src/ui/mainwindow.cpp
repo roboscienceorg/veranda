@@ -289,7 +289,7 @@ void MainWindow::objectSelected(object_id id)
         WorldObjectProperties* obj = worldObjects[id];
         QStandardItemModel* model = propertiesModel;
 
-        QMap<QString, PropertyView> objProps = obj->getProperties();
+        QMap<QString, PropertyView>& objProps = obj->getProperties();
         model->setRowCount(objProps.size());
 
         int i = 0;
@@ -306,9 +306,9 @@ void MainWindow::objectSelected(object_id id)
            model->setData(ind, iter.value().get());
 
            //Update value when it changes
-           connect(&iter.value(), &PropertyView::valueSet, [i, model, ind](QVariant v)
+           connect(&iter.value(), &PropertyView::valueSet, [i, model](QVariant v)
            {
-               model->setData(ind, v);
+               model->setData(model->index(i, 1), v);
            });
 
            displayed_properties[i] = iter.key();
