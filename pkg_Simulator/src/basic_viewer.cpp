@@ -272,7 +272,7 @@ QColor BasicViewer::_color(DrawLevel level, bool selected)
     QColor out(0, 0, 0);
 
     if(selected)
-        out.setRgb(37, 249, 83);
+        out.setRgb(50, 163, 103);
 
     switch(level)
     {
@@ -293,12 +293,18 @@ QColor BasicViewer::_color(DrawLevel level, bool selected)
 //Sets a graphics item and all it's children to a specific color pen
 void BasicViewer::_setOutlineColor(QGraphicsItem* item, const QColor& color)
 {
-    QAbstractGraphicsShapeItem* asShape = qgraphicsitem_cast<QAbstractGraphicsShapeItem*>(item);
+    QAbstractGraphicsShapeItem* asShape = dynamic_cast<QAbstractGraphicsShapeItem*>(item);
 
     if(asShape)
     {
-        //Unsure why, but this segfaults
-        //asShape->setPen(QPen(color));
+        asShape->setPen(QPen(color));
+    }
+    else
+    {
+        //QGraphicsLine is not a QAbstractGraphicsShapeItem so it needs to be a special check
+        QGraphicsLineItem* asLine = dynamic_cast<QGraphicsLineItem*>(item);
+        if(asLine)
+            asLine->setPen(QPen(color));
     }
 
     for(QGraphicsItem* i : item->childItems())
