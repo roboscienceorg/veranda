@@ -23,10 +23,7 @@ class WorldObject : public QObject
     Property _objName;
 
     Model* debugModel = nullptr;
-    Model* debugModel2 = nullptr;
-
     b2Body* anchorBody = nullptr;
-    b2Body* tempBody = nullptr;
 
     QVector<Model*> _models;
     QMap<QString, PropertyView> _properties

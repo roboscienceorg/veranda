@@ -137,6 +137,7 @@ void Touch_Sensor::_attachSensorFixture()
         fixDef.isSensor = false;
         fixDef.shape = &sensorRing;
         fixDef.filter.groupIndex = -objectId;
+        fixDef.density = 1;
 
         sensorFix = sensorBody->CreateFixture(&fixDef);
     }

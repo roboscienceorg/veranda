@@ -56,9 +56,7 @@ WorldObject::WorldObject(QVector<WorldObjectComponent_If *> components, QObject 
     }
 
     debugModel = new Model();
-    debugModel2 = new Model();
     _models += debugModel;
-    _models += debugModel2;
 }
 
 WorldObject* WorldObject::clone(QObject *newParent)
@@ -96,44 +94,22 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
     b2BodyDef anchorDef;
     anchorDef.type = b2_dynamicBody;
     anchorDef.position.Set(0,0);
-    anchorDef.allowSleep = false;
-    anchorDef.fixedRotation = false;
     anchorBody = world->CreateBody(&anchorDef);
-
-    anchorDef.position.Set(1, 0);
-    tempBody = world->CreateBody(&anchorDef);
 
     b2CircleShape* circ = new b2CircleShape;
     circ->m_p = b2Vec2(0, 0);
     circ->m_radius = 1;
 
-    b2EdgeShape* line = new b2EdgeShape;
-    line->m_vertex1 = b2Vec2(0, 0);
-    line->m_vertex2 = b2Vec2(0, 1);
-
     b2FixtureDef fix;
     fix.shape = circ;
     fix.density = 1;
+    fix.isSensor = true;
     anchorBody->CreateFixture(&fix);
 
-    fix.shape = line;
-    fix.density = 1;
-    tempBody->CreateFixture(&fix);
+    debugModel->addShapes(QVector<b2Shape*>{circ});
 
-    b2WeldJointDef weld;
-    weld.Initialize(anchorBody, tempBody, anchorBody->GetWorldCenter());
-    weld.collideConnected = false;
-    weld.frequencyHz = 0;
-    world->CreateJoint(&weld);
-
-    debugModel->addShapes(QVector<b2Shape*>{circ, line});
-    debugModel2->addShapes(QVector<b2Shape*>{line});
-
-    anchorBody->ApplyLinearImpulseToCenter(b2Vec2(0, 3), true);
-    anchorBody->ApplyAngularImpulse(10, true);
-
-    //for(int i = 0; i < components.size(); i++)
-        //components[i]->generateBodies(world, oId, anchorBody);
+    for(int i = 0; i < components.size(); i++)
+        components[i]->generateBodies(world, oId, anchorBody);
 }
 
 void WorldObject::connectChannels()
@@ -156,13 +132,12 @@ void WorldObject::disconnectChannels()
 
 void WorldObject::worldTicked(const b2World* w, const double t)
 {
-    qDebug() << "Main Object";
-    qDebug() << anchorBody->GetPosition().x << ", " << anchorBody->GetPosition().y;
-    qDebug() << anchorBody->GetLinearVelocity().x << ", " << anchorBody->GetLinearVelocity().y << " : " << anchorBody->GetAngularVelocity();
-
     debugModel->setTransform(anchorBody->GetPosition().x, anchorBody->GetPosition().y, anchorBody->GetAngle()*(180/(22.0/7)));
-    debugModel2->setTransform(tempBody->GetPosition().x, tempBody->GetPosition().y, tempBody->GetAngle()*(180/(22.0/7)));
 
-    //for(WorldObjectComponent_If* c : _components)
-        //c->worldTicked(w, t);
+    //qDebug() << "Main body speed: " << anchorBody->GetLinearVelocity().x << ", " << anchorBody->GetLinearVelocity().y;
+
+    for(WorldObjectComponent_If* c : _components)
+        c->worldTicked(w, t);
+
+    //qDebug() << "";
 }

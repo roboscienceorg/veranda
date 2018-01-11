@@ -1,14 +1,12 @@
 import rospy
-from std_msgs.msg import Float64MultiArray
-from std_msgs.msg import MultiArrayLayout
-from std_msgs.msg import MultiArrayDimension
+from std_msgs.msg import Float32
 import math
 import numpy as np
 from scipy.misc import derivative
 
 # Robot parameters
-R = 0.2
-L = 1
+R = 0.75
+L = 1.5
 
 # Location Functions to form a figure 8 of the necessary size
 def x_t(t, scale=1.0):
@@ -39,22 +37,14 @@ def DD_IK(x_t, y_t, t, scale):
 
 # Publishes a set of wheel velocities
 # in the format required by the STDR
-def publishWheelVelocity(pub, phi1, phi2):
-    layout = MultiArrayLayout()
-    layout.dim.insert(0, [MultiArrayDimension()] )
-
-    data = Float64MultiArray(data=[])
-    data.layout = MultiArrayLayout()
-    data.layout.dim = [MultiArrayDimension()]
-    data.layout.dim[0].label = "Parameters"
-    data.layout.dim[0].size = 2
-    data.layout.dim[0].stride = 1
-    data.data = [phi1, phi2]
-    pub.publish(data)
+def publishWheelVelocity(publeft, pubright, phi1, phi2):
+    publeft.publish(phi1)
+    pubright.publish(phi2)
 
 
 if __name__ == '__main__':
-        pub = rospy.Publisher('robot0/wheel_velocities', Float64MultiArray, queue_size=1)
+        publeft = rospy.Publisher('robot0/left_wheel', Float32, queue_size=1)
+        pubright = rospy.Publisher('robot0/right_wheel', Float32, queue_size=1)
         rospy.init_node('talker', anonymous=True)
         
         # Factor to scale down speed by
@@ -82,5 +72,5 @@ if __name__ == '__main__':
             time += dt
 
             # Publish velocities
-            publishWheelVelocity(pub, phi1, phi2)
+            publishWheelVelocity(publeft, pubright, phi1, phi2)
             rate.sleep()

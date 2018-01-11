@@ -19,64 +19,57 @@ class Fixed_Wheel : public WorldObjectComponent_If
     constexpr static double RAD2DEG = 360.0/(2*PI);
     constexpr static double DEG2RAD = 1.0/RAD2DEG;
 
-    QString _inputChannel;
     bool _connected = false;
 
     ros::NodeHandle _rosNode;
     ros::Subscriber _receiveChannel;
 
-    Property x_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X location of component within object"),
+    Property _xLocal = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X location of component within object"),
                                 QVariant(0.0), &Property::double_validator);
 
-    Property y_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y location of component within object"),
+    Property _yLocal = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y location of component within object"),
                                 QVariant(0.0), &Property::double_validator);
 
-    Property theta_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of component within object"),
+    Property _thetaLocal = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of component within object"),
                                 QVariant(0.0), &Property::angle_validator);
 
-    Property input_channel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
+    Property _inputChannel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
                                                     "Input channel for drive speed"), "");
 
-    Property radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property _radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                     "Wheel radius (meters)"), QVariant(0.1),
                                     &Property::abs_double_validator);
 
-    Property width = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property _width = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                   "Wheel width (meters)"), QVariant(0.0),
                                   &Property::abs_double_validator);
 
-    Property driven = Property(PropertyInfo(false, false, PropertyInfo::BOOL, "Whether or not the wheel is driven"),
+    Property _driven = Property(PropertyInfo(false, false, PropertyInfo::BOOL, "Whether or not the wheel is driven"),
                                QVariant(false), &Property::bool_validator);
 
-    Property max_rps = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                               "Maximum radians per second the wheel can spin"),
-                                               QVariant(1.0), &Property::abs_double_validator);
-
     QMap<QString, PropertyView> _properties{
-        {"channels/input_speed", &input_channel},
-        {"x_local", &x_local},
-        {"y_local", &y_local},
-        {"theta_local", &theta_local},
-        {"wheel_radius", &radius},
-        {"wheel_width", &width},
-        {"is_driven", &driven},
-        {"max_rps", &max_rps}
+        {"channels/input_speed", &_inputChannel},
+        {"x_local", &_xLocal},
+        {"y_local", &_yLocal},
+        {"theta_local", &_thetaLocal},
+        {"wheel_radius", &_radius},
+        {"wheel_width", &_width},
+        {"is_driven", &_driven}
     };
 
-    object_id objectId;
+    object_id _objectId;
 
-    Model* wheel_model = nullptr;
-    QVector<b2Shape*> wheel_shapes;
+    Model* _wheelModel = nullptr;
+    QVector<b2Shape*> _wheelShapes;
 
-    b2Body* wheelBody = nullptr;
-    b2Fixture* wheelFix = nullptr;
-    b2Joint* weldJoint = nullptr;
-    b2Vec2 localWheelFrontUnit;
-    b2Vec2 localWheelRightUnit;
+    b2Body* _wheelBody = nullptr;
+    b2Fixture* _wheelFix = nullptr;
+    b2Joint* _weldJoint = nullptr;
+    b2Vec2 _localWheelFrontUnit;
+    b2Vec2 _localWheelRightUnit;
 
     //Data published
-    double curr_percent = 0;
-    double curr_rps = 0;
+    double _targetAngularVelocity;
 
 public:
     Fixed_Wheel(QObject* parent=nullptr);
@@ -92,7 +85,7 @@ public:
     }
 
     QVector<Model*> getModels(){
-        return {wheel_model};
+        return {_wheelModel};
     }
 
     bool usesChannels(){
@@ -110,10 +103,6 @@ private slots:
     void _refreshChannel(QVariant);
     void _attachWheelFixture();
     void _buildModels();
-    void _updateForce()
-    {
-        curr_rps = curr_percent*max_rps.get().toDouble();
-    }
 
 public slots:
     //Connects to all ROS topics

@@ -9,24 +9,21 @@ Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent_If(parent)
     qRegisterMetaType<std_msgs::Float32>("std_msgs::Float32");
 
     //Update channel in if name or driven status changes
-    connect(&input_channel, &Property::valueSet, this, &Fixed_Wheel::_refreshChannel);
-    connect(&driven, &Property::valueSet, this, &Fixed_Wheel::_refreshChannel);
+    connect(&_inputChannel, &Property::valueSet, this, &Fixed_Wheel::_refreshChannel);
+    connect(&_driven, &Property::valueSet, this, &Fixed_Wheel::_refreshChannel);
 
     //Update box2d interface
-    connect(&radius, &Property::valueSet, this, &Fixed_Wheel::_attachWheelFixture);
-    connect(&width, &Property::valueSet, this, &Fixed_Wheel::_attachWheelFixture);
+    connect(&_radius, &Property::valueSet, this, &Fixed_Wheel::_attachWheelFixture);
+    connect(&_width, &Property::valueSet, this, &Fixed_Wheel::_attachWheelFixture);
 
     //Update drawn model
-    connect(&radius, &Property::valueSet, this, &Fixed_Wheel::_buildModels);
-    connect(&width, &Property::valueSet, this, &Fixed_Wheel::_buildModels);
-
-    //Update current force when max force changes
-    connect(&max_rps, &Property::valueSet, this, &Fixed_Wheel::_updateForce);
+    connect(&_radius, &Property::valueSet, this, &Fixed_Wheel::_buildModels);
+    connect(&_width, &Property::valueSet, this, &Fixed_Wheel::_buildModels);
 
     //Signal slot connection to correctly thread incomming messages
     connect(this, &Fixed_Wheel::_receiveMessage, this, &Fixed_Wheel::_processMessage);
 
-    wheel_model = new Model({}, {}, this);
+    _wheelModel = new Model({}, {}, this);
 }
 
 void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
@@ -34,21 +31,21 @@ void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
     clearBodies(world);
 
     b2BodyDef bDef;
-    bDef.angle = theta_local.get().toDouble()*DEG2RAD;
-    bDef.position = b2Vec2(x_local.get().toDouble(), y_local.get().toDouble());
+    bDef.angle = _thetaLocal.get().toDouble()*DEG2RAD;
+    bDef.position = b2Vec2(_xLocal.get().toDouble(), _yLocal.get().toDouble());
     bDef.type = b2_dynamicBody;
-    wheelBody = world->CreateBody(&bDef);
+    _wheelBody = world->CreateBody(&bDef);
 
     b2WeldJointDef weldDef;
     auto anchorPt = anchor->GetWorldCenter();
     weldDef.bodyA = anchor;
-    weldDef.bodyB = wheelBody;
+    weldDef.bodyB = _wheelBody;
     weldDef.localAnchorA = anchor->GetLocalPoint(anchorPt);
-    weldDef.localAnchorB = wheelBody->GetLocalPoint(anchorPt);
-    weldDef.referenceAngle = wheelBody->GetAngle() - anchor->GetAngle();
-    weldJoint = world->CreateJoint(&weldDef);
+    weldDef.localAnchorB = _wheelBody->GetLocalPoint(anchorPt);
+    weldDef.referenceAngle = _wheelBody->GetAngle() - anchor->GetAngle();
+    _weldJoint = world->CreateJoint(&weldDef);
 
-    objectId = oId;
+    _objectId = oId;
 
     _attachWheelFixture();
     _buildModels();
@@ -56,43 +53,44 @@ void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
 
 void Fixed_Wheel::clearBodies(b2World *world)
 {
-    if(nullptr != wheelBody)
+    if(nullptr != _wheelBody)
     {
-        world->DestroyJoint(weldJoint);
-        world->DestroyBody(wheelBody);
+        world->DestroyJoint(_weldJoint);
+        world->DestroyBody(_wheelBody);
 
-        weldJoint = nullptr;
-        wheelBody = nullptr;
-        wheelFix = nullptr;
+        _weldJoint = nullptr;
+        _wheelBody = nullptr;
+        _wheelFix = nullptr;
     }
 }
 
 void Fixed_Wheel::_attachWheelFixture()
 {
     //Can only add fixture if body defined
-    if(wheelBody)
+    if(_wheelBody)
     {
         //If old fixture, remove it
-        if(wheelFix)
+        if(_wheelFix)
         {
-            wheelBody->DestroyFixture(wheelFix);
-            wheelFix = nullptr;
+            _wheelBody->DestroyFixture(_wheelFix);
+            _wheelFix = nullptr;
         }
 
         //Create rectangle to represent the wheel from top down
         b2FixtureDef fixDef;
         b2PolygonShape wheel;
 
-        wheel.SetAsBox(radius.get().toDouble(), width.get().toDouble()/2.0);
+        wheel.SetAsBox(_radius.get().toDouble(), _width.get().toDouble()/2.0);
 
         fixDef.isSensor = false;
         fixDef.shape = &wheel;
-        fixDef.filter.groupIndex = -objectId;
+        fixDef.filter.groupIndex = -_objectId;
+        fixDef.density = 1;
 
-        wheelFix = wheelBody->CreateFixture(&fixDef);
+        _wheelFix = _wheelBody->CreateFixture(&fixDef);
 
-        localWheelFrontUnit = b2Vec2(1, 0);
-        localWheelRightUnit = b2Vec2(0, 1);
+        _localWheelFrontUnit = b2Vec2(1, 0);
+        _localWheelRightUnit = b2Vec2(0, 1);
     }
 }
 
@@ -100,14 +98,13 @@ WorldObjectComponent_If *Fixed_Wheel::clone(QObject *newParent)
 {
     Fixed_Wheel* out = new Fixed_Wheel(newParent);
 
-    out->input_channel.set(input_channel.get());
-    out->radius.set(radius.get());
-    out->width.set(width.get());
-    out->max_rps.set(max_rps.get());
-    out->driven.set(driven.get());
-    out->x_local.set(x_local.get());
-    out->y_local.set(y_local.get());
-    out->theta_local.set(theta_local.get());
+    out->_inputChannel.set(_inputChannel.get());
+    out->_radius.set(_radius.get());
+    out->_width.set(_width.get());
+    out->_driven.set(_driven.get());
+    out->_xLocal.set(_xLocal.get());
+    out->_yLocal.set(_yLocal.get());
+    out->_thetaLocal.set(_thetaLocal.get());
 
     return out;
 }
@@ -124,10 +121,12 @@ void Fixed_Wheel::connectChannels()
         disconnectChannels();
 
     //Only listen when the wheel is driven
-    if(driven.get().toBool())
-        _inputChannel = input_channel.get().toString();
-        _receiveChannel = _rosNode.subscribe(_inputChannel.toStdString(), 5, &Fixed_Wheel::_receiveMessage, this);
+    if(_driven.get().toBool())
+    {
+        QString inputChannel = _inputChannel.get().toString();
+        _receiveChannel = _rosNode.subscribe(inputChannel.toStdString(), 5, &Fixed_Wheel::_receiveMessage, this);
         _connected = true;
+    }
 }
 
 void Fixed_Wheel::disconnectChannels()
@@ -138,60 +137,50 @@ void Fixed_Wheel::disconnectChannels()
 
 void Fixed_Wheel::_buildModels()
 {
-    wheel_model->removeShapes(wheel_shapes);
-    qDeleteAll(wheel_shapes);
-    wheel_shapes.clear();
+    _wheelModel->removeShapes(_wheelShapes);
+    qDeleteAll(_wheelShapes);
+    _wheelShapes.clear();
 
     b2PolygonShape* sh = new b2PolygonShape;
-    sh->SetAsBox(radius.get().toDouble(), width.get().toDouble()/2.0);
+    sh->SetAsBox(_radius.get().toDouble(), _width.get().toDouble()/2.0);
 
     b2EdgeShape* line = new b2EdgeShape;
     line->m_vertex1 = b2Vec2(0, 0);
-    line->m_vertex2 = b2Vec2(radius.get().toDouble(), 0);
+    line->m_vertex2 = b2Vec2(_radius.get().toDouble(), 0);
 
-    wheel_shapes = QVector<b2Shape*>{sh, line};
-    wheel_model->addShapes(wheel_shapes);
+    _wheelShapes = QVector<b2Shape*>{sh, line};
+    _wheelModel->addShapes(_wheelShapes);
 }
 
 void Fixed_Wheel::worldTicked(const b2World*, const double)
 {
-    qDebug() << "Wheel at " << wheelBody->GetPosition().x << ", " << wheelBody->GetPosition().y;
+    b2Vec2 front = _wheelBody->GetWorldVector(_localWheelFrontUnit);
+    b2Vec2 right = _wheelBody->GetWorldVector(_localWheelRightUnit);
 
-    b2Vec2 front = wheelBody->GetWorldVector(localWheelFrontUnit);
-    b2Vec2 right = wheelBody->GetWorldVector(localWheelRightUnit);
-
-    double rps = max_rps.get().toDouble();
-    qDebug() << "Target rps: " << rps;
-
+    //Calculation to find target velocity from
+    //rotations per second; original idea was to behave more line
+    //real moter controller
     //Circumference * ratio of 2PI to radians traveled
-    double linear_target = 2*PI*radius.get().toDouble() * (rps/(2*PI));
-    qDebug() << "Target linear velocity: " << linear_target << " m/s";
+    double targetVelocity = 2*PI*_radius.get().toDouble() * (_targetAngularVelocity/(2*PI));
 
     //Calculate lateral movement
-    b2Vec2 lateralVelocity = right * b2Dot( right, wheelBody->GetLinearVelocity() );
+    b2Vec2 lateralVelocity = right * b2Dot( right, _wheelBody->GetLinearVelocity() );
 
     //Calculate linear movement
-    b2Vec2 forwardVelocity = front * b2Dot( front, wheelBody->GetLinearVelocity() );
-
-    qDebug() << "Current forward velocity: " << forwardVelocity.Length();
-    qDebug() << "Current lateral velocity: " << lateralVelocity.Length();
+    b2Vec2 forwardVelocity = front * b2Dot( front, _wheelBody->GetLinearVelocity() );
 
     //Negate slip/slide
-    b2Vec2 impulse1 = -lateralVelocity * wheelBody->GetMass();
-    qDebug() << "Apply " << (-lateralVelocity).Length() << " lateral correction";
+    b2Vec2 impulse1 = -lateralVelocity * _wheelBody->GetMass();
+    b2Vec2 impulse2 = (front * targetVelocity - forwardVelocity) * _wheelBody->GetMass();
+    _wheelBody->ApplyLinearImpulse( impulse1 + impulse2, _wheelBody->GetWorldCenter(), true );
 
-    b2Vec2 impulse2 = front * (linear_target-forwardVelocity.Length()) * wheelBody->GetMass();
-    qDebug() << "Apply " << (linear_target-forwardVelocity.Length()) << " forward correction";
-
-    //wheelBody->ApplyLinearImpulse( impulse1 + impulse2, wheelBody->GetWorldCenter(), true );
-
-    double x = wheelBody->GetWorldCenter().x;
-    double y = wheelBody->GetWorldCenter().y;
-    double t = wheelBody->GetAngle();
-    wheel_model->setTransform(x, y, t*RAD2DEG);
+    double x = _wheelBody->GetWorldCenter().x;
+    double y = _wheelBody->GetWorldCenter().y;
+    double t = _wheelBody->GetAngle();
+    _wheelModel->setTransform(x, y, t*RAD2DEG);
 }
 
 void Fixed_Wheel::_processMessage(std_msgs::Float32 data)
 {
-
+    _targetAngularVelocity = data.data;
 }

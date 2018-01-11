@@ -18,10 +18,10 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
         props["theta_local"].set(0, true);
         props["angle_start"].set(0, true);
         props["angle_end"].set(360, true);
-        props["ring_radius"].set(1, true);
+        props["ring_radius"].set(2, true);
         props["sensor_count"].set(10, true);
 
-        //components.push_back(touchRing);
+        components.push_back(touchRing);
     }
 
     if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.fixedwheel"))
@@ -49,11 +49,11 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
         propsl["wheel_width"].set(0.5, true);
         propsr["wheel_width"].set(0.5, true);
 
-        propsl["is_driven"].set(false, true);
-        propsr["is_driven"].set(false, true);
+        propsl["is_driven"].set(true, true);
+        propsr["is_driven"].set(true, true);
 
-        propsl["max_rps"].set(0, true);
-        propsr["max_rps"].set(3, true);
+        propsl["channels/input_speed"].set("robot0/left_wheel", true);
+        propsr["channels/input_speed"].set("robot0/right_wheel", true);
 
         components.push_back(leftWheel);
         components.push_back(rightWheel);
