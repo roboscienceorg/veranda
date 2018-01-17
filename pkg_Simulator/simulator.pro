@@ -36,7 +36,7 @@ HEADERS += \
     include/basic_robotloader.h \
 \
     include/robot.h \
-    include/world_object.h \
+    include/sdsmt_simulator/world_object.h \
     include/ui/mainwindow.h \
 \
     include/simulator_core.h \

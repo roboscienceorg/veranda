@@ -1,13 +1,17 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator_fixed_wheel_plugin)
 
-add_compile_options(-std=c++11 -fPIC)
+## Compile as C++11 Library
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fPIC")
+endif()
 
-find_package(catkin REQUIRED COMPONENTS
-    roscpp
-    std_msgs
-    sdsmt_simulator
-    sdsmt_simulator_box2d)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rmw_implementation REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(sdsmt_simulator REQUIRED)
+find_package(sdsmt_simulator_box2d REQUIRED)
 
 ## Find and configure QT
 find_package(Qt5 REQUIRED COMPONENTS
@@ -20,16 +24,19 @@ set(CMAKE_AUTOMOC ON)
 add_definitions(-DQT_PLUGIN)
 add_definitions(-DQT_SHARED)
 
+include_directories( include )
 include_directories( ${CMAKE_BINARY_DIR} )
 
 ## TODO If possible: Figure out how to mark Qt as a dependency
-catkin_package(
-    CATKIN_DEPENDS
-    roscpp
+ament_export_dependencies(    
+    rclcpp
     std_msgs
     sdsmt_simulator
     sdsmt_simulator_box2d
 )
+
+# Need to include this early so that moc is happy
+include_directories(${sdsmt_simulator_INCLUDE_DIRS})
 
 ###################
 ## FILE LISTINGS ##
@@ -50,12 +57,6 @@ set(CPP_SRCS
 ## Build ##
 ###########
 
-## Locations of header files
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
-
 ## Run MOC on files with Qt Keywords and Macros
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 
@@ -66,13 +67,12 @@ add_library(fixed_wheel_plugin SHARED ${CPP_SRCS} ${MOC_SRCS})
 ## this will find all the headers and link all the libraries
 qt5_use_modules(fixed_wheel_plugin Core)
 
-## Link any other libraries
-target_link_libraries(fixed_wheel_plugin
-  ${catkin_LIBRARIES}
+## Pull in stuff exported from other packages
+ament_target_dependencies(fixed_wheel_plugin
+    "rclcpp"
+    "std_msgs"
+    "sdsmt_simulator_box2d"
+    "sdsmt_simulator"
 )
 
-#############
-## INSTALL ##
-#############
-install(TARGETS fixed_wheel_plugin
-        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+ament_package()

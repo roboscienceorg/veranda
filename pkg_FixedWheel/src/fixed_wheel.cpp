@@ -1,12 +1,11 @@
 #include "fixed_wheel.h"
-#include "std_msgs/ByteMultiArray.h"
 
 #include <QDebug>
 #include <cmath>
 
 Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent_If(parent)
 {
-    qRegisterMetaType<std_msgs::Float32>("std_msgs::Float32");
+    qRegisterMetaType<std_msgs::msg::Float32::SharedPtr>("std_msgs::msg::Float32::SharedPtr");
 
     //Update channel in if name or driven status changes
     connect(&_inputChannel, &Property::valueSet, this, &Fixed_Wheel::_refreshChannel);
@@ -111,6 +110,12 @@ WorldObjectComponent_If *Fixed_Wheel::clone(QObject *newParent)
     return out;
 }
 
+void Fixed_Wheel::setROSNode(std::shared_ptr<rclcpp::Node> node)
+{
+    _receiveChannel.reset();
+    _rosNode = node;
+}
+
 void Fixed_Wheel::_refreshChannel(QVariant)
 {
     disconnectChannels();
@@ -123,17 +128,24 @@ void Fixed_Wheel::connectChannels()
         disconnectChannels();
 
     //Only listen when the wheel is driven
-    if(_driven.get().toBool())
+    if(_driven.get().toBool() && _rosNode)
     {
         QString inputChannel = _inputChannel.get().toString();
-        _receiveChannel = _rosNode.subscribe(inputChannel.toStdString(), 5, &Fixed_Wheel::_receiveMessage, this);
+
+        auto callback =
+        [this](const std_msgs::msg::Float32::SharedPtr msg) -> void
+        {
+            _receiveMessage(msg);
+        };
+        _receiveChannel = _rosNode->create_subscription<std_msgs::msg::Float32>(inputChannel.toStdString(), callback);
+        qDebug() << _receiveChannel.use_count() << " pointers to subscription" << endl;
         _connected = true;
     }
 }
 
 void Fixed_Wheel::disconnectChannels()
 {
-    _receiveChannel.shutdown();
+    _receiveChannel.reset();
     _connected = false;
 }
 
@@ -182,7 +194,7 @@ void Fixed_Wheel::worldTicked(const b2World*, const double)
     _wheelModel->setTransform(x, y, t*RAD2DEG);
 }
 
-void Fixed_Wheel::_processMessage(std_msgs::Float32 data)
+void Fixed_Wheel::_processMessage(const std_msgs::msg::Float32::SharedPtr data)
 {
-    _targetAngularVelocity = data.data;
+    _targetAngularVelocity = data->data;
 }

@@ -1,5 +1,6 @@
 #include "touch_sensor.h"
-#include "std_msgs/ByteMultiArray.h"
+#include "std_msgs/msg/multi_array_layout.hpp"
+#include "std_msgs/msg/multi_array_dimension.hpp"
 
 #include <QDebug>
 #include <cmath>
@@ -24,9 +25,11 @@ Touch_Sensor::Touch_Sensor(QObject *parent) : WorldObjectComponent_If(parent)
     buttons_model = new Model({}, {}, this);
     touches_model = new Model({}, {}, this);
 
-    data.layout.data_offset = 0;
-    data.layout.dim.push_back(std_msgs::MultiArrayDimension());
-    data.layout.dim[0].label = "hits";
+    data = std::make_shared<std_msgs::msg::ByteMultiArray>();
+
+    data->layout.data_offset = 0;
+    data->layout.dim.push_back(std_msgs::msg::MultiArrayDimension());
+    data->layout.dim[0].label = "hits";
 
     _updateDataMessageDimensions();
 }
@@ -34,9 +37,9 @@ Touch_Sensor::Touch_Sensor(QObject *parent) : WorldObjectComponent_If(parent)
 void Touch_Sensor::_updateDataMessageDimensions()
 {
     int buttons = sensor_count.get().toInt();
-    data.layout.dim[0].stride = data.layout.dim[0].size = buttons;
-    data.data.clear();
-    data.data.resize(buttons, 0);
+    data->layout.dim[0].stride = data->layout.dim[0].size = buttons;
+    data->data.clear();
+    data->data.resize(buttons, 0);
 }
 
 WorldObjectComponent_If *Touch_Sensor::clone(QObject *newParent)
@@ -50,6 +53,12 @@ WorldObjectComponent_If *Touch_Sensor::clone(QObject *newParent)
     out->radius.set(radius.get());
 
     return out;
+}
+
+void Touch_Sensor::setROSNode(std::shared_ptr<rclcpp::Node> node)
+{
+    _sendChannel.reset();
+    _rosNode = node;
 }
 
 void Touch_Sensor::_channelChanged(QVariant)
@@ -66,14 +75,21 @@ void Touch_Sensor::connectChannels()
     if(_connected)
         disconnectChannels();
 
-    _outputChannel = output_channel.get().toString();
-    _sendChannel = _rosNode.advertise<std_msgs::ByteMultiArray>(_outputChannel.toStdString(), 5);
-    _connected = true;
+    if(_rosNode)
+    {
+        _outputChannel = output_channel.get().toString();
+
+        rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
+        custom_qos_profile.depth = 7;
+
+        _sendChannel = _rosNode->create_publisher<std_msgs::msg::ByteMultiArray>(_outputChannel.toStdString(), custom_qos_profile);
+        _connected = true;
+    }
 }
 
 void Touch_Sensor::disconnectChannels()
 {
-    _sendChannel.shutdown();
+    _sendChannel.reset();
     _connected = false;
 }
 
@@ -186,8 +202,8 @@ void Touch_Sensor::_buildModels()
 
     //zero out all output data
     active_touches.clear();
-    data.data.clear();
-    data.data.resize(buttons, 0);
+    data->data.clear();
+    data->data.resize(buttons, 0);
 }
 
 void Touch_Sensor::_evaluateContact(b2Contact* c, QVector<int>& newTouches, QSet<int>& touchesNow)
@@ -224,9 +240,9 @@ void Touch_Sensor::_evaluateContact(b2Contact* c, QVector<int>& newTouches, QSet
                 sensorHit = (angle + 2*PI - angleMin) / degPerTouch;
 
             touchesNow.insert(sensorHit);
-            if(!data.data[sensorHit])
+            if(!data->data[sensorHit])
             {
-                data.data[sensorHit] = 1;
+                data->data[sensorHit] = 1;
                 newTouches.push_back(sensorHit);
             }
         }
@@ -261,7 +277,7 @@ void Touch_Sensor::worldTicked(const b2World*, const double)
 
             for(int i : active_touches)
             {
-                data.data[i] = 0;
+                data->data[i] = 0;
                 oldHitModels.push_back(touch_image[i]);
             }
 
@@ -274,7 +290,7 @@ void Touch_Sensor::worldTicked(const b2World*, const double)
 
             if(anyChange)
             {
-                _sendChannel.publish(data);
+                _sendChannel->publish(data);
             }
         }
 

@@ -38,7 +38,6 @@ void Simple_Shape::connectChannels()
 
 void Simple_Shape::disconnectChannels()
 {
-    _sendChannel.shutdown();
     _connected = false;
 }
 

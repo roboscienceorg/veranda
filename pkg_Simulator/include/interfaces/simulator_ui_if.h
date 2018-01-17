@@ -10,7 +10,7 @@
 
 #include <Box2D/Box2D.h>
 
-#include "world_object.h"
+#include "../sdsmt_simulator/world_object.h"
 
 class Simulator_Ui_If : public QMainWindow
 {

@@ -3,14 +3,17 @@
 
 #include "interfaces/simulator_physics_if.h"
 #include "interfaces/simulator_ui_if.h"
-#include "world_object.h"
+#include "sdsmt_simulator/world_object.h"
 #include "interfaces/simulator_visual_if.h"
 #include "map.h"
+
+#include "rclcpp/rclcpp.hpp"
 
 #include <QObject>
 #include <QMap>
 #include <QThread>
 
+#include <memory>
 #include <functional>
 
 class SimulatorCore : public QObject
@@ -23,8 +26,10 @@ class SimulatorCore : public QObject
     object_id _nextObject = 1;
     QMap<object_id, WorldObject*> _worldObjects;
 
+    std::shared_ptr<rclcpp::Node> _node;
+
 public:
-    SimulatorCore(Simulator_Physics_If* physics, Simulator_Ui_If* ui,
+    SimulatorCore(Simulator_Physics_If* physics, Simulator_Ui_If* ui, std::shared_ptr<rclcpp::Node> node,
                    QObject* parent = nullptr);
     ~SimulatorCore();
 

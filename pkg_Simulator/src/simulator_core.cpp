@@ -7,10 +7,10 @@
 
 using namespace std;
 
-SimulatorCore::SimulatorCore(Simulator_Physics_If *physics, Simulator_Ui_If *ui,
+SimulatorCore::SimulatorCore(Simulator_Physics_If *physics, Simulator_Ui_If *ui, std::shared_ptr<rclcpp::Node> node,
                                  QObject *parent) :
 QObject(parent),
-_physicsEngine(physics), _userInterface(ui)
+_physicsEngine(physics), _userInterface(ui), _node(node)
 {
     qRegisterMetaType<object_id>("object_id");
 
@@ -71,6 +71,8 @@ void SimulatorCore::addSimObject(WorldObject *obj)
 {
     //Clone object to have local copy for distributing
     obj = obj->clone();
+
+    obj->setROSNode(_node);
 
     connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &WorldObject::connectChannels);
     connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &WorldObject::disconnectChannels);

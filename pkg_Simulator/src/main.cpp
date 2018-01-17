@@ -1,8 +1,9 @@
-#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
 
 #include <string>
 #include <functional>
 #include <iostream>
+#include <memory>
 
 #include <QTimer>
 #include <QObject>
@@ -36,7 +37,8 @@ int main(int argc, char** argv)
     * Setup ROS and Qt to play nice
     *************************************/
     //Init ros stuff
-    ros::init(argc, argv, "sdsmt_simulator");
+    rclcpp::init(argc, argv);
+    shared_ptr<rclcpp::Node> node = make_shared<rclcpp::Node>("sdsmt_simulator");
 
     //Init Qt
     QApplication app(argc, argv);
@@ -44,9 +46,9 @@ int main(int argc, char** argv)
     //Start ros in separate thread, and trigger Qt shutdown when it exits
     //If Qt exits before ros, be sure to shutdown ros
     QFutureWatcher<void> rosThread;
-    rosThread.setFuture(QtConcurrent::run(&ros::spin));
+    rosThread.setFuture(QtConcurrent::run([node](){rclcpp::spin(node);}));
     QObject::connect(&rosThread, &QFutureWatcher<void>::finished, &app, &QCoreApplication::quit);
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, [](){ros::shutdown();});
+    QObject::connect(&app, &QCoreApplication::aboutToQuit, [](){rclcpp::shutdown();});
 
    /*************************************
     * Load robot part plugins
@@ -114,7 +116,7 @@ int main(int argc, char** argv)
     Simulator_Physics_If* physics = new BasicPhysics;
     Simulator_Ui_If* userinterface = new MainWindow(visuals, componentPlugins, objectLoaders, objectSavers);
 
-    SimulatorCore sim(physics, userinterface, &app);
+    SimulatorCore sim(physics, userinterface, node, &app);
 
     if(defaultBots)
     {

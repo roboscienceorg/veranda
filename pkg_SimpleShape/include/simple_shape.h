@@ -1,15 +1,17 @@
 #ifndef SIMPLE_SHAPE_H
 #define SIMPLE_SHAPE_H
 
-#include "ros/ros.h"
-#include "../pkg_Box2D/include/Box2D/Box2D.h"
+#include "rclcpp/rclcpp.hpp"
 
+#include <Box2D/Box2D.h>
 #include <sdsmt_simulator/world_object_component_if.h>
 
 #include <QVector>
 #include <QString>
 #include <QSet>
 #include <QObject>
+
+#include <memory>
 
 class Simple_Shape : public WorldObjectComponent_If
 {
@@ -20,9 +22,6 @@ class Simple_Shape : public WorldObjectComponent_If
     constexpr static double DEG2RAD = 1.0/RAD2DEG;
 
     bool _connected = false;
-
-    ros::NodeHandle _rosNode;
-    ros::Publisher _sendChannel;
 
     Property x = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                           "X position of the shape"), QVariant(0.0),
@@ -91,6 +90,7 @@ public:
 
     QVector<b2Body*> generateBodies(b2World *world, object_id oId, b2Body *anchor);
     void clearBodies(b2World* world);
+    void setROSNode(std::shared_ptr<rclcpp::Node>){}
 
 private slots:
     void _channelChanged(QVariant);

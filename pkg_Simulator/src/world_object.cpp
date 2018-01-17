@@ -1,4 +1,4 @@
-#include "world_object.h"
+#include "sdsmt_simulator/world_object.h"
 
 #include <QSet>
 
@@ -174,4 +174,10 @@ void WorldObject::_transformToStart(b2Body* body)
     qDebug() << "Moved body from " << relativeLoc.x << ", " << relativeLoc.y << " : " << body->GetAngle();
     qDebug() << "Result: " << newLoc.x << ", " << newLoc.y << " : " << body->GetAngle() + _locTheta.get().toDouble()*DEG2RAD;
     body->SetTransform(newLoc, body->GetAngle() + _locTheta.get().toDouble()*DEG2RAD);
+}
+
+void WorldObject::setROSNode(std::shared_ptr<rclcpp::Node> node)
+{
+    for(WorldObjectComponent_If* c : _components)
+        c->setROSNode(node);
 }

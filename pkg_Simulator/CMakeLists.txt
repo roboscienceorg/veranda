@@ -1,18 +1,19 @@
 ###########
 ## SETUP ##
 ###########
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+## Compile as C++11
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+endif()
 
 ## Find required ROS packages
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  std_msgs
-  sdsmt_simulator_box2d
-)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rmw_implementation REQUIRED)
+find_package(sdsmt_simulator_box2d REQUIRED)
 
 ## Find and configure QT
 find_package(Qt5 REQUIRED COMPONENTS
@@ -24,16 +25,19 @@ find_package(Qt5 REQUIRED COMPONENTS
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-include_directories( ${CMAKE_BINARY_DIR} )
+include_directories( include ${CMAKE_BINARY_DIR} )
 
 ## TODO If possible: Figure out how to mark Qt as a dependency
-catkin_package(
-  INCLUDE_DIRS include
-  CATKIN_DEPENDS
-    roscpp
+ament_export_dependencies(    
+    rclcpp
     std_msgs
     sdsmt_simulator_box2d
 )
+
+ament_export_include_directories( include )
+ament_export_libraries(sdsmt_simulator_objs)
+
+Message("Own includes:" ${sdsmt_simulator_INCLUDE_DIRS})
 
 ###################
 ## FILE LISTINGS ##
@@ -47,7 +51,6 @@ set(MOC_HDRS
     include/sdsmt_simulator/sensor_if.h
     include/sdsmt_simulator/robotcomponent_if.h
     include/sdsmt_simulator/property.h
-    include/sdsmt_simulator/model.h
     include/sdsmt_simulator/world_object_component_if.h
 
     include/interfaces/simulator_physics_if.h
@@ -60,9 +63,13 @@ set(MOC_HDRS
     include/simulator_core.h
     include/robot.h
     include/map.h
-    include/world_object.h
 
     include/ui/mainwindow.h
+    )
+
+set(LIB_MOC_HDRS
+    include/sdsmt_simulator/world_object.h
+    include/sdsmt_simulator/model.h
     )
 
 ## .ui qt widgets form files
@@ -75,11 +82,14 @@ set(CPP_SRCS
     src/basic_viewer.cpp
     src/simulator_core.cpp
     src/robot.cpp
-    src/world_object.cpp
 
     src/map.cpp
     src/ui/mainwindow.cpp
     src/main.cpp
+    )
+
+set(LIB_SRCS
+    src/world_object.cpp
     )
 
 set(RCC_FILES ui/resources.qrc)
@@ -89,32 +99,62 @@ qt5_add_resources(RCC_SRCS ${RCC_FILES})
 ## Build ##
 ###########
 
-## Locations of header files
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
-
 ## Run MOC on files with Qt Keywords and Macros
+qt5_wrap_cpp(LIB_MOC_SRCS ${LIB_MOC_HDRS})
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 
 ## Wrap .ui files as cpp files
 qt5_wrap_ui(UI_SRCS ${UI_FILES})
 
 ## Build the executable
-add_executable(sdsmt_simulator ${UI_SRCS} ${CPP_SRCS} ${MOC_SRCS} ${RCC_SRCS})
+add_executable(sdsmt_simulator ${UI_SRCS} ${CPP_SRCS} ${MOC_SRCS} ${LIB_SRCS} ${LIB_MOC_SRCS} ${RCC_SRCS})
 
 ## Add qt module dependencies to executable
 ## this will find all the headers and link all the libraries
 qt5_use_modules(sdsmt_simulator Core Gui Widgets)
 
-## Link any other libraries
-target_link_libraries(sdsmt_simulator
-  ${catkin_LIBRARIES}
+## Pull in stuff exported from other packages
+ament_target_dependencies(sdsmt_simulator
+    "rclcpp"
+    "std_msgs"
+    "sdsmt_simulator_box2d"
+)
+
+## Add fPIC for library exports
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+endif()
+
+## Build Library
+add_library(sdsmt_simulator_objs STATIC ${LIB_SRCS} ${LIB_MOC_SRCS})
+
+## Add qt module dependencies to library
+## this will find all the headers and link all the libraries
+qt5_use_modules(sdsmt_simulator_objs Core)
+
+## Pull in stuff exported from other packages
+ament_target_dependencies(sdsmt_simulator_objs
+    "rclcpp"
+    "sdsmt_simulator_box2d"
 )
 
 #############
-## INSTALL ##
+## Install ##
 #############
-install(TARGETS sdsmt_simulator
-        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+## Install include dir
+install(
+  DIRECTORY include/sdsmt_simulator
+  DESTINATION include
+)
+
+## Install executable and lib
+install(
+  TARGETS sdsmt_simulator sdsmt_simulator_objs
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+ament_package()
+

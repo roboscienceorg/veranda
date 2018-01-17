@@ -5,6 +5,9 @@
 #include <QString>
 #include <QMap>
 
+#include <memory>
+
+#include "rclcpp/rclcpp.hpp"
 #include "sdsmt_simulator/model.h"
 #include "sdsmt_simulator/property.h"
 
@@ -17,6 +20,9 @@ public:
 
     //Constructs copy of component
     virtual WorldObjectComponent_If* clone(QObject* newParent=nullptr) = 0;
+
+    //Interactions with ROS
+    virtual void setROSNode(std::shared_ptr<rclcpp::Node> node) = 0;
 
     //Drawing Interactions
     virtual QVector<Model*> getModels() = 0;

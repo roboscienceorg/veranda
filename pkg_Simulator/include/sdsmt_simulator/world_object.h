@@ -10,7 +10,7 @@
 #include "sdsmt_simulator/model.h"
 #include "sdsmt_simulator/property.h"
 
-#include "Box2D/Box2D.h"
+#include <Box2D/Box2D.h>
 #include <QVariant>
 
 class WorldObject : public QObject
@@ -73,6 +73,9 @@ public:
     void generateBodies(b2World* world, object_id oId);
 
     void clearBodies(b2World* world);
+
+    //ROS Interactions
+    void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
 public slots:
     void connectChannels();

@@ -1,15 +1,18 @@
 #ifndef TOUCH_SENSOR_RING_H
 #define TOUCH_SENSOR_RING_H
 
-#include "ros/ros.h"
-#include "std_msgs/ByteMultiArray.h"
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/byte_multi_array.hpp"
 
 #include <sdsmt_simulator/world_object_component_if.h>
+#include <Box2D/Box2D.h>
 
 #include <QVector>
 #include <QString>
 #include <QSet>
 #include <QObject>
+
+#include <memory>
 
 class Touch_Sensor : public WorldObjectComponent_If
 {
@@ -23,8 +26,8 @@ class Touch_Sensor : public WorldObjectComponent_If
     QString _outputChannel;
     bool _connected = false;
 
-    ros::NodeHandle _rosNode;
-    ros::Publisher _sendChannel;
+    std::shared_ptr<rclcpp::Node> _rosNode;
+    rclcpp::Publisher<std_msgs::msg::ByteMultiArray>::SharedPtr _sendChannel;
 
     Property x_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X location of component within object"),
                                 QVariant(0.0), &Property::double_validator);
@@ -80,7 +83,7 @@ class Touch_Sensor : public WorldObjectComponent_If
     b2Joint* weldJoint = nullptr;
 
     //Data published
-    std_msgs::ByteMultiArray data;
+    std::shared_ptr<std_msgs::msg::ByteMultiArray> data;
 
     //Track of what's shown
     QSet<int> active_touches;
@@ -111,6 +114,8 @@ public:
 
     QVector<b2Body *> generateBodies(b2World *world, object_id oId, b2Body *anchor);
     void clearBodies(b2World *world);
+
+    void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
 private slots:
     void _channelChanged(QVariant);

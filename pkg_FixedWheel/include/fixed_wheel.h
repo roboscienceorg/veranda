@@ -1,15 +1,18 @@
 #ifndef FIXED_WHEEL_H
 #define FIXED_WHEEL_H
 
-#include "ros/ros.h"
-#include "std_msgs/Float32.h"
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/float32.hpp"
 
 #include <sdsmt_simulator/world_object_component_if.h>
+#include <Box2D/Box2D.h>
 
 #include <QVector>
 #include <QString>
 #include <QSet>
 #include <QObject>
+
+#include <memory>
 
 class Fixed_Wheel : public WorldObjectComponent_If
 {
@@ -21,8 +24,8 @@ class Fixed_Wheel : public WorldObjectComponent_If
 
     bool _connected = false;
 
-    ros::NodeHandle _rosNode;
-    ros::Subscriber _receiveChannel;
+    std::shared_ptr<rclcpp::Node> _rosNode;
+    rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr _receiveChannel;
 
     Property _xLocal = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X location of component within object"),
                                 QVariant(0.0), &Property::double_validator);
@@ -95,11 +98,13 @@ public:
     QVector<b2Body *> generateBodies(b2World* world, object_id oId, b2Body* anchor);
     void clearBodies(b2World *world);
 
+    void setROSNode(std::shared_ptr<rclcpp::Node> node);
+
 signals:
-    void _receiveMessage(std_msgs::Float32 data);
+    void _receiveMessage(const std_msgs::msg::Float32::SharedPtr data);
 
 private slots:
-    void _processMessage(std_msgs::Float32 data);
+    void _processMessage(const std_msgs::msg::Float32::SharedPtr data);
     void _refreshChannel(QVariant);
     void _attachWheelFixture();
     void _buildModels();

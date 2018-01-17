@@ -1,17 +1,18 @@
 ###########
 ## SETUP ##
 ###########
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator_box2d)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11 -fPIC)
+## Compile as C++11 Library
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fPIC")
+endif()
 
-## TODO If possible: Figure out how to mark Qt as a dependency
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES sdsmt_simulator_box2d
-)
+find_package(ament_cmake REQUIRED)
+
+ament_export_include_directories(include)
+ament_export_libraries(sdsmt_simulator_box2d)
 
 ###################
 ## FILE LISTINGS ##
@@ -85,3 +86,23 @@ include_directories(
 
 ## Build Box2d
 add_library(sdsmt_simulator_box2d STATIC ${BOX2D_SRCS})
+
+#############
+## Install ##
+#############
+
+## Install include dir
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+
+## Install library
+install(
+  TARGETS sdsmt_simulator_box2d
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+ament_package()
