@@ -10,9 +10,6 @@
 
   <depend>sdsmt_simulator</depend>
   <depend>sdsmt_simulator_box2d</depend>
-  <depend>rclcpp</depend>
-  <depend>rmw_implementation</depend>
-  <depend>std_msgs</depend>
   
   <export>
     <build_type>ament_cmake</build_type>

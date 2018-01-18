@@ -13,10 +13,8 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-
   <depend>sdsmt_simulator_box2d</depend>
   <depend>rclcpp</depend>
-  <depend>rmw_implementation</depend>
   <depend>std_msgs</depend>
 
   <export>

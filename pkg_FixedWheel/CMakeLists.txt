@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator_fixed_wheel_plugin)
 
 ## Compile as C++11 Library
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD 11)
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rmw_implementation REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sdsmt_simulator REQUIRED)
 find_package(sdsmt_simulator_box2d REQUIRED)
@@ -73,6 +74,12 @@ ament_target_dependencies(fixed_wheel_plugin
     "std_msgs"
     "sdsmt_simulator_box2d"
     "sdsmt_simulator"
+)
+
+## Install lib into same directory as simulator executable
+install(
+  TARGETS fixed_wheel_plugin
+  DESTINATION bin
 )
 
 ament_package()

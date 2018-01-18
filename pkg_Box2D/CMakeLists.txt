@@ -4,9 +4,13 @@
 cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator_box2d)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 ## Compile as C++11 Library
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD 11)
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
 find_package(ament_cmake REQUIRED)
@@ -78,7 +82,6 @@ set(BOX2D_SRCS
 ###########
 ## Build ##
 ###########
-
 ## Locations of header files
 include_directories(
   include
@@ -100,9 +103,7 @@ install(
 ## Install library
 install(
   TARGETS sdsmt_simulator_box2d
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+  DESTINATION bin
 )
 
 ament_package()

@@ -2,14 +2,13 @@ cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator_default_robot_loader_plugin)
 
 ## Compile as C++11 Library
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD 11)
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rmw_implementation REQUIRED)
-find_package(std_msgs REQUIRED)
 find_package(sdsmt_simulator REQUIRED)
 find_package(sdsmt_simulator_box2d REQUIRED)
 
@@ -18,7 +17,6 @@ find_package(Qt5 REQUIRED COMPONENTS
   Core
 )
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
@@ -70,10 +68,14 @@ qt5_use_modules(default_robot_loader_plugin Core)
 
 ## Pull in stuff exported from other packages
 ament_target_dependencies(default_robot_loader_plugin
-    "rclcpp"
-    "std_msgs"
-    "sdsmt_simulator_box2d"
     "sdsmt_simulator"
+    "sdsmt_simulator_box2d"
+)
+
+## Install lib into same directory as simulator executable
+install(
+  TARGETS default_robot_loader_plugin
+  DESTINATION bin
 )
 
 ament_package()

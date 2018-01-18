@@ -4,15 +4,18 @@
 cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 ## Compile as C++11
+set(CMAKE_CXX_STANDARD 11)
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
 ## Find required ROS packages
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rmw_implementation REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(sdsmt_simulator_box2d REQUIRED)
 
 ## Find and configure QT
@@ -37,8 +40,6 @@ ament_export_dependencies(
 ament_export_include_directories( include )
 ament_export_libraries(sdsmt_simulator_objs)
 
-Message("Own includes:" ${sdsmt_simulator_INCLUDE_DIRS})
-
 ###################
 ## FILE LISTINGS ##
 ###################
@@ -50,8 +51,6 @@ set(MOC_HDRS
     include/sdsmt_simulator/drivetrain_if.h
     include/sdsmt_simulator/sensor_if.h
     include/sdsmt_simulator/robotcomponent_if.h
-    include/sdsmt_simulator/property.h
-    include/sdsmt_simulator/world_object_component_if.h
 
     include/interfaces/simulator_physics_if.h
     include/interfaces/simulator_ui_if.h
@@ -70,6 +69,8 @@ set(MOC_HDRS
 set(LIB_MOC_HDRS
     include/sdsmt_simulator/world_object.h
     include/sdsmt_simulator/model.h
+    include/sdsmt_simulator/property.h
+    include/sdsmt_simulator/world_object_component_if.h
     )
 
 ## .ui qt widgets form files
@@ -90,7 +91,7 @@ set(CPP_SRCS
 
 set(LIB_SRCS
     src/world_object.cpp
-    )
+)
 
 set(RCC_FILES ui/resources.qrc)
 qt5_add_resources(RCC_SRCS ${RCC_FILES})
@@ -98,6 +99,7 @@ qt5_add_resources(RCC_SRCS ${RCC_FILES})
 ###########
 ## Build ##
 ###########
+include_directories("${sdsmt_simulator_box2d_INCLUDE_DIRS}")
 
 ## Run MOC on files with Qt Keywords and Macros
 qt5_wrap_cpp(LIB_MOC_SRCS ${LIB_MOC_HDRS})
@@ -106,24 +108,8 @@ qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 ## Wrap .ui files as cpp files
 qt5_wrap_ui(UI_SRCS ${UI_FILES})
 
-## Build the executable
-add_executable(sdsmt_simulator ${UI_SRCS} ${CPP_SRCS} ${MOC_SRCS} ${LIB_SRCS} ${LIB_MOC_SRCS} ${RCC_SRCS})
-
-## Add qt module dependencies to executable
-## this will find all the headers and link all the libraries
-qt5_use_modules(sdsmt_simulator Core Gui Widgets)
-
-## Pull in stuff exported from other packages
-ament_target_dependencies(sdsmt_simulator
-    "rclcpp"
-    "std_msgs"
-    "sdsmt_simulator_box2d"
-)
-
 ## Add fPIC for library exports
-if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-endif()
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 ## Build Library
 add_library(sdsmt_simulator_objs STATIC ${LIB_SRCS} ${LIB_MOC_SRCS})
@@ -135,8 +121,26 @@ qt5_use_modules(sdsmt_simulator_objs Core)
 ## Pull in stuff exported from other packages
 ament_target_dependencies(sdsmt_simulator_objs
     "rclcpp"
-    "sdsmt_simulator_box2d"
 )
+
+## Remove fPIC for executable
+set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
+
+## Build the executable
+add_executable(sdsmt_simulator ${UI_SRCS} ${CPP_SRCS} ${MOC_SRCS} ${RCC_SRCS})
+
+## Add qt module dependencies to executable
+## this will find all the headers and link all the libraries
+qt5_use_modules(sdsmt_simulator Core Gui Widgets)
+
+## Pull in stuff exported from other packages
+ament_target_dependencies(sdsmt_simulator
+    "rclcpp"
+    "std_msgs"
+)
+
+set(WHOLE_LIBS -Wl,--whole-archive ${sdsmt_simulator_box2d_LIBRARIES} sdsmt_simulator_objs -Wl,--no-whole-archive)
+target_link_libraries(sdsmt_simulator "${WHOLE_LIBS}")
 
 #############
 ## Install ##
@@ -150,10 +154,13 @@ install(
 
 ## Install executable and lib
 install(
-  TARGETS sdsmt_simulator sdsmt_simulator_objs
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+  TARGETS sdsmt_simulator
+  DESTINATION lib/sdsmt_simulator
+)
+
+install(
+  TARGETS sdsmt_simulator_objs
+  DESTINATION bin
 )
 
 ament_package()

@@ -1,15 +1,18 @@
 cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator_touch_sensor_ring_plugin)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 ## Compile as C++11 Library
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD 11)
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
 ## Find required ROS packages
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rmw_implementation REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sdsmt_simulator REQUIRED)
 find_package(sdsmt_simulator_box2d REQUIRED)
@@ -74,6 +77,12 @@ ament_target_dependencies(touch_sensor_ring_plugin
     "std_msgs"
     "sdsmt_simulator"
     "sdsmt_simulator_box2d"
+)
+
+## Install lib into same directory as simulator executable
+install(
+  TARGETS touch_sensor_ring_plugin
+  DESTINATION bin
 )
 
 ament_package()
