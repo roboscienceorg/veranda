@@ -1,5 +1,8 @@
-import rospy
+import rclpy
+from rclpy.node import Node
+
 from std_msgs.msg import Float32
+
 import math
 import numpy as np
 from scipy.misc import derivative
@@ -38,39 +41,56 @@ def DD_IK(x_t, y_t, t, scale):
 # Publishes a set of wheel velocities
 # in the format required by the STDR
 def publishWheelVelocity(publeft, pubright, phi1, phi2):
-    publeft.publish(phi1)
-    pubright.publish(phi2)
+    msg = Float32()
 
+    msg.data = phi1
+    publeft.publish(msg)
+
+    msg.data = phi2
+    pubright.publish(msg)
+
+
+def main():
+    rclpy.init()
+    node = Node("talker")
+
+    publeft = node.create_publisher(Float32, 'robot0/left_wheel')
+    pubright = node.create_publisher(Float32, 'robot0/right_wheel')
+    
+    # Factor to scale down speed by
+    speedScale = 2
+
+    # Start time at pi because that's the function lines up
+    # with the robot starting location I've set
+    t = math.pi
+
+    # Start time at multiple of pi because the location
+    # function will divide the scale back out
+    t *= speedScale
+
+    # Tick time at 10 hz
+    dt = 0.1
+
+    def cb():
+        nonlocal t
+
+        # Calculate wheel velocities for current time
+        phi1, phi2 = DD_IK(x_t, y_t, t, speedScale)
+
+        print(phi1, phi2)
+
+        # Increment time
+        t += dt
+
+        # Publish velocities
+        publishWheelVelocity(publeft, pubright, phi1, phi2)
+
+    timer = node.create_timer(dt, cb)
+
+    rclpy.spin(node)
+    node.destroy_node()
+
+    rclpy.shutdown()
 
 if __name__ == '__main__':
-        publeft = rospy.Publisher('robot0/left_wheel', Float32, queue_size=1)
-        pubright = rospy.Publisher('robot0/right_wheel', Float32, queue_size=1)
-        rospy.init_node('talker', anonymous=True)
-        
-        # Factor to scale down speed by
-        speedScale = 2
-
-        # Start time at pi because that's the function lines up
-        # with the robot starting location I've set
-        time = math.pi
-
-        # Start time at multiple of pi because the location
-        # function will divide the scale back out
-        time *= speedScale
-
-        # Tick time at 10 hz
-        dt = 0.1
-        rate = rospy.Rate(1/dt)
-
-        while not rospy.is_shutdown():
-            # Calculate wheel velocities for current time
-            phi1, phi2 = DD_IK(x_t, y_t, time, speedScale)
-
-            print(phi1, phi2)
-
-            # Increment time
-            time += dt
-
-            # Publish velocities
-            publishWheelVelocity(publeft, pubright, phi1, phi2)
-            rate.sleep()
+    main()

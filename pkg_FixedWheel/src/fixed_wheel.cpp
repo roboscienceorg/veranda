@@ -132,14 +132,16 @@ void Fixed_Wheel::connectChannels()
     {
         QString inputChannel = _inputChannel.get().toString();
 
-        auto callback =
-        [this](const std_msgs::msg::Float32::SharedPtr msg) -> void
+        if(inputChannel.size())
         {
-            _receiveMessage(msg);
-        };
-        _receiveChannel = _rosNode->create_subscription<std_msgs::msg::Float32>(inputChannel.toStdString(), callback);
-        qDebug() << _receiveChannel.use_count() << " pointers to subscription" << endl;
-        _connected = true;
+            auto callback =
+            [this](const std_msgs::msg::Float32::SharedPtr msg) -> void
+            {
+                _receiveMessage(msg);
+            };
+            _receiveChannel = _rosNode->create_subscription<std_msgs::msg::Float32>(inputChannel.toStdString(), callback);
+            _connected = true;
+        }
     }
 }
 

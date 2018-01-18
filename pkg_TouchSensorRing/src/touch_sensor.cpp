@@ -79,11 +79,14 @@ void Touch_Sensor::connectChannels()
     {
         _outputChannel = output_channel.get().toString();
 
-        rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
-        custom_qos_profile.depth = 7;
+        if(_outputChannel.size())
+        {
+            rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
+            custom_qos_profile.depth = 7;
 
-        _sendChannel = _rosNode->create_publisher<std_msgs::msg::ByteMultiArray>(_outputChannel.toStdString(), custom_qos_profile);
-        _connected = true;
+            _sendChannel = _rosNode->create_publisher<std_msgs::msg::ByteMultiArray>(_outputChannel.toStdString(), custom_qos_profile);
+            _connected = true;
+        }
     }
 }
 
