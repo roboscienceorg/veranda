@@ -88,7 +88,7 @@ include_directories(
 )
 
 ## Build Box2d
-add_library(sdsmt_simulator_box2d STATIC ${BOX2D_SRCS})
+add_library(sdsmt_simulator_box2d SHARED ${BOX2D_SRCS})
 
 #############
 ## Install ##
@@ -103,7 +103,7 @@ install(
 ## Install library
 install(
   TARGETS sdsmt_simulator_box2d
-  DESTINATION bin
+  DESTINATION lib
 )
 
 ament_package()

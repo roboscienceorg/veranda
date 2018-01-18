@@ -79,7 +79,7 @@ ament_target_dependencies(fixed_wheel_plugin
 ## Install lib into same directory as simulator executable
 install(
   TARGETS fixed_wheel_plugin
-  DESTINATION bin
+  DESTINATION lib
 )
 
 ament_package()

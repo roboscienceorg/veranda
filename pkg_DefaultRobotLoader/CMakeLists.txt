@@ -75,7 +75,7 @@ ament_target_dependencies(default_robot_loader_plugin
 ## Install lib into same directory as simulator executable
 install(
   TARGETS default_robot_loader_plugin
-  DESTINATION bin
+  DESTINATION lib
 )
 
 ament_package()

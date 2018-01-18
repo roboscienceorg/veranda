@@ -112,7 +112,7 @@ qt5_wrap_ui(UI_SRCS ${UI_FILES})
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 ## Build Library
-add_library(sdsmt_simulator_objs STATIC ${LIB_SRCS} ${LIB_MOC_SRCS})
+add_library(sdsmt_simulator_objs SHARED ${LIB_SRCS} ${LIB_MOC_SRCS})
 
 ## Add qt module dependencies to library
 ## this will find all the headers and link all the libraries
@@ -121,6 +121,7 @@ qt5_use_modules(sdsmt_simulator_objs Core)
 ## Pull in stuff exported from other packages
 ament_target_dependencies(sdsmt_simulator_objs
     "rclcpp"
+    "sdsmt_simulator_box2d"
 )
 
 ## Remove fPIC for executable
@@ -137,10 +138,10 @@ qt5_use_modules(sdsmt_simulator Core Gui Widgets)
 ament_target_dependencies(sdsmt_simulator
     "rclcpp"
     "std_msgs"
+    "sdsmt_simulator_box2d"
 )
 
-set(WHOLE_LIBS -Wl,--whole-archive ${sdsmt_simulator_box2d_LIBRARIES} sdsmt_simulator_objs -Wl,--no-whole-archive)
-target_link_libraries(sdsmt_simulator "${WHOLE_LIBS}")
+target_link_libraries(sdsmt_simulator sdsmt_simulator_objs)
 
 #############
 ## Install ##
@@ -160,7 +161,7 @@ install(
 
 install(
   TARGETS sdsmt_simulator_objs
-  DESTINATION bin
+  DESTINATION lib
 )
 
 ament_package()

@@ -82,7 +82,7 @@ ament_target_dependencies(touch_sensor_ring_plugin
 ## Install lib into same directory as simulator executable
 install(
   TARGETS touch_sensor_ring_plugin
-  DESTINATION bin
+  DESTINATION lib
 )
 
 ament_package()

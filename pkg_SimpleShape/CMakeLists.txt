@@ -76,7 +76,7 @@ ament_target_dependencies(simple_shape_plugin
 ## Install lib into same directory as simulator executable
 install(
   TARGETS simple_shape_plugin
-  DESTINATION bin
+  DESTINATION lib
 )
 
 ament_package()
