@@ -19,7 +19,8 @@
 #ifndef B2_COLLISION_H
 #define B2_COLLISION_H
 
-#include "Box2D/Common/b2Math.h"
+#include <Box2D/Common/b2Api.h>
+#include <Box2D/Common/b2Math.h>
 #include <limits.h>
 
 /// @file
@@ -107,7 +108,7 @@ struct b2Manifold
 };
 
 /// This is used to compute the current state of a contact manifold.
-struct b2WorldManifold
+struct BOX2D_API b2WorldManifold
 {
 	/// Evaluate the manifold with supplied transforms. This assumes
 	/// modest motion from the original state. This does not change the
@@ -245,7 +246,7 @@ int32 b2ClipSegmentToLine(b2ClipVertex vOut[2], const b2ClipVertex vIn[2],
 							const b2Vec2& normal, float32 offset, int32 vertexIndexA);
 
 /// Determine if two generic shapes overlap.
-bool b2TestOverlap(	const b2Shape* shapeA, int32 indexA,
+bool BOX2D_API b2TestOverlap(	const b2Shape* shapeA, int32 indexA,
 					const b2Shape* shapeB, int32 indexB,
 					const b2Transform& xfA, const b2Transform& xfB);
 

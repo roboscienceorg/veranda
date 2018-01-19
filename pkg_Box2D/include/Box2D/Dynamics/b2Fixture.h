@@ -19,9 +19,10 @@
 #ifndef B2_FIXTURE_H
 #define B2_FIXTURE_H
 
-#include "Box2D/Dynamics/b2Body.h"
-#include "Box2D/Collision/b2Collision.h"
-#include "Box2D/Collision/Shapes/b2Shape.h"
+#include <Box2D/Common/b2Api.h>
+#include <Box2D/Dynamics/b2Body.h>
+#include <Box2D/Collision/b2Collision.h>
+#include <Box2D/Collision/Shapes/b2Shape.h>
 
 class b2BlockAllocator;
 class b2Body;
@@ -29,7 +30,7 @@ class b2BroadPhase;
 class b2Fixture;
 
 /// This holds contact filtering data.
-struct b2Filter
+struct BOX2D_API b2Filter
 {
 	b2Filter()
 	{
@@ -58,8 +59,8 @@ struct b2FixtureDef
 	/// The constructor sets the default fixture definition values.
 	b2FixtureDef()
 	{
-		shape = nullptr;
-		userData = nullptr;
+		shape = NULL;
+		userData = NULL;
 		friction = 0.2f;
 		restitution = 0.0f;
 		density = 0.0f;
@@ -104,7 +105,7 @@ struct b2FixtureProxy
 /// such as friction, collision filters, etc.
 /// Fixtures are created via b2Body::CreateFixture.
 /// @warning you cannot reuse fixtures.
-class b2Fixture
+class BOX2D_API b2Fixture
 {
 public:
 	/// Get the type of the child shape. You can use this to down cast to the concrete shape.
@@ -135,7 +136,7 @@ public:
 	/// Call this if you want to establish collision that was previously disabled by b2ContactFilter::ShouldCollide.
 	void Refilter();
 
-	/// Get the parent body of this fixture. This is nullptr if the fixture is not attached.
+	/// Get the parent body of this fixture. This is NULL if the fixture is not attached.
 	/// @return the parent body.
 	b2Body* GetBody();
 	const b2Body* GetBody() const;

@@ -19,7 +19,8 @@
 #ifndef B2_JOINT_H
 #define B2_JOINT_H
 
-#include "Box2D/Common/b2Math.h"
+#include <Box2D/Common/b2Api.h>
+#include <Box2D/Common/b2Math.h>
 
 class b2Body;
 class b2Joint;
@@ -76,9 +77,9 @@ struct b2JointDef
 	b2JointDef()
 	{
 		type = e_unknownJoint;
-		userData = nullptr;
-		bodyA = nullptr;
-		bodyB = nullptr;
+		userData = NULL;
+		bodyA = NULL;
+		bodyB = NULL;
 		collideConnected = false;
 	}
 
@@ -100,7 +101,7 @@ struct b2JointDef
 
 /// The base joint class. Joints are used to constraint two bodies together in
 /// various fashions. Some joints also feature limits and motors.
-class b2Joint
+class BOX2D_API b2Joint
 {
 public:
 

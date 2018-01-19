@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator_default_robot_loader_plugin)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 ## Compile as C++11 Library
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 11)
@@ -9,8 +11,9 @@ if(NOT WIN32)
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(sdsmt_simulator REQUIRED)
 find_package(sdsmt_simulator_box2d REQUIRED)
+find_package(sdsmt_simulator_api REQUIRED)
+find_package(rclcpp REQUIRED)
 
 ## Find and configure QT
 find_package(Qt5 REQUIRED COMPONENTS
@@ -30,12 +33,9 @@ include_directories( include )
 ament_export_dependencies(    
     rclcpp
     std_msgs
-    sdsmt_simulator
+    sdsmt_simulator_api
     sdsmt_simulator_box2d
 )
-
-# Need to include this early so that moc is happy
-include_directories(${sdsmt_simulator_INCLUDE_DIRS})
 
 ###################
 ## FILE LISTINGS ##
@@ -55,6 +55,11 @@ set(CPP_SRCS
 ###########
 ## Build ##
 ###########
+# Need to include this early so that moc is happy
+include_directories("${sdsmt_simulator_box2d_INCLUDE_DIRS}")
+include_directories("${sdsmt_simulator_api_INCLUDE_DIRS}")
+
+cmake_policy(SET CMP0071 NEW)
 
 ## Run MOC on files with Qt Keywords and Macros
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
@@ -68,8 +73,9 @@ qt5_use_modules(default_robot_loader_plugin Core)
 
 ## Pull in stuff exported from other packages
 ament_target_dependencies(default_robot_loader_plugin
-    "sdsmt_simulator"
+    "sdsmt_simulator_api"
     "sdsmt_simulator_box2d"
+    "rclcpp"
 )
 
 ## Install lib into same directory as simulator executable

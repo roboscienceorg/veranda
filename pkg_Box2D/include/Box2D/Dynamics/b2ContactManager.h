@@ -19,7 +19,8 @@
 #ifndef B2_CONTACT_MANAGER_H
 #define B2_CONTACT_MANAGER_H
 
-#include "Box2D/Collision/b2BroadPhase.h"
+#include <Box2D/Common/b2Api.h>
+#include <Box2D/Collision/b2BroadPhase.h>
 
 class b2Contact;
 class b2ContactFilter;
@@ -27,7 +28,7 @@ class b2ContactListener;
 class b2BlockAllocator;
 
 // Delegate of b2World.
-class b2ContactManager
+class BOX2D_API b2ContactManager
 {
 public:
 	b2ContactManager();
@@ -40,7 +41,7 @@ public:
 	void Destroy(b2Contact* c);
 
 	void Collide();
-            
+
 	b2BroadPhase m_broadPhase;
 	b2Contact* m_contactList;
 	int32 m_contactCount;

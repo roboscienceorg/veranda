@@ -19,7 +19,8 @@
 #ifndef B2_MATH_H
 #define B2_MATH_H
 
-#include "Box2D/Common/b2Settings.h"
+#include <Box2D/Common/b2Api.h>
+#include <Box2D/Common/b2Settings.h>
 #include <math.h>
 
 /// This function is used to ensure that a floating point number is not a NaN or infinity.
@@ -50,13 +51,13 @@ inline float32 b2InvSqrt(float32 x)
 #define	b2Atan2(y, x)	atan2f(y, x)
 
 /// A 2D column vector.
-struct b2Vec2
+struct BOX2D_API b2Vec2
 {
 	/// Default constructor does nothing (for performance).
 	b2Vec2() {}
 
 	/// Construct using coordinates.
-	b2Vec2(float32 xIn, float32 yIn) : x(xIn), y(yIn) {}
+	b2Vec2(float32 x, float32 y) : x(x), y(y) {}
 
 	/// Set this vector to all zeros.
 	void SetZero() { x = 0.0f; y = 0.0f; }
@@ -66,7 +67,7 @@ struct b2Vec2
 
 	/// Negate this vector.
 	b2Vec2 operator -() const { b2Vec2 v; v.Set(-x, -y); return v; }
-	
+
 	/// Read from and indexed element.
 	float32 operator () (int32 i) const
 	{
@@ -85,21 +86,11 @@ struct b2Vec2
 		x += v.x; y += v.y;
 	}
 
-        b2Vec2 operator +(const b2Vec2& v)
-        {
-                return b2Vec2(x+v.x, y+v.y);
-        }
-	
 	/// Subtract a vector from this vector.
 	void operator -= (const b2Vec2& v)
 	{
 		x -= v.x; y -= v.y;
 	}
-
-        b2Vec2 operator -(const b2Vec2& v)
-        {
-                return b2Vec2(x-v.x, y-v.y);
-        }
 
 	/// Multiply this vector by a scalar.
 	void operator *= (float32 a)
@@ -107,9 +98,9 @@ struct b2Vec2
 		x *= a; y *= a;
 	}
 
-        b2Vec2 operator *(float32 a)
+        b2Vec2 operator * (float32 a)
         {
-                return b2Vec2(x*a, y*a);
+            return b2Vec2(x*a, y*a);
         }
 
 	/// Get the length of this vector (the norm).
@@ -156,13 +147,13 @@ struct b2Vec2
 };
 
 /// A 2D column vector with 3 elements.
-struct b2Vec3
+struct BOX2D_API b2Vec3
 {
 	/// Default constructor does nothing (for performance).
 	b2Vec3() {}
 
 	/// Construct using coordinates.
-	b2Vec3(float32 xIn, float32 yIn, float32 zIn) : x(xIn), y(yIn), z(zIn) {}
+	b2Vec3(float32 x, float32 y, float32 z) : x(x), y(y), z(z) {}
 
 	/// Set this vector to all zeros.
 	void SetZero() { x = 0.0f; y = 0.0f; z = 0.0f; }
@@ -195,7 +186,7 @@ struct b2Vec3
 };
 
 /// A 2-by-2 matrix. Stored in column-major order.
-struct b2Mat22
+struct BOX2D_API b2Mat22
 {
 	/// The default constructor does nothing (for performance).
 	b2Mat22() {}
@@ -269,7 +260,7 @@ struct b2Mat22
 };
 
 /// A 3-by-3 matrix. Stored in column-major order.
-struct b2Mat33
+struct BOX2D_API b2Mat33
 {
 	/// The default constructor does nothing (for performance).
 	b2Mat33() {}
@@ -311,7 +302,7 @@ struct b2Mat33
 };
 
 /// Rotation
-struct b2Rot
+struct BOX2D_API b2Rot
 {
 	b2Rot() {}
 
@@ -362,7 +353,7 @@ struct b2Rot
 
 /// A transform contains translation and rotation. It is used to represent
 /// the position and orientation of rigid frames.
-struct b2Transform
+struct BOX2D_API b2Transform
 {
 	/// The default constructor does nothing.
 	b2Transform() {}
@@ -477,11 +468,6 @@ inline b2Vec2 operator * (float32 s, const b2Vec2& a)
 inline bool operator == (const b2Vec2& a, const b2Vec2& b)
 {
 	return a.x == b.x && a.y == b.y;
-}
-
-inline bool operator != (const b2Vec2& a, const b2Vec2& b)
-{
-	return a.x != b.x || a.y != b.y;
 }
 
 inline float32 b2Distance(const b2Vec2& a, const b2Vec2& b)

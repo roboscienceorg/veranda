@@ -19,13 +19,10 @@
 #ifndef B2_SETTINGS_H
 #define B2_SETTINGS_H
 
+#include <Box2D/Common/b2Api.h>
 #include <stddef.h>
 #include <assert.h>
 #include <float.h>
-
-#if !defined(NDEBUG)
-	#define b2DEBUG
-#endif
 
 #define B2_NOT_USED(x) ((void)(x))
 #define b2Assert(A) assert(A)
@@ -132,13 +129,13 @@ typedef double float64;
 // Memory Allocation
 
 /// Implement this function to use your own memory allocator.
-void* b2Alloc(int32 size);
+BOX2D_API void* b2Alloc(int32 size);
 
 /// If you implement b2Alloc, you should also implement this function.
-void b2Free(void* mem);
+BOX2D_API void b2Free(void* mem);
 
 /// Logging function.
-void b2Log(const char* string, ...);
+BOX2D_API void b2Log(const char* string, ...);
 
 /// Version numbering scheme.
 /// See http://en.wikipedia.org/wiki/Software_versioning

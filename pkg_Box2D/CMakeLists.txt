@@ -13,6 +13,7 @@ if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
+add_definitions(-DBOX2D_DLL)
 find_package(ament_cmake REQUIRED)
 
 ament_export_include_directories(include)
@@ -101,9 +102,18 @@ install(
 )
 
 ## Install library
+
+## On ubuntu (and presumably other unix), install/lib is
+## added to LD_LIBRARY_PATH; but on windows, install/bin
+## is added
+set(INSTALLDIR lib)
+if(WIN32)
+    set(INSTALLDIR bin)
+endif()
+
 install(
   TARGETS sdsmt_simulator_box2d
-  DESTINATION lib
+  DESTINATION ${INSTALLDIR}
 )
 
 ament_package()

@@ -3,6 +3,7 @@
 
 #include "world_object_loader_if.h"
 #include "world_object_saver_if.h"
+#include "dllapi.h"
 
 #include <QVector>
 
@@ -16,6 +17,5 @@ public:
 };
 
 Q_DECLARE_INTERFACE(WorldObjectFileHandler_Plugin_If, "org.sdsmt.sim.2d.fileHandler")
-
 
 #endif // WORLD_OBJECT_FILE_HANDLER_PLUGIN_H

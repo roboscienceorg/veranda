@@ -2,7 +2,6 @@
 #define BASIC_VIEWER_H
 
 #include "interfaces/simulator_visual_if.h"
-#include "sdsmt_simulator/model.h"
 
 #include <QMap>
 #include <QTimer>
@@ -13,6 +12,7 @@
 #include <QColor>
 
 #include <Box2D/Box2D.h>
+#include <sdsmt_simulator/model.h>
 
 class BasicViewer : public Simulator_Visual_If
 {

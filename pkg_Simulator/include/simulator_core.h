@@ -3,11 +3,11 @@
 
 #include "interfaces/simulator_physics_if.h"
 #include "interfaces/simulator_ui_if.h"
-#include "sdsmt_simulator/world_object.h"
 #include "interfaces/simulator_visual_if.h"
-#include "map.h"
+#include "interfaces/world_object_wrappers.h"
 
 #include "rclcpp/rclcpp.hpp"
+#include <sdsmt_simulator/world_object.h>
 
 #include <QObject>
 #include <QMap>

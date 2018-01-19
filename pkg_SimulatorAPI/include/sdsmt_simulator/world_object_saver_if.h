@@ -4,6 +4,7 @@
 #include <QString>
 #include <QVector>
 #include "world_object.h"
+#include "dllapi.h"
 
 class WorldObjectSaver_If
 {

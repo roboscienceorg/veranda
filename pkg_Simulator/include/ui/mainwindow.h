@@ -7,9 +7,11 @@
 
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/simulator_visual_if.h"
-#include "sdsmt_simulator/world_object_component_plugin.h"
-#include "sdsmt_simulator/world_object_loader_if.h"
-#include "sdsmt_simulator/world_object_saver_if.h"
+#include "interfaces/world_object_wrappers.h"
+
+#include <sdsmt_simulator/world_object_component_plugin.h>
+#include <sdsmt_simulator/world_object_loader_if.h>
+#include <sdsmt_simulator/world_object_saver_if.h>
 
 namespace Ui {
 class MainWindow;

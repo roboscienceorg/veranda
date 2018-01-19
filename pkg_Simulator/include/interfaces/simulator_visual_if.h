@@ -3,8 +3,8 @@
 
 #include <QWidget>
 
-#include "sdsmt_simulator/model.h"
-#include "old_world_object_if.h"
+#include <sdsmt_simulator/model.h>
+#include <sdsmt_simulator/world_object.h>
 
 class Simulator_Visual_If : public QWidget
 {

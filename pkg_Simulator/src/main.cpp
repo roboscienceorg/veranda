@@ -22,8 +22,9 @@
 #include "basic_physics.h"
 #include "basic_viewer.h"
 #include "ui/mainwindow.h"
-#include "sdsmt_simulator/world_object_component_plugin.h"
-#include "sdsmt_simulator/world_object_file_handler_plugin.h"
+
+#include <sdsmt_simulator/world_object_component_plugin.h>
+#include <sdsmt_simulator/world_object_file_handler_plugin.h>
 
 #include "simulator_core.h"
 

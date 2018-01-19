@@ -9,10 +9,11 @@
 #include <functional>
 
 #include "model.h"
+#include "dllapi.h"
 
 typedef uint32_t object_id;
 
-class PropertyInfo
+class SDSMT_SIMULATOR_API PropertyInfo
 {
 public:
     enum PropertyType {STRING, BOOL, INT, DOUBLE};
@@ -26,7 +27,7 @@ public:
         description(_description), readOnly(_readOnly), isList(_isList), type(_type){}
 };
 
-class Property : public QObject
+class SDSMT_SIMULATOR_API Property : public QObject
 {
     Q_OBJECT
 
@@ -126,7 +127,7 @@ private slots:
     }
 };
 
-class PropertyView : public QObject
+class SDSMT_SIMULATOR_API PropertyView : public QObject
 {
     Q_OBJECT
 

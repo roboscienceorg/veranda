@@ -10,7 +10,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(sdsmt_simulator REQUIRED)
+find_package(sdsmt_simulator_api REQUIRED)
 find_package(sdsmt_simulator_box2d REQUIRED)
 
 ## Find and configure QT
@@ -30,12 +30,13 @@ include_directories( ${CMAKE_BINARY_DIR} )
 ## TODO If possible: Figure out how to mark Qt as a dependency
 ament_export_dependencies(    
     rclcpp
-    sdsmt_simulator
+    sdsmt_simulator_api
     sdsmt_simulator_box2d
 )
 
 # Need to include this early so that moc is happy
-include_directories(${sdsmt_simulator_INCLUDE_DIRS})
+include_directories(${sdsmt_simulator_api_INCLUDE_DIRS})
+include_directories(${sdsmt_simulator_box2d_INCLUDE_DIRS})
 
 ###################
 ## FILE LISTINGS ##
@@ -55,6 +56,7 @@ set(CPP_SRCS
 ###########
 ## Build ##
 ###########
+cmake_policy(SET CMP0071 NEW)
 
 ## Run MOC on files with Qt Keywords and Macros
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
@@ -70,7 +72,7 @@ qt5_use_modules(simple_shape_plugin Core)
 ament_target_dependencies(simple_shape_plugin
     "rclcpp"
     "sdsmt_simulator_box2d"
-    "sdsmt_simulator"
+    "sdsmt_simulator_api"
 )
 
 ## Install lib into same directory as simulator executable

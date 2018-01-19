@@ -19,7 +19,8 @@
 #ifndef B2_BLOCK_ALLOCATOR_H
 #define B2_BLOCK_ALLOCATOR_H
 
-#include "Box2D/Common/b2Settings.h"
+#include <Box2D/Common/b2Api.h>
+#include <Box2D/Common/b2Settings.h>
 
 const int32 b2_chunkSize = 16 * 1024;
 const int32 b2_maxBlockSize = 640;
@@ -32,7 +33,7 @@ struct b2Chunk;
 /// This is a small object allocator used for allocating small
 /// objects that persist for more than one time step.
 /// See: http://www.codeproject.com/useritems/Small_Block_Allocator.asp
-class b2BlockAllocator
+class BOX2D_API b2BlockAllocator
 {
 public:
 	b2BlockAllocator();

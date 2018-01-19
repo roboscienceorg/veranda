@@ -5,6 +5,7 @@
 #include <QVector>
 #include "world_object_component_plugin.h"
 #include "world_object.h"
+#include "dllapi.h"
 
 class WorldObjectLoader_If
 {

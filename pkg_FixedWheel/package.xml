@@ -8,7 +8,7 @@
 
   <license>TODO</license>
 
-  <depend>sdsmt_simulator</depend>
+  <depend>sdsmt_simulator_api</depend>
   <depend>sdsmt_simulator_box2d</depend>
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>

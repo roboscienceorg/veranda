@@ -6,7 +6,7 @@
 
 #include <Box2D/Box2D.h>
 
-#include "../sdsmt_simulator/world_object.h"
+#include "interfaces/world_object_wrappers.h"
 
 class Simulator_Physics_If : public QObject
 {

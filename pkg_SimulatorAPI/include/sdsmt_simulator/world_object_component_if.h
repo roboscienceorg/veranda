@@ -10,8 +10,9 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sdsmt_simulator/model.h"
 #include "sdsmt_simulator/property.h"
+#include "dllapi.h"
 
-class WorldObjectComponent_If : public QObject
+class SDSMT_SIMULATOR_API WorldObjectComponent_If : public QObject
 {
     Q_OBJECT
 

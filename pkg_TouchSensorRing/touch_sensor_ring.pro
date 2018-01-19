@@ -3,7 +3,7 @@ QT       += core
 TARGET = diffDrive_drivetrain
 TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being set
 
-INCLUDEPATH += include ../pkg_Simulator/include
+INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include
 
 SOURCES += \
     src/touch_sensor.cpp \

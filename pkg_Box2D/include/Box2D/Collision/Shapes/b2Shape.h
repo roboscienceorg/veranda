@@ -19,9 +19,10 @@
 #ifndef B2_SHAPE_H
 #define B2_SHAPE_H
 
-#include "Box2D/Common/b2BlockAllocator.h"
-#include "Box2D/Common/b2Math.h"
-#include "Box2D/Collision/b2Collision.h"
+#include <Box2D/Common/b2Api.h>
+#include <Box2D/Common/b2BlockAllocator.h>
+#include <Box2D/Common/b2Math.h>
+#include <Box2D/Collision/b2Collision.h>
 
 /// This holds the mass data computed for a shape.
 struct b2MassData
@@ -39,10 +40,10 @@ struct b2MassData
 /// A shape is used for collision detection. You can create a shape however you like.
 /// Shapes used for simulation in b2World are created automatically when a b2Fixture
 /// is created. Shapes may encapsulate a one or more child shapes.
-class b2Shape
+class BOX2D_API b2Shape
 {
 public:
-	
+
 	enum Type
 	{
 		e_circle = 0,
@@ -90,9 +91,6 @@ public:
 	virtual void ComputeMass(b2MassData* massData, float32 density) const = 0;
 
 	Type m_type;
-
-	/// Radius of a shape. For polygonal shapes this must be b2_polygonRadius. There is no support for
-	/// making rounded polygons.
 	float32 m_radius;
 };
 

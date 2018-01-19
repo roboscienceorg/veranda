@@ -2,6 +2,7 @@
 #define WORLD_OBJECT_COMPONENT_PLUGIN_H
 
 #include "world_object_component_if.h"
+#include "dllapi.h"
 
 class WorldObjectComponent_Plugin_If
 {

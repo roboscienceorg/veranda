@@ -19,7 +19,8 @@
 #ifndef B2_WORLD_CALLBACKS_H
 #define B2_WORLD_CALLBACKS_H
 
-#include "Box2D/Common/b2Settings.h"
+#include <Box2D/Common/b2Api.h>
+#include <Box2D/Common/b2Settings.h>
 
 struct b2Vec2;
 struct b2Transform;
@@ -49,7 +50,7 @@ public:
 
 /// Implement this class to provide collision filtering. In other words, you can implement
 /// this class if you want finer control over contact creation.
-class b2ContactFilter
+class BOX2D_API b2ContactFilter
 {
 public:
 	virtual ~b2ContactFilter() {}

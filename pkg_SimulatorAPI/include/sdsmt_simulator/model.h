@@ -6,7 +6,9 @@
 
 #include <Box2D/Box2D.h>
 
-class Model : public QObject
+#include "dllapi.h"
+
+class SDSMT_SIMULATOR_API Model : public QObject
 {
     Q_OBJECT
 
