@@ -56,7 +56,10 @@ set(CPP_SRCS
 ###########
 ## Build ##
 ###########
-cmake_policy(SET CMP0071 NEW)
+# Use new MOC policy if CMake 3.10+
+if(NOT ${CMAKE_VERSION} VERSION_LESS "3.10")
+    cmake_policy(SET CMP0071 NEW)
+endif()
 
 ## Run MOC on files with Qt Keywords and Macros
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
