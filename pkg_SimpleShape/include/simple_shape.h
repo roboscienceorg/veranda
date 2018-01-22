@@ -98,12 +98,14 @@ private slots:
 
 public slots:
     //Connects to all ROS topics
-    virtual void connectChannels();
+    virtual void connectChannels(){}
 
     //Disconnects all ROS topics
-    virtual void disconnectChannels();
+    virtual void disconnectChannels(){}
 
     virtual void worldTicked(const b2World*, const double);
+
+    virtual void setObjectMass(double mass){}
 };
 
 #endif // FLOATER_DRIVETRAIN_H

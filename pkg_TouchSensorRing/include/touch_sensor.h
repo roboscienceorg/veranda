@@ -132,6 +132,8 @@ public slots:
     virtual void disconnectChannels();
 
     virtual void worldTicked(const b2World*, const double);
+
+    virtual void setObjectMass(double mass){}
 };
 
 #endif // FLOATER_DRIVETRAIN_H

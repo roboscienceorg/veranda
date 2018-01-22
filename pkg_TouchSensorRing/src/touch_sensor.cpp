@@ -106,6 +106,8 @@ void Touch_Sensor::clearBodies(b2World *world)
         weldJoint = nullptr;
         sensorBody = nullptr;
         sensorFix = nullptr;
+
+        massChanged(this, 0);
     }
 }
 
@@ -161,6 +163,8 @@ void Touch_Sensor::_attachSensorFixture()
         fixDef.density = 1;
 
         sensorFix = sensorBody->CreateFixture(&fixDef);
+
+        massChanged(this, sensorBody->GetMass());
     }
 }
 

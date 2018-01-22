@@ -53,6 +53,11 @@ WorldObject::WorldObject(QVector<WorldObjectComponent_If *> components, QObject 
         * Channels
         *************/
         if(c->usesChannels()) _useChannels = true;
+
+       /*************
+        * Mass Aggregation
+        *************/
+        connect(c, &WorldObjectComponent_If::massChanged, this, &WorldObject::componentMassChanged);
     }
 
     debugModel = new Model();
@@ -77,6 +82,10 @@ WorldObject* WorldObject::clone(QObject *newParent)
 void WorldObject::clearBodies(b2World *world)
 {
     QVector<WorldObjectComponent_If*> components = getComponents();
+
+    disconnect(this, &WorldObject::massChanged, 0, 0);
+    _totalMass = 0;
+    _componentMasses.clear();
 
     if(anchorBody)
     {
@@ -119,11 +128,19 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
 
         //Transform component bodies to starting orientation
         for(b2Body* b : componentBodies)
-        _transformToStart(b);
+            _transformToStart(b);
     }
 
     //Transform main body to starting orientation
     _transformToStart(anchorBody);
+
+    _totalMass += anchorBody->GetMass();
+
+    for(WorldObjectComponent_If* c : components)
+    {
+        connect(this, &WorldObject::massChanged, c, &WorldObjectComponent_If::setObjectMass);
+        c->setObjectMass(_totalMass);
+    }
 }
 
 void WorldObject::connectChannels()
@@ -180,4 +197,19 @@ void WorldObject::setROSNode(std::shared_ptr<rclcpp::Node> node)
 {
     for(WorldObjectComponent_If* c : _components)
         c->setROSNode(node);
+}
+
+void WorldObject::componentMassChanged(WorldObjectComponent_If *component, double mass)
+{
+    auto curr = _componentMasses.find(component);
+    if(curr == _componentMasses.end())
+    {
+        curr = _componentMasses.insert(component, 0);
+    }
+
+    _totalMass -= curr.value();
+    curr.value() = mass;
+    _totalMass += curr.value();
+
+    massChanged(_totalMass);
 }

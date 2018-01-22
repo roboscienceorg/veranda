@@ -28,19 +28,6 @@ void Simple_Shape::_channelChanged(QVariant)
     }
 }
 
-void Simple_Shape::connectChannels()
-{
-    if(_connected)
-        disconnectChannels();
-
-    _connected = true;
-}
-
-void Simple_Shape::disconnectChannels()
-{
-    _connected = false;
-}
-
 void Simple_Shape::_buildModels()
 {
     //Clear always-showing model
@@ -79,6 +66,8 @@ QVector<b2Body*> Simple_Shape::generateBodies(b2World *world, object_id oId, b2B
     joint = (b2WeldJoint*)world->CreateJoint(&jointDef);
 
     _buildModels();
+
+    massChanged(this, body->GetMass());
     return {body};
 }
 
@@ -86,6 +75,7 @@ void Simple_Shape::clearBodies(b2World* world)
 {
     world->DestroyJoint(joint);
     world->DestroyBody(body);
+    massChanged(this, 0);
 }
 
 void Simple_Shape::worldTicked(const b2World*, const double)

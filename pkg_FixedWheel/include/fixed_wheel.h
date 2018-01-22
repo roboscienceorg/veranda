@@ -50,6 +50,9 @@ class Fixed_Wheel : public WorldObjectComponent_If
     Property _driven = Property(PropertyInfo(false, false, PropertyInfo::BOOL, "Whether or not the wheel is driven"),
                                QVariant(false), &Property::bool_validator);
 
+    Property _density = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Density of the wheel"),
+                                 QVariant(1), &Property::abs_double_validator);
+
     QMap<QString, PropertyView> _properties{
         {"channels/input_speed", &_inputChannel},
         {"x_local", &_xLocal},
@@ -57,13 +60,15 @@ class Fixed_Wheel : public WorldObjectComponent_If
         {"theta_local", &_thetaLocal},
         {"wheel_radius", &_radius},
         {"wheel_width", &_width},
-        {"is_driven", &_driven}
+        {"is_driven", &_driven},
+        {"density", &_density}
     };
 
     object_id _objectId;
 
     Model* _wheelModel = nullptr;
     QVector<b2Shape*> _wheelShapes;
+    double _objectMass;
 
     b2Body* _wheelBody = nullptr;
     b2Fixture* _wheelFix = nullptr;
@@ -117,6 +122,11 @@ public slots:
     virtual void disconnectChannels();
 
     virtual void worldTicked(const b2World*, const double);
+
+    virtual void setObjectMass(double mass)
+    {
+        _objectMass = mass;
+    }
 };
 
 #endif // FLOATER_DRIVETRAIN_H

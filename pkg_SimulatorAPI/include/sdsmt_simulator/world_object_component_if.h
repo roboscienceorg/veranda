@@ -41,6 +41,10 @@ public slots:
     virtual void connectChannels() = 0;
     virtual void disconnectChannels() = 0;
     virtual void worldTicked(const b2World* w, const double t) = 0;
+    virtual void setObjectMass(double mass) = 0;
+
+signals:
+    virtual void massChanged(WorldObjectComponent_If* component, double mass);
 };
 
 #endif // WORLD_OBJECT_COMPONENT_H

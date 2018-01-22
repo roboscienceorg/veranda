@@ -49,6 +49,9 @@ class SDSMT_SIMULATOR_API WorldObject : public QObject
         {"Theta", &_locTheta}
     };
 
+    QMap<WorldObjectComponent_If*, double> _componentMasses;
+    double _totalMass = 0;
+
 public:
     WorldObject(QVector<WorldObjectComponent_If*> components, QObject* parent = nullptr);
 
@@ -81,6 +84,10 @@ public slots:
     void connectChannels();
     void disconnectChannels();
     void worldTicked(const b2World* w, const double t);
+    void componentMassChanged(WorldObjectComponent_If* component, double mass);
+
+signals:
+    void massChanged(double);
 };
 
 #endif // WORLD_OBJECT_IF_H

@@ -75,15 +75,16 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
 
     WorldObject* robot1 = new WorldObject(components);
     QMap<QString, PropertyView> props = robot1->getProperties();
-    props["X"].set(5, true);
+    props["X"].set(0, true);
     props["Y"].set(0, true);
-    props["Theta"].set(45, true);
+    props["Theta"].set(0, true);
 
+    /*
     WorldObject* robot2 = new WorldObject(components);
 
     robot2->getProperties()["X"].set(0, true);
     robot2->getProperties()["Y"].set(0, true);
     robot2->getProperties()["Theta"].set(315, true);
-
-    return QVector<WorldObject*>{robot1, robot2};
+    */
+    return QVector<WorldObject*>{robot1};
 }
