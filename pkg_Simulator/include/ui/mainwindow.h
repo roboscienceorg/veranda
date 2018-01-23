@@ -78,9 +78,8 @@ public slots:
 private slots:
 
     //Slots for button clicks on all menus
-    void simModeButtonClick();
-    void mapModeButtonClick();
-    void robotModeButtonClick();
+    void simulatorButtonClick();
+    void designerButtonClick();
     void showBuildObjectsButtonClick();
     void showMenuButtonClick();
     void playSimButtonClick();

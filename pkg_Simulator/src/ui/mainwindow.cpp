@@ -32,14 +32,14 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
 
     //Initialize Widget Settings
     ui->buildToolsWidget->setVisible((false));
-    ui->simModeMenuWidget->setVisible(false);
-    ui->robotModeMenuWidget->setVisible(false);
+    ui->designerMenuWidget->setVisible(false);
     ui->playSimButton->setToolTip("Play Simulation");
     ui->speedSimButton->setToolTip("Speed x2");
 
-    ui->mapModeButton->setEnabled(false);
+    ui->simulatorButton->setEnabled(false);
     ui->modeLabel->setText("Map Mode");
 
+    //Did Andrew do this? Setting Properties to display those of the map (?)
     visual = makeWidget();
     ui->worldViewLayout->addWidget(visual);
     ui->propertiesTableView->verticalHeader()->setVisible(false);
@@ -49,9 +49,8 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     //Main window button signals and slots
     connect(ui->showBuildObjectsButton, SIGNAL (released()), this, SLOT (showBuildObjectsButtonClick()));
     connect(ui->showMenuButton, SIGNAL (released()), this, SLOT (showMenuButtonClick()));
-    connect(ui->simModeButton, SIGNAL (released()), this, SLOT (simModeButtonClick()));
-    connect(ui->robotModeButton, SIGNAL (released()), this, SLOT (robotModeButtonClick()));
-    connect(ui->mapModeButton, SIGNAL (released()), this, SLOT (mapModeButtonClick()));
+    connect(ui->simulatorButton, SIGNAL (released()), this, SLOT (simulatorButtonClick()));
+    connect(ui->designerButton, SIGNAL (released()), this, SLOT (designerButtonClick()));
 
     //Simulation mode button signals and slots
     connect(ui->playSimButton, SIGNAL (released()), this, SLOT (playSimButtonClick()));
@@ -67,7 +66,6 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     propertiesModel->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
     ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->propertiesTableView->setModel(propertiesModel);
-
     connect(ui->robotsWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(robotItemClicked(QListWidgetItem*)));
     connect(visual, SIGNAL (userSelectedModel(model_id id)), this, SLOT (modelSelected(model_id id)));
 }
@@ -78,50 +76,31 @@ MainWindow::~MainWindow()
 }
 
 //Menu Mode Button Clicks
-void MainWindow::simModeButtonClick()
+void MainWindow::simulatorButtonClick()
 {
-    ui->modeLabel->setText("Simulation Mode");
-    ui->propertiesLabel->setText("Simulation Properties");
+    ui->modeLabel->setText("Simulator");
+    ui->propertiesLabel->setText("Simulation Object Properties");
     ui->buildToolsLabel->setText("Simulation Build Tools");
 
-    ui->simModeMenuWidget->setVisible(true);
-    ui->mapModeMenuWidget->setVisible(false);
-    ui->robotModeMenuWidget->setVisible(false);
+    ui->simulatorMenuWidget->setVisible(true);
+    ui->designerMenuWidget->setVisible(false);
 
     //Enable/Disable Mode Buttons
-    ui->robotModeButton->setEnabled(true);
-    ui->mapModeButton->setEnabled(true);
-    ui->simModeButton->setEnabled(false);
+    ui->designerButton->setEnabled(true);
+    ui->simulatorButton->setEnabled(false);
 }
-void MainWindow::mapModeButtonClick()
+void MainWindow::designerButtonClick()
 {
-    ui->modeLabel->setText("Map Mode");
-    ui->propertiesLabel->setText("Map Properties");
-    ui->buildToolsLabel->setText("Map Build Tools");
+    ui->modeLabel->setText("Designer");
+    ui->propertiesLabel->setText("Designer Object Properties");
+    ui->buildToolsLabel->setText("Designer Build Tools");
 
-    ui->simModeMenuWidget->setVisible(false);
-    ui->mapModeMenuWidget->setVisible(true);
-    ui->robotModeMenuWidget->setVisible(false);
+    ui->simulatorMenuWidget->setVisible(false);
+    ui->designerMenuWidget->setVisible(true);
 
     //Enable/Disable Mode Buttons
-    ui->robotModeButton->setEnabled(true);
-    ui->simModeButton->setEnabled(true);
-    ui->mapModeButton->setEnabled(false);
-}
-void MainWindow::robotModeButtonClick()
-{
-    ui->modeLabel->setText("Robot Mode");
-    ui->propertiesLabel->setText("Robot Properties");
-    ui->buildToolsLabel->setText("Robot Build Tools");
-
-    ui->simModeMenuWidget->setVisible(false);
-    ui->mapModeMenuWidget->setVisible(false);
-    ui->robotModeMenuWidget->setVisible(true);
-
-    //Enable/Disable Mode Buttons
-    ui->simModeButton->setEnabled(true);
-    ui->mapModeButton->setEnabled(true);
-    ui->robotModeButton->setEnabled(false);
+    ui->simulatorButton->setEnabled(true);
+    ui->designerButton->setEnabled(false);
 }
 
 void MainWindow::physicsStarted()
@@ -133,8 +112,7 @@ void MainWindow::physicsStarted()
 
     //disable options while simulation is running
     ui->saveSimButton->setEnabled(false);
-    ui->mapModeButton->setEnabled(false);
-    ui->robotModeButton->setEnabled(false);
+    ui->designerButton->setEnabled(false);
     ui->buildToolsList->setEnabled(false);
 }
 
@@ -147,8 +125,7 @@ void MainWindow::physicsStopped()
 
     //enable options while simulation is running
     ui->saveSimButton->setEnabled(true);
-    ui->mapModeButton->setEnabled(true);
-    ui->robotModeButton->setEnabled(true);
+    ui->designerButton->setEnabled(true);
     ui->buildToolsList->setEnabled(true);
 }
 
@@ -200,10 +177,6 @@ void MainWindow::screenshotSimButtonClick()
     QPixmap pixmap(visual->size());
     visual->render(&pixmap);
     qint64 current = QDateTime::currentMSecsSinceEpoch();
-    //QString fileName = current.toString();
-
-    //std::stringstream ss;
-    //ss << current;
     QString fileName = QString::number(current);
 
     QFile file(fileName);
@@ -383,4 +356,6 @@ void MainWindow::listBuildTools(int mode)
 {
     //for(auto iter = robot->getProperties().begin(); iter != robot->getProperties().end(); iter++)
         //connect(&iter.value(), &PropertyView::valueSet, [](QVariant v){qDebug() << v;});
+    //for each file in folder
+        //put name of build object? can I add an icon for each build object? would be useful
 }
