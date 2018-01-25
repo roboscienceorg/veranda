@@ -107,7 +107,8 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
 
     b2BodyDef anchorDef;
     anchorDef.type = b2_dynamicBody;
-    anchorDef.position.Set(0,0);
+    anchorDef.position.Set(_locX.get().toDouble(), _locY.get().toDouble());
+    anchorDef.angle = _locTheta.get().toDouble() * DEG2RAD;
     anchorBody = world->CreateBody(&anchorDef);
 
     b2CircleShape* circ = new b2CircleShape;
@@ -124,15 +125,8 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
 
     for(int i = 0; i < components.size(); i++)
     {
-        QVector<b2Body*> componentBodies = components[i]->generateBodies(world, oId, anchorBody);
-
-        //Transform component bodies to starting orientation
-        for(b2Body* b : componentBodies)
-            _transformToStart(b);
+        components[i]->generateBodies(world, oId, anchorBody);
     }
-
-    //Transform main body to starting orientation
-    _transformToStart(anchorBody);
 
     _totalMass += anchorBody->GetMass();
 
@@ -171,26 +165,6 @@ void WorldObject::worldTicked(const b2World* w, const double t)
 
     for(WorldObjectComponent_If* c : _components)
         c->worldTicked(w, t);
-}
-
-void WorldObject::_transformToStart(b2Body* body)
-{
-    double cosT = cos(_locTheta.get().toDouble()*DEG2RAD);
-    double sinT = sin(_locTheta.get().toDouble()*DEG2RAD);
-
-    b2Vec2 relativeLoc = body->GetWorldCenter();
-
-    //Apply rotation matrix
-    b2Vec2 newLoc;
-    newLoc.x = cosT * relativeLoc.x - sinT * relativeLoc.y;
-    newLoc.y = sinT * relativeLoc.x + cosT * relativeLoc.y;
-
-    //Offset
-    newLoc += b2Vec2(_locX.get().toDouble(), _locY.get().toDouble());
-
-    qDebug() << "Moved body from " << relativeLoc.x << ", " << relativeLoc.y << " : " << body->GetAngle();
-    qDebug() << "Result: " << newLoc.x << ", " << newLoc.y << " : " << body->GetAngle() + _locTheta.get().toDouble()*DEG2RAD;
-    body->SetTransform(newLoc, body->GetAngle() + _locTheta.get().toDouble()*DEG2RAD);
 }
 
 void WorldObject::setROSNode(std::shared_ptr<rclcpp::Node> node)

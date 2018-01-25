@@ -35,15 +35,15 @@ Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent_If(parent)
     _wheelModel = new Model({}, {}, this);
 }
 
-QVector<b2Body*> Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
+void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
 {
     clearBodies(world);
 
     b2BodyDef bDef;
-    bDef.angle = _thetaLocal.get().toDouble()*DEG2RAD;
-    bDef.position = b2Vec2(_xLocal.get().toDouble(), _yLocal.get().toDouble());
     bDef.type = b2_dynamicBody;
     _wheelBody = world->CreateBody(&bDef);
+
+    moveBodyToLocalSpaceOfOtherBody(_wheelBody, anchor, _xLocal.get().toDouble(), _yLocal.get().toDouble(), _thetaLocal.get().toDouble());
 
     b2WeldJointDef weldDef;
     auto anchorPt = anchor->GetWorldCenter();
@@ -58,8 +58,6 @@ QVector<b2Body*> Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Bo
 
     _attachWheelFixture();
     _buildModels();
-
-    return {_wheelBody};
 }
 
 void Fixed_Wheel::clearBodies(b2World *world)

@@ -111,15 +111,16 @@ void Touch_Sensor::clearBodies(b2World *world)
     }
 }
 
-QVector<b2Body*> Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+void Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     clearBodies(world);
 
     b2BodyDef bDef;
     bDef.angle = theta_local.get().toDouble()*DEG2RAD;
-    bDef.position = b2Vec2(x_local.get().toDouble(), y_local.get().toDouble());
     bDef.type = b2_dynamicBody;
     sensorBody = world->CreateBody(&bDef);
+
+    moveBodyToLocalSpaceOfOtherBody(sensorBody, anchor, x_local.get().toDouble(), y_local.get().toDouble());
 
     b2WeldJointDef weldDef;
     auto anchorPt = anchor->GetWorldCenter();
@@ -134,8 +135,6 @@ QVector<b2Body*> Touch_Sensor::generateBodies(b2World *world, object_id oId, b2B
 
     _attachSensorFixture();
     _buildModels();
-
-    return {sensorBody};
 }
 
 void Touch_Sensor::_attachSensorFixture()

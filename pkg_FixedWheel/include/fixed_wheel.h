@@ -77,7 +77,7 @@ class Fixed_Wheel : public WorldObjectComponent_If
     b2Vec2 _localWheelRightUnit;
 
     //Data published
-    double _targetAngularVelocity;
+    double _targetAngularVelocity = 0;
 
 public:
     Fixed_Wheel(QObject* parent=nullptr);
@@ -100,7 +100,7 @@ public:
         return true;
     }
 
-    QVector<b2Body *> generateBodies(b2World* world, object_id oId, b2Body* anchor);
+    void generateBodies(b2World* world, object_id oId, b2Body* anchor);
     void clearBodies(b2World *world);
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);

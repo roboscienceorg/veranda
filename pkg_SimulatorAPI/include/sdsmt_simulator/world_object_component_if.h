@@ -17,6 +17,10 @@ class SDSMT_SIMULATOR_API WorldObjectComponent_If : public QObject
     Q_OBJECT
 
 public:
+    constexpr static double PI = 3.14159265359;
+    constexpr static double RAD2DEG = 360.0/(2*PI);
+    constexpr static double DEG2RAD = 1.0/RAD2DEG;
+
     WorldObjectComponent_If(QObject* parent=nullptr) : QObject(parent){}
 
     //Constructs copy of component
@@ -34,8 +38,11 @@ public:
 
     virtual bool usesChannels() = 0;
 
-    virtual QVector<b2Body*> generateBodies(b2World* world, object_id oId, b2Body* anchor) = 0;
+    virtual void generateBodies(b2World* world, object_id oId, b2Body* anchor) = 0;
     virtual void clearBodies(b2World* world) = 0;
+
+    static void moveBodyToLocalSpaceOfOtherBody(b2Body* bodyToMove, b2Body* bodyToReference,
+                                                double xRelative, double yRelative, double thetaRelativeDegrees);
 
 public slots:
     virtual void connectChannels() = 0;
@@ -46,5 +53,25 @@ public slots:
 signals:
     virtual void massChanged(WorldObjectComponent_If* component, double mass);
 };
+
+inline void WorldObjectComponent_If::moveBodyToLocalSpaceOfOtherBody(b2Body* bodyToMove, b2Body* bodyToReference,
+                                                                     double xRelative=0, double yRelative=0, double thetaRelativeDegrees=0)
+{
+    double referenceAngle = bodyToReference->GetAngle();
+    double cosT = cos(referenceAngle);
+    double sinT = sin(referenceAngle);
+
+    b2Vec2 relativeLoc(xRelative, yRelative);
+
+    //Apply rotation matrix
+    b2Vec2 newLoc;
+    newLoc.x = cosT * relativeLoc.x - sinT * relativeLoc.y;
+    newLoc.y = sinT * relativeLoc.x + cosT * relativeLoc.y;
+
+    //Offset
+    newLoc += b2Vec2(bodyToReference->GetWorldCenter().x, bodyToReference->GetWorldCenter().y);
+
+    bodyToMove->SetTransform(newLoc, thetaRelativeDegrees*DEG2RAD + referenceAngle);
+}
 
 #endif // WORLD_OBJECT_COMPONENT_H

@@ -42,13 +42,14 @@ void Simple_Shape::_buildModels()
     shape_model->addShapes({circle});
 }
 
-QVector<b2Body*> Simple_Shape::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+void Simple_Shape::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(anchor->GetPosition().x + x.get().toFloat(), anchor->GetPosition().y + y.get().toFloat());
     bodyDef.angle = 0;
     body = world->CreateBody(&bodyDef);
+
+    moveBodyToLocalSpaceOfOtherBody(body, anchor, x.get().toFloat(), y.get().toFloat());
 
     b2CircleShape circleShape;
     circleShape.m_radius = radius.get().toFloat();
@@ -68,7 +69,6 @@ QVector<b2Body*> Simple_Shape::generateBodies(b2World *world, object_id oId, b2B
     _buildModels();
 
     massChanged(this, body->GetMass());
-    return {body};
 }
 
 void Simple_Shape::clearBodies(b2World* world)

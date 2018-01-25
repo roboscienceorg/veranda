@@ -21,8 +21,6 @@ class SDSMT_SIMULATOR_API WorldObject : public QObject
     constexpr static double RAD2DEG = 360.0/(2*PI);
     constexpr static double DEG2RAD = 1.0/RAD2DEG;
 
-    void _transformToStart(b2Body* body);
-
     QVector<WorldObjectComponent_If*> _components;
 
     bool _useChannels = false;
