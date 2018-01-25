@@ -4,6 +4,8 @@
 #include <string>
 #include <stdexcept>
 
+#include <QElapsedTimer>
+
 BasicPhysics::BasicPhysics(QObject *parent) : Simulator_Physics_If(parent)
 {
     //No gravity for top down simulation

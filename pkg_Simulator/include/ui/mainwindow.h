@@ -41,6 +41,7 @@ private:
     QStandardItemModel* propertiesModel = nullptr;
 
     QMap<object_id, WorldObjectProperties*> worldObjects;
+    QMap<object_id, QListWidgetItem*> listItems;
 
     QMap<uint64_t, QString> displayed_properties;
 
@@ -66,7 +67,6 @@ public slots:
     void errorMessage(QString error){}
 
     void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
-    void drawActiveObjectsList();
 
     //Slot to show main window
     void showMainWindow(){
@@ -92,6 +92,7 @@ private slots:
     void nothingSelected();
     void listBuildTools(int mode);
     void robotItemClicked(QListWidgetItem* item);
+    void updatePropertyInformation();
 
 private:
     Ui::MainWindow *ui;

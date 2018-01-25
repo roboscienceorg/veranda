@@ -67,7 +67,6 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     ui->propertiesTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->propertiesTableView->setModel(propertiesModel);
     connect(ui->robotsWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(robotItemClicked(QListWidgetItem*)));
-    connect(visual, SIGNAL (userSelectedModel(model_id id)), this, SLOT (modelSelected(model_id id)));
 }
 
 MainWindow::~MainWindow()
@@ -249,6 +248,14 @@ void MainWindow::nothingSelected()
 {
     propertiesModel->setRowCount(0);
     disconnect(propertiesModel, &QStandardItemModel::dataChanged, 0, 0);
+
+    if(worldObjects.contains(selected))
+    {
+        for(auto iter : worldObjects[selected]->getProperties())
+            disconnect(&iter, 0, this, 0);
+    }
+    selected = 0;
+
     nothingIsSelected();
 }
 
@@ -263,28 +270,22 @@ void MainWindow::objectSelected(object_id id)
         QStandardItemModel* model = propertiesModel;
 
         QMap<QString, PropertyView>& objProps = obj->getProperties();
+        QStringList propKeys = objProps.keys();
         model->setRowCount(objProps.size());
 
         int i = 0;
-        for(auto iter = objProps.begin(); iter != objProps.end(); iter++, i++)
+        for(QString k : propKeys)
         {
            QModelIndex ind;
 
            //Set key
            ind = model->index(i, 0);
-           model->setData(ind, iter.key());
+           model->setData(ind, k);
 
-           //Init value
-           ind = model->index(i, 1);
-           model->setData(ind, iter.value().get());
+           connect(&objProps[k], &PropertyView::valueSet, this, &MainWindow::updatePropertyInformation);
 
-           //Update value when it changes
-           connect(&iter.value(), &PropertyView::valueSet, [i, model](QVariant v)
-           {
-               model->setData(model->index(i, 1), v);
-           });
-
-           displayed_properties[i] = iter.key();
+           displayed_properties[i] = k;
+           i++;
         }
 
         connect(model, &QStandardItemModel::dataChanged, [this, obj, model](QModelIndex tl, QModelIndex br)
@@ -292,6 +293,10 @@ void MainWindow::objectSelected(object_id id)
            for(int i = tl.row(); i <= br.row(); i++)
                obj->getProperties()[displayed_properties[i]].set(model->data(model->index(i, 1)));
         });
+
+        updatePropertyInformation();
+
+        ui->robotsWidget->setCurrentItem(listItems[id]);
 
         objectIsSelected(id);
     }
@@ -318,44 +323,52 @@ void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties *object, obj
 
     visual->objectAddedToScreen(object->getModels(), oId);
 
+    listItems[oId] = new QListWidgetItem();
+    listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
+    ui->robotsWidget->addItem(listItems[oId]);
+
     objectSelected(oId);
-    drawActiveObjectsList();
 }
 
 void MainWindow::worldObjectRemovedFromSimulation(object_id oId)
 {
     visual->objectRemovedFromScreen(oId);
     worldObjects.remove(oId);
+
+    ui->robotsWidget->removeItemWidget(listItems[oId]);
+    delete listItems[oId];
+    listItems.remove(oId);
+
     if(selected == oId)
         nothingSelected();
-    drawActiveObjectsList();
-}
-
-void MainWindow::drawActiveObjectsList()
-{
-    ui->robotsWidget->clear();
-
-    for(int i = 0; i < worldObjects.size(); i++)
-    {
-        QString str= QString::number(i);
-        ui->robotsWidget->addItem(str);
-    }
 }
 
 void MainWindow::robotItemClicked(QListWidgetItem* item)
 {
-    for(int kl = 1; kl < sizeof(worldObjects) - 1; kl++)
-    {
-        if (ui->robotsWidget->item(kl) == item)
-        {
-            objectSelected(kl);
-        }
-    }
+    objectSelected(item->data(Qt::DisplayRole).toInt());
 }
+
 void MainWindow::listBuildTools(int mode)
 {
     //for(auto iter = robot->getProperties().begin(); iter != robot->getProperties().end(); iter++)
         //connect(&iter.value(), &PropertyView::valueSet, [](QVariant v){qDebug() << v;});
     //for each file in folder
         //put name of build object? can I add an icon for each build object? would be useful
+}
+
+void MainWindow::updatePropertyInformation()
+{
+    if(worldObjects.contains(selected))
+    {
+        QMap<QString, PropertyView>& ppts = worldObjects[selected]->getProperties();
+        QStandardItemModel* model = propertiesModel;
+
+        ui->propertiesTableView->setUpdatesEnabled(false);
+        for(int i=0; i<ppts.size(); i++)
+        {
+            QString key = model->data(model->index(i, 0)).toString();
+            model->setData(model->index(i, 1), ppts[key].get().toString(), Qt::DisplayRole);
+        }
+        ui->propertiesTableView->setUpdatesEnabled(true);
+    }
 }
