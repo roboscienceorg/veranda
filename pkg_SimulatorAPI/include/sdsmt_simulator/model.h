@@ -43,6 +43,11 @@ public:
     const QVector<b2Shape*>& shapes(){ return _shapes; }
     const QVector<Model*>& children(){ return _children; }
 
+    void forceDraw()
+    {
+        modelChanged(this);
+    }
+
     void setTransform(const double& x, const double& y, const double& theta)
     {
         double dx = x-_x, dy = y-_y, dt = theta-_theta;

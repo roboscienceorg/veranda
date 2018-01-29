@@ -49,6 +49,9 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
         propsl["wheel_width"].set(0.5, true);
         propsr["wheel_width"].set(0.5, true);
 
+        propsl["density"].set(20, true);
+        propsr["density"].set(20, true);
+
         propsl["is_driven"].set(true, true);
         propsr["is_driven"].set(true, true);
 
@@ -71,6 +74,23 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
         props["radius"].set(2, true);
 
         components.push_back(simpleShape);
+    }
+
+    if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar"))
+    {
+        qDebug() << "Adding lidar";
+
+        WorldObjectComponent_If* lidar = plugins["org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar"]->createComponent();
+        QMap<QString, PropertyView> props = lidar->getProperties();
+
+        props["x_local"].set(0, true);
+        props["y_local"].set(1, true);
+        props["scan_radius"].set(5, true);
+        props["scan_range"].set(90, true);
+        props["scan_points"].set(20, true);
+        props["scan_rate"].set(10, true);
+
+        components.push_back(lidar);
     }
 
     WorldObject* robot1 = new WorldObject(components);
