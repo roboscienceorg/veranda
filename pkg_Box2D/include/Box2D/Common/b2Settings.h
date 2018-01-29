@@ -133,13 +133,13 @@ typedef double float64;
 // Memory Allocation
 
 /// Implement this function to use your own memory allocator.
-void* BOX2D_API b2Alloc(int32 size);
+BOX2D_API void* b2Alloc(int32 size);
 
 /// If you implement b2Alloc, you should also implement this function.
-void BOX2D_API b2Free(void* mem);
+BOX2D_API void b2Free(void* mem);
 
 /// Logging function.
-void BOX2D_API b2Log(const char* string, ...);
+BOX2D_API void b2Log(const char* string, ...);
 
 /// Version numbering scheme.
 /// See http://en.wikipedia.org/wiki/Software_versioning

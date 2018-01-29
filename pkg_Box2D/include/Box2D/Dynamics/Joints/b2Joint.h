@@ -71,7 +71,7 @@ struct b2JointEdge
 };
 
 /// Joint definitions are used to construct joints.
-struct b2JointDef
+struct BOX2D_API b2JointDef
 {
 	b2JointDef()
 	{

@@ -11,7 +11,7 @@
 #include "model.h"
 #include "dllapi.h"
 
-typedef uint32_t object_id;
+typedef int32_t object_id;
 
 class SDSMT_SIMULATOR_API PropertyInfo
 {
