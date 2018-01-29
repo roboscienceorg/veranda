@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <limits>
+#include <cmath>
 
 class Lidar_Sensor : public WorldObjectComponent_If
 {
@@ -48,7 +49,7 @@ class Lidar_Sensor : public WorldObjectComponent_If
 
             world->RayCast(this, p1, p2);
 
-            return {_bestPoint, _bestDist};
+            return {_bestPoint, std::sqrt(_bestDist)};
         }
     };
 
@@ -96,7 +97,7 @@ class Lidar_Sensor : public WorldObjectComponent_If
                                  QVariant(10), &Property::abs_double_validator);
 
     QMap<QString, PropertyView> _properties{
-        {"channels/output_touches", &output_channel},
+        {"channels/output_ranges", &output_channel},
         {"x_local", &x_local},
         {"y_local", &y_local},
         {"theta_local", &theta_local},

@@ -14,6 +14,7 @@ Lidar_Sensor::Lidar_Sensor(QObject *parent) : WorldObjectComponent_If(parent)
     connect(&scan_points, &Property::valueSet, this, &Lidar_Sensor::_updateDataMessageDimensions);
     connect(&angle_range, &Property::valueSet, this, &Lidar_Sensor::_updateDataMessageDimensions);
     connect(&pub_rate, &Property::valueSet, this, &Lidar_Sensor::_updateDataMessageDimensions);
+    connect(&radius, &Property::valueSet, this, &Lidar_Sensor::_updateDataMessageDimensions);
 
     sensor_model = new Model({}, {}, this);
     scan_model = new Model({}, {}, this);
@@ -54,14 +55,10 @@ WorldObjectComponent_If *Lidar_Sensor::clone(QObject *newParent)
 {
     Lidar_Sensor* out = new Lidar_Sensor(newParent);
 
-    out->output_channel.set(output_channel.get());
-    out->radius.set(radius.get());
-    out->angle_range.set(angle_range.get());
-    out->scan_points.set(scan_points.get());
-    out->pub_rate.set(pub_rate.get());
-    out->x_local.set(x_local.get());
-    out->y_local.set(y_local.get());
-    out->theta_local.set(theta_local.get());
+    for(QString s : _properties.keys())
+    {
+        out->_properties[s].set(_properties[s].get(), true);
+    }
 
     return out;
 }
@@ -96,9 +93,9 @@ void Lidar_Sensor::connectChannels()
             custom_qos_profile.depth = 7;
 
             _sendChannel = _rosNode->create_publisher<sensor_msgs::msg::LaserScan>(_outputChannel.toStdString(), custom_qos_profile);
-            _connected = true;
         }
     }
+    _connected = true;
 }
 
 void Lidar_Sensor::disconnectChannels()
@@ -241,6 +238,9 @@ void Lidar_Sensor::worldTicked(const b2World* world, const double dt)
             double curr_angle = data->angle_min;
             double scan_radius = radius.get().toDouble();
 
+            data->range_min = scan_radius;
+            data->range_max = 0;
+
             b2Vec2 worldOrigin = sensorBody->GetPosition();
             for(int i=0; i<scan_image.size(); i++, curr_angle += data->angle_increment)
             {
@@ -251,10 +251,17 @@ void Lidar_Sensor::worldTicked(const b2World* world, const double dt)
 
                 b2EdgeShape* thisLine = dynamic_cast<b2EdgeShape*>(scan_image[i]);
                 thisLine->m_vertex2 = sensorBody->GetLocalPoint(rayCastResult.first);
+
                 data->ranges[i] = rayCastResult.second;
+
+                if(data->ranges[i] >= 0)
+                    data->range_min = std::min(data->ranges[i], data->range_min);
+
+                if(data->ranges[i] <= scan_radius)
+                    data->range_max = std::max(data->ranges[i], data->range_max);
             }
 
-            if(_connected)
+            if(_sendChannel)
             {
                 _sendChannel->publish(data);
             }
