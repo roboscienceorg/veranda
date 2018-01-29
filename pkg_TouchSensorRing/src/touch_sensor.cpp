@@ -46,14 +46,10 @@ WorldObjectComponent_If *Touch_Sensor::clone(QObject *newParent)
 {
     Touch_Sensor* out = new Touch_Sensor(newParent);
 
-    out->output_channel.set(output_channel.get());
-    out->angle_end.set(angle_end.get());
-    out->angle_start.set(angle_start.get());
-    out->sensor_count.set(sensor_count.get());
-    out->radius.set(radius.get());
-    out->x_local.set(x_local.get());
-    out->y_local.set(y_local.get());
-    out->theta_local.set(theta_local.get());
+    for(QString s : _properties.keys())
+    {
+        out->_properties[s].set(_properties[s].get(), true);
+    }
 
     return out;
 }
@@ -88,9 +84,10 @@ void Touch_Sensor::connectChannels()
             custom_qos_profile.depth = 7;
 
             _sendChannel = _rosNode->create_publisher<std_msgs::msg::ByteMultiArray>(_outputChannel.toStdString(), custom_qos_profile);
-            _connected = true;
         }
     }
+    _connected = true;
+
 }
 
 void Touch_Sensor::disconnectChannels()
@@ -295,7 +292,7 @@ void Touch_Sensor::worldTicked(const b2World*, const double)
         }
         active_touches = currentTouches;
 
-        if(anyChange && _connected)
+        if(anyChange && _sendChannel)
         {
             _sendChannel->publish(data);
         }

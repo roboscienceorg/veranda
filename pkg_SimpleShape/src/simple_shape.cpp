@@ -12,9 +12,10 @@ WorldObjectComponent_If *Simple_Shape::clone(QObject *newParent)
 {
     Simple_Shape* out = new Simple_Shape(newParent);
 
-    out->x.set(x.get());
-    out->y.set(y.get());
-    out->radius.set(radius.get());
+    for(QString s : _properties.keys())
+    {
+        out->_properties[s].set(_properties[s].get(), true);
+    }
 
     return out;
 }

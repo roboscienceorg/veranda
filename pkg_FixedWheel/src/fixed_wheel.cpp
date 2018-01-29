@@ -112,13 +112,10 @@ WorldObjectComponent_If *Fixed_Wheel::clone(QObject *newParent)
 {
     Fixed_Wheel* out = new Fixed_Wheel(newParent);
 
-    out->_inputChannel.set(_inputChannel.get());
-    out->_radius.set(_radius.get());
-    out->_width.set(_width.get());
-    out->_driven.set(_driven.get());
-    out->_xLocal.set(_xLocal.get());
-    out->_yLocal.set(_yLocal.get());
-    out->_thetaLocal.set(_thetaLocal.get());
+    for(QString s : _properties.keys())
+    {
+        out->_properties[s].set(_properties[s].get(), true);
+    }
 
     return out;
 }
@@ -153,9 +150,9 @@ void Fixed_Wheel::connectChannels()
                 _receiveMessage(msg);
             };
             _receiveChannel = _rosNode->create_subscription<std_msgs::msg::Float32>(inputChannel.toStdString(), callback);
-            _connected = true;
         }
     }
+    _connected = true;
 }
 
 void Fixed_Wheel::disconnectChannels()
