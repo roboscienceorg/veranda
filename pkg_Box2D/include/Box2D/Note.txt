@@ -1,1 +1,0 @@
-Box2D with DLL exports found at https://bitbucket.org/Gachapen/box2d-dll/overview

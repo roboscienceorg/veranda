@@ -19,8 +19,7 @@
 #ifndef B2_PRISMATIC_JOINT_H
 #define B2_PRISMATIC_JOINT_H
 
-#include <Box2D/Common/b2Api.h>
-#include <Box2D/Dynamics/Joints/b2Joint.h>
+#include "Box2D/Dynamics/Joints/b2Joint.h"
 
 /// Prismatic joint definition. This requires defining a line of
 /// motion using an axis and an anchor point. The definition uses local
@@ -28,7 +27,7 @@
 /// can violate the constraint slightly. The joint translation is zero
 /// when the local anchor points coincide in world space. Using local
 /// anchors and a local axis helps when saving and loading a game.
-struct b2PrismaticJointDef : public b2JointDef
+struct BOX2D_API b2PrismaticJointDef : public b2JointDef
 {
 	b2PrismaticJointDef()
 	{
@@ -84,14 +83,14 @@ struct b2PrismaticJointDef : public b2JointDef
 /// along an axis fixed in bodyA. Relative rotation is prevented. You can
 /// use a joint limit to restrict the range of motion and a joint motor to
 /// drive the motion or to model joint friction.
-class BOX2D_API b2PrismaticJoint : public b2Joint
+class b2PrismaticJoint : public b2Joint
 {
 public:
-	b2Vec2 GetAnchorA() const;
-	b2Vec2 GetAnchorB() const;
+	b2Vec2 GetAnchorA() const override;
+	b2Vec2 GetAnchorB() const override;
 
-	b2Vec2 GetReactionForce(float32 inv_dt) const;
-	float32 GetReactionTorque(float32 inv_dt) const;
+	b2Vec2 GetReactionForce(float32 inv_dt) const override;
+	float32 GetReactionTorque(float32 inv_dt) const override;
 
 	/// The local anchor point relative to bodyA's origin.
 	const b2Vec2& GetLocalAnchorA() const { return m_localAnchorA; }
@@ -146,16 +145,16 @@ public:
 	float32 GetMotorForce(float32 inv_dt) const;
 
 	/// Dump to b2Log
-	void Dump();
+	void Dump() override;
 
 protected:
 	friend class b2Joint;
 	friend class b2GearJoint;
 	b2PrismaticJoint(const b2PrismaticJointDef* def);
 
-	void InitVelocityConstraints(const b2SolverData& data);
-	void SolveVelocityConstraints(const b2SolverData& data);
-	bool SolvePositionConstraints(const b2SolverData& data);
+	void InitVelocityConstraints(const b2SolverData& data) override;
+	void SolveVelocityConstraints(const b2SolverData& data) override;
+	bool SolvePositionConstraints(const b2SolverData& data) override;
 
 	// Solver shared
 	b2Vec2 m_localAnchorA;

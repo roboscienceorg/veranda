@@ -19,8 +19,7 @@
 #ifndef B2_CONTACT_MANAGER_H
 #define B2_CONTACT_MANAGER_H
 
-#include <Box2D/Common/b2Api.h>
-#include <Box2D/Collision/b2BroadPhase.h>
+#include "Box2D/Collision/b2BroadPhase.h"
 
 class b2Contact;
 class b2ContactFilter;
@@ -41,7 +40,7 @@ public:
 	void Destroy(b2Contact* c);
 
 	void Collide();
-
+            
 	b2BroadPhase m_broadPhase;
 	b2Contact* m_contactList;
 	int32 m_contactCount;
