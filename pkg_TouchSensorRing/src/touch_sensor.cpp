@@ -51,6 +51,9 @@ WorldObjectComponent_If *Touch_Sensor::clone(QObject *newParent)
     out->angle_start.set(angle_start.get());
     out->sensor_count.set(sensor_count.get());
     out->radius.set(radius.get());
+    out->x_local.set(x_local.get());
+    out->y_local.set(y_local.get());
+    out->theta_local.set(theta_local.get());
 
     return out;
 }
@@ -259,45 +262,42 @@ void Touch_Sensor::worldTicked(const b2World*, const double)
 {
     if(sensorBody)
     {
-        if(_connected)
+        bool anyChange = false;
+        QSet<int> currentTouches;
+        QVector<int> newTouches;
+
+        b2ContactEdge* edge = sensorBody->GetContactList();
+        while(edge)
         {
-            bool anyChange = false;
-            QSet<int> currentTouches;
-            QVector<int> newTouches;
+            _evaluateContact(edge->contact, newTouches, currentTouches);
+            edge = edge->next;
+        }
 
-            b2ContactEdge* edge = sensorBody->GetContactList();
-            while(edge)
-            {
-                _evaluateContact(edge->contact, newTouches, currentTouches);
-                edge = edge->next;
-            }
+        active_touches -= currentTouches;
+        anyChange = active_touches.size() || newTouches.size();
 
-            active_touches -= currentTouches;
-            anyChange = active_touches.size() || newTouches.size();
+        QVector<b2Shape*> newHitModels, oldHitModels;
+        for(int i : newTouches)
+        {
+            newHitModels.push_back(touch_image[i]);
+        }
 
-            QVector<b2Shape*> newHitModels, oldHitModels;
-            for(int i : newTouches)
-            {
-                newHitModels.push_back(touch_image[i]);
-            }
+        for(int i : active_touches)
+        {
+            data->data[i] = 0;
+            oldHitModels.push_back(touch_image[i]);
+        }
 
-            for(int i : active_touches)
-            {
-                data->data[i] = 0;
-                oldHitModels.push_back(touch_image[i]);
-            }
+        if(newHitModels.size() || oldHitModels.size())
+        {
+            touches_model->addShapes(newHitModels);
+            touches_model->removeShapes(oldHitModels);
+        }
+        active_touches = currentTouches;
 
-            if(newHitModels.size() || oldHitModels.size())
-            {
-                touches_model->addShapes(newHitModels);
-                touches_model->removeShapes(oldHitModels);
-            }
-            active_touches = currentTouches;
-
-            if(anyChange)
-            {
-                _sendChannel->publish(data);
-            }
+        if(anyChange && _connected)
+        {
+            _sendChannel->publish(data);
         }
 
         double x = sensorBody->GetWorldCenter().x;

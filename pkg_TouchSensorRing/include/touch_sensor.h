@@ -18,10 +18,6 @@ class Touch_Sensor : public WorldObjectComponent_If
 {
     Q_OBJECT
 
-    constexpr static double PI = 3.14159265359;
-    constexpr static double RAD2DEG = 360.0/(2*PI);
-    constexpr static double DEG2RAD = 1.0/RAD2DEG;
-
     object_id objectId = 0;
     QString _outputChannel;
     bool _connected = false;

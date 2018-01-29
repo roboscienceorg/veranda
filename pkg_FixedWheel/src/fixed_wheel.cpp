@@ -26,6 +26,7 @@ Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent_If(parent)
         {
             _wheelFix->SetDensity(d.toDouble());
             _wheelBody->ResetMassData();
+            massChanged(this, _wheelBody->GetMass());
         }
     });
 

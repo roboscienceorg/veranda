@@ -18,10 +18,6 @@ class Fixed_Wheel : public WorldObjectComponent_If
 {
     Q_OBJECT
 
-    constexpr static double PI = 3.14159265359;
-    constexpr static double RAD2DEG = 360.0/(2*PI);
-    constexpr static double DEG2RAD = 1.0/RAD2DEG;
-
     bool _connected = false;
 
     std::shared_ptr<rclcpp::Node> _rosNode;
