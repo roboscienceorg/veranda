@@ -19,7 +19,7 @@
 
 //Constructor
 //Sets up widget with subwidget to view a graphics scene
-//makes the 
+//makes the
 BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
 {
     _children = new QVBoxLayout(this);
@@ -121,7 +121,7 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 
         _setOutlineColor(graphic, newColor);
         _scene->addItem(graphic);
-    }    
+    }
 }
 
 
@@ -210,7 +210,7 @@ void BasicViewer::setWorldBounds(double xMin, double xMax, double yMin, double y
     _rescale();
 }
 
-//for after the MVP 
+//for after the MVP
 //The object identified by object_id is no longer on the world
 void BasicViewer::objectRemovedFromScreen(object_id id)
 {
@@ -265,6 +265,19 @@ void BasicViewer::objectSelected(object_id id)
             _setOutlineColor(_shapes[m], newColor);
     }
 }
+
+//No objects are selected, draw without highlights
+void BasicViewer::nothingSelected()
+{
+    QColor newColor;
+    if(_currSelection != 0)
+    {
+        newColor = _color(_drawLevels[_currSelection], false);
+        for(Model* m : _models[_currSelection])
+            _setOutlineColor(_shapes[m], newColor);
+    }
+}
+
 
 //Returns a color given drawlevel and state of selected
 QColor BasicViewer::_color(DrawLevel level, bool selected)

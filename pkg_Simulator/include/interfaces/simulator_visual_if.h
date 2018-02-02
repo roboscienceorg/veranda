@@ -25,5 +25,6 @@ public slots:
     virtual void objectRemovedFromScreen(object_id id) = 0;
     virtual void objectDrawLevelSet(object_id id, DrawLevel) = 0;
     virtual void objectSelected(object_id id) = 0;
+    virtual void nothingSelected() = 0;
 };
 #endif // SIMULATOR_VISUAL_H

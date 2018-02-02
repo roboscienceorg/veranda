@@ -63,6 +63,7 @@ public slots:
     void objectRemovedFromScreen(object_id id) override;
     void objectDrawLevelSet(object_id id, DrawLevel level) override;
     void objectSelected(object_id id) override;
+    void nothingSelected() override;
 
 private slots:
     void modelMoved(Model* m, double dx, double dy, double dt);

@@ -10,10 +10,22 @@
     <height>855</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
@@ -28,7 +40,7 @@
       <layout class="QHBoxLayout" name="menuLayout">
        <item>
         <widget class="QWidget" name="menuWidget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,1">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,1">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
@@ -273,7 +285,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/des/ExportFileIcon</normaloff>:/des/ExportFileIcon</iconset>
+                 <normaloff>:/sim/SaveFileIcon</normaloff>:/sim/SaveFileIcon</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -284,56 +296,16 @@
               </widget>
              </item>
              <item>
-              <widget class="QToolButton" name="leftObjectButton">
+              <widget class="QToolButton" name="loadObjectButton">
                <property name="toolTip">
-                <string>Previous Object</string>
+                <string>Load Object</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/des/MoveLeftIcon</normaloff>:/des/MoveLeftIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="rightObjectButton">
-               <property name="toolTip">
-                <string>Next Object</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/des/MoveRightIcon</normaloff>:/des/MoveRightIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="deleteObjectButton">
-               <property name="toolTip">
-                <string>Delete Object</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/des/DeleteFileIcon</normaloff>:/des/DeleteFileIcon</iconset>
+                 <normaloff>:/sim/ImportMapIcon</normaloff>:/sim/ImportMapIcon</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -363,7 +335,10 @@
            </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="robotsWidget"/>
+           <widget class="QListWidget" name="designerActiveWidget"/>
+          </item>
+          <item>
+           <widget class="QListWidget" name="simulatorActiveWidget"/>
           </item>
           <item>
            <widget class="QLabel" name="propertiesLabel">
@@ -374,7 +349,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>Simulator Object Properties</string>
+             <string>Object Properties</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -500,7 +475,7 @@
        </item>
        <item>
         <widget class="QWidget" name="buildToolsWidget" native="true">
-         <layout class="QVBoxLayout" name="buildToolsLayout" stretch="0,1">
+         <layout class="QVBoxLayout" name="buildToolsLayout" stretch="0,0,0,1,1">
           <item>
            <widget class="QLabel" name="buildToolsLabel">
             <property name="frameShape">
@@ -510,7 +485,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>Map Build Tools</string>
+             <string>Simulator Build Tools</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -518,7 +493,122 @@
            </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="buildToolsList"/>
+           <widget class="QWidget" name="designerToolsMenu" native="true">
+            <layout class="QHBoxLayout" name="designerToolsLayout">
+             <item>
+              <widget class="QToolButton" name="addToolButton">
+               <property name="toolTip">
+                <string>Add Component</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/des/NewFileIcon</normaloff>:/des/NewFileIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="deleteToolButton">
+               <property name="toolTip">
+                <string>Delete Component</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/des/DeleteFileIcon</normaloff>:/des/DeleteFileIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="exportObjectButton">
+               <property name="toolTip">
+                <string>Export as World Object</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/des/ExportFileIcon</normaloff>:/des/ExportFileIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="simulatorToolsMenu" native="true">
+            <layout class="QHBoxLayout" name="simulatorToolsLayout">
+             <item>
+              <widget class="QToolButton" name="addObjectButton">
+               <property name="toolTip">
+                <string>Add Object</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/des/NewFileIcon</normaloff>:/des/NewFileIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="deleteObjectButton">
+               <property name="toolTip">
+                <string>Delete Object</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/des/DeleteFileIcon</normaloff>:/des/DeleteFileIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QListWidget" name="simulatorToolsList"/>
+          </item>
+          <item>
+           <widget class="QListWidget" name="designerToolsList"/>
           </item>
          </layout>
         </widget>

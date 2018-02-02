@@ -27,7 +27,8 @@ private:
     Q_OBJECT
 
     visualizerFactory makeWidget;
-    Simulator_Visual_If* visual;
+    Simulator_Visual_If* visualSimulator;
+    Simulator_Visual_If* visualDesigner;
 
     QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
     QMap<QString, WorldObjectLoader_If*> objectLoaders;
@@ -77,20 +78,40 @@ public slots:
 
 private slots:
 
-    //Slots for button clicks on all menus
+    //Main menu signals and slots
     void simulatorButtonClick();
     void designerButtonClick();
     void showBuildObjectsButtonClick();
     void showMenuButtonClick();
+
+    //Simulation mode button signals and slots
     void playSimButtonClick();
     void speedSimButtonClick();
     void screenshotSimButtonClick();
     void importMapButtonClick();
+    void joystickButtonClick();
+    void saveSimButtonClick();
+    void restartSimButtonClick();
 
-    //Slots for build tools and properties
+    //Designer mode button signals and slots
+    void newObjectButtonClick();
+    void loadObjectButtonClick();
+    void saveObjectButtonClick();
+
+    //Simulation mode tool button signals and slots
+    void addObjectButtonClick();
+    void deleteObjectButtonClick();
+
+    //Designer mode tool button signals and slots
+    void addToolButtonClick();
+    void deleteToolButtonClick();
+    void exportObjectButtonClick();
+
+    //World view signals and slots
     void objectSelected(object_id id);
     void nothingSelected();
-    void listBuildTools(int mode);
+    void updateDesignerBuildTools();
+    void updateSimulatorBuildTools();
     void robotItemClicked(QListWidgetItem* item);
     void updatePropertyInformation();
 
