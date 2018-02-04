@@ -7,11 +7,13 @@ INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include
 
 SOURCES += \
     src/image_loader.cpp \
-    src/image_loader_plugin.cpp
+    src/image_loader_plugin.cpp \
+    src/polygonscomponent.cpp
 
 HEADERS += \
     include/image_loader.h \
-    include/image_loader_plugin.h
+    include/image_loader_plugin.h \
+    include/polygonscomponent.h
 
 DISTFILES += \
     CMakeLists.txt \

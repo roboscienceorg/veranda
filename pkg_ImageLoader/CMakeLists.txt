@@ -45,12 +45,14 @@ ament_export_dependencies(
 ## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
 set(MOC_HDRS
     include/image_loader.h
-    include/image_loader_plugin.h)
+    include/image_loader_plugin.h
+    include/polygonscomponent.h)
 
 ## Any other source files
 set(CPP_SRCS
     src/image_loader.cpp
-    src/image_loader_plugin.cpp)
+    src/image_loader_plugin.cpp
+    src/polygonscomponent.cpp)
 
 ###########
 ## Build ##

@@ -5,12 +5,13 @@
 #include <QString>
 
 #include <sdsmt_simulator/world_object_loader_if.h>
+#include <sdsmt_simulator/world_object.h>
 #include <Box2D/Box2D.h>
 
 class ImageLoader : public WorldObjectLoader_If
 {
 private:
-    QVector<QVector<b2Shape*>> getShapesFromFile(QString filePath);
+    QVector<QVector<b2PolygonShape *> > getShapesFromFile(QString filePath);
 
 public:
     virtual QVector<QString> fileExts() { return QVector<QString>{""};}
