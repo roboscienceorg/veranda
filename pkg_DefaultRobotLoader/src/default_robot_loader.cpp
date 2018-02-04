@@ -93,6 +93,22 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
         components.push_back(lidar);
     }
 
+    if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.rectangle"))
+    {
+        qDebug() << "Adding rectangle";
+
+        WorldObjectComponent_If* rectangle = plugins["org.sdsmt.sim.2d.worldObjectComponent.defaults.rectangle"]->createComponent();
+        QMap<QString, PropertyView> props = rectangle->getProperties();
+
+        props["x_pos"].set(0, true);
+        props["y_pos"].set(-1, true);
+        props["height"].set(1, true);
+        props["width"].set(2, true);
+        props["rotation"].set(45, true);
+
+        components.push_back(rectangle);
+    }
+
     WorldObject* robot1 = new WorldObject(components);
     QMap<QString, PropertyView> props = robot1->getProperties();
     props["X"].set(20, true);
