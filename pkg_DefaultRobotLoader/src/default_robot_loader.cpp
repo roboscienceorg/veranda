@@ -62,18 +62,18 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
         components.push_back(rightWheel);
     }
 
-    if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.simpleshape"))
+    if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.circle"))
     {
         qDebug() << "Adding simple circle";
 
-        WorldObjectComponent_If* simpleShape = plugins["org.sdsmt.sim.2d.worldObjectComponent.defaults.simpleshape"]->createComponent();
-        QMap<QString, PropertyView> props = simpleShape->getProperties();
+        WorldObjectComponent_If* circle = plugins["org.sdsmt.sim.2d.worldObjectComponent.defaults.circle"]->createComponent();
+        QMap<QString, PropertyView> props = circle->getProperties();
 
         props["x"].set(0, true);
         props["y"].set(0, true);
         props["radius"].set(2, true);
 
-        components.push_back(simpleShape);
+        components.push_back(circle);
     }
 
     if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar"))
