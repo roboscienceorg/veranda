@@ -1,5 +1,5 @@
-#ifndef SIMPLE_SHAPE_H
-#define SIMPLE_SHAPE_H
+#ifndef CIRCLE_H
+#define CIRCLE_H
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -13,53 +13,32 @@
 
 #include <memory>
 
-class Simple_Shape : public WorldObjectComponent_If
+class Circle : public WorldObjectComponent_If
 {
     Q_OBJECT
 
     constexpr static double PI = 3.14159265359;
-    constexpr static double RAD2DEG = 360.0/(2*PI);
-    constexpr static double DEG2RAD = 1.0/RAD2DEG;
+    constexpr static double RAD2DEG = (360.0/(2*PI));
+    constexpr static double DEG2RAD = (1.0/RAD2DEG);
 
     bool _connected = false;
 
     Property x = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                           "X position of the shape"), QVariant(0.0),
-                          [](QVariant _old, QVariant _new)
-                          {
-                                bool valid;
-                                int newVal = _new.toDouble(&valid);
-                                if(valid)
-                                    return _new;
-                                return _old;
-                          });
+                          &Property::double_validator);
 
     Property y = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                           "Y position of the shape"), QVariant(0.0),
-                          [](QVariant _old, QVariant _new)
-                          {
-                                bool valid;
-                                int newVal = _new.toDouble(&valid);
-                                if(valid)
-                                    return _new;
-                                return _old;
-                          });
+                          &Property::double_validator);
 
     Property radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                               "Radius of the circle"), QVariant(1.0),
-                               [](QVariant _old, QVariant _new)
-                               {
-                                     bool valid;
-                                     int newVal = _new.toDouble(&valid);
-                                     if(valid && newVal >= 0)
-                                         return _new;
-                                     return _old;
-                               });
+                               "Width of the Circle"), QVariant(1.0),
+                               &Property::abs_double_validator);
 
     QMap<QString, PropertyView> _properties{
         {"x_pos", &x},
         {"y_pos", &y},
-        {"radius", &radius},
+        {"radius", &radius}
     };
 
     Model* shape_model = nullptr;
@@ -68,7 +47,7 @@ class Simple_Shape : public WorldObjectComponent_If
     b2WeldJoint* joint = nullptr;
 
 public:
-    Simple_Shape(QObject* parent=nullptr);
+    Circle(QObject* parent=nullptr);
 
     WorldObjectComponent_If* clone(QObject *newParent);
 
@@ -77,7 +56,7 @@ public:
     }
 
     virtual QString getPropertyGroup(){
-        return "Simple Shape";
+        return "Circle";
     }
 
     QVector<Model*> getModels(){
@@ -108,4 +87,4 @@ public slots:
     virtual void setObjectMass(double mass){}
 };
 
-#endif // FLOATER_DRIVETRAIN_H
+#endif

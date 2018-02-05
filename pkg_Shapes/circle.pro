@@ -10,8 +10,8 @@ SOURCES += \
     src/circle_plugin.cpp
 
 HEADERS += \
-    include/circle_plugin.h \
-    include/circle.h
+    include/circle.h \
+    include/circle_plugin.h
 
 DISTFILES += \
     CMakeLists.txt \

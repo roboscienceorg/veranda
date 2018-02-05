@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>sdsmt_simulator_touch_sensor_ring_plugin</name>
+  <name>sdsmt_simulator_shape_plugins</name>
   <version>0.0.1</version>
-  <description>Ring of Touch Sensors Plugin</description>
+  <description>Various Simple Shape plugins</description>
 
   <maintainer email="andrew.stelter@mines.sdsmt.edu">Andrew Stelter</maintainer>
+  <maintainer email="samuel.williams@mines.sdsmt.edu">Sam Williams</maintainer>
 
   <license>TODO</license>
 
   <depend>sdsmt_simulator_api</depend>
   <depend>sdsmt_simulator_box2d</depend>
   <depend>rclcpp</depend>
-  <depend>std_msgs</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
