@@ -8,6 +8,8 @@
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/simulator_visual_if.h"
 #include "interfaces/world_object_wrappers.h"
+//#include "interfaces/joystickprototype_if.h"
+#include "ui/joystickprototype.h"
 
 #include <sdsmt_simulator/world_object_component_plugin.h>
 #include <sdsmt_simulator/world_object_loader_if.h>
@@ -29,6 +31,7 @@ private:
     visualizerFactory makeWidget;
     Simulator_Visual_If* visualSimulator;
     Simulator_Visual_If* visualDesigner;
+    //QMap<QWindow*, JoystickPrototype*> joysticks;
 
     QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
     QMap<QString, WorldObjectLoader_If*> objectLoaders;

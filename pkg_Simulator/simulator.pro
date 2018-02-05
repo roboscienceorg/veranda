@@ -16,7 +16,8 @@ SOURCES += \
     src/basic_physics.cpp \
 \
     src/ui/mainwindow.cpp \
-    src/simulator_core.cpp
+    src/simulator_core.cpp \
+    src/ui/joystickprototype.cpp
 
 HEADERS += \
 \
@@ -30,11 +31,13 @@ HEADERS += \
     include/ui/mainwindow.h \
 \
     include/simulator_core.h \
-    include/interfaces/world_object_wrappers.h
+    include/interfaces/world_object_wrappers.h \
+    include/ui/joystickprototype.h
 
 FORMS    += \
     ui/mainwindow.ui \
-    ui/emptysimwindow.ui
+    ui/emptysimwindow.ui \
+    ui/joystickprototype.ui
 
 RESOURCES += \
     ui/resources.qrc

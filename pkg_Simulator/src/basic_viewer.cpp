@@ -278,6 +278,25 @@ void BasicViewer::nothingSelected()
     }
 }
 
+void BasicViewer::joystickMoved(double x, double y, double z, QString channel)
+{
+    QString xS = QString::number(x) + " ";
+    QString yS = QString::number(y) + " ";
+    QString zS = QString::number(z) + " ";
+    qDebug() << "joystick moved " + xS + yS + zS + channel;
+}
+
+void BasicViewer::joystickButtonPress(int key, QString channel)
+{
+    QString keyS = QString::number(key) + " ";
+    qDebug() << "joystick button pressed " + keyS + channel;
+}
+
+void BasicViewer::joystickButtonRelease(int key, QString channel)
+{
+    QString keyS = QString::number(key) + " ";
+    qDebug() << "joystick button pressed " + keyS + channel;
+}
 
 //Returns a color given drawlevel and state of selected
 QColor BasicViewer::_color(DrawLevel level, bool selected)
