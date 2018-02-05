@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>sdsmt_simulator_simple_shape_plugin</name>
+  <name>sdsmt_simulator_sensor_plugins</name>
   <version>0.0.1</version>
-  <description>Simple Shape Plugin</description>
+  <description>Basic Sensor Plugins</description>
 
   <maintainer email="andrew.stelter@mines.sdsmt.edu">Andrew Stelter</maintainer>
 
@@ -11,6 +11,8 @@
   <depend>sdsmt_simulator_api</depend>
   <depend>sdsmt_simulator_box2d</depend>
   <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

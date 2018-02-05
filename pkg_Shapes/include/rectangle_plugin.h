@@ -1,5 +1,5 @@
-#ifndef SIMPLE_SHAPE_PLUGIN_H
-#define SIMPLE_SHAPE_PLUGIN_H
+#ifndef RECTANGLE_PLUGIN_H
+#define RECTANGLE_PLUGIN_H
 
 #include <QObject>
 
@@ -10,14 +10,14 @@
 //do conditional compilation so this would be used only on windows
 #include "../../../install/include/sdsmt_simulator/world_object_component_plugin.h"
 
-class Simple_Shape_Plugin : public QObject, public WorldObjectComponent_Plugin_If
+class Rectangle_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.simpleshape")
+    Q_PLUGIN_METADATA(IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.rectangle")
     Q_INTERFACES(WorldObjectComponent_Plugin_If)
 
 public:
-    Simple_Shape_Plugin();
+    Rectangle_Plugin();
     WorldObjectComponent_If* createComponent();
 
 };

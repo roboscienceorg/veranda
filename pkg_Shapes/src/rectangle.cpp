@@ -1,16 +1,16 @@
-#include "simple_shape.h"
+#include "rectangle.h"
 
 #include <QDebug>
 #include <cmath>
 
-Simple_Shape::Simple_Shape(QObject *parent) : WorldObjectComponent_If(parent)
+Rectangle::Rectangle(QObject *parent) : WorldObjectComponent_If(parent)
 {
     shape_model = new Model({}, {}, this);
 }
 
-WorldObjectComponent_If *Simple_Shape::clone(QObject *newParent)
+WorldObjectComponent_If *Rectangle::clone(QObject *newParent)
 {
-    Simple_Shape* out = new Simple_Shape(newParent);
+    Rectangle* out = new Rectangle(newParent);
 
     for(QString s : _properties.keys())
     {
@@ -20,7 +20,7 @@ WorldObjectComponent_If *Simple_Shape::clone(QObject *newParent)
     return out;
 }
 
-void Simple_Shape::_channelChanged(QVariant)
+void Rectangle::_channelChanged(QVariant)
 {
     if(_connected)
     {
@@ -29,7 +29,7 @@ void Simple_Shape::_channelChanged(QVariant)
     }
 }
 
-void Simple_Shape::_buildModels()
+void Rectangle::_buildModels()
 {
     //Clear always-showing model
     QVector<b2Shape*> oldModel = shape_model->shapes();
@@ -37,13 +37,12 @@ void Simple_Shape::_buildModels()
     qDeleteAll(oldModel);
 
     //Build always-showing model...
-    b2CircleShape* circle = new b2CircleShape;
-    circle->m_radius = radius.get().toFloat();
-    circle->m_p = b2Vec2(0,0);
-    shape_model->addShapes({circle});
+    b2PolygonShape* rectangle = new b2PolygonShape;
+    rectangle->SetAsBox(width.get().toFloat() / 2.0, height.get().toFloat() / 2.0,  b2Vec2(0,0), rotation.get().toFloat() * DEG2RAD);
+    shape_model->addShapes({rectangle});
 }
 
-void Simple_Shape::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+void Rectangle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
@@ -52,13 +51,13 @@ void Simple_Shape::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 
     moveBodyToLocalSpaceOfOtherBody(body, anchor, x.get().toFloat(), y.get().toFloat());
 
-    b2CircleShape circleShape;
-    circleShape.m_radius = radius.get().toFloat();
-    b2FixtureDef circleFixtureDef;
-    circleFixtureDef.shape = &circleShape;
-    circleFixtureDef.density = 1;
-    circleFixtureDef.filter.groupIndex = -oId;
-    body->CreateFixture(&circleFixtureDef);
+    b2PolygonShape rectangleShape;
+    rectangleShape.SetAsBox(width.get().toFloat(), height.get().toFloat());
+    b2FixtureDef rectangleFixtureDef;
+    rectangleFixtureDef.shape = &rectangleShape;
+    rectangleFixtureDef.density = 1;
+    rectangleFixtureDef.filter.groupIndex = -oId;
+    body->CreateFixture(&rectangleFixtureDef);
 
     b2WeldJointDef jointDef;
     jointDef.bodyA = body;
@@ -72,14 +71,14 @@ void Simple_Shape::generateBodies(b2World *world, object_id oId, b2Body *anchor)
     massChanged(this, body->GetMass());
 }
 
-void Simple_Shape::clearBodies(b2World* world)
+void Rectangle::clearBodies(b2World* world)
 {
     world->DestroyJoint(joint);
     world->DestroyBody(body);
     massChanged(this, 0);
 }
 
-void Simple_Shape::worldTicked(const b2World*, const double)
+void Rectangle::worldTicked(const b2World*, const double)
 {
     double x = body->GetWorldCenter().x;
     double y = body->GetWorldCenter().y;
