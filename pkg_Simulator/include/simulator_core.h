@@ -7,6 +7,8 @@
 #include "interfaces/world_object_wrappers.h"
 
 #include "rclcpp/rclcpp.hpp"
+#include "sensor_msgs/msg/joy.hpp"
+
 #include <sdsmt_simulator/world_object.h>
 
 #include <QObject>
@@ -28,12 +30,26 @@ class SimulatorCore : public QObject
 
     std::shared_ptr<rclcpp::Node> _node;
 
+    struct joymsg
+    {
+        typedef sensor_msgs::msg::Joy msgType;
+
+        std::shared_ptr<msgType> _message;
+        std::shared_ptr<rclcpp::Publisher<msgType>> _channel;
+    };
+
+    QMap<QString, joymsg> _joysticks;
+
+
 public:
     SimulatorCore(Simulator_Physics_If* physics, Simulator_Ui_If* ui, std::shared_ptr<rclcpp::Node> node,
                    QObject* parent = nullptr);
     ~SimulatorCore();
 
     void start();
+
+private:
+    joymsg initJoystick(QString channel);
 
 signals:
     void objectRemoved(object_id rId);
@@ -50,6 +66,13 @@ signals:
     void physicsStarted();
     void physicsStopped();
     void physicsTickSet(double, double);
+
+private slots:
+    void joystickMoved(double x, double y, double z, QString channel);
+    void joystickButtonDown(int button, QString channel);
+    void joystickButtonUp(int button, QString channel);
+
+    void clearJoystickChannels();
 
 public slots:
     void addSimObject(WorldObject* obj);
