@@ -12,7 +12,7 @@ def main():
     args = sys.argv
 
     if len(args) != 2:
-        print("Usage: lidar_listener channel")
+        print("Usage: joystick_listener {channel}")
         return
 
     channel = str(args[1])
