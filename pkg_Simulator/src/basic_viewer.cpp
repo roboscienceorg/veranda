@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include <QMouseEvent>
 #include <QMessageBox>
+#include <QQueue>
 
 #include <QGraphicsEllipseItem>
 #include <QGraphicsLineItem>
@@ -70,22 +71,18 @@ QGraphicsItem* BasicViewer::_drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
     return newShape;
 }
 
-QGraphicsItem* BasicViewer::_drawModel(Model* m, QGraphicsItem* parent)
+QGraphicsItem* BasicViewer::_drawModel(Model* m)
 {
-    QGraphicsItemGroup* baseItem = new QGraphicsItemGroup(parent);
+    QGraphicsItemGroup* baseItem = new QGraphicsItemGroup();
 
     //Draw all shapes as children of the base item
     for(b2Shape* s : m->shapes())
         baseItem->addToGroup(_drawb2Shape(s));
 
-    //Draw all children models, making them children shape objects
-    //to transform to relative coordinates
-    for(Model* m_sub : m->children())
-        _drawModel(m_sub, baseItem);
-
     //Set location of model
     double x, y, t;
     m->getTransform(x, y, t);
+
     baseItem->moveBy(x * WORLD_SCALE, -y*WORLD_SCALE);
     baseItem->setRotation(-t);
 
@@ -105,23 +102,37 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 
     for(Model* m : objects)
     {
-        _modelToObject[m] = id;
-
-        QGraphicsItem* graphic = _drawModel(m);
-        _shapes[m] = graphic;
-        _shapeToModel[graphic] = m;
-
-        //If the model or one of its submodels changes, redraw the whole thing
-        connect(m, &Model::modelChanged, this, &BasicViewer::modelChanged);
-        connect(m, &Model::childModelChanged, this, &BasicViewer::modelChanged);
-        connect(m, &Model::childTransformChanged, this, &BasicViewer::modelChanged);
-
-        //If the base model moves, update the transform
-        connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
+        QGraphicsItem* graphic = addModel(m, id);
 
         _setOutlineColor(graphic, newColor);
         _scene->addItem(graphic);
     }
+}
+
+QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
+{
+    QGraphicsItem* graphic = _drawModel(m);
+
+
+    _shapes[m] = graphic;
+    _shapeToModel[graphic] = m;
+    _modelToObject[m] = id;
+    _modelChildren[m] = m->children();
+
+    //If the model or one of its submodels changes, redraw the whole thing
+    connect(m, &Model::modelChanged, this, &BasicViewer::modelChanged);
+
+    //If the base model moves, update the transform
+    connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
+
+    for(Model* child : m->children())
+    {
+        QGraphicsItem* cGraph = addModel(child, id);
+
+        cGraph->setParentItem(graphic);
+    }
+
+    return graphic;
 }
 
 
@@ -138,6 +149,8 @@ void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
     dx *= WORLD_SCALE;
     dy *= WORLD_SCALE;
 
+    qDebug() << "Shape rotation: " << t;
+
     _shapes[m]->moveBy(dx, -dy);
     _shapes[m]->setRotation(-t);
 }
@@ -146,18 +159,26 @@ void BasicViewer::modelChanged(Model *m)
 {
     object_id oid = _modelToObject[m];
 
-    _scene->removeItem(_shapes[m]);
-    _shapeToModel.remove(_shapes[m]);
-    delete _shapes[m];
+    QGraphicsItem* parent = _shapes[m]->parentItem();
 
-    QGraphicsItem* graphic = _drawModel(m);
-    _shapes[m] = graphic;
-    _shapeToModel[graphic] = m;
+    if(parent == nullptr)
+        _scene->removeItem(_shapes[m]);
+
+    //Remove old version
+    removeModel(m);
+
+    //Draw and add new version
+    QGraphicsItem* replace = addModel(m, oid);
+
+    replace->setParentItem(parent);
 
     QColor newColor = _color(_drawLevels[oid], _currSelection == oid);
-    _setOutlineColor(graphic, newColor);
+    _setOutlineColor(replace, newColor);
 
-    _scene->addItem(graphic);
+    if(parent == nullptr)
+    {
+        _scene->addItem(replace);
+    }
 }
 
 //World View Clicked
@@ -218,21 +239,33 @@ void BasicViewer::objectRemovedFromScreen(object_id id)
     {
         for(Model* m : _models[id])
         {
-            //Stop drawing shapes
             _scene->removeItem(_shapes[m]);
-            _shapeToModel.remove(_shapes[m]);
-            delete _shapes[m];
-
-            //Stop tracking shape
-            _shapes.remove(m);
-
-            //Stop tracking model
-            disconnect(m, 0, this, 0);
+            removeModel(m);
         }
         _models.remove(id);
         _drawLevels.remove(id);
     }
     if(_currSelection == id) _currSelection = 0;
+}
+
+void BasicViewer::removeModel(Model *m)
+{
+    for(Model* child : _modelChildren[m])
+        removeModel(child);
+
+    //Stop drawing shapes
+    _modelToObject.remove(m);
+    _shapeToModel.remove(_shapes[m]);
+    _modelChildren.remove(m);
+
+    delete _shapes[m];
+
+    //Stop tracking shape
+    _shapes.remove(m);
+
+    //Stop tracking model
+    disconnect(m, 0, this, 0);
+
 }
 
 //The object identified by object_id is in the world, but should not be drawn
