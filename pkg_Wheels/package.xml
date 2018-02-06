@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>sdsmt_simulator_fixed_wheel_plugin</name>
+  <name>sdsmt_simulator_wheel_plugins</name>
   <version>0.0.1</version>
-  <description>Fixed Wheel Plugin</description>
+  <description>Default Wheel Plugins</description>
 
   <maintainer email="andrew.stelter@mines.sdsmt.edu">Andrew Stelter</maintainer>
 

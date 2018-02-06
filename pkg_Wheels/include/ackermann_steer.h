@@ -14,7 +14,7 @@
 
 #include <memory>
 
-class Fixed_Wheel : public WorldObjectComponent_If
+class Ackermann_Steer : public WorldObjectComponent_If
 {
     Q_OBJECT
 
@@ -33,48 +33,61 @@ class Fixed_Wheel : public WorldObjectComponent_If
                                 QVariant(0.0), &Property::angle_validator);
 
     Property _inputChannel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
-                                                    "Input channel for drive speed"), "");
+                                                    "Input channel for turn angle"), "");
 
-    Property _radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property _wradius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                     "Wheel radius (meters)"), QVariant(0.1),
                                     &Property::abs_double_validator);
 
-    Property _width = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property _wwidth = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                   "Wheel width (meters)"), QVariant(0.0),
                                   &Property::abs_double_validator);
 
-    Property _driven = Property(PropertyInfo(false, false, PropertyInfo::BOOL, "Whether or not the wheel is driven"),
-                               QVariant(false), &Property::bool_validator);
+    Property _l1 = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+                              "Axle length (meters)"), QVariant(1.0),
+                              &Property::abs_double_validator);
 
-    Property _density = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Density of the wheel"),
+    Property _l2 = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+                              "Vehicle length (meters)"), QVariant(1.0),
+                              &Property::abs_double_validator);
+
+    Property _density = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Density of the wheels"),
                                  QVariant(1.0), &Property::abs_double_validator);
 
+    Property _steerAngle = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of steering"),
+                                 QVariant(1.0), &Property::double_validator);
+
     QMap<QString, PropertyView> _properties{
-        {"channels/input_speed", &_inputChannel},
+        {"channels/input_angle", &_inputChannel},
         {"x_local", &_xLocal},
         {"y_local", &_yLocal},
         {"theta_local", &_thetaLocal},
-        {"wheel_radius", &_radius},
-        {"wheel_width", &_width},
-        {"is_driven", &_driven},
+        {"wheel_radius", &_wradius},
+        {"wheel_width", &_wwidth},
+        {"axle_length", &_l1},
+        {"vehicle_length", &_l2},
         {"density", &_density}
     };
 
     object_id _objectId;
 
     Model* _wheelModel = nullptr;
-    QVector<b2Shape*> _wheelShapes;
+    Model* _lWheelModel = nullptr;
+    Model* _rWheelModel = nullptr;
+
     double _objectMass;
 
-    b2Body* _wheelBody = nullptr;
-    b2Fixture* _wheelFix = nullptr;
-    b2Joint* _weldJoint = nullptr;
+    b2World* _world = nullptr;
+    b2Body* _anchor = nullptr;
+    b2Body* _lWheelBody = nullptr, *_rWheelBody = nullptr, *_cBody = nullptr;
+    b2Fixture* _lWheelFix = nullptr, *_rWheelFix = nullptr, *_cFix = nullptr;
+    b2Joint* _lRevJoint = nullptr, *_rRevJoint = nullptr, *_cJoint = nullptr;
 
     //Data published
-    double _targetAngularVelocity = 0;
+    double _targetAngle;
 
 public:
-    Fixed_Wheel(QObject* parent=nullptr);
+    Ackermann_Steer(QObject* parent=nullptr);
 
     WorldObjectComponent_If* clone(QObject *newParent);
 
@@ -83,7 +96,7 @@ public:
     }
 
     virtual QString getPropertyGroup(){
-        return "Fixed Wheel";
+        return "Ackermann Steer";
     }
 
     QVector<Model*> getModels(){
@@ -107,6 +120,8 @@ private slots:
     void _refreshChannel(QVariant);
     void _attachWheelFixture();
     void _buildModels();
+    void _jointWheels();
+    void _updateModelLocations();
 
 public slots:
     //Connects to all ROS topics

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(sdsmt_simulator_fixed_wheel_plugin)
+project(sdsmt_simulator_wheel_plugins)
 
 ## Compile as C++11 Library
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -29,31 +29,45 @@ include_directories( include )
 include_directories( ${CMAKE_BINARY_DIR} )
 
 ## TODO If possible: Figure out how to mark Qt as a dependency
-ament_export_dependencies(    
+ament_export_dependencies(
     rclcpp
-    std_msgs
     sdsmt_simulator_api
     sdsmt_simulator_box2d
+    std_msgs
 )
 
 # Need to include this early so that moc is happy
 include_directories(${sdsmt_simulator_api_INCLUDE_DIRS})
 include_directories(${sdsmt_simulator_box2d_INCLUDE_DIRS})
 
-###################
-## FILE LISTINGS ##
-###################
+###########################################
+## Make a plugin from source and headers ##
+###########################################
+function(make_plugin plugin_name plugin_moc_hdrs plugin_srcs)
 
-## Files that have any Qt macros or keywords in them
-## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
-set(MOC_HDRS
-    include/fixed_wheel.h
-    include/fixed_wheel_plugin.h)
+    ## Run MOC on files with Qt Keywords and Macros
+    qt5_wrap_cpp(plugin_moc_srcs ${plugin_moc_hdrs})
 
-## Any other source files
-set(CPP_SRCS
-    src/fixed_wheel.cpp
-    src/fixed_wheel_plugin.cpp)
+    ## Build the plugin lib
+    add_library(${plugin_name} SHARED ${plugin_srcs} ${plugin_moc_srcs})
+
+    ## Add qt module dependencies to executable
+    ## this will find all the headers and link all the libraries
+    qt5_use_modules(${plugin_name} Core)
+
+    ## Pull in stuff exported from other packages
+    ament_target_dependencies(${plugin_name}
+        "rclcpp"
+        "sdsmt_simulator_box2d"
+        "sdsmt_simulator_api"
+        "std_msgs")
+
+    ## Install lib into same directory as simulator executable
+    install(
+      TARGETS ${plugin_name}
+      DESTINATION lib
+    )
+endfunction()
 
 ###########
 ## Build ##
@@ -63,28 +77,13 @@ if(NOT ${CMAKE_VERSION} VERSION_LESS "3.10")
     cmake_policy(SET CMP0071 NEW)
 endif()
 
-## Run MOC on files with Qt Keywords and Macros
-qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
+set(headers include/fixed_wheel.h include/fixed_wheel_plugin.h)
+set(sources src/fixed_wheel.cpp src/fixed_wheel_plugin.cpp)
+make_plugin(fixed_wheel_plugin "${headers}" "${sources}")
 
-## Build the executable
-add_library(fixed_wheel_plugin SHARED ${CPP_SRCS} ${MOC_SRCS})
-
-## Add qt module dependencies to executable
-## this will find all the headers and link all the libraries
-qt5_use_modules(fixed_wheel_plugin Core)
-
-## Pull in stuff exported from other packages
-ament_target_dependencies(fixed_wheel_plugin
-    "rclcpp"
-    "std_msgs"
-    "sdsmt_simulator_box2d"
-    "sdsmt_simulator_api"
-)
-
-## Install lib into same directory as simulator executable
-install(
-  TARGETS fixed_wheel_plugin
-  DESTINATION lib
-)
+set(headers include/ackermann_steer.h include/ackermann_steer_plugin.h)
+set(sources src/ackermann_steer.cpp src/ackermann_steer_plugin.cpp)
+make_plugin(ackermann_steer_plugin "${headers}" "${sources}")
 
 ament_package()
+

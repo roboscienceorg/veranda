@@ -1,4 +1,5 @@
 #include "fixed_wheel.h"
+#include "basic_wheel.h"
 
 #include <QDebug>
 #include <cmath>
@@ -90,21 +91,18 @@ void Fixed_Wheel::_attachWheelFixture()
 
         //Create rectangle to represent the wheel from top down
         b2FixtureDef fixDef;
-        b2PolygonShape wheel;
-
-        wheel.SetAsBox(_radius.get().toDouble(), _width.get().toDouble()/2.0);
+        b2Shape* wheel = Basic_Wheel::makeWheelShape(_radius.get().toDouble(), _width.get().toDouble());
 
         fixDef.isSensor = false;
-        fixDef.shape = &wheel;
+        fixDef.shape = wheel;
         fixDef.filter.groupIndex = -_objectId;
         fixDef.density = _density.get().toDouble();
 
         _wheelFix = _wheelBody->CreateFixture(&fixDef);
 
-        _localWheelFrontUnit = b2Vec2(1, 0);
-        _localWheelRightUnit = b2Vec2(0, 1);
-
         massChanged(this, _wheelBody->GetMass());
+
+        delete wheel;
     }
 }
 
@@ -167,40 +165,20 @@ void Fixed_Wheel::_buildModels()
     qDeleteAll(_wheelShapes);
     _wheelShapes.clear();
 
-    b2PolygonShape* sh = new b2PolygonShape;
-    sh->SetAsBox(_radius.get().toDouble(), _width.get().toDouble()/2.0);
+    Model* newModel = Basic_Wheel::makeWheelModel(_radius.get().toDouble(), _width.get().toDouble());
 
-    b2EdgeShape* line = new b2EdgeShape;
-    line->m_vertex1 = b2Vec2(0, 0);
-    line->m_vertex2 = b2Vec2(_radius.get().toDouble(), 0);
-
-    _wheelShapes = QVector<b2Shape*>{sh, line};
+    _wheelShapes = newModel->shapes();
     _wheelModel->addShapes(_wheelShapes);
+
+    delete newModel;
 }
 
 void Fixed_Wheel::worldTicked(const b2World*, const double)
 {
     if(_wheelBody)
     {
-        b2Vec2 front = _wheelBody->GetWorldVector(_localWheelFrontUnit);
-        b2Vec2 right = _wheelBody->GetWorldVector(_localWheelRightUnit);
-
-        //Calculation to find target velocity from
-        //rotations per second; original idea was to behave more line
-        //real moter controller
-        //Circumference * ratio of 2PI to radians traveled
-        double targetVelocity = 2*PI*_radius.get().toDouble() * (_targetAngularVelocity/(2*PI));
-
-        //Calculate lateral movement
-        b2Vec2 lateralVelocity = right * b2Dot( right, _wheelBody->GetLinearVelocity() );
-
-        //Calculate linear movement
-        b2Vec2 forwardVelocity = front * b2Dot( front, _wheelBody->GetLinearVelocity() );
-
-        //Negate slip/slide
-        b2Vec2 impulse1 = -lateralVelocity * _wheelBody->GetMass();
-        b2Vec2 impulse2 = (front * targetVelocity - forwardVelocity) * _wheelBody->GetMass();
-        _wheelBody->ApplyLinearImpulse( impulse1 + impulse2, _wheelBody->GetWorldCenter(), true );
+        Basic_Wheel::applyNoSlideConstraint(_wheelBody, _radius.get().toDouble());
+        Basic_Wheel::applyNoSlipConstraint(_wheelBody, _radius.get().toDouble(), _targetAngularVelocity);
 
         double x = _wheelBody->GetWorldCenter().x;
         double y = _wheelBody->GetWorldCenter().y;
