@@ -69,7 +69,7 @@ public:
         emit joystickClosed();
     }
 
-public slots:
+private slots:
     void joystickMoved();
 
 protected:

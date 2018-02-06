@@ -34,8 +34,8 @@ class SimulatorCore : public QObject
     {
         typedef sensor_msgs::msg::Joy msgType;
 
-        std::shared_ptr<msgType> _message;
-        std::shared_ptr<rclcpp::Publisher<msgType>> _channel;
+        std::shared_ptr<msgType> _message = nullptr;
+        std::shared_ptr<rclcpp::Publisher<msgType>> _channel = nullptr;
     };
 
     QMap<QString, joymsg> _joysticks;

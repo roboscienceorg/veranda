@@ -79,6 +79,11 @@ public slots:
         setWorldBounds(-30, 30, -30, 30);
     }
 
+    void closeEvent(QCloseEvent *)
+    {
+        emit windowClosed();
+    }
+
 private slots:
 
     //Main menu signals and slots
@@ -124,6 +129,7 @@ private:
 signals:
     void objectIsSelected(object_id id);
     void nothingIsSelected();
+    void windowClosed();
 };
 
 #endif // MAINWINDOW_H

@@ -64,9 +64,6 @@ public slots:
     void objectDrawLevelSet(object_id id, DrawLevel level) override;
     void objectSelected(object_id id) override;
     void nothingSelected() override;
-    void joystickMoved(double x, double y, double z, QString channel) override;
-    void joystickButtonPress(int key, QString channel) override;
-    void joystickButtonRelease(int key, QString channel) override;
 
 private slots:
     void modelMoved(Model* m, double dx, double dy, double dt);

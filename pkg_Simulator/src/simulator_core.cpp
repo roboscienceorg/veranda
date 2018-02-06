@@ -44,6 +44,10 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, this, &SimulatorCore::physicsStopped);
     connect(_physicsEngine, &Simulator_Physics_If::physicsTickSet, this, &SimulatorCore::physicsTickSet);
 
+    connect(_userInterface, &Simulator_Ui_If::joystickButtonPress, this, &SimulatorCore::joystickButtonDown);
+    connect(_userInterface, &Simulator_Ui_If::joystickButtonRelease, this, &SimulatorCore::joystickButtonUp);
+    connect(_userInterface, &Simulator_Ui_If::joystickMoved, this, &SimulatorCore::joystickMoved);
+
     connect(this, &SimulatorCore::errorMsg, _userInterface, &Simulator_Ui_If::errorMessage);
 }
 
@@ -123,6 +127,8 @@ void SimulatorCore::removeSimObject(object_id oId)
 
 void SimulatorCore::joystickMoved(double x, double y, double z, QString channel)
 {
+    if(!channel.size()) return;
+
     joymsg joystick = initJoystick(channel);
 
     joystick._message->axes.resize(3);
@@ -138,6 +144,8 @@ void SimulatorCore::joystickMoved(double x, double y, double z, QString channel)
 
 void SimulatorCore::joystickButtonDown(int button, QString channel)
 {
+    if(!channel.size() || button > 256) return;
+
     joymsg joystick = initJoystick(channel);
 
     if(joystick._message->buttons.size() <= button)
@@ -153,6 +161,8 @@ void SimulatorCore::joystickButtonDown(int button, QString channel)
 
 void SimulatorCore::joystickButtonUp(int button, QString channel)
 {
+    if(!channel.size() || button > 256) return;
+
     joymsg joystick = initJoystick(channel);
 
     if(joystick._message->buttons.size() <= button)
@@ -186,7 +196,9 @@ SimulatorCore::joymsg SimulatorCore::initJoystick(QString channel)
     }
 
     if(!joy._message)
+    {
         joy._message = make_shared<joymsg::msgType>();
+    }
 
     return joy;
 }

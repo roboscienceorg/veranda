@@ -28,21 +28,37 @@ JoystickPrototype::JoystickPrototype(QWindow *parent) :
     west = Qt::Key_A;
     down = Qt::Key_S;
     left = Qt::Key_Z;
-    right = Qt::Key_X;   
+    right = Qt::Key_X;
+
+    setMinimumSize(size());
+    setMaximumSize(size());
 
     //grabKeyboard();
 }
 
 void JoystickPrototype::joystickMoved()
 {
-    joystickMoved(joystickWidget->xVector, joystickWidget->yVector, rotationWidget->value - rotationWidget->maximum()/2, "temp channel");
+    joystickUi->setChannel->clearFocus();
+
+    joystickMoved(joystickWidget->xVector, joystickWidget->yVector,
+                  rotationWidget->value - rotationWidget->maximum()/2,
+                  joystickUi->setChannel->text());
 }
 
 void JoystickPrototype::keyPressEvent(QKeyEvent * event)
 {
-    if (event->type()==QEvent::KeyPress)
+    //if (event->type()==QEvent::KeyPress)
+    //{
+    //    qDebug() << "key pressed " + event->text();
+    //}
+
+    //Don't trigger on keypresses in the text input
+    if(joystickUi->setChannel->hasFocus())
     {
-        qDebug() << "key pressed " + event->text();
+        if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+            joystickUi->setChannel->clearFocus();
+        else
+            return;
     }
 
     int speedButtons = 60;
@@ -78,18 +94,21 @@ void JoystickPrototype::keyPressEvent(QKeyEvent * event)
         rotationWidget->addValue(speedButtons);
     }
     else
-        joystickButtonPress(event->key(), "mah channel");
+        joystickButtonPress(event->key(), joystickUi->setChannel->text());
     joystickWidget->update();
 }
 
 void JoystickPrototype::keyReleaseEvent(QKeyEvent * event)
 {
+    //Don't trigger on keypresses in the text input
+    if(joystickUi->setChannel->hasFocus()) return;
+
     if(!event->isAutoRepeat())
     {
-        if (event->type()==QEvent::KeyRelease)
-        {
-            qDebug() << "key released " + event->text();
-        }
+        //if (event->type()==QEvent::KeyRelease)
+        //{
+        //    qDebug() << "key released " + event->text();
+        //}
 
         if(event->key() == up)
             joystickWidget->m_MouseUp = false;
@@ -104,7 +123,7 @@ void JoystickPrototype::keyReleaseEvent(QKeyEvent * event)
         else if(event->key() == right)
             rotationWidget->m_MouseRight = false;
         else
-            joystickButtonRelease(event->key(), "mah channel");
+            joystickButtonRelease(event->key(), joystickUi->setChannel->text());
         joystickWidget->update();
         rotationWidget->resetValue();
     }
@@ -132,7 +151,7 @@ void RotationWidget::addValue(int amount)
         value = maximum();
     else if(value < 0)
         value = 0;
-    qDebug() << QString::number(value);
+    //qDebug() << QString::number(value);
     setValue(value);
 }
 void RotationWidget::mouseReleaseEvent(QMouseEvent * event)
@@ -261,6 +280,10 @@ void JoystickWidget::paintEvent(QPaintEvent *event)
         yVector = 0 - yCenter + centerC;
     else
         yVector = centerC - yCenter;
+
+    //Scale values to [-1, 1]
+    xVector /= (radius*0.5);
+    yVector /= (radius*0.5);
 
     joystickMoved();
 

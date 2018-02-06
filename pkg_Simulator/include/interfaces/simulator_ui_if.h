@@ -45,6 +45,10 @@ signals:
     void userAddWorldObjectToSimulation(WorldObject* obj);
     void userRemoveWorldObjectFromSimulation(object_id oId);
 
+    void joystickMoved(double x, double y, double z, QString channel);
+    void joystickButtonPress(int key, QString channel);
+    void joystickButtonRelease(int key, QString channel);
+
 public slots:
     //Simulator core added something to the simulation
     //Do not delete the world object when it is removed; that will be handled elsewhere

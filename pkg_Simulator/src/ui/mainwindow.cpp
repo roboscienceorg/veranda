@@ -353,9 +353,11 @@ void MainWindow::joystickButtonClick()
     JoystickPrototype *joystick = new JoystickPrototype(jWindow);
 
     //Joystick button signals and slots
-    connect(joystick, SIGNAL(joystickMoved(double, double, double, QString)), visualSimulator, SLOT(joystickMoved(double, double, double, QString)));
-    connect(joystick, SIGNAL(joystickButtonPress(int, QString)), visualSimulator, SLOT(joystickButtonPress(int, QString)));
-    connect(joystick, SIGNAL(joystickButtonRelease(int, QString)), visualSimulator, SLOT(joystickButtonRelease(int, QString)));
+    connect(joystick, SIGNAL(joystickMoved(double, double, double, QString)), this, SIGNAL(joystickMoved(double, double, double, QString)));
+    connect(joystick, SIGNAL(joystickButtonPress(int, QString)), this, SIGNAL(joystickButtonPress(int, QString)));
+    connect(joystick, SIGNAL(joystickButtonRelease(int, QString)), this, SIGNAL(joystickButtonRelease(int, QString)));
+
+    connect(this, &MainWindow::windowClosed, joystick, &JoystickPrototype::deleteLater);
     connect(joystick, &JoystickPrototype::joystickClosed, joystick, &JoystickPrototype::deleteLater);
     connect(joystick, &JoystickPrototype::destroyed, jWindow, &QWindow::deleteLater);
 

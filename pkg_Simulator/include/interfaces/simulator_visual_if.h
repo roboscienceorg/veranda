@@ -26,8 +26,5 @@ public slots:
     virtual void objectDrawLevelSet(object_id id, DrawLevel) = 0;
     virtual void objectSelected(object_id id) = 0;
     virtual void nothingSelected() = 0;
-    virtual void joystickMoved(double x, double y, double z, QString channel) = 0;
-    virtual void joystickButtonPress(int key, QString channel) = 0;
-    virtual void joystickButtonRelease(int key, QString channel) = 0;
 };
 #endif // SIMULATOR_VISUAL_H
