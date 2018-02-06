@@ -32,9 +32,10 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     connect(this, &SimulatorCore::physicsStopped, _userInterface, &Simulator_Ui_If::physicsStopped);
     connect(this, &SimulatorCore::physicsTickSet, _userInterface, &Simulator_Ui_If::physicsTickChanged);
 
-    //Every time the user stops the physics simulation, we'll clear out our cache of
-    //joystick channels; this should prevent it from getting to big ever and hogging memory
+    //Every time the user stops or starts the physics simulation, we'll clear out our cache of
+    //joystick channels; this should prevent it from getting too big ever and hogging memory
     connect(this, &SimulatorCore::physicsStopped, this, &SimulatorCore::clearJoystickChannels);
+    connect(this, &SimulatorCore::physicsStarted, this, &SimulatorCore::clearJoystickChannels);
 
     connect(_userInterface, &Simulator_Ui_If::userStartPhysics, this, &SimulatorCore::userStartPhysics);
     connect(_userInterface, &Simulator_Ui_If::userStopPhysics, this, &SimulatorCore::userStopPhysics);
