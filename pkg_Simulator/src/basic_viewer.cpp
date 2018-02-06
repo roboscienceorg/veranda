@@ -149,8 +149,6 @@ void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
     dx *= WORLD_SCALE;
     dy *= WORLD_SCALE;
 
-    qDebug() << "Shape rotation: " << t;
-
     _shapes[m]->moveBy(dx, -dy);
     _shapes[m]->setRotation(-t);
 }

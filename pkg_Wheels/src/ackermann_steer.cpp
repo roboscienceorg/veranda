@@ -78,12 +78,10 @@ void Ackermann_Steer::_jointWheels()
         moveBodyToLocalSpaceOfOtherBody(_rWheelBody, _cBody, _l1.get().toDouble()/2.0, 0, 90);
         moveBodyToLocalSpaceOfOtherBody(_lWheelBody, _cBody, -_l1.get().toDouble()/2.0, 0, 90);
 
-        qDebug() << "Center body:" << _cBody->GetWorldCenter().x << _cBody->GetWorldCenter().y << _cBody->GetAngle()*RAD2DEG;
-        qDebug() << "Left body:" << _lWheelBody->GetWorldCenter().x << _lWheelBody->GetWorldCenter().y << _lWheelBody->GetAngle()*RAD2DEG;
-        qDebug() << "Right body:" << _rWheelBody->GetWorldCenter().x << _rWheelBody->GetWorldCenter().y << _rWheelBody->GetAngle()*RAD2DEG;
-
         b2RevoluteJointDef revDef;
         revDef.enableMotor = false;
+        revDef.lowerAngle = revDef.upperAngle = 0;
+        revDef.enableLimit = true;
 
         auto anchorPt = _lWheelBody->GetWorldCenter();
         revDef.bodyA = _anchor;
@@ -279,13 +277,13 @@ void Ackermann_Steer::_updateModelLocations()
 {
     if(_world)
     {
-        _lWheelModel->setTransform(-_l1.get().toDouble()/2.0, 0, 90);
-        _rWheelModel->setTransform(_l1.get().toDouble()/2.0, 0, 90);
-
+        double t = _cBody->GetAngle();
         double x = _cBody->GetWorldCenter().x;
         double y = _cBody->GetWorldCenter().y;
-        double t = _cBody->GetAngle();
         _wheelModel->setTransform(x, y, t * RAD2DEG);
+
+        _lWheelModel->setTransform(-_l1.get().toDouble()/2.0, 0, (_lWheelBody->GetAngle() - t) * RAD2DEG);
+        _rWheelModel->setTransform(_l1.get().toDouble()/2.0, 0, (_rWheelBody->GetAngle() - t) * RAD2DEG);
     }
 }
 
@@ -300,8 +298,42 @@ void Ackermann_Steer::worldTicked(const b2World*, const double)
     }
 }
 
+//http://ckw.phys.ncku.edu.tw/public/pub/Notes/GeneralPhysics/Powerpoint/Extra/05/11_0_0_Steering_Theroy.pdf
 void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr data)
 {
-    _targetAngle = std::min(PI/2.0, std::max(-PI/2.0, (double)data->data));
-    _steerAngle.set(_targetAngle);
+    double targetAngle = std::min(PI/2.0, std::max(-PI/2.0, (double)data->data));
+    _steerAngle.set(targetAngle);
+
+    double targetLeft = 0, targetRight = 0;
+    if(targetAngle < -0.001 || targetAngle > 0.001)
+    {
+        double l2 = _l2.get().toDouble();
+        double l25 = l2/2.0;
+        double cot = atan(targetAngle);
+        double R = l25*l25 + l2*l2*cot*cot;
+        double R1 = sqrt(R - l25*l25);
+
+        double l1 = _l1.get().toDouble();
+        double dti = atan(l2/(R1 - l1/2.0));
+        double dto = atan(l2/(R1 + l1/2.0));
+
+
+        qDebug() << dti << dto;
+
+        if(targetAngle < 0)
+        {
+            targetLeft = dti;
+            targetRight = dto;
+        }
+        else
+        {
+            targetLeft = -dto;
+            targetRight = -dti;
+        }
+    }
+
+    double t = _cBody->GetAngle();
+    ((b2RevoluteJoint*)_lRevJoint)->SetLimits(t+targetLeft, t+targetLeft);
+    ((b2RevoluteJoint*)_rRevJoint)->SetLimits(t+targetRight, t+targetRight);
+
 }

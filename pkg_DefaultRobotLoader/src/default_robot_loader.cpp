@@ -174,6 +174,7 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
         props["wheel_radius"].set(0.75, true);
         props["wheel_width"].set(0.5, true);
         props["density"].set(20, true);
+        props["channels/input_angle"].set("robot1/steer", true);
 
         components.push_back(steer);
     }

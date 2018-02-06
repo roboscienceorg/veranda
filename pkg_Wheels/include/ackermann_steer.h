@@ -55,7 +55,7 @@ class Ackermann_Steer : public WorldObjectComponent_If
                                  QVariant(1.0), &Property::abs_double_validator);
 
     Property _steerAngle = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of steering"),
-                                 QVariant(1.0), &Property::double_validator);
+                                 QVariant(0.0), &Property::double_validator);
 
     QMap<QString, PropertyView> _properties{
         {"channels/input_angle", &_inputChannel},
@@ -66,7 +66,8 @@ class Ackermann_Steer : public WorldObjectComponent_If
         {"wheel_width", &_wwidth},
         {"axle_length", &_l1},
         {"vehicle_length", &_l2},
-        {"density", &_density}
+        {"density", &_density},
+        {"steer_angle", &_steerAngle}
     };
 
     object_id _objectId;
@@ -82,9 +83,6 @@ class Ackermann_Steer : public WorldObjectComponent_If
     b2Body* _lWheelBody = nullptr, *_rWheelBody = nullptr, *_cBody = nullptr;
     b2Fixture* _lWheelFix = nullptr, *_rWheelFix = nullptr, *_cFix = nullptr;
     b2Joint* _lRevJoint = nullptr, *_rRevJoint = nullptr, *_cJoint = nullptr;
-
-    //Data published
-    double _targetAngle;
 
 public:
     Ackermann_Steer(QObject* parent=nullptr);
