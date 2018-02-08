@@ -61,7 +61,7 @@ WorldObject::WorldObject(QVector<WorldObjectComponent_If *> components, QObject 
     }
 
     debugModel = new Model();
-    _models += debugModel;
+    //_models += debugModel;
 }
 
 WorldObject* WorldObject::clone(QObject *newParent)

@@ -46,7 +46,7 @@ Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent_If(pare
     _rWheelModel = new Model({}, {}, this);
     _debugModel = new Model({}, {}, this);
 
-    _wheelModel->addChildren({_lWheelModel, _rWheelModel, _debugModel});
+    _wheelModel->addChildren({_lWheelModel, _rWheelModel/*, _debugModel*/});
 }
 
 void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anchor)
@@ -58,7 +58,8 @@ void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anch
     _lWheelBody = world->CreateBody(&bDef);
     _rWheelBody = world->CreateBody(&bDef);
 
-    bDef.type = b2_staticBody;
+    //Temporarily static
+    //bDef.type = b2_staticBody;
     _cBody = world->CreateBody(&bDef);
 
     _anchor = anchor;
@@ -80,6 +81,10 @@ void Ackermann_Steer::_jointWheels()
         moveBodyToLocalSpaceOfOtherBody(_cBody, _anchor, _xLocal.get().toDouble(), _yLocal.get().toDouble(), _thetaLocal.get().toDouble());
         moveBodyToLocalSpaceOfOtherBody(_rWheelBody, _cBody, _l1.get().toDouble()/2.0, 0, 90);
         moveBodyToLocalSpaceOfOtherBody(_lWheelBody, _cBody, -_l1.get().toDouble()/2.0, 0, 90);
+
+        //qDebug() << "Main body:" << _cBody->GetWorldCenter().x << _cBody->GetWorldCenter().y << _cBody->GetAngle();
+        //qDebug() << "Left body:" << _lWheelBody->GetWorldCenter().x << _lWheelBody->GetWorldCenter().y << _lWheelBody->GetAngle();
+        //qDebug() << "Right body:" << _rWheelBody->GetWorldCenter().x << _rWheelBody->GetWorldCenter().y << _rWheelBody->GetAngle();
 
         b2RevoluteJointDef revDef;
         revDef.enableMotor = false;
@@ -181,7 +186,7 @@ void Ackermann_Steer::_attachWheelFixture()
 
         fixDef.shape = circ;
         fixDef.density = 1;
-        fixDef.isSensor = false;
+        fixDef.isSensor = true;
 
         _cFix = _cBody->CreateFixture(&fixDef);
 
@@ -295,27 +300,28 @@ void Ackermann_Steer::worldTicked(const b2World*, const double)
 {
     if(_lWheelBody && _rWheelBody)
     {
-        //Basic_Wheel::applyNoSlideConstraint(_lWheelBody, _wradius.get().toDouble());
-        //Basic_Wheel::applyNoSlideConstraint(_rWheelBody, _wradius.get().toDouble());
+        Basic_Wheel::applyNoSlideConstraint(_lWheelBody, _wradius.get().toDouble());
+        Basic_Wheel::applyNoSlideConstraint(_rWheelBody, _wradius.get().toDouble());
 
-        qDebug() << "Actual angles" << _lWheelBody->GetAngle() << _rWheelBody->GetAngle();
+        //qDebug() << "Actual angles" << _lWheelBody->GetAngle() << _rWheelBody->GetAngle();
         //qDebug() << "(Relative)" << _lWheelBody->GetAngle() - _cBody->GetAngle() << _rWheelBody->GetAngle() - _cBody->GetAngle();
 
         _updateModelLocations();
 
-        double l = ((b2RevoluteJoint*)_lRevJoint)->GetUpperLimit() + PI/100;
-        ((b2RevoluteJoint*)_lRevJoint)->SetLimits(l, l);
-        ((b2RevoluteJoint*)_rRevJoint)->SetLimits(l, l);
-        qDebug() << "Target angle " << l;
+        //double l = ((b2RevoluteJoint*)_lRevJoint)->GetUpperLimit() - PI/100;
+        //((b2RevoluteJoint*)_lRevJoint)->SetLimits(l, l);
+        //((b2RevoluteJoint*)_rRevJoint)->SetLimits(l, l);
+        //qDebug() << "Target angle " << l;
     }
 }
 
 void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr data)
 {
+
     double targetAngle = std::min(PI/2.0, std::max(-PI/2.0, (double)data->data));
     _steerAngle.set(targetAngle);
 
-    qDebug() << "Steer angle:" << targetAngle;
+    //qDebug() << "Steer angle:" << targetAngle;
 
     double targetLeft = 0, targetRight = 0;
     if(targetAngle < -0.001 || targetAngle > 0.001)
@@ -326,7 +332,7 @@ void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr da
         double dtr = tan(cot - l1l2);
         double dtl = tan(cot + l1l2);
 
-        qDebug() << "Target angles" << dtr << dtl;
+        //qDebug() << "Target angles" << dtr << dtl;
 
         targetRight = dtr;
         targetLeft = dtl;
@@ -334,4 +340,5 @@ void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr da
 
     ((b2RevoluteJoint*)_lRevJoint)->SetLimits(targetLeft, targetLeft);
     ((b2RevoluteJoint*)_rRevJoint)->SetLimits(targetRight, targetRight);
+
 }

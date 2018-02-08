@@ -16,7 +16,7 @@ QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QStrin
     robot2->getProperties()["Y"].set(0, true);
     robot2->getProperties()["Theta"].set(270, true);
 
-    return QVector<WorldObject*>{/*robot1,*/ robot2};
+    return QVector<WorldObject*>{robot1, robot2};
 }
 
 WorldObject* DefaultRobotLoader::makeDiffDriveBot(QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
@@ -107,7 +107,7 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
         props["scan_points"].set(20, true);
         props["scan_rate"].set(10, true);
 
-        //components.push_back(lidar);
+        components.push_back(lidar);
     }
 
     if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.rectangle"))
@@ -121,7 +121,7 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
         props["width"].set(2, true);
         props["rotation"].set(0, true);
 
-        //components.push_back(rectangle);
+        components.push_back(rectangle);
     }
 
     if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.fixedwheel"))
@@ -156,8 +156,8 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
         propsl["channels/input_speed"].set("robot1/left_wheel", true);
         propsr["channels/input_speed"].set("robot1/right_wheel", true);
 
-        //components.push_back(leftWheel);
-        //components.push_back(rightWheel);
+        components.push_back(leftWheel);
+        components.push_back(rightWheel);
     }
 
     if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.ackermann"))
@@ -169,7 +169,7 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
         props["x_local"].set(0, true);
         props["y_local"].set(2, true);
         props["vehicle_length"].set(4, true);
-        props["axle_length"].set(5, true);
+        props["axle_length"].set(2.5, true);
         props["theta_local"].set(0, true);
         props["wheel_radius"].set(0.75, true);
         props["wheel_width"].set(0.5, true);

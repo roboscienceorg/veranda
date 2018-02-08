@@ -53,12 +53,12 @@ def main():
             return
         
         speed = msg.axes[1]
-        steer = msg.axes[0]
+        steer = -msg.axes[0]
 
         phi1 = phi2 = 1/R*speed*SPEED
         phi3 = math.pi/4.0 * steer
 
-        #publishWheelVelocity(publeft, pubright, phi1, phi2)
+        publishWheelVelocity(publeft, pubright, phi1, phi2)
         publishWheelSteer(pubsteer, phi3)
 
     node.create_subscription(Joy, channel, joystick_callback)

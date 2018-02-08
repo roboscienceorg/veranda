@@ -64,35 +64,6 @@ void BasicPhysics::addWorldObject(WorldObjectPhysics* obj, object_id oId)
     
     obj->generateBodies(world, oId);
 
-    //keeping this around as a comment for now
-    //because it may be nice to copy some of this code into
-    //world_object.generateBodies()
-    /*
-    for(WorldObjectComponent_If* c : components)
-    {
-        QMap<QString, PropertyView> properties = c->getProperties();
-        if(properties.contains("bodyType"))
-        {
-            b2BodyDef robotBodyDef;
-            robotBodyDef.type = (b2BodyType)properties["bodyType"].get().toInt();
-            robotBodyDef.position.Set(properties["x"].get().toFloat(),properties["y"].get().toFloat());
-
-            b2Body* body = world->CreateBody(&robotBodyDef);
-            worldDat.dynamicBodies.push_back(body);
-        }
-    }
-
-    for(b2Body* b : worldDat.dynamicBodies)
-    {
-        b2JointDef jointDef;
-        jointDef.bodyA = anchor;
-        jointDef.bodyB = b;
-        jointDef.collideConnected = false;
-        b2Joint* joint = world->CreateJoint(&jointDef);
-        worldDat.joints.push_back(joint);
-    }
-    */
-
     obj->worldTicked(world, 0);
 }
 
