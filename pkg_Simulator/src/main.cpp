@@ -21,12 +21,17 @@
 
 #include "basic_physics.h"
 #include "basic_viewer.h"
-#include "ui/mainwindow.h"
 
 #include <sdsmt_simulator/world_object_component_plugin.h>
 #include <sdsmt_simulator/world_object_file_handler_plugin.h>
 
 #include "simulator_core.h"
+
+//This MUST be the last include
+//For some reason, MSVC will hate you forever if
+//QOpenGLWidget is included before some of the other
+//stuff
+#include "ui/mainwindow.h"
 
 using namespace std;
 
