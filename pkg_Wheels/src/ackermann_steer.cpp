@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <cmath>
+#include <functional>
 
 Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent_If(parent)
 {
@@ -57,9 +58,6 @@ void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anch
     bDef.type = b2_dynamicBody;
     _lWheelBody = world->CreateBody(&bDef);
     _rWheelBody = world->CreateBody(&bDef);
-
-    //Temporarily static
-    //bDef.type = b2_staticBody;
     _cBody = world->CreateBody(&bDef);
 
     _anchor = anchor;
@@ -77,6 +75,13 @@ void Ackermann_Steer::_jointWheels()
 {
     if(_world)
     {
+        if(_lRevJoint)
+        {
+            _world->DestroyJoint(_lRevJoint);
+            _world->DestroyJoint(_rRevJoint);
+            _world->DestroyJoint(_cJoint);
+        }
+
         //Leverage the move body function rather than do math manually
         moveBodyToLocalSpaceOfOtherBody(_cBody, _anchor, _xLocal.get().toDouble(), _yLocal.get().toDouble(), _thetaLocal.get().toDouble());
         moveBodyToLocalSpaceOfOtherBody(_rWheelBody, _cBody, _l1.get().toDouble()/2.0, 0, 90);
@@ -90,6 +95,7 @@ void Ackermann_Steer::_jointWheels()
         revDef.enableMotor = false;
         revDef.lowerAngle = revDef.upperAngle = 0;
         revDef.enableLimit = true;
+        revDef.collideConnected = false;
 
         auto anchorPt = _lWheelBody->GetWorldCenter();
         revDef.bodyA = _anchor;
@@ -108,6 +114,7 @@ void Ackermann_Steer::_jointWheels()
         _rRevJoint = _world->CreateJoint(&revDef);
 
         b2WeldJointDef weldDef;
+        weldDef.collideConnected = false;
         anchorPt = _anchor->GetWorldCenter();
         weldDef.bodyA = _anchor;
         weldDef.bodyB = _cBody;
@@ -303,20 +310,13 @@ void Ackermann_Steer::worldTicked(const b2World*, const double)
         Basic_Wheel::applyNoSlideConstraint(_lWheelBody, _wradius.get().toDouble());
         Basic_Wheel::applyNoSlideConstraint(_rWheelBody, _wradius.get().toDouble());
 
-        //qDebug() << "Actual angles" << _lWheelBody->GetAngle() << _rWheelBody->GetAngle();
-        //qDebug() << "(Relative)" << _lWheelBody->GetAngle() - _cBody->GetAngle() << _rWheelBody->GetAngle() - _cBody->GetAngle();
-
         _updateModelLocations();
-
-        //double l = ((b2RevoluteJoint*)_lRevJoint)->GetUpperLimit() - PI/100;
-        //((b2RevoluteJoint*)_lRevJoint)->SetLimits(l, l);
-        //((b2RevoluteJoint*)_rRevJoint)->SetLimits(l, l);
-        //qDebug() << "Target angle " << l;
     }
 }
 
 void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr data)
 {
+    const std::function<double(const double&)> acot = [](const double& x){return PI/2 - atan(x);};
 
     double targetAngle = std::min(PI/2.0, std::max(-PI/2.0, (double)data->data));
     _steerAngle.set(targetAngle);
@@ -326,16 +326,17 @@ void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr da
     double targetLeft = 0, targetRight = 0;
     if(targetAngle < -0.001 || targetAngle > 0.001)
     {
-        double cot = atan(targetAngle);
+        double cot = cos(targetAngle)/sin(targetAngle);
         double l1l2 = _l1.get().toDouble()*0.5/_l2.get().toDouble();
 
-        double dtr = tan(cot - l1l2);
-        double dtl = tan(cot + l1l2);
+        double dtr = acot(cot - l1l2);
+        double dtl = acot(cot + l1l2);
 
-        //qDebug() << "Target angles" << dtr << dtl;
+        targetRight = dtl;
+        targetLeft = dtr;
 
-        targetRight = dtr;
-        targetLeft = dtl;
+        if(targetRight > PI/2) targetRight -= PI;
+        if(targetLeft > PI/2) targetLeft -= PI;
     }
 
     ((b2RevoluteJoint*)_lRevJoint)->SetLimits(targetLeft, targetLeft);
