@@ -44,8 +44,9 @@ Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent_If(pare
     _wheelModel = new Model({}, {}, this);
     _lWheelModel = new Model({}, {}, this);
     _rWheelModel = new Model({}, {}, this);
+    _debugModel = new Model({}, {}, this);
 
-    _wheelModel->addChildren({_lWheelModel, _rWheelModel});
+    _wheelModel->addChildren({_lWheelModel, _rWheelModel, _debugModel});
 }
 
 void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anchor)
@@ -56,6 +57,8 @@ void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anch
     bDef.type = b2_dynamicBody;
     _lWheelBody = world->CreateBody(&bDef);
     _rWheelBody = world->CreateBody(&bDef);
+
+    bDef.type = b2_staticBody;
     _cBody = world->CreateBody(&bDef);
 
     _anchor = anchor;
@@ -172,12 +175,13 @@ void Ackermann_Steer::_attachWheelFixture()
         _lWheelFix = _lWheelBody->CreateFixture(&fixDef);
         _rWheelFix = _rWheelBody->CreateFixture(&fixDef);
 
-        b2CircleShape circ;
-        circ.m_radius = 1;
+        b2CircleShape* circ = new b2CircleShape;
+        circ->m_radius = 1;
+        _debugModel->addShapes({circ});
 
-        fixDef.shape = &circ;
+        fixDef.shape = circ;
         fixDef.density = 1;
-        fixDef.isSensor = true;
+        fixDef.isSensor = false;
 
         _cFix = _cBody->CreateFixture(&fixDef);
 
@@ -291,49 +295,43 @@ void Ackermann_Steer::worldTicked(const b2World*, const double)
 {
     if(_lWheelBody && _rWheelBody)
     {
-        Basic_Wheel::applyNoSlideConstraint(_lWheelBody, _wradius.get().toDouble());
-        Basic_Wheel::applyNoSlideConstraint(_rWheelBody, _wradius.get().toDouble());
+        //Basic_Wheel::applyNoSlideConstraint(_lWheelBody, _wradius.get().toDouble());
+        //Basic_Wheel::applyNoSlideConstraint(_rWheelBody, _wradius.get().toDouble());
+
+        qDebug() << "Actual angles" << _lWheelBody->GetAngle() << _rWheelBody->GetAngle();
+        //qDebug() << "(Relative)" << _lWheelBody->GetAngle() - _cBody->GetAngle() << _rWheelBody->GetAngle() - _cBody->GetAngle();
 
         _updateModelLocations();
+
+        double l = ((b2RevoluteJoint*)_lRevJoint)->GetUpperLimit() + PI/100;
+        ((b2RevoluteJoint*)_lRevJoint)->SetLimits(l, l);
+        ((b2RevoluteJoint*)_rRevJoint)->SetLimits(l, l);
+        qDebug() << "Target angle " << l;
     }
 }
 
-//http://ckw.phys.ncku.edu.tw/public/pub/Notes/GeneralPhysics/Powerpoint/Extra/05/11_0_0_Steering_Theroy.pdf
 void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr data)
 {
     double targetAngle = std::min(PI/2.0, std::max(-PI/2.0, (double)data->data));
     _steerAngle.set(targetAngle);
 
+    qDebug() << "Steer angle:" << targetAngle;
+
     double targetLeft = 0, targetRight = 0;
     if(targetAngle < -0.001 || targetAngle > 0.001)
     {
-        double l2 = _l2.get().toDouble();
-        double l25 = l2/2.0;
         double cot = atan(targetAngle);
-        double R = l25*l25 + l2*l2*cot*cot;
-        double R1 = sqrt(R - l25*l25);
+        double l1l2 = _l1.get().toDouble()*0.5/_l2.get().toDouble();
 
-        double l1 = _l1.get().toDouble();
-        double dti = atan(l2/(R1 - l1/2.0));
-        double dto = atan(l2/(R1 + l1/2.0));
+        double dtr = tan(cot - l1l2);
+        double dtl = tan(cot + l1l2);
 
+        qDebug() << "Target angles" << dtr << dtl;
 
-        qDebug() << dti << dto;
-
-        if(targetAngle < 0)
-        {
-            targetLeft = dti;
-            targetRight = dto;
-        }
-        else
-        {
-            targetLeft = -dto;
-            targetRight = -dti;
-        }
+        targetRight = dtr;
+        targetLeft = dtl;
     }
 
-    double t = _cBody->GetAngle();
-    ((b2RevoluteJoint*)_lRevJoint)->SetLimits(t+targetLeft, t+targetLeft);
-    ((b2RevoluteJoint*)_rRevJoint)->SetLimits(t+targetRight, t+targetRight);
-
+    ((b2RevoluteJoint*)_lRevJoint)->SetLimits(targetLeft, targetLeft);
+    ((b2RevoluteJoint*)_rRevJoint)->SetLimits(targetRight, targetRight);
 }

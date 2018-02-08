@@ -75,6 +75,7 @@ class Ackermann_Steer : public WorldObjectComponent_If
     Model* _wheelModel = nullptr;
     Model* _lWheelModel = nullptr;
     Model* _rWheelModel = nullptr;
+    Model* _debugModel = nullptr;
 
     double _objectMass;
 
