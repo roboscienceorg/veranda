@@ -5,13 +5,13 @@
 #include <QOpenGLWidget>
 #include <QScrollBar>
 #include <QDebug>
+#include "ui/settingspopup.h"
 
 
 namespace Ui {
 class JoystickWidget;
 class JoystickPrototype;
 class RotationWidget;
-class KeyReciever;
 }
 
 class JoystickWidget : public QOpenGLWidget /*Joystickprototype_If*/
@@ -47,12 +47,11 @@ public:
     RotationWidget(QWidget *parent);
     bool m_MousePressed, m_MouseLeft, m_MouseRight;
     void addValue(int amount);
-    void resetValue();
     int value;
     double zVector;
 
-protected:
-    void mouseReleaseEvent(QMouseEvent * event);
+public slots:
+    void resetValue();
 };
 
 class JoystickPrototype : public QWidget
@@ -71,6 +70,10 @@ public:
 
 private slots:
     void joystickMoved();
+    void rotationMoved(int val);
+    void keysButtonClick();
+    void makeUsable();
+    void settingsChanged(int n, int e, int s, int w, int l, int r, int speed);
 
 protected:
     virtual void keyPressEvent(QKeyEvent * event);
@@ -81,6 +84,7 @@ protected:
     int down;
     int left;
     int right;
+    int speedButtons;
 
 private:
     Ui::JoystickPrototype *joystickUi;

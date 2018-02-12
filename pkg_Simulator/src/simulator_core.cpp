@@ -129,7 +129,6 @@ void SimulatorCore::removeSimObject(object_id oId)
 void SimulatorCore::joystickMoved(double x, double y, double z, QString channel)
 {
     if(!channel.size()) return;
-
     joymsg joystick = initJoystick(channel);
 
     joystick._message->axes.resize(3);

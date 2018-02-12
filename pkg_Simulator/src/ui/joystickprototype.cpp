@@ -20,7 +20,8 @@ JoystickPrototype::JoystickPrototype(QWindow *parent) :
     joystickUi->verticalLayout->addWidget(rotationWidget);
 
     connect(joystickWidget, SIGNAL(joystickMoved()), this, SLOT(joystickMoved()));
-    connect(rotationWidget, SIGNAL(valueChanged()), this, SLOT(joystickMoved()));
+    connect(rotationWidget, SIGNAL(valueChanged(int)), this, SLOT(rotationMoved(int)));
+    connect(joystickUi->setKeys, SIGNAL (released()), this, SLOT (keysButtonClick()));
 
     //initialize joystick keyboard shortcuts, these can be altered by user
     up = Qt::Key_W;
@@ -29,16 +30,76 @@ JoystickPrototype::JoystickPrototype(QWindow *parent) :
     down = Qt::Key_S;
     left = Qt::Key_Z;
     right = Qt::Key_X;
+    speedButtons = 60;
+
+    //initialize actions to false so joystick starts on center point
+    joystickWidget->m_MousePressed = false;
+    joystickWidget->m_MouseUp = false;
+    joystickWidget->m_MouseEast = false;
+    joystickWidget->m_MouseWest = false;
+    joystickWidget->m_MouseDown = false;
+    rotationWidget->m_MouseLeft = false;
+    rotationWidget->m_MouseRight = false;
+
 
     setMinimumSize(size());
     setMaximumSize(size());
+}
 
-    //grabKeyboard();
+void JoystickPrototype::keysButtonClick()
+{
+    this->setEnabled(false);
+
+    //create window and settings popup, link them
+    QWindow *jWindow = new QWindow();
+    settingspopup *settings = new settingspopup(jWindow);
+
+    //Settings popup button signals and slots
+    connect(settings, SIGNAL(settingsSaved(int, int, int, int, int, int, int)), this, SLOT(settingsChanged(int, int, int, int, int, int, int)));
+    connect(settings, SIGNAL(settingsClosed()), this, SLOT(makeUsable()));
+
+    connect(this, &JoystickPrototype::joystickClosed, settings, &settingspopup::deleteLater);
+    connect(settings, &settingspopup::settingsClosed, settings, &settingspopup::deleteLater);
+    connect(settings, &settingspopup::destroyed, jWindow, &QWindow::deleteLater);
+
+    //show this popup
+    settings->show();
+}
+
+void JoystickPrototype::makeUsable()
+{
+    this->setEnabled(true);
+}
+
+void JoystickPrototype::settingsChanged(int n, int e, int s, int w, int l, int r, int speed)
+{
+    up = n;
+    east = e;
+    west = w;
+    down = s;
+    left = l;
+    right = r;
+
+    speedButtons = speed;
+    this->setEnabled(true);
+}
+
+void JoystickPrototype::rotationMoved(int val)
+{
+    joystickUi->setChannel->clearFocus();
+
+    qDebug() << "joystick moved " << joystickWidget->xVector << " " << joystickWidget->yVector << " " << val - rotationWidget->maximum()/2;
+
+    joystickMoved(joystickWidget->xVector, joystickWidget->yVector,
+                  val - rotationWidget->maximum()/2,
+                  joystickUi->setChannel->text());
 }
 
 void JoystickPrototype::joystickMoved()
 {
     joystickUi->setChannel->clearFocus();
+
+    qDebug() << "joystick moved " << joystickWidget->xVector << " " << joystickWidget->yVector << " " << rotationWidget->value - rotationWidget->maximum()/2;
 
     joystickMoved(joystickWidget->xVector, joystickWidget->yVector,
                   rotationWidget->value - rotationWidget->maximum()/2,
@@ -47,11 +108,6 @@ void JoystickPrototype::joystickMoved()
 
 void JoystickPrototype::keyPressEvent(QKeyEvent * event)
 {
-    //if (event->type()==QEvent::KeyPress)
-    //{
-    //    qDebug() << "key pressed " + event->text();
-    //}
-
     //Don't trigger on keypresses in the text input
     if(joystickUi->setChannel->hasFocus())
     {
@@ -60,8 +116,6 @@ void JoystickPrototype::keyPressEvent(QKeyEvent * event)
         else
             return;
     }
-
-    int speedButtons = 60;
 
     if(event->key() == up)
     {
@@ -105,11 +159,6 @@ void JoystickPrototype::keyReleaseEvent(QKeyEvent * event)
 
     if(!event->isAutoRepeat())
     {
-        //if (event->type()==QEvent::KeyRelease)
-        //{
-        //    qDebug() << "key released " + event->text();
-        //}
-
         if(event->key() == up)
             joystickWidget->m_MouseUp = false;
         else if(event->key() == east)
@@ -135,6 +184,7 @@ RotationWidget::RotationWidget(QWidget *parent)
     : QScrollBar(Qt::Horizontal, parent)
 {
     resetValue();
+    connect(this, SIGNAL(sliderReleased()), this, SLOT(resetValue()));
 }
 
 void RotationWidget::resetValue()
@@ -151,33 +201,8 @@ void RotationWidget::addValue(int amount)
         value = maximum();
     else if(value < 0)
         value = 0;
-    //qDebug() << QString::number(value);
     setValue(value);
 }
-void RotationWidget::mouseReleaseEvent(QMouseEvent * event)
-{
-    Q_UNUSED(event)
-    m_MousePressed = false;
-    resetValue();
-}
-
-/*
-void RotationWidget::mousePressEvent(QMouseEvent* event)
-{
-    Q_UNUSED(event)
-    m_MousePressed = true;
-}
-
-void RotationWidget::mouseMoveEvent(QMouseEvent *event)
-{
-    Q_UNUSED(event)
-    if (event->type() == QEvent::MouseMove)
-    {
-        xCenter = event->pos().x();
-        yCenter = event->pos().y();
-        update();
-    }
-}*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

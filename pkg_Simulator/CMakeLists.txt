@@ -59,12 +59,14 @@ set(MOC_HDRS
 
     include/ui/mainwindow.h
     include/ui/joystickprototype.h
+    include/ui/settingspopup.h
     )
 
 ## .ui qt widgets form files
 set(UI_FILES
     ui/mainwindow.ui
-    ui/joystickprototype.ui)
+    ui/joystickprototype.ui
+    ui/settingspopup.ui)
 
 ## Any other source files
 set(CPP_SRCS
@@ -74,6 +76,7 @@ set(CPP_SRCS
 
     src/ui/mainwindow.cpp
     src/ui/joystickprototype.cpp
+    src/ui/settingspopup.cpp
     src/main.cpp
     )
 
