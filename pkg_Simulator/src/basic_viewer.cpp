@@ -31,7 +31,7 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     _children->addWidget(_viewer);
     setLayout(_children);
 
-    setWorldBounds(-30, 30, -30, 30);
+    setWorldBounds(-200, 200, -200, 200);
 }
 
 QGraphicsItem* BasicViewer::_drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)

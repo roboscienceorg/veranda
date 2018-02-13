@@ -73,7 +73,7 @@ public slots:
     void showMainWindow(){
         show();
 
-        setWorldBounds(-30, 30, -30, 30);
+        setWorldBounds(-200, 200, -200, 200);
     }
 
 private slots:

@@ -8,6 +8,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 11)
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+else()
+  add_definitions(-DWINDOWS)
 endif()
 
 find_package(ament_cmake REQUIRED)
@@ -15,9 +17,12 @@ find_package(sdsmt_simulator_box2d REQUIRED)
 find_package(sdsmt_simulator_api REQUIRED)
 find_package(rclcpp REQUIRED)
 
+find_package(OpenGL REQUIRED)
+
 ## Find and configure QT
 find_package(Qt5 REQUIRED COMPONENTS
   Core
+  Gui
 )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -28,6 +33,8 @@ add_definitions(-DQT_SHARED)
 
 include_directories( ${CMAKE_BINARY_DIR} )
 include_directories( include )
+
+include_directories( ${OPENGL_INCLUDE_DIRS} )
 
 ## TODO If possible: Figure out how to mark Qt as a dependency
 ament_export_dependencies(    
@@ -52,7 +59,8 @@ set(MOC_HDRS
 set(CPP_SRCS
     src/image_loader.cpp
     src/image_loader_plugin.cpp
-    src/polygonscomponent.cpp)
+    src/polygonscomponent.cpp
+    src/imageparser.cpp)
 
 ###########
 ## Build ##
@@ -74,7 +82,7 @@ add_library(image_loader_plugin SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to executable
 ## this will find all the headers and link all the libraries
-qt5_use_modules(image_loader_plugin Core)
+qt5_use_modules(image_loader_plugin Core Gui)
 
 ## Pull in stuff exported from other packages
 ament_target_dependencies(image_loader_plugin
@@ -82,6 +90,8 @@ ament_target_dependencies(image_loader_plugin
     "sdsmt_simulator_box2d"
     "rclcpp"
 )
+
+target_link_libraries(image_loader_plugin ${OPENGL_LIBRARIES} )
 
 ## Install lib into same directory as simulator executable
 install(

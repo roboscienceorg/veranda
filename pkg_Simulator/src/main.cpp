@@ -18,6 +18,7 @@
 #include <QDebug>
 #include <QTextStream>
 #include <QMap>
+#include <QFileDialog>
 
 #include "basic_physics.h"
 #include "basic_viewer.h"
@@ -150,7 +151,8 @@ int main(int argc, char** argv)
 
     if(imageLoader)
     {
-        for(WorldObject* wo : imageLoader->loadFile("./file.png", componentPlugins))
+        QString fileName = QFileDialog::getOpenFileName();
+        for(WorldObject* wo : imageLoader->loadFile(fileName, componentPlugins))
         {
             sim.addSimObject(wo);
             delete wo;
