@@ -48,10 +48,14 @@ QVector<QVector<b2PolygonShape*>> ImageLoader::getShapesFromFile(QString filePat
             triBuffer[1].Set(poly[1].x(), poly[1].y());
             triBuffer[2].Set(poly[2].x(), poly[2].y());
 
-            b2PolygonShape* triangle = new b2PolygonShape();
-            triangle->Set(triBuffer, 3);
+            //Remove 'triangles' that are just a line
+            if(std::abs(b2Cross(triBuffer[1] - triBuffer[0], triBuffer[2] - triBuffer[0])) > 0.001)
+            {
+                b2PolygonShape* triangle = new b2PolygonShape();
+                triangle->Set(triBuffer, 3);
 
-            triangles.push_back(triangle);
+                triangles.push_back(triangle);
+            }
         }
     }
 

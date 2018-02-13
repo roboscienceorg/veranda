@@ -35,7 +35,7 @@ QVector<QVector<QPolygonF>> ImageParser::parseImage(const QImage& image)
     {
         for(int j=0; j<image.width(); j++)
         {
-            pixMap[i][j] = image.pixelColor(j, i).rgb();
+            pixMap[i][j] = image.pixel(j, i);
         }
     }
 
@@ -469,7 +469,12 @@ QVector<QPolygonF> ImageParser::_triangulateGLU(const Shape& s)
     if(!tess) throw std::exception();
 
     //Set up callbacks
+
+#ifdef WINDOWS
 #define CB (void (CALLBACK *)())
+#else
+#define CB (_GLUfuncptr)
+#endif
     gluTessCallback(tess, GLU_TESS_BEGIN_DATA, CB GLTess_begin);
     gluTessCallback(tess, GLU_TESS_COMBINE_DATA, CB GLTess_combine);
     gluTessCallback(tess, GLU_TESS_VERTEX_DATA,  CB GLTess_vert);

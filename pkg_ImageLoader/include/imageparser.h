@@ -10,9 +10,10 @@
 #include <windows.h>
 #undef min
 #undef max
-#endif
-
 #include <GL/GLU.h>
+#else
+#include <GL/glu.h>
+#endif
 
 #include <functional>
 

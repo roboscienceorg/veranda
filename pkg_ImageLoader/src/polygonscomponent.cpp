@@ -7,6 +7,8 @@ PolygonsComponent::PolygonsComponent(QVector<b2PolygonShape *> polys, QObject* p
     for(int i=0; i<polys.size(); i++)
         _shapePtrs[i] = copy(polys[i]);
 
+    _numShapes.set(_shapePtrs.size());
+
     _polyModel = new Model(QVector<Model*>{}, _shapePtrs, this);
 }
 
