@@ -10,9 +10,40 @@
 #include <QGraphicsItem>
 #include <QLayout>
 #include <QColor>
+#include <QDebug>
 
 #include <Box2D/Box2D.h>
 #include <sdsmt_simulator/model.h>
+
+class CustomGraphicsView : public QGraphicsView
+{
+    Q_OBJECT
+
+public:
+    CustomGraphicsView(QGraphicsScene* scene, QWidget* parent = nullptr) :
+        QGraphicsView(scene, parent){}
+
+signals:
+    void mouseMoved(QMouseEvent* event);
+    void mousePress(QMouseEvent* event);
+    void mouseRelease(QMouseEvent* event);
+
+private:
+    void mouseMoveEvent(QMouseEvent* event)
+    {
+        mouseMoved(event);
+    }
+
+    void mousePressEvent(QMouseEvent* event)
+    {
+        mousePress(event);
+    }
+
+    void mouseReleaseEvent(QMouseEvent* event)
+    {
+        mouseRelease(event);
+    }
+};
 
 class BasicViewer : public Simulator_Visual_If
 {
@@ -25,6 +56,7 @@ class BasicViewer : public Simulator_Visual_If
     QMap<Model*, object_id> _modelToObject;
 
     //Top-level parent shape for objects
+    QMap<object_id, QGraphicsItemGroup*> _topShapes;
     QMap<Model*, QGraphicsItem*> _shapes;
     QMap<QGraphicsItem*, Model*> _shapeToModel;
 
@@ -35,9 +67,12 @@ class BasicViewer : public Simulator_Visual_If
     object_id _currSelection = 0;
 
     //Viewer, scene, and widget layout
-    QGraphicsView* _viewer;
+    CustomGraphicsView* _viewer;
     QGraphicsScene* _scene;
     QLayout* _children;
+
+    QGraphicsItem* _transformer;
+    QGraphicsItem* _rotater;
 
     //Constructs a QAbstractGraphicsShapeItem from a box2d shape
     QGraphicsItem* _drawb2Shape(b2Shape* s, QGraphicsItem* itemParent = nullptr);
@@ -53,6 +88,13 @@ class BasicViewer : public Simulator_Visual_If
 
     //Sets a graphics item and all it's children to a specific color pen
     void _setOutlineColor(QGraphicsItem* item, const QColor& color);
+
+    bool _draggingTransform = false;
+    bool _draggingRotate = false;
+
+    QGraphicsItem* _makeTransformer();
+    QGraphicsItem* _makeRotater();
+    QGraphicsItem* _makeArrow(double pointx, double pointy, double angle);
 
 public:
     BasicViewer(QWidget* parent = nullptr);
@@ -70,6 +112,8 @@ private slots:
     void modelChanged(Model* m);
 
     void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent* event);
+    void mouseMoveEvent(QMouseEvent* event);
     void resizeEvent(QResizeEvent* event);
 };
 

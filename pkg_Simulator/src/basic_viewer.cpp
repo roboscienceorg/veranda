@@ -25,11 +25,18 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     _children = new QVBoxLayout(this);
 
     _scene = new QGraphicsScene(this);
-    _viewer = new QGraphicsView(_scene, this);
+    _viewer = new CustomGraphicsView(_scene, this);
     _viewer->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+    _viewer->setMouseTracking(true);
+
+    connect(_viewer, &CustomGraphicsView::mouseMoved, this, &BasicViewer::mouseMoveEvent);
+    connect(_viewer, &CustomGraphicsView::mousePress, this, &BasicViewer::mousePressEvent);
+    connect(_viewer, &CustomGraphicsView::mouseRelease, this, &BasicViewer::mouseReleaseEvent);
 
     _children->addWidget(_viewer);
     setLayout(_children);
+
+    _transformer = _makeTransformer();
 
     setWorldBounds(-200, 200, -200, 200);
 }
@@ -103,11 +110,12 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
     QColor newColor = _color(Solid, false);
     _drawLevels[id] = Solid;
 
+    QGraphicsItemGroup* group = new QGraphicsItemGroup();
     for(Model* m : objects)
     {
         _modelToObject[m] = id;
 
-        QGraphicsItem* graphic = _drawModel(m);
+        QGraphicsItem* graphic = _drawModel(m, group);
         _shapes[m] = graphic;
         _shapeToModel[graphic] = m;
 
@@ -119,9 +127,9 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
         //If the base model moves, update the transform
         connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
 
-        _setOutlineColor(graphic, newColor);
-        _scene->addItem(graphic);
     }
+    _setOutlineColor(group, newColor);
+    _scene->addItem(group);
 }
 
 
@@ -171,8 +179,20 @@ void BasicViewer::mousePressEvent(QMouseEvent *event)
             shape = shape->parentItem();
         Model* m = _shapeToModel[shape];
         object_id oid = _modelToObject[m];
+
         userSelectedObject(oid);
     }
+
+    Simulator_Visual_If::mousePressEvent(event);
+}
+
+void BasicViewer::mouseMoveEvent(QMouseEvent* event)
+{
+}
+
+void BasicViewer::mouseReleaseEvent(QMouseEvent *event)
+{
+
 }
 
 void BasicViewer::resizeEvent(QResizeEvent *event)
@@ -261,8 +281,28 @@ void BasicViewer::objectSelected(object_id id)
 
         _currSelection = id;
         newColor = _color(_drawLevels[_currSelection], true);
+
+        bool first = false;
+        double leftEdge, bottomEdge;
         for(Model* m : _models[_currSelection])
+        {
             _setOutlineColor(_shapes[m], newColor);
+
+            QRectF bound = _shapes[m]->boundingRect();
+            if(first)
+            {
+                leftEdge = bound.x() + bound.width();
+                bottomEdge = bound.y() + bound.height();
+            }
+            else
+            {
+                leftEdge = std::max(leftEdge, bound.x() + bound.width());
+                bottomEdge = std::max(bottomEdge, bound.y() + bound.height());
+            }
+        }
+
+       _transformer->setParentItem(_shapes[m]);
+       _transformer->setPos(bound.x(), bound.y());
     }
 }
 
@@ -275,6 +315,8 @@ void BasicViewer::nothingSelected()
         newColor = _color(_drawLevels[_currSelection], false);
         for(Model* m : _models[_currSelection])
             _setOutlineColor(_shapes[m], newColor);
+
+        _currSelection = 0;
     }
 }
 
@@ -322,4 +364,30 @@ void BasicViewer::_setOutlineColor(QGraphicsItem* item, const QColor& color)
 
     for(QGraphicsItem* i : item->childItems())
         _setOutlineColor(i, color);
+}
+
+QGraphicsItem* BasicViewer::_makeTransformer()
+{
+    QGraphicsItemGroup* group = new QGraphicsItemGroup;
+    group->addToGroup(new QGraphicsLineItem(0, 10, 0, -10));
+    group->addToGroup(new QGraphicsLineItem(10, 0, -10, 0));
+    group->addToGroup(_makeArrow(0, 10, 0));
+    group->addToGroup(_makeArrow(0, -10, 180));
+    group->addToGroup(_makeArrow(10, 0, 90));
+    group->addToGroup(_makeArrow(-10, 0, 270));
+}
+
+QGraphicsItem* BasicViewer::_makeRotater()
+{
+
+}
+
+QGraphicsItem* BasicViewer::_makeArrow(double pointx, double pointy, double angle)
+{
+    QGraphicsItemGroup* group = new QGraphicsItemGroup;
+    group->addToGroup(new QGraphicsLineItem(0, 0, -5, -5));
+    group->addToGroup(new QGraphicsLineItem(0, 0, 5, -5));
+
+    group->setPos(pointx, pointy);
+    group->setRotation(angle);
 }
