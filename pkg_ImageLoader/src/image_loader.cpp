@@ -50,6 +50,9 @@ QVector<QVector<b2PolygonShape*>> ImageLoader::getShapesFromFile(QString filePat
     for(auto& s : shapes)
         triangleCount += s.size();
 
+    double scalex = opt.getPxPerWidth();
+    double scaley = opt.getPxPerHeight();
+
     out.resize(shapes.size());
     b2Vec2 triBuffer[3];
     for(int i=0; i<shapes.size(); i++)
@@ -59,9 +62,9 @@ QVector<QVector<b2PolygonShape*>> ImageLoader::getShapesFromFile(QString filePat
 
         for(QPolygonF& poly : shape)
         {
-            triBuffer[0].Set(poly[0].x(), poly[0].y());
-            triBuffer[1].Set(poly[1].x(), poly[1].y());
-            triBuffer[2].Set(poly[2].x(), poly[2].y());
+            triBuffer[0].Set(poly[0].x()/scalex, poly[0].y()/scaley);
+            triBuffer[1].Set(poly[1].x()/scalex, poly[1].y()/scaley);
+            triBuffer[2].Set(poly[2].x()/scalex, poly[2].y()/scaley);
 
             //Remove 'triangles' that are just a line
             if(std::abs(b2Cross(triBuffer[1] - triBuffer[0], triBuffer[2] - triBuffer[0])) > 0.001)
