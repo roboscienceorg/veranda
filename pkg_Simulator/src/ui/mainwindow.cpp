@@ -10,6 +10,7 @@
 #include <QListWidgetItem>
 #include <QProgressBar>
 #include <QtConcurrent/QtConcurrent>
+#include <QWindow>
 
 #include <stdexcept>
 #include <string>
@@ -50,7 +51,6 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     play = false;
 
     //Initialize Widget Settings
-
     ui->playSimButton->setToolTip("Play Simulation");
     ui->speedSimButton->setToolTip("Speed x2");
     ui->buildToolsWidget->setVisible((false));
@@ -58,6 +58,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     ui->designerToolsMenu->setVisible(false);
     ui->simulatorButton->setEnabled(false);
     ui->designerToolsList->setVisible(false);
+    ui->designerActiveWidget->setVisible(false);
 
     //Initiate a world view for Simulator and another for Designer
     visualSimulator = makeWidget();
@@ -396,7 +397,25 @@ void MainWindow::importMapButtonClick()
     }
 }
 
-void MainWindow::joystickButtonClick(){}
+void MainWindow::joystickButtonClick()
+{
+    //create window and joystick, link them
+    QWindow *jWindow = new QWindow();
+    JoystickPrototype *joystick = new JoystickPrototype(jWindow);
+
+    //Joystick button signals and slots
+    connect(joystick, SIGNAL(joystickMoved(double, double, double, QString)), this, SIGNAL(joystickMoved(double, double, double, QString)));
+    connect(joystick, SIGNAL(joystickButtonPress(int, QString)), this, SIGNAL(joystickButtonPress(int, QString)));
+    connect(joystick, SIGNAL(joystickButtonRelease(int, QString)), this, SIGNAL(joystickButtonRelease(int, QString)));
+
+    connect(this, &MainWindow::windowClosed, joystick, &JoystickPrototype::deleteLater);
+    connect(joystick, &JoystickPrototype::joystickClosed, joystick, &JoystickPrototype::deleteLater);
+    connect(joystick, &JoystickPrototype::destroyed, jWindow, &QWindow::deleteLater);
+
+    //show this joystick
+    joystick->show();
+}
+
 void MainWindow::saveSimButtonClick(){}
 void MainWindow::restartSimButtonClick(){}
 
@@ -428,7 +447,6 @@ void MainWindow::exportObjectButtonClick(){}
 void listBuildTools(int mode);
 void robotItemClicked(QListWidgetItem* item);
 void updatePropertyInformation();
-
 
 void MainWindow::objectSelected(object_id id)
 {
@@ -487,8 +505,6 @@ void MainWindow::nothingSelected()
 
     nothingIsSelected();
 }
-
-
 
 void MainWindow::robotItemClicked(QListWidgetItem* item)
 {

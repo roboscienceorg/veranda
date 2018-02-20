@@ -16,6 +16,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(sdsmt_simulator_box2d REQUIRED)
 find_package(sdsmt_simulator_api REQUIRED)
 
@@ -35,6 +36,7 @@ include_directories( include ${CMAKE_BINARY_DIR} )
 ament_export_dependencies(    
     rclcpp
     std_msgs
+    sensor_msgs
     sdsmt_simulator_box2d
     sdsmt_simulator_api
 )
@@ -56,11 +58,15 @@ set(MOC_HDRS
     include/simulator_core.h
 
     include/ui/mainwindow.h
+    include/ui/joystickprototype.h
+    include/ui/settingspopup.h
     )
 
 ## .ui qt widgets form files
 set(UI_FILES
-    ui/mainwindow.ui)
+    ui/mainwindow.ui
+    ui/joystickprototype.ui
+    ui/settingspopup.ui)
 
 ## Any other source files
 set(CPP_SRCS
@@ -69,6 +75,8 @@ set(CPP_SRCS
     src/simulator_core.cpp
 
     src/ui/mainwindow.cpp
+    src/ui/joystickprototype.cpp
+    src/ui/settingspopup.cpp
     src/main.cpp
     )
 
@@ -104,6 +112,7 @@ qt5_use_modules(sdsmt_simulator Core Gui Widgets)
 ament_target_dependencies(sdsmt_simulator
     "rclcpp"
     "std_msgs"
+    "sensor_msgs"
     "sdsmt_simulator_box2d"
     "sdsmt_simulator_api"
 )

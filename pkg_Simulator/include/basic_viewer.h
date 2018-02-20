@@ -53,12 +53,13 @@ class BasicViewer : public Simulator_Visual_If
 
     //Actual models provided for object
     QMap<object_id, QVector<Model*>> _models;
-    QMap<Model*, object_id> _modelToObject;
 
     //Top-level parent shape for objects
     QMap<object_id, QGraphicsItemGroup*> _topShapes;
     QMap<Model*, QGraphicsItem*> _shapes;
-    QMap<QGraphicsItem*, Model*> _shapeToModel;
+    QMap<QGraphicsItem*, object_id> _shapeToObject;
+    QMap<Model*, object_id> _modelToObject;
+    QMap<Model*, QVector<Model*>> _modelChildren;
 
     //Keep track of what is drawn
     QMap<object_id, DrawLevel> _drawLevels;
@@ -78,7 +79,7 @@ class BasicViewer : public Simulator_Visual_If
     QGraphicsItem* _drawb2Shape(b2Shape* s, QGraphicsItem* itemParent = nullptr);
 
     //Constructs a QGraphicsItem with multiple shapes from a model
-    QGraphicsItem* _drawModel(Model* m, QGraphicsItem* parent=nullptr);
+    QGraphicsItem* _drawModel(Model* m);
 
     //Rescales the view
     void _rescale();
@@ -91,10 +92,11 @@ class BasicViewer : public Simulator_Visual_If
 
     bool _draggingTransform = false;
     bool _draggingRotate = false;
+    QPointF _dragStart;
 
     QGraphicsItem* _makeTransformer();
     QGraphicsItem* _makeRotater();
-    QGraphicsItem* _makeArrow(double pointx, double pointy, double angle);
+    QGraphicsItem* _makeArrow(double pointx, double pointy, double angle, QPen p, QBrush b);
 
 public:
     BasicViewer(QWidget* parent = nullptr);
@@ -110,6 +112,8 @@ public slots:
 private slots:
     void modelMoved(Model* m, double dx, double dy, double dt);
     void modelChanged(Model* m);
+    void removeModel(Model* m);
+    QGraphicsItem* addModel(Model* m, object_id id);
 
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent* event);

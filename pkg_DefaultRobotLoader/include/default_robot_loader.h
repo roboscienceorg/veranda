@@ -10,6 +10,9 @@ class DefaultRobotLoader : public WorldLoader_If
 {
     virtual QVector<QString> fileExts() { return QVector<QString>{""};}
     virtual QVector<WorldObject *> loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins);
+
+    WorldObject* makeDiffDriveBot(QMap<QString, WorldObjectComponent_Plugin_If*> plugins);
+    WorldObject* makeAckermannBot(QMap<QString, WorldObjectComponent_Plugin_If*> plugins);
 };
 
 #endif

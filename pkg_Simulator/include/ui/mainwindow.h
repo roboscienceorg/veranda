@@ -11,6 +11,8 @@
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/simulator_visual_if.h"
 #include "interfaces/world_object_wrappers.h"
+//#include "interfaces/joystickprototype_if.h"
+#include "ui/joystickprototype.h"
 
 #include <sdsmt_simulator/world_object_component_plugin.h>
 #include <sdsmt_simulator/object_loader_if.h>
@@ -32,6 +34,7 @@ private:
     visualizerFactory makeWidget;
     Simulator_Visual_If* visualSimulator;
     Simulator_Visual_If* visualDesigner;
+    //QMap<QWindow*, JoystickPrototype*> joysticks;
 
     QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
 
@@ -84,6 +87,11 @@ public slots:
         setWorldBounds(-200, 200, -200, 200);
     }
 
+    void closeEvent(QCloseEvent *)
+    {
+        emit windowClosed();
+    }
+
 private slots:
 
     //Main menu signals and slots
@@ -129,6 +137,7 @@ private:
 signals:
     void objectIsSelected(object_id id);
     void nothingIsSelected();
+    void windowClosed();
 };
 
 #endif // MAINWINDOW_H

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>sdsmt_simulator_wheel_plugins</name>
+  <version>0.0.1</version>
+  <description>Default Wheel Plugins</description>
+
+  <maintainer email="andrew.stelter@mines.sdsmt.edu">Andrew Stelter</maintainer>
+
+  <license>TODO</license>
+
+  <depend>sdsmt_simulator_api</depend>
+  <depend>sdsmt_simulator_box2d</depend>
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

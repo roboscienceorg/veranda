@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <QDebug>
 
 #include <Box2D/Box2D.h>
 
@@ -23,6 +24,27 @@ signals:
     void childModelChanged(Model*, Model*);
     void childTransformChanged(Model*, Model*);
 
+private slots:
+    void _childChildModelChanged(Model*, Model* childChild)
+    {
+        emit childModelChanged(this, childChild);
+    }
+
+    void _childChildTransformChanged(Model*, Model* childChild)
+    {
+        emit childTransformChanged(this, childChild);
+    }
+
+    void _childModelChanged(Model* child)
+    {
+        emit childModelChanged(this, child);
+    }
+
+    void _childTransformChanged(Model* child)
+    {
+        emit childTransformChanged(this, child);
+    }
+
 public:
     Model(QVector<Model*> children, QVector<b2Shape*> shapes = {}, QObject* parent = nullptr) : QObject(parent)
     {
@@ -37,7 +59,6 @@ public:
 
     ~Model()
     {
-        qDeleteAll(_children);
     }
 
     const QVector<b2Shape*>& shapes(){ return _shapes; }
@@ -70,11 +91,11 @@ public:
         {
             for(Model* s : newChildren)
             {
-                connect(s, &Model::modelChanged, [this](Model* c){childModelChanged(this, c);});
-                connect(s, &Model::childModelChanged, [this](Model* c, Model* cc){childModelChanged(this, cc);});
+                connect(s, &Model::modelChanged, this, &Model::_childModelChanged);
+                connect(s, &Model::childModelChanged, this, &Model::_childChildModelChanged);
 
-                connect(s, &Model::transformChanged, [this](Model* c){childModelChanged(this, c);});
-                connect(s, &Model::childTransformChanged, [this](Model* c, Model* cc){childModelChanged(this, cc);});
+                connect(s, &Model::transformChanged, this, &Model::_childTransformChanged);
+                connect(s, &Model::childTransformChanged, this, &Model::_childChildTransformChanged);
                 _children.push_back(s);
             }
             modelChanged(this);

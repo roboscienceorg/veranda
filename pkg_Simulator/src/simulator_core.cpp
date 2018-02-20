@@ -32,6 +32,11 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     connect(this, &SimulatorCore::physicsStopped, _userInterface, &Simulator_Ui_If::physicsStopped);
     connect(this, &SimulatorCore::physicsTickSet, _userInterface, &Simulator_Ui_If::physicsTickChanged);
 
+    //Every time the user stops or starts the physics simulation, we'll clear out our cache of
+    //joystick channels; this should prevent it from getting too big ever and hogging memory
+    connect(this, &SimulatorCore::physicsStopped, this, &SimulatorCore::clearJoystickChannels);
+    connect(this, &SimulatorCore::physicsStarted, this, &SimulatorCore::clearJoystickChannels);
+
     connect(_userInterface, &Simulator_Ui_If::userStartPhysics, this, &SimulatorCore::userStartPhysics);
     connect(_userInterface, &Simulator_Ui_If::userStopPhysics, this, &SimulatorCore::userStopPhysics);
     connect(_userInterface, &Simulator_Ui_If::userSetPhysicsTick, this, &SimulatorCore::userSetPhysicsTick);
@@ -39,6 +44,10 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, this, &SimulatorCore::physicsStarted);
     connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, this, &SimulatorCore::physicsStopped);
     connect(_physicsEngine, &Simulator_Physics_If::physicsTickSet, this, &SimulatorCore::physicsTickSet);
+
+    connect(_userInterface, &Simulator_Ui_If::joystickButtonPress, this, &SimulatorCore::joystickButtonDown);
+    connect(_userInterface, &Simulator_Ui_If::joystickButtonRelease, this, &SimulatorCore::joystickButtonUp);
+    connect(_userInterface, &Simulator_Ui_If::joystickMoved, this, &SimulatorCore::joystickMoved);
 
     connect(this, &SimulatorCore::errorMsg, _userInterface, &Simulator_Ui_If::errorMessage);
 }
@@ -118,4 +127,81 @@ void SimulatorCore::removeSimObjects(QVector<object_id> oIds)
         delete _worldObjects[oId];
         _worldObjects.remove(oId);
     }
+}
+
+void SimulatorCore::joystickMoved(double x, double y, double z, QString channel)
+{
+    if(!channel.size()) return;
+    joymsg joystick = initJoystick(channel);
+
+    joystick._message->axes.resize(3);
+    joystick._message->axes[0] = x;
+    joystick._message->axes[1] = y;
+    joystick._message->axes[2] = z;
+
+    if(joystick._channel)
+    {
+        joystick._channel->publish(joystick._message);
+    }
+}
+
+void SimulatorCore::joystickButtonDown(int button, QString channel)
+{
+    if(!channel.size() || button > 256) return;
+
+    joymsg joystick = initJoystick(channel);
+
+    if(joystick._message->buttons.size() <= button)
+        joystick._message->buttons.resize(button+1);
+
+    joystick._message->buttons[button] = 1;
+
+    if(joystick._channel)
+    {
+        joystick._channel->publish(joystick._message);
+    }
+}
+
+void SimulatorCore::joystickButtonUp(int button, QString channel)
+{
+    if(!channel.size() || button > 256) return;
+
+    joymsg joystick = initJoystick(channel);
+
+    if(joystick._message->buttons.size() <= button)
+        joystick._message->buttons.resize(button+1);
+
+    joystick._message->buttons[button] = 0;
+
+    if(joystick._channel)
+    {
+        joystick._channel->publish(joystick._message);
+    }
+}
+
+void SimulatorCore::clearJoystickChannels()
+{
+    _joysticks.clear();
+}
+
+SimulatorCore::joymsg SimulatorCore::initJoystick(QString channel)
+{
+    joymsg& joy = _joysticks[channel];
+    if(!joy._channel)
+    {
+        if(_node)
+        {
+            rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
+            custom_qos_profile.depth = 7;
+
+            joy._channel = _node->create_publisher<joymsg::msgType>(channel.toStdString(), custom_qos_profile);
+        }
+    }
+
+    if(!joy._message)
+    {
+        joy._message = make_shared<joymsg::msgType>();
+    }
+
+    return joy;
 }
