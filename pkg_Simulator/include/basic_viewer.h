@@ -115,9 +115,9 @@ private slots:
     void removeModel(Model* m);
     QGraphicsItem* addModel(Model* m, object_id id);
 
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent* event);
-    void mouseMoveEvent(QMouseEvent* event);
+    void viewMousePress(QMouseEvent *event);
+    void viewMouseRelease(QMouseEvent* event);
+    void viewMouseMove(QMouseEvent* event);
     void resizeEvent(QResizeEvent* event);
 };
 

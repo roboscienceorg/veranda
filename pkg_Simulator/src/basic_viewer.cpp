@@ -30,9 +30,9 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     _viewer->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
     _viewer->setMouseTracking(true);
 
-    connect(_viewer, &CustomGraphicsView::mouseMoved, this, &BasicViewer::mouseMoveEvent);
-    connect(_viewer, &CustomGraphicsView::mousePress, this, &BasicViewer::mousePressEvent);
-    connect(_viewer, &CustomGraphicsView::mouseRelease, this, &BasicViewer::mouseReleaseEvent);
+    connect(_viewer, &CustomGraphicsView::mouseMoved, this, &BasicViewer::viewMouseMove);
+    connect(_viewer, &CustomGraphicsView::mousePress, this, &BasicViewer::viewMousePress);
+    connect(_viewer, &CustomGraphicsView::mouseRelease, this, &BasicViewer::viewMouseRelease);
 
     _children->addWidget(_viewer);
     setLayout(_children);
@@ -189,16 +189,19 @@ void BasicViewer::modelChanged(Model *m)
 }
 
 //World View Clicked
-void BasicViewer::mousePressEvent(QMouseEvent *event)
+void BasicViewer::viewMousePress(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
         QPointF hit = event->localPos();
-        qDebug() << "Clicked transform?" << _transformer->contains(_transformer->sceneTransform().inverted().map(hit));
-        for(auto child : _transformer->childItems())
-            qDebug() << "Clicked transform?" << child->contains(hit);
 
-        if(!_draggingTransform && _transformer->contains(hit))
+        bool startDrag = _transformer->contains(
+                    _transformer->sceneTransform().inverted().map(
+                        _viewer->mapToScene(
+                            _viewer->mapFromGlobal(
+                                event->globalPos()))));
+
+        if(!_draggingTransform && startDrag)
         {
             qDebug() << "Start dragging";
             _draggingTransform = true;
@@ -214,16 +217,14 @@ void BasicViewer::mousePressEvent(QMouseEvent *event)
             userSelectedObject(oid);
         }
     }
-
-    Simulator_Visual_If::mousePressEvent(event);
 }
 
-void BasicViewer::mouseMoveEvent(QMouseEvent* event)
+void BasicViewer::viewMouseMove(QMouseEvent* event)
 {
-    if(_draggingTransform) qDebug() << "Drag to " << event->globalPos() - _dragStart;
+    if(_draggingTransform) qDebug() << "Drag to " << event->localPos() - _dragStart;
 }
 
-void BasicViewer::mouseReleaseEvent(QMouseEvent *event)
+void BasicViewer::viewMouseRelease(QMouseEvent *event)
 {
     _draggingTransform = false;
     _draggingRotate = false;
