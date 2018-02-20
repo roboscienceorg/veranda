@@ -26,9 +26,9 @@ public:
         QVector<QPolygonF> inner;
     };
 
-    static QVector<QVector<QPolygonF>> parseImage(QString fileName);
-    static QVector<QVector<QPolygonF>> parseImage(const QImage& image);
-    static QVector<QVector<QPolygonF>> parseImage(const QVector<QVector<QRgb> >& pixMap);
+    static QVector<QVector<QPolygonF>> parseImage(QString fileName, const uint64_t &threshold, uint64_t& width, uint64_t& height);
+    static QVector<QVector<QPolygonF>> parseImage(const QImage& image, const uint64_t& threshold);
+    static QVector<QVector<QPolygonF>> parseImage(const QVector<QVector<QRgb> >& pixMap, const uint64_t& threshold);
 
 private:
     //Edge finding

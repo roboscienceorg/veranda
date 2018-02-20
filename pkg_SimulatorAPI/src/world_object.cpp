@@ -101,7 +101,7 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
 {
     clearBodies(world);
 
-    qDebug() << "Creating object at " << _locX.get().toDouble() << ", " << _locY.get().toDouble() << " : " << _locTheta.get().toDouble();
+    //qDebug() << "Creating object at " << _locX.get().toDouble() << ", " << _locY.get().toDouble() << " : " << _locTheta.get().toDouble();
 
     QVector<WorldObjectComponent_If*> components = getComponents();
 

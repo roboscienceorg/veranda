@@ -36,10 +36,10 @@ public:
     void start();
 
 signals:
-    void objectRemoved(object_id rId);
+    void objectsRemoved(QVector<object_id> rId);
 
-    void objectAdded(WorldObjectPhysics* interface, object_id id);
-    void objectAdded(WorldObjectProperties* interface, object_id id);
+    void objectsAdded(QVector<QPair<WorldObjectPhysics*, object_id>> objs);
+    void objectsAdded(QVector<QPair<WorldObjectProperties*, object_id>> objs);
 
     void errorMsg(QString);
 
@@ -52,8 +52,8 @@ signals:
     void physicsTickSet(double, double);
 
 public slots:
-    void addSimObject(WorldObject* obj);
-    void removeSimObject(object_id oId);
+    void addSimObjects(QVector<WorldObject*> objs);
+    void removeSimObjects(QVector<object_id> oIds);
 };
 
 #endif // SDSMT_SIMULATOR_H

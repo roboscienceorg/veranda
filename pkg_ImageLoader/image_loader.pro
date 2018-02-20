@@ -1,4 +1,4 @@
-QT       += core
+QT       += core widgets
 
 TARGET = diffDrive_drivetrain
 TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being set
@@ -15,7 +15,8 @@ HEADERS += \
     include/image_loader.h \
     include/image_loader_plugin.h \
     include/polygonscomponent.h \
-    include/imageparser.h
+    include/imageparser.h \
+    include/optiondialog.h
 
 DISTFILES += \
     CMakeLists.txt \

@@ -8,11 +8,15 @@
 #include <QStandardItemModel>
 #include <QThread>
 #include <QListWidgetItem>
+#include <QProgressBar>
+#include <QtConcurrent/QtConcurrent>
+
 #include <stdexcept>
 #include <string>
 
 MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If *> components,
-                       QVector<WorldObjectLoader_If*> loaders, QVector<WorldObjectSaver_If*> savers, QWidget *parent) :
+                       QVector<WorldObjectLoader_If*> oloaders, QVector<WorldObjectSaver_If*> osavers,
+                       QVector<WorldLoader_If *> wloaders, QVector<WorldSaver_If *> wsavers, QWidget *parent) :
     Simulator_Ui_If(parent),
     makeWidget(factory), componentPlugins(components),
     ui(new Ui::MainWindow)
@@ -21,13 +25,26 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
 
     ui->centralWidget->setLayout(ui->mainLayout);
 
-    for(WorldObjectLoader_If* l : loaders)
+    for(WorldObjectLoader_If* l : oloaders)
         for(QString e : l->fileExts())
-            objectLoaders[e] = l;
+            objectLoaders[e] += l;
 
-    for(WorldObjectSaver_If* s : savers)
+    for(WorldObjectSaver_If* s : osavers)
         for(QString e : s->fileExts())
-            objectSavers[e] = s;
+            objectSavers[e] += s;
+
+    for(WorldLoader_If* l : wloaders)
+        for(QString e : l->fileExts())
+            worldLoaders[e] += l;
+
+    for(WorldSaver_If* s : wsavers)
+        for(QString e : s->fileExts())
+            worldSavers[e] += s;
+
+    //If no world loader plugins exist,
+    //don't present button to user
+    if(wloaders.size() == 0)
+        ui->importMapButton->setVisible(false);
 
     speed = 1;
     play = false;
@@ -108,32 +125,41 @@ MainWindow::~MainWindow()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Add robot to the simulation world view
-void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties *object, object_id oId)
+void MainWindow::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties *, object_id>> objs)
 {
-    if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
+    for(auto& p : objs)
+    {
+        object_id& oId = p.second;
+        WorldObjectProperties* object = p.first;
 
-    worldObjects[oId] = object;
+        if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
 
-    visualSimulator->objectAddedToScreen(object->getModels(), oId);
+        worldObjects[oId] = object;
 
-    listItems[oId] = new QListWidgetItem();
-    listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
-    ui->simulatorActiveWidget->addItem(listItems[oId]);
+        visualSimulator->objectAddedToScreen(object->getModels(), oId);
 
-    objectSelected(oId);
+        listItems[oId] = new QListWidgetItem();
+        listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
+        ui->simulatorActiveWidget->addItem(listItems[oId]);
+
+        objectSelected(oId);
+    }
 }
 
-void MainWindow::worldObjectRemovedFromSimulation(object_id oId)
+void MainWindow::worldObjectsRemovedFromSimulation(QVector<object_id> oIds)
 {
-    visualSimulator->objectRemovedFromScreen(oId);
-    worldObjects.remove(oId);
+    for(object_id oId : oIds)
+    {
+        visualSimulator->objectRemovedFromScreen(oId);
+        worldObjects.remove(oId);
 
-    ui->simulatorActiveWidget->removeItemWidget(listItems[oId]);
-    delete listItems[oId];
-    listItems.remove(oId);
+        ui->simulatorActiveWidget->removeItemWidget(listItems[oId]);
+        delete listItems[oId];
+        listItems.remove(oId);
 
-    if(selected == oId)
-        nothingSelected();
+        if(selected == oId)
+            nothingSelected();
+    }
 }
 
 void MainWindow::physicsStarted()
@@ -314,22 +340,47 @@ void MainWindow::importMapButtonClick()
     switch (ret) {
       case QMessageBox::Yes:
     {
+          QString types;
+          qDebug() << "Able to load files:" << worldLoaders.keys();
+          for(QString k : worldLoaders.keys())
+              if(k.size())
+                types += "(*." + k + ");;";
+
+          types = types.left(types.size()-2);
+
           // Save was clicked
-          QString path = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", tr("Json files (*.json);;Images (*.png *.jpg)"));
+          QString path = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", types);
 
           if(path.length())
           {
-              /*Map* map = mapLoader->loadMapFile(path);
-              if(map)
-              {
-                  //Clear out simulation
-                  while(worldObjects.size())
-                      userRemoveWorldObjectFromSimulation(worldObjects.firstKey());
+              QString ext = QFileInfo(path).suffix();
+              QVector<WorldObject*> loadedObjs;
 
-                  //Add map into new simulation
-                  userAddWorldObjectToSimulation(map);
-                  delete map;
-              }*/
+              for(WorldLoader_If* wl : worldLoaders[ext])
+                  if(!loadedObjs.size())
+                  {
+                      try
+                      {
+                          qDebug() << "Load file";
+                          loadedObjs=wl->loadFile(path, componentPlugins);
+                      }catch(std::exception& ex){}
+                  }
+
+              if(loadedObjs.size())
+              {
+                  qDebug() << "Clear world";
+                  userRemoveWorldObjectsFromSimulation(worldObjects.keys().toVector());
+
+                  qDebug() << "Build new world";
+                  userAddWorldObjectsToSimulation(loadedObjs);
+                  qDeleteAll(loadedObjs);
+              }
+              else
+              {
+                  QMessageBox err;
+                  err.setText("Unable to open \'" + path + "\' as a world file");
+                  err.exec();
+              }
           }
 
           break;

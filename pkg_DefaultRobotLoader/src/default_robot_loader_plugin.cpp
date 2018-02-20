@@ -6,7 +6,7 @@ Default_Robot_Loader_Plugin::Default_Robot_Loader_Plugin()
 
 }
 
-QVector<WorldObjectLoader_If*> Default_Robot_Loader_Plugin::getLoaders()
+QVector<WorldLoader_If*> Default_Robot_Loader_Plugin::getLoaders()
 {
-    return QVector<WorldObjectLoader_If*>{ new DefaultRobotLoader };
+    return QVector<WorldLoader_If*>{ new DefaultRobotLoader };
 }

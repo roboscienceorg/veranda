@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(image_loader_plugin)
+project(sdsmt_simulator_image_loader_plugin)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -23,6 +23,7 @@ find_package(OpenGL REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS
   Core
   Gui
+  Widgets
 )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -53,7 +54,8 @@ ament_export_dependencies(
 set(MOC_HDRS
     include/image_loader.h
     include/image_loader_plugin.h
-    include/polygonscomponent.h)
+    include/polygonscomponent.h
+    include/optiondialog.h)
 
 ## Any other source files
 set(CPP_SRCS
@@ -82,7 +84,7 @@ add_library(image_loader_plugin SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to executable
 ## this will find all the headers and link all the libraries
-qt5_use_modules(image_loader_plugin Core Gui)
+qt5_use_modules(image_loader_plugin Core Gui Widgets)
 
 ## Pull in stuff exported from other packages
 ament_target_dependencies(image_loader_plugin

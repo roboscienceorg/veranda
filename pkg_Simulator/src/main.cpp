@@ -25,7 +25,7 @@
 #include "ui/mainwindow.h"
 
 #include <sdsmt_simulator/world_object_component_plugin.h>
-#include <sdsmt_simulator/world_object_file_handler_plugin.h>
+#include <sdsmt_simulator/file_handler_plugin.h>
 
 #include "simulator_core.h"
 
@@ -87,7 +87,8 @@ int main(int argc, char** argv)
     QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
     QVector<WorldObjectLoader_If*> objectLoaders;
     QVector<WorldObjectSaver_If*> objectSavers;
-    WorldObjectLoader_If* imageLoader = nullptr;
+    QVector<WorldLoader_If*> worldLoaders;
+    QVector<WorldSaver_If*> worldSavers;
 
     QPluginLoader plugLoader;
 
@@ -117,13 +118,17 @@ int main(int argc, char** argv)
             }
             else if(qobject_cast<WorldObjectFileHandler_Plugin_If*>(plugin))
             {
-                qInfo() << "Filehandler Plugin Accepted";
+                qInfo() << "Object Filehandler Plugin Accepted";
                 WorldObjectFileHandler_Plugin_If* p = qobject_cast<WorldObjectFileHandler_Plugin_If*>(plugin);
                 objectLoaders += p->getLoaders();
                 objectSavers += p->getSavers();
-
-                if(iid == "org.sdsmt.sim.2d.fileHandlers.imageLoader")
-                    imageLoader = p->getLoaders()[0];
+            }
+            else if(qobject_cast<WorldFileHandler_Plugin_If*>(plugin))
+            {
+                qInfo() << "World Filehandler Plugin Accepted";
+                WorldFileHandler_Plugin_If* p = qobject_cast<WorldFileHandler_Plugin_If*>(plugin);
+                worldLoaders += p->getLoaders();
+                worldSavers += p->getSavers();
             }
             else
             {
@@ -145,19 +150,9 @@ int main(int argc, char** argv)
     };
 
     Simulator_Physics_If* physics = new BasicPhysics;
-    Simulator_Ui_If* userinterface = new MainWindow(visuals, componentPlugins, objectLoaders, objectSavers);
+    Simulator_Ui_If* userinterface = new MainWindow(visuals, componentPlugins, objectLoaders, objectSavers, worldLoaders, worldSavers);
 
     SimulatorCore sim(physics, userinterface, node, &app);
-
-    if(imageLoader)
-    {
-        QString fileName = QFileDialog::getOpenFileName();
-        for(WorldObject* wo : imageLoader->loadFile(fileName, componentPlugins))
-        {
-            sim.addSimObject(wo);
-            delete wo;
-        }
-    }
 
     qDebug() << "Starting Simulation";
     sim.start();

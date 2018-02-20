@@ -13,6 +13,15 @@ public:
     ~WorldObjectLoader_If(){}
 
     virtual QVector<QString> fileExts() = 0;
+    virtual WorldObject* loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins) = 0;
+};
+
+class WorldLoader_If
+{
+public:
+    ~WorldLoader_If(){}
+
+    virtual QVector<QString> fileExts() = 0;
     virtual QVector<WorldObject*> loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins) = 0;
 };
 

@@ -4,14 +4,17 @@
 #include <QMainWindow>
 #include <QStandardItem>
 #include <QListWidgetItem>
+#include <QProgressBar>
+#include <QVector>
+#include <QPair>
 
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/simulator_visual_if.h"
 #include "interfaces/world_object_wrappers.h"
 
 #include <sdsmt_simulator/world_object_component_plugin.h>
-#include <sdsmt_simulator/world_object_loader_if.h>
-#include <sdsmt_simulator/world_object_saver_if.h>
+#include <sdsmt_simulator/object_loader_if.h>
+#include <sdsmt_simulator/object_saver_if.h>
 
 namespace Ui {
 class MainWindow;
@@ -31,8 +34,12 @@ private:
     Simulator_Visual_If* visualDesigner;
 
     QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
-    QMap<QString, WorldObjectLoader_If*> objectLoaders;
-    QMap<QString, WorldObjectSaver_If*> objectSavers;
+
+    QMap<QString, QVector<WorldObjectLoader_If*>> objectLoaders;
+    QMap<QString, QVector<WorldObjectSaver_If*>> objectSavers;
+
+    QMap<QString, QVector<WorldLoader_If*>> worldLoaders;
+    QMap<QString, QVector<WorldSaver_If*>> worldSavers;
 
     int speed;
     bool play;
@@ -48,16 +55,17 @@ private:
 
 public:
     explicit MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If*> components,
-                        QVector<WorldObjectLoader_If*> loaders, QVector<WorldObjectSaver_If*> savers, QWidget *parent = 0);
+                        QVector<WorldObjectLoader_If*> oloaders, QVector<WorldObjectSaver_If*> osavers,
+                        QVector<WorldLoader_If*> wloaders, QVector<WorldSaver_If*> wsavers, QWidget *parent = 0);
     ~MainWindow();
 
 public slots:
     //Simulator core added something to the simulation
     //Do not delete the world object when it is removed; that will be handled elsewhere
-    virtual void worldObjectAddedToSimulation(WorldObjectProperties* object, object_id oId);
+    virtual void worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>> objs);
 
     //Simulator core removed something from simulation
-    virtual void worldObjectRemovedFromSimulation(object_id oId);
+    virtual void worldObjectsRemovedFromSimulation(QVector<object_id> oIds);
 
     //Slots to indicate that physics settings changed
     void physicsTickChanged(double rate_hz, double duration_s){}

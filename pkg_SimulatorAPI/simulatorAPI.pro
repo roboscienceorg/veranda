@@ -18,10 +18,10 @@ HEADERS += \
     include/sdsmt_simulator/world_object_component_if.h \
     include/sdsmt_simulator/property.h \
     include/sdsmt_simulator/world_object_component_plugin.h \
-    include/sdsmt_simulator/world_object_loader_if.h \
-    include/sdsmt_simulator/world_object_saver_if.h \
-    include/sdsmt_simulator/world_object_file_handler_plugin.h \
-    include/sdsmt_simulator/dllapi.h
+    include/sdsmt_simulator/dllapi.h \
+    include/sdsmt_simulator/file_handler_plugin.h \
+    include/sdsmt_simulator/object_loader_if.h \
+    include/sdsmt_simulator/object_saver_if.h
 
 DISTFILES += \
     CMakeLists.txt \

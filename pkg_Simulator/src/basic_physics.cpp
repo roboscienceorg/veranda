@@ -54,64 +54,44 @@ void BasicPhysics::setTick(double rate_hz, double duration_s)
     emit physicsTickSet(tickRate, stepTime);
 }
 
-void BasicPhysics::addWorldObject(WorldObjectPhysics* obj, object_id oId)
+void BasicPhysics::addWorldObjects(QVector<QPair<WorldObjectPhysics*, object_id>> objs)
 {
-    if(objects.contains(oId)) throw std::logic_error("object with id " + std::to_string(oId) + " already exists");
-
-    objectWorldData& worldDat = objects[oId];
-    worldDat.obj = obj;
-    connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics::worldTicked);
-    
-    obj->generateBodies(world, oId);
-
-    //keeping this around as a comment for now
-    //because it may be nice to copy some of this code into
-    //world_object.generateBodies()
-    /*
-    for(WorldObjectComponent_If* c : components)
+    for(auto& p : objs)
     {
-        QMap<QString, PropertyView> properties = c->getProperties();
-        if(properties.contains("bodyType"))
-        {
-            b2BodyDef robotBodyDef;
-            robotBodyDef.type = (b2BodyType)properties["bodyType"].get().toInt();
-            robotBodyDef.position.Set(properties["x"].get().toFloat(),properties["y"].get().toFloat());
+        object_id& oId = p.second;
+        WorldObjectPhysics* obj = p.first;
 
-            b2Body* body = world->CreateBody(&robotBodyDef);
-            worldDat.dynamicBodies.push_back(body);
-        }
+        if(objects.contains(oId)) throw std::logic_error("object with id " + std::to_string(oId) + " already exists");
+
+        objectWorldData& worldDat = objects[oId];
+        worldDat.obj = obj;
+        connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics::worldTicked);
+
+        obj->generateBodies(world, oId);
+
+        obj->worldTicked(world, 0);
     }
-
-    for(b2Body* b : worldDat.dynamicBodies)
-    {
-        b2JointDef jointDef;
-        jointDef.bodyA = anchor;
-        jointDef.bodyB = b;
-        jointDef.collideConnected = false;
-        b2Joint* joint = world->CreateJoint(&jointDef);
-        worldDat.joints.push_back(joint);
-    }
-    */
-
-    obj->worldTicked(world, 0);
 }
 
-void BasicPhysics::removeWorldObject(object_id oId)
+void BasicPhysics::removeWorldObjects(QVector<object_id> oIds)
 {
-    if(objects.contains(oId))
+    for(object_id oId : oIds)
     {
-        objectWorldData& dat = objects[oId];
+        if(objects.contains(oId))
+        {
+            objectWorldData& dat = objects[oId];
 
-        for(b2Joint* j : dat.joints)
-            world->DestroyJoint(j);
+            for(b2Joint* j : dat.joints)
+                world->DestroyJoint(j);
 
-        for(b2Body* s : dat.staticBodies)
-            world->DestroyBody(s);
+            for(b2Body* s : dat.staticBodies)
+                world->DestroyBody(s);
 
-        for(b2Body* d : dat.dynamicBodies)
-            world->DestroyBody(d);
+            for(b2Body* d : dat.dynamicBodies)
+                world->DestroyBody(d);
 
-       objects.remove(oId);
+           objects.remove(oId);
+        }
     }
 }
 

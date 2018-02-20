@@ -15,7 +15,7 @@
 typedef ImageParser::Shape Shape;
 using std::vector;
 
-QVector<QVector<QPolygonF>> ImageParser::parseImage(QString fileName)
+QVector<QVector<QPolygonF>> ImageParser::parseImage(QString fileName, const uint64_t& threshold, uint64_t &width, uint64_t &height)
 {
     qDebug() << "Opening file...";
     QImage loaded(fileName);
@@ -23,10 +23,13 @@ QVector<QVector<QPolygonF>> ImageParser::parseImage(QString fileName)
     if(loaded.isNull())
         throw std::exception();
 
-    return parseImage(loaded);
+    width = loaded.width();
+    height = loaded.height();
+
+    return parseImage(loaded, threshold);
 }
 
-QVector<QVector<QPolygonF>> ImageParser::parseImage(const QImage& image)
+QVector<QVector<QPolygonF>> ImageParser::parseImage(const QImage& image, const uint64_t& threshold)
 {
     qDebug() << "Reading image colors...";
     QVector<QVector<QRgb>> pixMap(image.height(), QVector<QRgb>(image.width()));
@@ -39,10 +42,10 @@ QVector<QVector<QPolygonF>> ImageParser::parseImage(const QImage& image)
         }
     }
 
-    return parseImage(pixMap);
+    return parseImage(pixMap, threshold);
 }
 
-QVector<QVector<QPolygonF> > ImageParser::parseImage(const QVector<QVector<QRgb> > &pixMap)
+QVector<QVector<QPolygonF> > ImageParser::parseImage(const QVector<QVector<QRgb>>& pixMap, const uint64_t& threshold)
 {
     qDebug() << "Making black and white...";
     if(!pixMap.size() || !pixMap[0].size())
@@ -53,7 +56,7 @@ QVector<QVector<QPolygonF> > ImageParser::parseImage(const QVector<QVector<QRgb>
     {
         for(int j=0; j<pixMap[i].size(); j++)
         {
-            blackWhite[i][j] = qGray(pixMap[i][j]) > 125;
+            blackWhite[i][j] = qGray(pixMap[i][j]) > threshold;
         }
     }
 

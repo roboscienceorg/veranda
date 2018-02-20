@@ -26,10 +26,10 @@ public slots:
     virtual void setTick(double rate_hz, double duration_s) = 0;
 
     //Adds world objects to simulation
-    virtual void addWorldObject(WorldObjectPhysics* obj, object_id oId) = 0;
+    virtual void addWorldObjects(QVector<QPair<WorldObjectPhysics*, object_id>>) = 0;
 
     //Removes a robot from simulation
-    virtual void removeWorldObject(object_id oId) = 0;
+    virtual void removeWorldObjects(QVector<object_id>) = 0;
 
 signals:
     void physicsStarted();

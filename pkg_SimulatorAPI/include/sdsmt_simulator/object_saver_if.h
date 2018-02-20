@@ -12,6 +12,15 @@ public:
     ~WorldObjectSaver_If(){}
 
     virtual QVector<QString> fileExts() = 0;
+    virtual void saveFile(QString filePath, WorldObject* objects) = 0;
+};
+
+class WorldSaver_If
+{
+public:
+    ~WorldSaver_If(){}
+
+    virtual QVector<QString> fileExts() = 0;
     virtual void saveFile(QString filePath, QVector<WorldObject*> objects) = 0;
 };
 

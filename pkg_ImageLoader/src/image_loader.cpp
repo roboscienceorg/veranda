@@ -1,6 +1,7 @@
 #include "image_loader.h"
 #include "polygonscomponent.h"
 #include "imageparser.h"
+#include "optiondialog.h"
 
 #include <QDebug>
 #include <QDir>
@@ -32,8 +33,22 @@ QVector<WorldObject*> ImageLoader::loadFile(QString filePath, QMap<QString, Worl
 
 QVector<QVector<b2PolygonShape*>> ImageLoader::getShapesFromFile(QString filePath)
 {
-    QVector<QVector<QPolygonF>> shapes = ImageParser::parseImage(filePath);
+    QImage img(filePath);
+    if(img.isNull()) throw std::exception();
+
+    uint64_t fileWidth = img.width(), fileHeight = img.height();
+
+    ImageOptions opt(fileWidth, fileHeight);
+    opt.exec();
+
+    uint64_t threshold = opt.getBlackWhiteThreshold();
+
+    QVector<QVector<QPolygonF>> shapes = ImageParser::parseImage(img, threshold);
     QVector<QVector<b2PolygonShape*>> out;
+
+    uint64_t triangleCount = 0;
+    for(auto& s : shapes)
+        triangleCount += s.size();
 
     out.resize(shapes.size());
     b2Vec2 triBuffer[3];

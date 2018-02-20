@@ -14,15 +14,15 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
 {
     qRegisterMetaType<object_id>("object_id");
 
-    connect(_userInterface, &Simulator_Ui_If::userRemoveWorldObjectFromSimulation, this, &SimulatorCore::removeSimObject);
-    connect(this, &SimulatorCore::objectRemoved, _userInterface, &Simulator_Ui_If::worldObjectRemovedFromSimulation);
-    connect(this, &SimulatorCore::objectRemoved, _physicsEngine, &Simulator_Physics_If::removeWorldObject);
+    connect(_userInterface, &Simulator_Ui_If::userRemoveWorldObjectsFromSimulation, this, &SimulatorCore::removeSimObjects);
+    connect(this, &SimulatorCore::objectsRemoved, _userInterface, &Simulator_Ui_If::worldObjectsRemovedFromSimulation);
+    connect(this, &SimulatorCore::objectsRemoved, _physicsEngine, &Simulator_Physics_If::removeWorldObjects);
 
-    connect(_userInterface, &Simulator_Ui_If::userAddWorldObjectToSimulation, this, &SimulatorCore::addSimObject);
-    connect(this, static_cast<void (SimulatorCore::*)(WorldObjectPhysics*, object_id)>(&SimulatorCore::objectAdded),
-            _physicsEngine, &Simulator_Physics_If::addWorldObject);
-    connect(this, static_cast<void (SimulatorCore::*)(WorldObjectProperties*, object_id)>(&SimulatorCore::objectAdded),
-            _userInterface, &Simulator_Ui_If::worldObjectAddedToSimulation);
+    connect(_userInterface, &Simulator_Ui_If::userAddWorldObjectsToSimulation, this, &SimulatorCore::addSimObjects);
+    connect(this, static_cast<void (SimulatorCore::*)(QVector<QPair<WorldObjectPhysics*, object_id>>)>(&SimulatorCore::objectsAdded),
+            _physicsEngine, &Simulator_Physics_If::addWorldObjects);
+    connect(this, static_cast<void (SimulatorCore::*)(QVector<QPair<WorldObjectProperties*, object_id>>)>(&SimulatorCore::objectsAdded),
+            _userInterface, &Simulator_Ui_If::worldObjectsAddedToSimulation);
 
     connect(this, &SimulatorCore::userStartPhysics, _physicsEngine, &Simulator_Physics_If::start);
     connect(this, &SimulatorCore::userStopPhysics, _physicsEngine, &Simulator_Physics_If::stop);
@@ -46,8 +46,7 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
 SimulatorCore::~SimulatorCore()
 {
     //Destroy all remaining objects
-    while(_worldObjects.size())
-        removeSimObject(_worldObjects.firstKey());
+    removeSimObjects(_worldObjects.keys().toVector());
 
     //Stop physics engine
     userStopPhysics();
@@ -67,49 +66,53 @@ void SimulatorCore::start()
 }
 
 
-void SimulatorCore::addSimObject(WorldObject *obj)
+void SimulatorCore::addSimObjects(QVector<WorldObject *> objs)
 {
-    //Clone object to have local copy for distributing
-    obj = obj->clone();
+    QVector<QPair<WorldObjectPhysics*, object_id>> physObjs;
+    QVector<QPair<WorldObjectProperties*, object_id>> propObjs;
 
-    obj->setROSNode(_node);
+    for(WorldObject* obj : objs)
+    {
+        //Clone object to have local copy for distributing
+        obj = obj->clone();
 
-    connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &WorldObject::connectChannels);
-    connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &WorldObject::disconnectChannels);
+        obj->setROSNode(_node);
 
-    WorldObjectPhysics* phys_interface = new WorldObjectPhysics(obj, obj);
-    WorldObjectProperties* prop_interface = new WorldObjectProperties(obj, obj);
+        connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &WorldObject::connectChannels);
+        connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &WorldObject::disconnectChannels);
+
+        physObjs += {new WorldObjectPhysics(obj, obj), _nextObject};
+        propObjs += {new WorldObjectProperties(obj, obj), _nextObject};
+
+        //Keep references to robot and thread
+        _worldObjects[_nextObject] = obj;
+
+        _nextObject++;
+
+        if(_physicsEngine->running())
+            obj->connectChannels();
+        else
+            obj->disconnectChannels();
+    }
 
     //Send out object interfaces
-    emit objectAdded(phys_interface, _nextObject);
-    emit objectAdded(prop_interface, _nextObject);
+    emit objectsAdded(physObjs);
+    emit objectsAdded(propObjs);
 
-    //Keep references to robot and thread
-    _worldObjects[_nextObject] = obj;
-
-    _nextObject++;
-
-    if(_physicsEngine->running())
-        obj->connectChannels();
-    else
-        obj->disconnectChannels();
-
-    /*Map* asMap = qobject_cast<Map*>(obj);
-    if(asMap)
-    {
-        double xMin, xMax, yMin, yMax;
-        asMap->getBounds(xMin, yMin, xMax, yMax);
-        _userInterface->setWorldBounds(xMin, xMax, yMin, yMax);
-    }*/
 }
 
-void SimulatorCore::removeSimObject(object_id oId)
+void SimulatorCore::removeSimObjects(QVector<object_id> oIds)
 {
-    if(_worldObjects.contains(oId))
-    {
-        //Signal that object is no longer in simulation
-        emit objectRemoved(oId);
+    QVector<object_id> removes;
+    for(object_id oId : oIds)
+        if(_worldObjects.contains(oId))
+            removes += oId;
 
+    //Signal that object is no longer in simulation
+    emit objectsRemoved(removes);
+
+    for(object_id oId : removes)
+    {
         //Delete object
         //This should delete all object interfaces; they are children to it
         delete _worldObjects[oId];

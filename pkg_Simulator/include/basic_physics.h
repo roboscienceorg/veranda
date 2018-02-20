@@ -43,10 +43,10 @@ public slots:
     virtual void setTick(double rate_hz, double duration_s) override;
 
     //Adds world objects to simulation
-    virtual void addWorldObject(WorldObjectPhysics* obj, object_id oId) override;
+    virtual void addWorldObjects(QVector<QPair<WorldObjectPhysics*, object_id>> objs) override;
 
     //Removes a robot from simulation
-    virtual void removeWorldObject(object_id oId) override;
+    virtual void removeWorldObjects(QVector<object_id> oIds) override;
 
     void step();
 

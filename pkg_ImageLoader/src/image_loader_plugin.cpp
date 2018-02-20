@@ -6,7 +6,7 @@ Image_Loader_Plugin::Image_Loader_Plugin()
 
 }
 
-QVector<WorldObjectLoader_If*> Image_Loader_Plugin::getLoaders()
+QVector<WorldLoader_If*> Image_Loader_Plugin::getLoaders()
 {
-    return QVector<WorldObjectLoader_If*>{ new ImageLoader };
+    return QVector<WorldLoader_If*>{ new ImageLoader };
 }
