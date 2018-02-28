@@ -37,6 +37,7 @@ class SDSMT_SIMULATOR_API WorldObject : public QObject
 
     Model* debugModel = nullptr;
     b2Body* anchorBody = nullptr;
+    QVector<b2Body>* childBodies;
 
     QVector<Model*> _models;
     QMap<QString, PropertyView> _properties

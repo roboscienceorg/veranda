@@ -50,7 +50,7 @@ Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent_If(pare
     _wheelModel->addChildren({_lWheelModel, _rWheelModel/*, _debugModel*/});
 }
 
-void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anchor)
+QVector<b2Body*> Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anchor)
 {
     clearBodies(world);
 
@@ -69,6 +69,8 @@ void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anch
 
     _attachWheelFixture();
     _buildModels();
+
+    return {_lWheelBody, _rWheelBody, _cBody};
 }
 
 void Ackermann_Steer::_jointWheels()

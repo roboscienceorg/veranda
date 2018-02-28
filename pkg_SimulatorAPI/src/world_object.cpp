@@ -123,9 +123,10 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
 
     debugModel->addShapes(QVector<b2Shape*>{circ});
 
+    childBodies->clear();
     for(int i = 0; i < components.size(); i++)
     {
-        components[i]->generateBodies(world, oId, anchorBody);
+        childBodies += components[i]->generateBodies(world, oId, anchorBody);
     }
 
     _totalMass += anchorBody->GetMass();

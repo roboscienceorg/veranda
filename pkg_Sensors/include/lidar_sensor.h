@@ -145,7 +145,7 @@ public:
         return true;
     }
 
-    void generateBodies(b2World *world, object_id oId, b2Body *anchor);
+    QVector<b2Body *> generateBodies(b2World *world, object_id oId, b2Body *anchor);
     void clearBodies(b2World *world);
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);

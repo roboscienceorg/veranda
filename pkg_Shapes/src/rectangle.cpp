@@ -42,7 +42,7 @@ void Rectangle::_buildModels()
     shape_model->addShapes({rectangle});
 }
 
-void Rectangle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+QVector<b2Body*> Rectangle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
@@ -69,6 +69,8 @@ void Rectangle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
     _buildModels();
 
     massChanged(this, body->GetMass());
+
+    return {body};
 }
 
 void Rectangle::clearBodies(b2World* world)

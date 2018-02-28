@@ -38,7 +38,7 @@ public:
 
     virtual bool usesChannels() = 0;
 
-    virtual void generateBodies(b2World* world, object_id oId, b2Body* anchor) = 0;
+    virtual QVector<b2Body*> generateBodies(b2World* world, object_id oId, b2Body* anchor) = 0;
     virtual void clearBodies(b2World* world) = 0;
 
     static void moveBodyToLocalSpaceOfOtherBody(b2Body* bodyToMove, b2Body* bodyToReference,
@@ -53,6 +53,7 @@ public slots:
 signals:
     virtual void massChanged(WorldObjectComponent_If* component, double mass);
 };
+
 
 inline void WorldObjectComponent_If::moveBodyToLocalSpaceOfOtherBody(b2Body* bodyToMove, b2Body* bodyToReference,
                                                                      double xRelative=0, double yRelative=0, double thetaRelativeDegrees=0)

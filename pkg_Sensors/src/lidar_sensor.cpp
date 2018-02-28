@@ -119,7 +119,7 @@ void Lidar_Sensor::clearBodies(b2World *world)
     }
 }
 
-void Lidar_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+QVector<b2Body*> Lidar_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     clearBodies(world);
 
@@ -143,6 +143,8 @@ void Lidar_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 
     _attachSensorFixture();
     _buildModels();
+
+    return {sensorBody};
 }
 
 void Lidar_Sensor::_attachSensorFixture()

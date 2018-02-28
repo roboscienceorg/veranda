@@ -43,7 +43,7 @@ void Circle::_buildModels()
     shape_model->addShapes({circle});
 }
 
-void Circle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+QVector<b2Body*> Circle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
@@ -70,6 +70,8 @@ void Circle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
     _buildModels();
 
     massChanged(this, body->GetMass());
+
+    return {body};
 }
 
 void Circle::clearBodies(b2World* world)

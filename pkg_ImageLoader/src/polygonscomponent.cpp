@@ -35,7 +35,7 @@ WorldObjectComponent_If* PolygonsComponent::clone(QObject* newParent)
     return out;
 }
 
-void PolygonsComponent::generateBodies(b2World* world, object_id oId, b2Body* anchor)
+QVector<b2Body*> PolygonsComponent::generateBodies(b2World* world, object_id oId, b2Body* anchor)
 {
     clearBodies(world);
 
@@ -50,6 +50,8 @@ void PolygonsComponent::generateBodies(b2World* world, object_id oId, b2Body* an
         _polyFixtures += _polyBody->CreateFixture(p, 1);
     }
     massChanged(this, _polyBody->GetMass());
+
+    return {_polyBody};
 }
 
 void PolygonsComponent::clearBodies(b2World* world)

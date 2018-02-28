@@ -111,7 +111,7 @@ void Touch_Sensor::clearBodies(b2World *world)
     }
 }
 
-void Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+QVector<b2Body*> Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     clearBodies(world);
 
@@ -135,6 +135,8 @@ void Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 
     _attachSensorFixture();
     _buildModels();
+
+    return {sensorBody};
 }
 
 void Touch_Sensor::_attachSensorFixture()
