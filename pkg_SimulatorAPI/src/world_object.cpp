@@ -2,7 +2,7 @@
 
 #include <QSet>
 
-WorldObject::WorldObject(QVector<WorldObjectComponent_If *> components, QObject *parent) : QObject(parent), _components(components)
+WorldObject::WorldObject(QVector<WorldObjectComponent_If *> components, QObject *parent) : WorldObjectComponent_If(parent), _components(components)
 {
     QMap<QString, int> groupcounts;
 
@@ -97,7 +97,7 @@ void WorldObject::clearBodies(b2World *world)
     }
 }
 
-void WorldObject::generateBodies(b2World* world, object_id oId)
+QVector<b2Body *> WorldObject::generateBodies(b2World* world, object_id oId, b2Body* anchorBody)
 {
     clearBodies(world);
 
@@ -123,9 +123,10 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
 
     debugModel->addShapes(QVector<b2Shape*>{circ});
 
+    childBodies.clear();
     for(int i = 0; i < components.size(); i++)
     {
-        components[i]->generateBodies(world, oId, anchorBody);
+        childBodies += components[i]->generateBodies(world, oId, anchorBody);
     }
 
     _totalMass += anchorBody->GetMass();
@@ -135,6 +136,8 @@ void WorldObject::generateBodies(b2World* world, object_id oId)
         connect(this, &WorldObject::massChanged, c, &WorldObjectComponent_If::setObjectMass);
         c->setObjectMass(_totalMass);
     }
+
+    return childBodies;
 }
 
 void WorldObject::connectChannels()

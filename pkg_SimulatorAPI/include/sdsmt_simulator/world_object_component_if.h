@@ -33,7 +33,7 @@ public:
     virtual QVector<Model*> getModels() = 0;
 
     //UI Interactions
-    virtual QMap<QString, PropertyView> getProperties() = 0;
+    virtual QMap<QString, PropertyView>& getProperties() = 0;
     virtual QString getPropertyGroup() = 0;
 
     virtual bool usesChannels() = 0;

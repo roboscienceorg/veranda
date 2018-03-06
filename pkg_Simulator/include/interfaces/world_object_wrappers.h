@@ -14,16 +14,14 @@ class WorldObjectProperties : public QObject
 {
     Q_OBJECT
 
-    WorldObject* _obj = nullptr;
     WorldObjectComponent_If* _comp = nullptr;
 
 public:
-    WorldObjectProperties(WorldObject* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
     WorldObjectProperties(WorldObjectComponent_If* comp, QObject* parent=nullptr) : QObject(parent), _comp(comp){}
 
     //Drawing Interactions
     QVector<Model*> getModels()
-    { return _obj ? _obj->getModels() : _comp->getModels(); }
+    { return _comp->getModels(); }
 
     QString getName()
     { return ""; }
@@ -33,23 +31,23 @@ public:
 
     //UI Interactions
     QMap<QString, PropertyView>& getProperties()
-    { return _obj ? _obj->getProperties() : _comp->getProperties(); }
+    { return _comp->getProperties(); }
 
     bool usesChannels()
-    { return _obj ? _obj->usesChannels() : _comp->usesChannels(); }
+    { return _comp->usesChannels(); }
 
     WorldObject* getObject()
-    { return _obj; }
+    { return dynamic_cast<WorldObject*>(_comp); }
 
     WorldObjectComponent_If* getComponent()
     { return _comp; }
 
 public slots:
     void connectChannels()
-    { _obj->connectChannels(); }
+    { _comp->connectChannels(); }
 
     void disconnectChannels()
-    { _obj->disconnectChannels(); }
+    { _comp->disconnectChannels(); }
 };
 
 class WorldObjectPhysics : public QObject
