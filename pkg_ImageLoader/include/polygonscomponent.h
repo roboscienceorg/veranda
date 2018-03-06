@@ -39,7 +39,8 @@ public:
     QVector<Model*> getModels(){ return {_polyModel}; }
 
     //UI Interactions
-    QMap<QString, PropertyView> getProperties(){ return _properties; }
+
+    QMap<QString, PropertyView>& getProperties(){ return _properties; }
     QString getPropertyGroup(){ return "PolyGroup"; }
 
     bool usesChannels(){return false;}

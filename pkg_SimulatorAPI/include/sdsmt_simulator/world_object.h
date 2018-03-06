@@ -13,7 +13,7 @@
 #include <Box2D/Box2D.h>
 #include <QVariant>
 
-class SDSMT_SIMULATOR_API WorldObject : public QObject
+class SDSMT_SIMULATOR_API WorldObject : public WorldObjectComponent_If
 {
     Q_OBJECT
 
@@ -37,7 +37,7 @@ class SDSMT_SIMULATOR_API WorldObject : public QObject
 
     Model* debugModel = nullptr;
     b2Body* anchorBody = nullptr;
-    QVector<b2Body>* childBodies;
+    QVector<b2Body*> childBodies;
 
     QVector<Model*> _models;
     QMap<QString, PropertyView> _properties
@@ -71,8 +71,10 @@ public:
     bool usesChannels()
     { return _useChannels; }
 
+    virtual QString getPropertyGroup(){return "object";}
+
     //Physics Interactions
-    void generateBodies(b2World* world, object_id oId);
+    QVector<b2Body*> generateBodies(b2World* world, object_id oId, b2Body* anchorBody = nullptr);
 
     void clearBodies(b2World* world);
 
@@ -84,6 +86,7 @@ public slots:
     void disconnectChannels();
     void worldTicked(const b2World* w, const double t);
     void componentMassChanged(WorldObjectComponent_If* component, double mass);
+    void setObjectMass(double mass){}
 
 signals:
     void massChanged(double);

@@ -61,7 +61,7 @@ public:
 
     WorldObjectComponent_If* clone(QObject *newParent);
 
-    virtual QMap<QString, PropertyView> getProperties(){
+    virtual QMap<QString, PropertyView>& getProperties(){
         return _properties;
     }
 
