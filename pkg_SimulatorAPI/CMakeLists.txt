@@ -19,7 +19,7 @@ find_package(rclcpp REQUIRED)
 
 ## Find and configure QT
 find_package(Qt5 REQUIRED COMPONENTS
-  Core
+  Core Gui
 )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -46,7 +46,7 @@ set(MOC_HDRS
     include/sdsmt_simulator/world_object.h
     include/sdsmt_simulator/model.h
     include/sdsmt_simulator/property.h
-    include/sdsmt_simulator/world_object_component_if.h
+    include/sdsmt_simulator/world_object_component.h
 )
 
 set(CPP_HDRS
@@ -58,6 +58,7 @@ set(CPP_HDRS
 
 set(CPP_SRCS
     src/world_object.cpp
+    src/world_object_component.cpp
 )
 
 ###########
@@ -84,7 +85,7 @@ add_library(sdsmt_simulator_api SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to library
 ## this will find all the headers and link all the libraries
-qt5_use_modules(sdsmt_simulator_api Core)
+qt5_use_modules(sdsmt_simulator_api Core Gui)
 
 ## Pull in stuff exported from other packages
 ament_target_dependencies(sdsmt_simulator_api

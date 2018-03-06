@@ -12,10 +12,6 @@ class BasicPhysics : public Simulator_Physics_If
     Q_OBJECT
 
     struct objectWorldData{
-        QVector<b2Body*> staticBodies;
-        QVector<b2Body*> dynamicBodies;
-        QVector<b2Joint*> joints;
-
         WorldObjectPhysics *obj;
     };
 
@@ -51,7 +47,7 @@ public slots:
     void step();
 
 signals:
-    void worldTick(const b2World*, const double);
+    void worldTick(const double);
 };
 
 #endif // BASIC_PHYSICS_H

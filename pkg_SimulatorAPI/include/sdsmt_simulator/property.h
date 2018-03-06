@@ -27,6 +27,7 @@ public:
         description(_description), readOnly(_readOnly), isList(_isList), type(_type){}
 };
 
+
 class SDSMT_SIMULATOR_API Property : public QObject
 {
     Q_OBJECT

@@ -53,6 +53,7 @@ private:
 
     QMap<object_id, WorldObjectProperties*> worldObjects;
     QMap<object_id, QListWidgetItem*> listItems;
+    QMap<QString, QSharedPointer<PropertyView>> selectedProps;
 
     QMap<uint64_t, QString> displayed_properties;
 

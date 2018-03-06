@@ -14,10 +14,10 @@ class WorldObjectProperties : public QObject
 {
     Q_OBJECT
 
-    WorldObjectComponent_If* _comp = nullptr;
+    WorldObjectComponent* _comp = nullptr;
 
 public:
-    WorldObjectProperties(WorldObjectComponent_If* comp, QObject* parent=nullptr) : QObject(parent), _comp(comp){}
+    WorldObjectProperties(WorldObjectComponent* comp, QObject* parent=nullptr) : QObject(parent), _comp(comp){}
 
     //Drawing Interactions
     QVector<Model*> getModels()
@@ -30,7 +30,7 @@ public:
     { return ""; }
 
     //UI Interactions
-    QMap<QString, PropertyView>& getProperties()
+    QMap<QString, QSharedPointer<PropertyView>> getProperties()
     { return _comp->getProperties(); }
 
     bool usesChannels()
@@ -39,7 +39,7 @@ public:
     WorldObject* getObject()
     { return dynamic_cast<WorldObject*>(_comp); }
 
-    WorldObjectComponent_If* getComponent()
+    WorldObjectComponent* getComponent()
     { return _comp; }
 
 public slots:
@@ -60,11 +60,11 @@ public:
     WorldObjectPhysics(WorldObject* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
 
     virtual void generateBodies(b2World* world, object_id oId){_obj->generateBodies(world, oId);}
-    virtual void clearDynamicBodies(){}
-    virtual void clearStaticBodies(){}
+    virtual void clearBodies(){_obj->clearBodies();}
 
 public slots:
     //Interface to update on world ticks
-    virtual void worldTicked(const b2World* w, const double t){_obj->worldTicked(w, t);}
+    virtual void syncModels(){_obj->syncModels();}
+    virtual void worldTicked(const double t){_obj->worldTicked(t);}
 };
 #endif // WORLD_OBJECT_WRAPPERS_H

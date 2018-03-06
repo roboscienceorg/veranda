@@ -66,10 +66,11 @@ void BasicPhysics::addWorldObjects(QVector<QPair<WorldObjectPhysics*, object_id>
         objectWorldData& worldDat = objects[oId];
         worldDat.obj = obj;
         connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics::worldTicked);
+        connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics::syncModels);
 
         obj->generateBodies(world, oId);
 
-        obj->worldTicked(world, 0);
+        obj->syncModels();
     }
 }
 
@@ -80,17 +81,9 @@ void BasicPhysics::removeWorldObjects(QVector<object_id> oIds)
         if(objects.contains(oId))
         {
             objectWorldData& dat = objects[oId];
+            dat.obj->clearBodies();
 
-            for(b2Joint* j : dat.joints)
-                world->DestroyJoint(j);
-
-            for(b2Body* s : dat.staticBodies)
-                world->DestroyBody(s);
-
-            for(b2Body* d : dat.dynamicBodies)
-                world->DestroyBody(d);
-
-           objects.remove(oId);
+            objects.remove(oId);
         }
     }
 }
@@ -99,5 +92,5 @@ void BasicPhysics::step()
 {
     world->Step(stepTime, 8, 3); //suggested values for velocity and position iterations
 
-    emit worldTick(world, stepTime);
+    emit worldTick(stepTime);
 }

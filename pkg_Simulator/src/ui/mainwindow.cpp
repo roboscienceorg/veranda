@@ -458,9 +458,9 @@ void MainWindow::objectSelected(object_id id)
         WorldObjectProperties* obj = worldObjects[id];
         QStandardItemModel* model = propertiesModel;
 
-        QMap<QString, PropertyView>& objProps = obj->getProperties();
-        QStringList propKeys = objProps.keys();
-        model->setRowCount(objProps.size());
+        selectedProps = obj->getProperties();
+        QStringList propKeys = selectedProps.keys();
+        model->setRowCount(selectedProps.size());
 
         int i = 0;
         for(QString k : propKeys)
@@ -471,7 +471,7 @@ void MainWindow::objectSelected(object_id id)
            ind = model->index(i, 0);
            model->setData(ind, k);
 
-           connect(&objProps[k], &PropertyView::valueSet, this, &MainWindow::updatePropertyInformation);
+           connect(selectedProps[k].data(), &PropertyView::valueSet, this, &MainWindow::updatePropertyInformation);
 
            displayed_properties[i] = k;
            i++;
@@ -480,7 +480,7 @@ void MainWindow::objectSelected(object_id id)
         connect(model, &QStandardItemModel::dataChanged, [this, obj, model](QModelIndex tl, QModelIndex br)
         {
            for(int i = tl.row(); i <= br.row(); i++)
-               obj->getProperties()[displayed_properties[i]].set(model->data(model->index(i, 1)));
+               selectedProps[displayed_properties[i]]->set(model->data(model->index(i, 1)));
         });
 
         updatePropertyInformation();
@@ -498,9 +498,10 @@ void MainWindow::nothingSelected()
 
     if(worldObjects.contains(selected))
     {
-        for(auto iter : worldObjects[selected]->getProperties())
-            disconnect(&iter, 0, this, 0);
+        for(auto iter : selectedProps)
+            disconnect(iter.data(), 0, this, 0);
     }
+    selectedProps.clear();
     selected = 0;
 
     nothingIsSelected();
@@ -516,14 +517,13 @@ void MainWindow::updatePropertyInformation()
 {
     if(worldObjects.contains(selected))
     {
-        QMap<QString, PropertyView>& ppts = worldObjects[selected]->getProperties();
         QStandardItemModel* model = propertiesModel;
 
         ui->propertiesTableView->setUpdatesEnabled(false);
-        for(int i=0; i<ppts.size(); i++)
+        for(int i=0; i<selectedProps.size(); i++)
         {
             QString key = model->data(model->index(i, 0)).toString();
-            model->setData(model->index(i, 1), ppts[key].get().toString(), Qt::DisplayRole);
+            model->setData(model->index(i, 1), selectedProps[key]->get().toString(), Qt::DisplayRole);
         }
         ui->propertiesTableView->setUpdatesEnabled(true);
     }
