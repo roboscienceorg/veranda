@@ -18,7 +18,7 @@ class Touch_Sensor_Plugin : public QObject, public WorldObjectComponent_Plugin_I
 
 public:
     Touch_Sensor_Plugin();
-    WorldObjectComponent_If* createComponent();
+    WorldObjectComponent* createComponent();
 
 };
 

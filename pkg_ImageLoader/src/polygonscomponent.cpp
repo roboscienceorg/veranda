@@ -1,6 +1,6 @@
 #include "polygonscomponent.h"
 
-PolygonsComponent::PolygonsComponent(QVector<b2PolygonShape *> polys, QObject* parent) : WorldObjectComponent_If(parent)
+PolygonsComponent::PolygonsComponent(QVector<b2PolygonShape *> polys, QObject* parent) : WorldObjectComponent("PolyGroup", parent)
 {
     _shapePtrs.resize(polys.size());
 
@@ -9,7 +9,8 @@ PolygonsComponent::PolygonsComponent(QVector<b2PolygonShape *> polys, QObject* p
 
     _numShapes.set(_shapePtrs.size());
 
-    _polyModel = new Model(QVector<Model*>{}, _shapePtrs, this);
+    _polyModel = new Model({}, _shapePtrs, this);
+    registerModel(_polyModel);
 }
 
 PolygonsComponent::~PolygonsComponent()
@@ -19,7 +20,7 @@ PolygonsComponent::~PolygonsComponent()
     _shapePtrs.clear();
 }
 
-WorldObjectComponent_If* PolygonsComponent::clone(QObject* newParent)
+WorldObjectComponent* PolygonsComponent::clone(QObject* newParent)
 {
     QVector<b2PolygonShape*> polyShapes;
     for(b2Shape* s : _shapePtrs)
@@ -29,42 +30,39 @@ WorldObjectComponent_If* PolygonsComponent::clone(QObject* newParent)
 
     for(QString s : _properties.keys())
     {
-        out->_properties[s].set(_properties[s].get(), true);
+        out->_properties[s]->set(_properties[s]->get(), true);
     }
 
     return out;
 }
 
-QVector<b2Body*> PolygonsComponent::generateBodies(b2World* world, object_id oId, b2Body* anchor)
+void PolygonsComponent::generateBodies(b2World* world, object_id oId, b2Body* anchor)
 {
-    clearBodies(world);
+    clearBodies();
+    _world = world;
 
     b2BodyDef bDef;
     bDef.type = b2_staticBody;
     _polyBody = world->CreateBody(&bDef);
-
-    moveBodyToLocalSpaceOfOtherBody(_polyBody, anchor, 0, 0, 0);
+    registerBody(_polyBody);
 
     for(b2Shape* p : _shapePtrs)
     {
         _polyFixtures += _polyBody->CreateFixture(p, 1);
     }
-    massChanged(this, _polyBody->GetMass());
-
-    return {_polyBody};
 }
 
-void PolygonsComponent::clearBodies(b2World* world)
+void PolygonsComponent::clearBodies()
 {
-    if(_polyBody)
+    if(_world)
     {
         for(b2Fixture* f : _polyFixtures)
             _polyBody->DestroyFixture(f);
-        world->DestroyBody(_polyBody);
+        _world->DestroyBody(_polyBody);
 
         _polyFixtures.clear();
     }
-    massChanged(this, 0);
+    _world = nullptr;
 }
 
 b2PolygonShape* PolygonsComponent::copy(b2PolygonShape* orig)

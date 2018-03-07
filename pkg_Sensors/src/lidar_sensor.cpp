@@ -5,7 +5,7 @@
 #include <cmath>
 #include <limits>
 
-Lidar_Sensor::Lidar_Sensor(QObject *parent) : WorldObjectComponent_If(parent)
+Lidar_Sensor::Lidar_Sensor(QObject *parent) : WorldObjectComponent("Lidar", parent)
 {
     //Update channel out
     connect(&output_channel, &Property::valueSet, this, &Lidar_Sensor::_channelChanged);
@@ -18,6 +18,8 @@ Lidar_Sensor::Lidar_Sensor(QObject *parent) : WorldObjectComponent_If(parent)
 
     sensor_model = new Model({}, {}, this);
     scan_model = new Model({}, {}, this);
+    registerModel(sensor_model);
+    registerModel(scan_model);
 
     data = std::make_shared<sensor_msgs::msg::LaserScan>();
 
@@ -51,13 +53,13 @@ void Lidar_Sensor::_updateDataMessageDimensions()
     _buildModels();
 }
 
-WorldObjectComponent_If *Lidar_Sensor::clone(QObject *newParent)
+WorldObjectComponent *Lidar_Sensor::clone(QObject *newParent)
 {
     Lidar_Sensor* out = new Lidar_Sensor(newParent);
 
     for(QString s : _properties.keys())
     {
-        out->_properties[s].set(_properties[s].get(), true);
+        out->_properties[s]->set(_properties[s]->get(), true);
     }
 
     return out;
@@ -104,31 +106,33 @@ void Lidar_Sensor::disconnectChannels()
     _connected = false;
 }
 
-void Lidar_Sensor::clearBodies(b2World *world)
+void Lidar_Sensor::clearBodies()
 {
-    if(nullptr != sensorBody)
+    if(_world)
     {
-        world->DestroyJoint(weldJoint);
-        world->DestroyBody(sensorBody);
+        _world->DestroyJoint(weldJoint);
+        _world->DestroyBody(sensorBody);
 
         weldJoint = nullptr;
         sensorBody = nullptr;
         sensorFix = nullptr;
-
-        massChanged(this, 0);
     }
+    _world = nullptr;
 }
 
-QVector<b2Body*> Lidar_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+void Lidar_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
-    clearBodies(world);
+    clearBodies();
+    _world = world;
 
     b2BodyDef bDef;
-    bDef.angle = theta_local.get().toDouble()*DEG2RAD;
+    double x, y, t;
+    getTransform(x, y, t);
+    bDef.position.Set(x, y);
+    bDef.angle = t*DEG2RAD;
     bDef.type = b2_dynamicBody;
     sensorBody = world->CreateBody(&bDef);
-
-    moveBodyToLocalSpaceOfOtherBody(sensorBody, anchor, x_local.get().toDouble(), y_local.get().toDouble());
+    registerBody(sensorBody, {sensor_model, scan_model});
 
     b2WeldJointDef weldDef;
     auto anchorPt = anchor->GetWorldCenter();
@@ -143,8 +147,6 @@ QVector<b2Body*> Lidar_Sensor::generateBodies(b2World *world, object_id oId, b2B
 
     _attachSensorFixture();
     _buildModels();
-
-    return {sensorBody};
 }
 
 void Lidar_Sensor::_attachSensorFixture()
@@ -172,8 +174,6 @@ void Lidar_Sensor::_attachSensorFixture()
         fixDef.density = 1;
 
         sensorFix = sensorBody->CreateFixture(&fixDef);
-
-        massChanged(this, sensorBody->GetMass());
     }
 }
 
@@ -222,18 +222,12 @@ b2Vec2 Lidar_Sensor::_getRayPoint(double angle_rad, double dist)
     return b2Vec2(sin(angle_rad) * dist, cos(angle_rad) * dist);
 }
 
-void Lidar_Sensor::worldTicked(const b2World* world, const double dt)
+void Lidar_Sensor::_worldTicked(const double dt)
 {
     if(sensorBody)
     {
         _timeSinceScan += dt;
         double pr = pub_rate.get().toDouble();
-
-        double x = sensorBody->GetWorldCenter().x;
-        double y = sensorBody->GetWorldCenter().y;
-        double t = sensorBody->GetAngle();
-        sensor_model->setTransform(x, y, t*RAD2DEG);
-        scan_model->setTransform(x, y, t*RAD2DEG);
 
         if(pr > 0 && _timeSinceScan > 1.0/pr)
         {
@@ -249,7 +243,7 @@ void Lidar_Sensor::worldTicked(const b2World* world, const double dt)
                 b2Vec2 localEndpoint = _getRayPoint(curr_angle, scan_radius);
                 b2Vec2 worldEndpoint = sensorBody->GetWorldPoint(localEndpoint);
 
-                QPair<b2Vec2, double> rayCastResult = _rayCaster.rayCast(world, worldOrigin, worldEndpoint);
+                QPair<b2Vec2, double> rayCastResult = _rayCaster.rayCast(_world, worldOrigin, worldEndpoint);
 
                 b2EdgeShape* thisLine = dynamic_cast<b2EdgeShape*>(scan_image[i]);
                 thisLine->m_vertex2 = sensorBody->GetLocalPoint(rayCastResult.first);

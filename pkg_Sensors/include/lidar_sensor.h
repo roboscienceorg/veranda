@@ -4,7 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 
-#include <sdsmt_simulator/world_object_component_if.h>
+#include <sdsmt_simulator/world_object_component.h>
 #include <Box2D/Box2D.h>
 
 #include <QVector>
@@ -17,7 +17,7 @@
 #include <limits>
 #include <cmath>
 
-class Lidar_Sensor : public WorldObjectComponent_If
+class Lidar_Sensor : public WorldObjectComponent
 {
     Q_OBJECT
 
@@ -62,15 +62,6 @@ class Lidar_Sensor : public WorldObjectComponent_If
     std::shared_ptr<rclcpp::Node> _rosNode;
     rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr _sendChannel;
 
-    Property x_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X location of component within object"),
-                                QVariant(0.0), &Property::double_validator);
-
-    Property y_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y location of component within object"),
-                                QVariant(0.0), &Property::double_validator);
-
-    Property theta_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of component within object"),
-                                QVariant(0.0), &Property::angle_validator);
-
     Property output_channel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
                                                     "Output channel for touch messages"), "");
 
@@ -96,16 +87,15 @@ class Lidar_Sensor : public WorldObjectComponent_If
     Property pub_rate = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Scan rate (hz)"),
                                  QVariant(10), &Property::abs_double_validator);
 
-    QMap<QString, PropertyView> _properties{
-        {"channels/output_ranges", &output_channel},
-        {"x_local", &x_local},
-        {"y_local", &y_local},
-        {"theta_local", &theta_local},
-        {"scan_range", &angle_range},
-        {"scan_radius", &radius},
-        {"scan_points", &scan_points},
-        {"scan_rate", &pub_rate}
+#define pview(a) QSharedPointer<PropertyView>(new PropertyView(a))
+    QMap<QString, QSharedPointer<PropertyView>> _properties{
+        {"channels/output_ranges", pview(&output_channel)},
+        {"scan_range", pview(&angle_range)},
+        {"scan_radius", pview(&radius)},
+        {"scan_points", pview(&scan_points)},
+        {"scan_rate", pview(&pub_rate)}
     };
+#undef pview
 
     Model* sensor_model = nullptr;
     Model* scan_model = nullptr;
@@ -124,29 +114,23 @@ class Lidar_Sensor : public WorldObjectComponent_If
 
     double _timeSinceScan = 0;
 
+    b2World* _world = nullptr;
+
 public:
     Lidar_Sensor(QObject* parent=nullptr);
 
-    WorldObjectComponent_If* clone(QObject *newParent);
+    WorldObjectComponent *clone(QObject *newParent);
 
-    QMap<QString, PropertyView>& getProperties(){
+    QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
         return _properties;
-    }
-
-    QString getPropertyGroup(){
-        return "Lidar";
-    }
-
-    QVector<Model*> getModels(){
-        return {sensor_model, scan_model};
     }
 
     bool usesChannels(){
         return true;
     }
 
-    QVector<b2Body *> generateBodies(b2World *world, object_id oId, b2Body *anchor);
-    void clearBodies(b2World *world);
+    void generateBodies(b2World *world, object_id oId, b2Body *anchor);
+    void clearBodies();
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
@@ -166,9 +150,7 @@ public slots:
     //Disconnects all ROS topics
     virtual void disconnectChannels();
 
-    virtual void worldTicked(const b2World*world, const double dt);
-
-    virtual void setObjectMass(double mass){}
+    virtual void _worldTicked(const double dt);
 };
 
 #endif // FLOATER_DRIVETRAIN_H

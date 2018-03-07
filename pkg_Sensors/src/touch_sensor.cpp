@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <cmath>
 
-Touch_Sensor::Touch_Sensor(QObject *parent) : WorldObjectComponent_If(parent)
+Touch_Sensor::Touch_Sensor(QObject *parent) : WorldObjectComponent("Touch Ring", parent)
 {
     //Update channel out
     connect(&output_channel, &Property::valueSet, this, &Touch_Sensor::_channelChanged);
@@ -24,6 +24,8 @@ Touch_Sensor::Touch_Sensor(QObject *parent) : WorldObjectComponent_If(parent)
 
     buttons_model = new Model({}, {}, this);
     touches_model = new Model({}, {}, this);
+    registerModel(buttons_model);
+    registerModel(touches_model);
 
     data = std::make_shared<std_msgs::msg::ByteMultiArray>();
 
@@ -42,13 +44,13 @@ void Touch_Sensor::_updateDataMessageDimensions()
     data->data.resize(buttons, 0);
 }
 
-WorldObjectComponent_If *Touch_Sensor::clone(QObject *newParent)
+WorldObjectComponent *Touch_Sensor::clone(QObject *newParent)
 {
     Touch_Sensor* out = new Touch_Sensor(newParent);
 
     for(QString s : _properties.keys())
     {
-        out->_properties[s].set(_properties[s].get(), true);
+        out->_properties[s]->set(_properties[s]->get(), true);
     }
 
     return out;
@@ -96,31 +98,33 @@ void Touch_Sensor::disconnectChannels()
     _connected = false;
 }
 
-void Touch_Sensor::clearBodies(b2World *world)
+void Touch_Sensor::clearBodies()
 {
-    if(nullptr != sensorBody)
+    if(_world)
     {
-        world->DestroyJoint(weldJoint);
-        world->DestroyBody(sensorBody);
+        _world->DestroyJoint(weldJoint);
+        _world->DestroyBody(sensorBody);
 
         weldJoint = nullptr;
         sensorBody = nullptr;
         sensorFix = nullptr;
-
-        massChanged(this, 0);
     }
+    _world = nullptr;
 }
 
-QVector<b2Body*> Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+void Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
-    clearBodies(world);
+    clearBodies();
+    _world = world;
 
     b2BodyDef bDef;
-    bDef.angle = theta_local.get().toDouble()*DEG2RAD;
+    double x, y, t;
+    getTransform(x, y, t);
+    bDef.angle = t*DEG2RAD;
+    bDef.position.Set(x, y);
     bDef.type = b2_dynamicBody;
     sensorBody = world->CreateBody(&bDef);
-
-    moveBodyToLocalSpaceOfOtherBody(sensorBody, anchor, x_local.get().toDouble(), y_local.get().toDouble());
+    registerBody(sensorBody, {buttons_model, touches_model});
 
     b2WeldJointDef weldDef;
     auto anchorPt = anchor->GetWorldCenter();
@@ -135,8 +139,6 @@ QVector<b2Body*> Touch_Sensor::generateBodies(b2World *world, object_id oId, b2B
 
     _attachSensorFixture();
     _buildModels();
-
-    return {sensorBody};
 }
 
 void Touch_Sensor::_attachSensorFixture()
@@ -164,8 +166,6 @@ void Touch_Sensor::_attachSensorFixture()
         fixDef.density = 1;
 
         sensorFix = sensorBody->CreateFixture(&fixDef);
-
-        massChanged(this, sensorBody->GetMass());
     }
 }
 
@@ -226,7 +226,7 @@ void Touch_Sensor::_evaluateContact(b2Contact* c, QVector<int>& newTouches, QSet
     if(angleMax < angleMin)
         degPerTouch = (angleMax + 2*PI - angleMin) / sensor_count.get().toInt();
 
-    //qDebug() << "Contact with" << c->GetManifold()->pointCount << "points";
+    //qDebug() << "Contact with" << c.getManifold()->pointCount << "points";
     for(int i = 0; i < c->GetManifold()->pointCount; i++)
     {
         b2Vec2 worldContact = man.points[i];
@@ -257,7 +257,7 @@ void Touch_Sensor::_evaluateContact(b2Contact* c, QVector<int>& newTouches, QSet
     }
 }
 
-void Touch_Sensor::worldTicked(const b2World*, const double)
+void Touch_Sensor::_worldTicked(const double)
 {
     if(sensorBody)
     {
@@ -298,11 +298,5 @@ void Touch_Sensor::worldTicked(const b2World*, const double)
         {
             _sendChannel->publish(data);
         }
-
-        double x = sensorBody->GetWorldCenter().x;
-        double y = sensorBody->GetWorldCenter().y;
-        double t = sensorBody->GetAngle();
-        buttons_model->setTransform(x, y, t*RAD2DEG);
-        touches_model->setTransform(x, y, t*RAD2DEG);
     }
 }
