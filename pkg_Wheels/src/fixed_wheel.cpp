@@ -103,14 +103,9 @@ void Fixed_Wheel::_attachWheelFixture()
     }
 }
 
-WorldObjectComponent *Fixed_Wheel::clone(QObject *newParent)
+WorldObjectComponent *Fixed_Wheel::_clone(QObject *newParent)
 {
     Fixed_Wheel* out = new Fixed_Wheel(newParent);
-
-    for(QString s : _properties.keys())
-    {
-        out->_properties[s]->set(_properties[s]->get(), true);
-    }
 
     return out;
 }

@@ -44,14 +44,9 @@ void Touch_Sensor::_updateDataMessageDimensions()
     data->data.resize(buttons, 0);
 }
 
-WorldObjectComponent *Touch_Sensor::clone(QObject *newParent)
+WorldObjectComponent *Touch_Sensor::_clone(QObject *newParent)
 {
     Touch_Sensor* out = new Touch_Sensor(newParent);
-
-    for(QString s : _properties.keys())
-    {
-        out->_properties[s]->set(_properties[s]->get(), true);
-    }
 
     return out;
 }

@@ -14,14 +14,9 @@ Circle::Circle(QObject *parent) : WorldObjectComponent("Circle", parent)
     connect(&radius, &Property::valueSet, this, &Circle::_makeFixtures);
 }
 
-WorldObjectComponent *Circle::clone(QObject *newParent)
+WorldObjectComponent *Circle::_clone(QObject *newParent)
 {
     Circle* out = new Circle(newParent);
-
-    for(QString s : _properties.keys())
-    {
-        out->_properties[s]->set(_properties[s]->get(), true);
-    }
 
     return out;
 }

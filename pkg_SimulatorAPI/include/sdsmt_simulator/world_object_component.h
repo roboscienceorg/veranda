@@ -80,7 +80,8 @@ public:
     WorldObjectComponent(QString defaultName = "", QObject* parent=nullptr);
 
     //Constructs copy of component
-    virtual WorldObjectComponent* clone(QObject* newParent=nullptr) = 0;
+    virtual WorldObjectComponent* _clone(QObject* newParent=nullptr) = 0;
+    WorldObjectComponent* clone(QObject* newParent = nullptr);
 
     //Drawing Interactions
     QVector<Model*> getModels(){ return {_masterModel}; }

@@ -206,14 +206,9 @@ void Ackermann_Steer::_attachWheelFixture()
     }
 }
 
-WorldObjectComponent *Ackermann_Steer::clone(QObject *newParent)
+WorldObjectComponent *Ackermann_Steer::_clone(QObject *newParent)
 {
     Ackermann_Steer* out = new Ackermann_Steer(newParent);
-
-    for(QString s : _properties.keys())
-    {
-        out->_properties[s]->set(_properties[s]->get(), true);
-    }
 
     return out;
 }

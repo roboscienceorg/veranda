@@ -34,7 +34,7 @@ public:
     ~PolygonsComponent();
 
     //Constructs copy of component
-    WorldObjectComponent *clone(QObject* newParent=nullptr);
+    WorldObjectComponent *_clone(QObject* newParent=nullptr);
 
     void generateBodies(b2World* world, object_id oId, b2Body* anchor);
     void clearBodies();

@@ -82,7 +82,7 @@ class Touch_Sensor : public WorldObjectComponent
 public:
     Touch_Sensor(QObject* parent=nullptr);
 
-    WorldObjectComponent* clone(QObject *newParent);
+    WorldObjectComponent* _clone(QObject *newParent);
 
     QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
         return _properties;

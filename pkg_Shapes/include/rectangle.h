@@ -43,7 +43,7 @@ class Rectangle : public WorldObjectComponent
 public:
     Rectangle(QObject* parent=nullptr);
 
-    WorldObjectComponent* clone(QObject *newParent);
+    WorldObjectComponent* _clone(QObject *newParent);
 
     virtual QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
         return _properties;

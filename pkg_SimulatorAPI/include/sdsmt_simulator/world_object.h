@@ -41,7 +41,7 @@ public:
     WorldObject(QVector<WorldObjectComponent*> components, QString name = "object", QObject* parent = nullptr);
 
     //Constructs copy of object
-    WorldObject* clone(QObject* newParent=nullptr);
+    WorldObject* _clone(QObject* newParent=nullptr);
 
     QVector<WorldObjectComponent*> getComponents()
     {return _components; }

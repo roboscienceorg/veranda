@@ -53,14 +53,9 @@ void Lidar_Sensor::_updateDataMessageDimensions()
     _buildModels();
 }
 
-WorldObjectComponent *Lidar_Sensor::clone(QObject *newParent)
+WorldObjectComponent *Lidar_Sensor::_clone(QObject *newParent)
 {
     Lidar_Sensor* out = new Lidar_Sensor(newParent);
-
-    for(QString s : _properties.keys())
-    {
-        out->_properties[s]->set(_properties[s]->get(), true);
-    }
 
     return out;
 }

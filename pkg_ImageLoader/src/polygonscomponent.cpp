@@ -20,7 +20,7 @@ PolygonsComponent::~PolygonsComponent()
     _shapePtrs.clear();
 }
 
-WorldObjectComponent* PolygonsComponent::clone(QObject* newParent)
+WorldObjectComponent* PolygonsComponent::_clone(QObject* newParent)
 {
     QVector<b2PolygonShape*> polyShapes;
     for(b2Shape* s : _shapePtrs)

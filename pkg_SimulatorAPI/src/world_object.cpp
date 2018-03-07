@@ -60,11 +60,11 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
     registerModel(debugModel);
 }
 
-WorldObject* WorldObject::clone(QObject *newParent)
+WorldObject* WorldObject::_clone(QObject *newParent)
 {
     QVector<WorldObjectComponent*> childClones;
     for(WorldObjectComponent* c : _components)
-        childClones.push_back(c->clone());
+        childClones.push_back(c->_clone());
 
     WorldObject* copy = new WorldObject(childClones, getName(), newParent);
     double x, y, theta;

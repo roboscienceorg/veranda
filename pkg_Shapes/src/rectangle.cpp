@@ -16,14 +16,9 @@ Rectangle::Rectangle(QObject *parent) : WorldObjectComponent("Rectangle", parent
     connect(&width, &Property::valueSet, this, &Rectangle::_makeFixtures);
 }
 
-WorldObjectComponent *Rectangle::clone(QObject *newParent)
+WorldObjectComponent *Rectangle::_clone(QObject *newParent)
 {
     Rectangle* out = new Rectangle(newParent);
-
-    for(QString s : _properties.keys())
-    {
-        out->_properties[s]->set(_properties[s]->get(), true);
-    }
 
     return out;
 }

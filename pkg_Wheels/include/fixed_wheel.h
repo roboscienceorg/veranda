@@ -68,7 +68,7 @@ class Fixed_Wheel : public WorldObjectComponent
 public:
     Fixed_Wheel(QObject* parent=nullptr);
 
-    WorldObjectComponent* clone(QObject *newParent);
+    WorldObjectComponent* _clone(QObject *newParent);
 
     virtual QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
         return _properties;

@@ -119,7 +119,7 @@ class Lidar_Sensor : public WorldObjectComponent
 public:
     Lidar_Sensor(QObject* parent=nullptr);
 
-    WorldObjectComponent *clone(QObject *newParent);
+    WorldObjectComponent *_clone(QObject *newParent);
 
     QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
         return _properties;

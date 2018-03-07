@@ -83,7 +83,7 @@ void SimulatorCore::addSimObjects(QVector<WorldObject *> objs)
     for(WorldObject* obj : objs)
     {
         //Clone object to have local copy for distributing
-        obj = obj->clone();
+        obj = qobject_cast<WorldObject*>(obj->clone());
 
         obj->setROSNode(_node);
 

@@ -69,6 +69,18 @@ WorldObjectComponent::WorldObjectComponent(QString defaultName, QObject* parent)
     _masterModel = new Model();
 }
 
+WorldObjectComponent* WorldObjectComponent::clone(QObject* newParent)
+{
+    WorldObjectComponent* out = _clone(newParent);
+
+    auto props = getProperties();
+    auto outProps = out->getProperties();
+    for(QString s : props.keys())
+        outProps[s]->set(props[s]->get(), true);
+
+    return out;
+}
+
 //Register bodies so that they will be handled
 //during transforms to other object local space
 //Adding representations to a body means that they will be updated

@@ -4,24 +4,20 @@
 QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
     WorldObject* robot1 = makeDiffDriveBot(plugins);
-    QMap<QString, QSharedPointer<PropertyView>> props = robot1->getProperties();
-    props["X"]->set(20, true);
-    props["Y"]->set(0, true);
-    props["Theta"]->set(0, true);
-
+    robot1->getProperties()["GlobalPos/X"]->set(20, true);
+    robot1->getProperties()["GlobalPos/Y"]->set(0, true);
+    robot1->getProperties()["GlobalPos/Theta"]->set(0, true);
 
     WorldObject* robot2 = makeAckermannBot(plugins);
-
-    robot2->getProperties()["X"]->set(0, true);
-    robot2->getProperties()["Y"]->set(0, true);
-    robot2->getProperties()["Theta"]->set(0, true);
+    robot2->getProperties()["GlobalPos/X"]->set(0, true);
+    robot2->getProperties()["GlobalPos/Y"]->set(0, true);
+    robot2->getProperties()["GlobalPos/Theta"]->set(0, true);
 
     return QVector<WorldObject*>{robot1, robot2};
 }
 
 WorldObject* DefaultRobotLoader::makeDiffDriveBot(QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
-
     QVector<WorldObjectComponent*> components;
 
     if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.touchring"))
@@ -29,9 +25,9 @@ WorldObject* DefaultRobotLoader::makeDiffDriveBot(QMap<QString, WorldObjectCompo
         WorldObjectComponent* touchRing = plugins["org.sdsmt.sim.2d.worldObjectComponent.defaults.touchring"]->createComponent();
         QMap<QString, QSharedPointer<PropertyView>> props = touchRing->getProperties();
 
-        props["x_local"]->set(0, true);
-        props["y_local"]->set(0, true);
-        props["theta_local"]->set(0, true);
+        props["LocalPos/X"]->set(0, true);
+        props["LocalPos/Y"]->set(0, true);
+        props["LocalPos/Theta"]->set(0, true);
         props["angle_start"]->set(0, true);
         props["angle_end"]->set(360, true);
         props["ring_radius"]->set(2, true);
@@ -48,14 +44,14 @@ WorldObject* DefaultRobotLoader::makeDiffDriveBot(QMap<QString, WorldObjectCompo
         QMap<QString, QSharedPointer<PropertyView>> propsl = leftWheel->getProperties();
         QMap<QString, QSharedPointer<PropertyView>> propsr = rightWheel->getProperties();
 
-        propsl["x_local"]->set(-1.5, true);
-        propsr["x_local"]->set(1.5, true);
+        propsl["LocalPos/X"]->set(-1.5, true);
+        propsr["LocalPos/X"]->set(1.5, true);
 
-        propsl["y_local"]->set(0, true);
-        propsr["y_local"]->set(0, true);
+        propsl["LocalPos/Y"]->set(0, true);
+        propsr["LocalPos/Y"]->set(0, true);
 
-        propsl["theta_local"]->set(90, true);
-        propsr["theta_local"]->set(90, true);
+        propsl["LocalPos/Theta"]->set(90, true);
+        propsr["LocalPos/Theta"]->set(90, true);
 
         propsl["wheel_radius"]->set(0.75, true);
         propsr["wheel_radius"]->set(0.75, true);
@@ -81,8 +77,8 @@ WorldObject* DefaultRobotLoader::makeDiffDriveBot(QMap<QString, WorldObjectCompo
         WorldObjectComponent* circle = plugins["org.sdsmt.sim.2d.worldObjectComponent.defaults.circle"]->createComponent();
         QMap<QString, QSharedPointer<PropertyView>> props = circle->getProperties();
 
-        props["x"]->set(0, true);
-        props["y"]->set(0, true);
+        props["LocalPos/X"]->set(0, true);
+        props["LocalPos/Y"]->set(0, true);
         props["radius"]->set(2, true);
 
         components.push_back(circle);
@@ -100,8 +96,8 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
         WorldObjectComponent* lidar = plugins["org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar"]->createComponent();
         QMap<QString, QSharedPointer<PropertyView>> props = lidar->getProperties();
 
-        props["x_local"]->set(0, true);
-        props["y_local"]->set(2, true);
+        props["LocalPos/X"]->set(0, true);
+        props["LocalPos/Y"]->set(2, true);
         props["scan_radius"]->set(5, true);
         props["scan_range"]->set(90, true);
         props["scan_points"]->set(20, true);
@@ -115,8 +111,8 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
         WorldObjectComponent* rectangle = plugins["org.sdsmt.sim.2d.worldObjectComponent.defaults.rectangle"]->createComponent();
         QMap<QString, QSharedPointer<PropertyView>> props = rectangle->getProperties();
 
-        props["x_pos"]->set(0, true);
-        props["y_pos"]->set(0, true);
+        props["LocalPos/X"]->set(0, true);
+        props["LocalPos/Y"]->set(0, true);
         props["height"]->set(4, true);
         props["width"]->set(2, true);
         props["rotation"]->set(0, true);
@@ -132,14 +128,14 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
         QMap<QString, QSharedPointer<PropertyView>> propsl = leftWheel->getProperties();
         QMap<QString, QSharedPointer<PropertyView>> propsr = rightWheel->getProperties();
 
-        propsl["x_local"]->set(-1.25, true);
-        propsr["x_local"]->set(1.25, true);
+        propsl["LocalPos/X"]->set(-1.25, true);
+        propsr["LocalPos/X"]->set(1.25, true);
 
-        propsl["y_local"]->set(-2, true);
-        propsr["y_local"]->set(-2, true);
+        propsl["LocalPos/Y"]->set(-2, true);
+        propsr["LocalPos/Y"]->set(-2, true);
 
-        propsl["theta_local"]->set(90, true);
-        propsr["theta_local"]->set(90, true);
+        propsl["LocalPos/Theta"]->set(90, true);
+        propsr["LocalPos/Theta"]->set(90, true);
 
         propsl["wheel_radius"]->set(0.75, true);
         propsr["wheel_radius"]->set(0.75, true);
@@ -166,11 +162,11 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
 
         QMap<QString, QSharedPointer<PropertyView>> props = steer->getProperties();
 
-        props["x_local"]->set(0, true);
-        props["y_local"]->set(2, true);
+        props["LocalPos/X"]->set(0, true);
+        props["LocalPos/Y"]->set(2, true);
         props["vehicle_length"]->set(4, true);
         props["axle_length"]->set(2.5, true);
-        props["theta_local"]->set(0, true);
+        props["LocalPos/Theta"]->set(0, true);
         props["wheel_radius"]->set(0.75, true);
         props["wheel_width"]->set(0.5, true);
         props["density"]->set(20, true);
