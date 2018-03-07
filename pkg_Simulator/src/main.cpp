@@ -159,6 +159,8 @@ int main(int argc, char** argv)
 
     SimulatorCore sim(physics, userinterface, node, &app);
 
+    sim.addSimObjects({new WorldObject({})});
+
     qDebug() << "Starting Simulation";
     sim.start();
 

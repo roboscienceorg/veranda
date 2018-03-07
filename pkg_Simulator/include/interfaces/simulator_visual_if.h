@@ -19,6 +19,8 @@ public:
 signals:
     //Signals that the user clicked on a robot
     void userSelectedObject(object_id id);
+    void userDragMoveObject(object_id, double dx, double dy);
+    void userDragRotateObject(object_id, double dt);
 
 public slots:
     virtual void objectAddedToScreen(QVector<Model*> objects, object_id oId) = 0;

@@ -25,8 +25,6 @@ class SDSMT_SIMULATOR_API WorldObject : public WorldObjectComponent
     b2Body* anchorBody = nullptr;
     QVector<b2Body*> childBodies;
 
-    QVector<Model*> _models;
-
     b2World* _world = nullptr;
 
     QMap<QString, QSharedPointer<PropertyView>> _properties;

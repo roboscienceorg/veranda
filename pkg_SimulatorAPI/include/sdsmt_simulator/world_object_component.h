@@ -41,22 +41,20 @@ class SDSMT_SIMULATOR_API WorldObjectComponent : public QObject
     QMap<QString, Property*> _properties
     {
         {"Name", &_objName},
-        {"X Local", &_locX},
-        {"Y Local", &_locY},
-        {"Theta Local", &_locTheta},
-        {"X Global", &_globX},
-        {"Y Global", &_globY},
-        {"Theta Global", &_globTheta}
+        {"LocalPos/X", &_locX},
+        {"LocalPos/Y", &_locY},
+        {"LocalPos/Theta", &_locTheta},
+        {"GlobalPos/X", &_globX},
+        {"GlobalPos/Y", &_globY},
+        {"GlobalPos/Theta", &_globTheta}
     };
 
-    QSet<Model*> _models;
+    Model* _masterModel;
     QMap<b2Body*, QVector<Model*>> _bodies;
 
     QTransform worldTransform;
     QTransform localTransform;
     QTransform invTransform;
-
-    b2World* world;
 
     void adjustTransform(const QTransform& tOldI, const QTransform& tNew);
     void updateProperties();
@@ -85,7 +83,7 @@ public:
     virtual WorldObjectComponent* clone(QObject* newParent=nullptr) = 0;
 
     //Drawing Interactions
-    QVector<Model*> getModels(){ return _models.toList().toVector(); }
+    QVector<Model*> getModels(){ return {_masterModel}; }
 
     //UI Interactions
     QMap<QString, QSharedPointer<PropertyView>> getProperties();

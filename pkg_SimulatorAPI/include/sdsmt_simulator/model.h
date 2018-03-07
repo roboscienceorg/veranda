@@ -75,7 +75,9 @@ public:
         _x = x;
         _y = y;
         _theta = theta;
-        transformChanged(this, dx, dy, dt);
+
+        //if(abs(dx) > 0.001 || abs(dy) > 0.001 || abs(dt) > 0.001)
+            transformChanged(this, dx, dy, dt);
     }
 
     void getTransform(double& x, double& y, double& theta)

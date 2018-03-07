@@ -24,7 +24,7 @@ public:
     { return _comp->getModels(); }
 
     QString getName()
-    { return ""; }
+    { return _comp->getName(); }
 
     QString getType()
     { return ""; }
@@ -41,6 +41,10 @@ public:
 
     WorldObjectComponent* getComponent()
     { return _comp; }
+
+    void translate(double x, double y){ _comp->translate(x, y); }
+    void rotate(double degrees){ _comp->rotate(degrees); }
+    void getTransform(double& x, double& y, double& degrees){ _comp->getTransform(x, y, degrees); }
 
 public slots:
     void connectChannels()

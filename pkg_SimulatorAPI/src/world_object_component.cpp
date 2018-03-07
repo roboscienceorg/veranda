@@ -65,6 +65,8 @@ WorldObjectComponent::WorldObjectComponent(QString defaultName, QObject* parent)
         double diff = _globTheta.get().toDouble() - (rad < 0 ? PI*2 + rad : rad)*RAD2DEG;
         rotate(diff);
     });
+
+    _masterModel = new Model();
 }
 
 //Register bodies so that they will be handled
@@ -90,12 +92,12 @@ void WorldObjectComponent::unregisterBody(b2Body* bod)
 //transforms
 void WorldObjectComponent::registerModel(Model* mod)
 {
-    _models.insert(mod);
+    _masterModel->addChildren({mod});
 }
 
 void WorldObjectComponent::unregisterModel(Model* mod)
 {
-    _models.remove(mod);
+    _masterModel->removeChildren({mod});
 }
 
 void WorldObjectComponent::adjustTransform(const QTransform& tOldI, const QTransform& tNew)
@@ -109,6 +111,8 @@ void WorldObjectComponent::adjustTransform(const QTransform& tOldI, const QTrans
         QTransform newLoc = bodyTransform(b) * tDiff;
         b->SetTransform(b2Vec2(newLoc.dx(), newLoc.dy()), radians(newLoc));
     }
+
+    syncModels();
 }
 
 void WorldObjectComponent::updateProperties()
@@ -124,32 +128,44 @@ void WorldObjectComponent::updateProperties()
 
 void WorldObjectComponent::translate(double x, double y)
 {
-    if(abs(x) < EPSILON && abs(y) < EPSILON) return;
+    if(std::abs(x) < EPSILON && std::abs(y) < EPSILON) return;
 
     localTransform.translate(x, y);
     QTransform tNew = localTransform * worldTransform;
 
-    adjustTransform(invTransform, tNew);
+    updateProperties();
+
+    //If any bodies exist, physically move them and then update the models to them
+    //Otherwise, move the models
+    if(_bodies.size())
+        adjustTransform(invTransform, tNew);
+    else
+        _masterModel->setTransform(_locX.get().toDouble(), _locY.get().toDouble(), _locTheta.get().toDouble() * RAD2DEG);
     invTransform = tNew.inverted();
 
     emit transformChanged(tNew);
-
-    updateProperties();
 }
 
 void WorldObjectComponent::rotate(double degrees)
 {
-    if(abs(degrees) < EPSILON) return;
+    if(std::abs(degrees) < EPSILON) return;
 
     localTransform.rotate(degrees);
     QTransform tNew = localTransform * worldTransform;
 
-    adjustTransform(invTransform, tNew);
+    updateProperties();
+
+    //If any bodies exist, physically move them and then update the models to them
+    //Otherwise, move the models
+    if(_bodies.size())
+        adjustTransform(invTransform, tNew);
+    else
+        _masterModel->setTransform(_locX.get().toDouble(), _locY.get().toDouble(), _locTheta.get().toDouble() * RAD2DEG);
+
     invTransform = tNew.inverted();
 
     emit transformChanged(tNew);
 
-    updateProperties();
 }
 
 void WorldObjectComponent::setParentTransform(const QTransform& t)
@@ -176,7 +192,7 @@ void WorldObjectComponent::syncModels()
     {
         if(iter.value().size())
         {
-            QTransform localLoc = bodyTransform(iter.key()) * invTransform;
+            QTransform localLoc = bodyTransform(iter.key()) * invTransform * localTransform;
             double x = localLoc.dx();
             double y = localLoc.dy();
             double t = radians(localLoc)*RAD2DEG;

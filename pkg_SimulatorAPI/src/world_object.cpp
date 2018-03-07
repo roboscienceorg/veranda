@@ -47,7 +47,8 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
        /*************
         * Models
         *************/
-        _models += c->getModels();
+        for(Model* m : c->getModels())
+            registerModel(m);
 
        /*************
         * Channels
@@ -56,7 +57,7 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
     }
 
     debugModel = new Model();
-    //_models += debugModel;
+    registerModel(debugModel);
 }
 
 WorldObject* WorldObject::clone(QObject *newParent)

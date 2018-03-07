@@ -70,6 +70,10 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     ui->propertiesTableView->verticalHeader()->setVisible(false);
     connect(visualSimulator, SIGNAL(userSelectedObject(object_id)), this, SLOT(objectSelected(object_id)));
     //connect(visualDesigner, SIGNAL(userSelectedTool(tool_id)), this, SLOT(toolSelected(t_id)));
+    connect(visualSimulator, SIGNAL(userDragMoveObject(object_id,double,double)), this, SLOT(simObjectMoveDragged(object_id,double,double)));
+    connect(visualSimulator, SIGNAL(userDragRotateObject(object_id,double)), this, SLOT(simObjectRotateDragged(object_id,double)));
+    connect(visualDesigner, SIGNAL(userDragMoveObject(object_id,double,double)), this, SLOT(buildObjectMoveDragged(object_id,double,double)));
+    connect(visualDesigner, SIGNAL(userDragRotateObject(object_id,double)), this, SLOT(buildObjectRotateDragged(object_id,double)));
     connect(this, SIGNAL(objectIsSelected(object_id)), visualSimulator, SLOT(objectSelected(object_id)));
     connect(this, SIGNAL(nothingIsSelected()), visualSimulator, SLOT(nothingSelected()));
 
@@ -544,3 +548,22 @@ void MainWindow::updateDesignerBuildTools()
         //how many tabs/categories?
         //widget using items from *components in basic viewer + mouse-over description
 }
+
+void MainWindow::simObjectMoveDragged(object_id id, double dx, double dy)
+{
+   auto obj = worldObjects.find(id);
+   if(obj != worldObjects.end())
+       obj.value()->translate(dx, dy);
+}
+
+void MainWindow::simObjectRotateDragged(object_id id, double dt)
+{
+    auto obj = worldObjects.find(id);
+    if(obj != worldObjects.end())
+        obj.value()->rotate(dt);
+}
+
+//These two slots exist so that if build objects and simulation
+//objects are stored separately, we can index into the correct list
+void MainWindow::buildObjectMoveDragged(object_id id, double dx, double dy){}
+void MainWindow::buildObjectRotateDragged(object_id id, double dt){}

@@ -85,13 +85,19 @@ public slots:
     void showMainWindow(){
         show();
 
-        setWorldBounds(-200, 200, -200, 200);
+        //setWorldBounds(-200, 200, -200, 200);
+        setWorldBounds(-50, 50, -50, 50);
     }
 
     void closeEvent(QCloseEvent *)
     {
         emit windowClosed();
     }
+
+    void simObjectMoveDragged(object_id id, double dx, double dy);
+    void simObjectRotateDragged(object_id id, double dt);
+    void buildObjectMoveDragged(object_id id, double dx, double dy);
+    void buildObjectRotateDragged(object_id id, double dt);
 
 private slots:
 

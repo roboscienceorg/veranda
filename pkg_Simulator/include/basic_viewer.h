@@ -74,6 +74,7 @@ class BasicViewer : public Simulator_Visual_If
 
     QGraphicsItem* _transformer;
     QGraphicsItem* _rotater;
+    QTransform _transformerTransform;
 
     //Constructs a QAbstractGraphicsShapeItem from a box2d shape
     QGraphicsItem* _drawb2Shape(b2Shape* s, QGraphicsItem* itemParent = nullptr);
@@ -90,7 +91,7 @@ class BasicViewer : public Simulator_Visual_If
     //Sets a graphics item and all it's children to a specific color pen
     void _setOutlineColor(QGraphicsItem* item, const QColor& color);
 
-    bool _draggingTransform = false;
+    bool _draggingTranslate = false;
     bool _draggingRotate = false;
     QPointF _dragStart;
 
