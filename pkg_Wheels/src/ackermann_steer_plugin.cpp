@@ -6,7 +6,7 @@ Ackermann_Steer_Plugin::Ackermann_Steer_Plugin()
 
 }
 
-WorldObjectComponent_If* Ackermann_Steer_Plugin::createComponent()
+WorldObjectComponent* Ackermann_Steer_Plugin::createComponent()
 {
     return new Ackermann_Steer;
 }

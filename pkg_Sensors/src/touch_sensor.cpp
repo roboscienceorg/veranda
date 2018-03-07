@@ -118,10 +118,6 @@ void Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
     _world = world;
 
     b2BodyDef bDef;
-    double x, y, t;
-    getTransform(x, y, t);
-    bDef.angle = t*DEG2RAD;
-    bDef.position.Set(x, y);
     bDef.type = b2_dynamicBody;
     sensorBody = world->CreateBody(&bDef);
     registerBody(sensorBody, {buttons_model, touches_model});

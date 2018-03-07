@@ -17,7 +17,7 @@ find_package(rclcpp REQUIRED)
 
 ## Find and configure QT
 find_package(Qt5 REQUIRED COMPONENTS
-  Core
+  Core Gui
 )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -72,7 +72,7 @@ add_library(default_robot_loader_plugin SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to executable
 ## this will find all the headers and link all the libraries
-qt5_use_modules(default_robot_loader_plugin Core)
+qt5_use_modules(default_robot_loader_plugin Core Gui)
 
 ## Pull in stuff exported from other packages
 ament_target_dependencies(default_robot_loader_plugin

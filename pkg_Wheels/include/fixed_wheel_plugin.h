@@ -18,7 +18,7 @@ class Fixed_Wheel_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 
 public:
     Fixed_Wheel_Plugin();
-    WorldObjectComponent_If* createComponent();
+    WorldObjectComponent *createComponent();
 
 };
 

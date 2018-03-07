@@ -18,7 +18,7 @@ class Ackermann_Steer_Plugin : public QObject, public WorldObjectComponent_Plugi
 
 public:
     Ackermann_Steer_Plugin();
-    WorldObjectComponent_If* createComponent();
+    WorldObjectComponent* createComponent();
 
 };
 

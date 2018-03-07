@@ -48,10 +48,6 @@ void Circle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
-    double x, y, t;
-    getTransform(x, y, t);
-    bodyDef.angle = t*DEG2RAD;
-    bodyDef.position.Set(x, y);
     body = world->CreateBody(&bodyDef);
     registerBody(body, {shape_model});
 
