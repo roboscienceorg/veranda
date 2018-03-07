@@ -15,7 +15,7 @@ find_package(sdsmt_simulator_box2d REQUIRED)
 
 ## Find and configure QT
 find_package(Qt5 REQUIRED COMPONENTS
-  Core
+  Core Gui
 )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -51,7 +51,7 @@ function(make_plugin plugin_name plugin_moc_hdrs plugin_srcs)
 
     ## Add qt module dependencies to executable
     ## this will find all the headers and link all the libraries
-    qt5_use_modules(${plugin_name} Core)
+    qt5_use_modules(${plugin_name} Core Gui)
 
     ## Pull in stuff exported from other packages
     ament_target_dependencies(${plugin_name}
