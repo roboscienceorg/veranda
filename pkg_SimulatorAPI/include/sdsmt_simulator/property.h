@@ -102,29 +102,42 @@ public:
     const PropertyInfo& info()
     { return _info; }
 
-    void set(const QVariant& v)
+    void set(const QVariant& v, bool notifyOwner = false)
     {
-        _set(v);
+        //Update to value if valid
+        _value = _validate(_value, v);
+
+        //Notify watchers
+        _update(notifyOwner);
     }
 
 signals:
-    //Signals that the value was changed or attempted to change
+    //Signals an outgoing value that viewers
+    //should listen to
     void valueSet(QVariant);
 
+    //Signals an incoming value that an external
+    //source set
+    void valueRequested(QVariant);
+
 private slots:
-    void _set(QVariant newValue)
+    void _request(QVariant newValue)
     {
         //qDebug() << "Validate value at origin" << this;
         _value = _validate(_value, newValue);
 
         //Push value to viewers created from this one
-        _update();
+        _update(true);
     }
 
-    void _update()
+    void _update(bool isRequest)
     {
         //Publish value to watching objects
         valueSet(_value);
+
+        //Notify owner
+        if(isRequest)
+            valueRequested(_value);
     }
 };
 
@@ -140,7 +153,7 @@ class SDSMT_SIMULATOR_API PropertyView : public QObject
         {
             connect(_origin, &Property::valueSet, this, &PropertyView::valueSet);
             connect(_origin, &Property::destroyed, this, &PropertyView::_invalidate);
-            connect(this, &PropertyView::requestValue, _origin, &Property::_set);
+            connect(this, &PropertyView::requestValue, _origin, &Property::_request);
         }
     }
 

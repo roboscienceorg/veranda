@@ -34,33 +34,33 @@ WorldObjectComponent::WorldObjectComponent(QString defaultName, QObject* parent)
 {
     _objName.set(defaultName);
 
-    connect(&_locX, &Property::valueSet, [this](){
+    connect(&_locX, &Property::valueRequested, [this](){
         double diff = _locX.get().toDouble() - localTransform.dx();
         translate(diff, 0);
     });
 
-    connect(&_locY, &Property::valueSet, [this](){
+    connect(&_locY, &Property::valueRequested, [this](){
         double diff = _locY.get().toDouble() - localTransform.dy();
         translate(0, diff);
     });
 
-    connect(&_locTheta, &Property::valueSet, [this](){
+    connect(&_locTheta, &Property::valueRequested, [this](){
         double rad = radians(localTransform);
         double diff = _locTheta.get().toDouble() - (rad < 0 ? PI*2 + rad : rad)*RAD2DEG;
         rotate(diff);
     });
 
-    connect(&_globX, &Property::valueSet, [this](){
+    connect(&_globX, &Property::valueRequested, [this](){
         double diff = _globX.get().toDouble() - worldTransform.dx();
         translate(diff, 0);
     });
 
-    connect(&_globX, &Property::valueSet, [this](){
+    connect(&_globX, &Property::valueRequested, [this](){
         double diff = _globY.get().toDouble() - worldTransform.dy();
         translate(0, diff);
     });
 
-    connect(&_globX, &Property::valueSet, [this](){
+    connect(&_globX, &Property::valueRequested, [this](){
         double rad = radians(worldTransform);
         double diff = _globTheta.get().toDouble() - (rad < 0 ? PI*2 + rad : rad)*RAD2DEG;
         rotate(diff);

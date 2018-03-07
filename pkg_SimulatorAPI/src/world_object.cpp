@@ -54,6 +54,8 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
         * Channels
         *************/
         if(c->usesChannels()) _useChannels = true;
+
+        connect(this, &WorldObjectComponent::transformChanged, c, &WorldObjectComponent::setParentTransform);
     }
 
     debugModel = new Model();
