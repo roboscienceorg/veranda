@@ -4,13 +4,21 @@
 cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator_api)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
 ## Compile as C++11
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 11)
-if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-endif()
+
+# Remove -g from general builds
+string(REPLACE -g "" CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS)
+
+# Always use -Wall
+set(CMAKE_CXX_FLAGS "-Wall")
+
+# Add -g to debug builds
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+
+# Use O3 for release builds
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 ## Find required ROS packages
 find_package(ament_cmake REQUIRED)
@@ -75,9 +83,6 @@ endif()
 
 ## Run MOC on files with Qt Keywords and Macros
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
-
-## Add fPIC for library exports
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 ## Build Library
 add_definitions(-DSDSMT_SIMULATOR_DLL)

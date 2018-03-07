@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QThread>
+#include <QSharedPointer>
 
 using namespace std;
 
@@ -75,15 +76,15 @@ void SimulatorCore::start()
 }
 
 
-void SimulatorCore::addSimObjects(QVector<WorldObject *> objs)
+void SimulatorCore::addSimObjects(QVector<QSharedPointer<WorldObject>> objs)
 {
     QVector<QPair<WorldObjectPhysics*, object_id>> physObjs;
     QVector<QPair<WorldObjectProperties*, object_id>> propObjs;
 
-    for(WorldObject* obj : objs)
+    for(QSharedPointer<WorldObject> oldObj : objs)
     {
         //Clone object to have local copy for distributing
-        obj = qobject_cast<WorldObject*>(obj->clone());
+        WorldObject* obj = qobject_cast<WorldObject*>(oldObj->clone());
 
         obj->setROSNode(_node);
 

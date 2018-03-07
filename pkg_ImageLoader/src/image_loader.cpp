@@ -7,18 +7,38 @@
 #include <QDir>
 
 #include <stdexcept>
+#include <limits>
 
-QVector<WorldObject*> ImageLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
+QVector<QSharedPointer<WorldObject> > ImageLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
     try
     {
         QVector<QVector<b2PolygonShape*>> shapes = getShapesFromFile(filePath);
-        QVector<WorldObject*> objects;
+        QVector<QSharedPointer<WorldObject>> objects;
 
         for(QVector<b2PolygonShape*>& poly : shapes)
         {
+            if(!poly.size()) continue;
+
+            //Normalize each object so it's
+            //parts have a reasonable local origin
+            b2Vec2 max = poly[0]->m_vertices[0], min = max;
+            for(b2PolygonShape* s : poly)
+                for(b2Vec2* it = s->m_vertices; it < s->m_vertices + s->m_count; it++)
+                {
+                    min = b2Min(min, *it);
+                    max = b2Max(max, *it);
+                }
+
+            b2Vec2 avg = (min + max) / 2.0;
+            for(b2PolygonShape* s : poly)
+                for(b2Vec2* it = s->m_vertices; it < s->m_vertices + s->m_count; it++)
+                    *it = (*it) - avg;
+
             PolygonsComponent* comp = new PolygonsComponent(poly);
-            objects.push_back(new WorldObject({comp}));
+            QSharedPointer<WorldObject> obj(new WorldObject({comp}));
+            obj->translate(avg.x, avg.y);
+            objects.push_back(obj);
 
             qDeleteAll(poly);
         }
@@ -31,17 +51,29 @@ QVector<WorldObject*> ImageLoader::loadFile(QString filePath, QMap<QString, Worl
     return {};
 }
 
+bool ImageLoader::canLoadFile(QString filePath)
+{
+    QImage img(filePath);
+    if(img.isNull()) return false;
+    return true;
+}
+
+void ImageLoader::getUserOptions(QString filePath)
+{
+    QImage img(filePath);
+    if(img.isNull()) throw std::exception();
+    uint64_t fileWidth = img.width(), fileHeight = img.height();
+
+    lastOptions.reset(new ImageOptions(fileWidth, fileHeight));
+    lastOptions->exec();
+}
+
 QVector<QVector<b2PolygonShape*>> ImageLoader::getShapesFromFile(QString filePath)
 {
     QImage img(filePath);
     if(img.isNull()) throw std::exception();
 
-    uint64_t fileWidth = img.width(), fileHeight = img.height();
-
-    ImageOptions opt(fileWidth, fileHeight);
-    opt.exec();
-
-    uint64_t threshold = opt.getBlackWhiteThreshold();
+    uint64_t threshold = lastOptions->getBlackWhiteThreshold();
 
     QVector<QVector<QPolygonF>> shapes = ImageParser::parseImage(img, threshold);
     QVector<QVector<b2PolygonShape*>> out;
@@ -50,15 +82,14 @@ QVector<QVector<b2PolygonShape*>> ImageLoader::getShapesFromFile(QString filePat
     for(auto& s : shapes)
         triangleCount += s.size();
 
-    double scalex = opt.getPxPerWidth();
-    double scaley = opt.getPxPerHeight();
+    double scalex = lastOptions->getPxPerWidth();
+    double scaley = lastOptions->getPxPerHeight();
 
-    out.resize(shapes.size());
     b2Vec2 triBuffer[3];
     for(int i=0; i<shapes.size(); i++)
     {
         QVector<QPolygonF>& shape = shapes[i];
-        QVector<b2PolygonShape*>& triangles = out[i];
+        QVector<b2PolygonShape*>triangles;
 
         for(QPolygonF& poly : shape)
         {
@@ -75,6 +106,7 @@ QVector<QVector<b2PolygonShape*>> ImageLoader::getShapesFromFile(QString filePat
                 triangles.push_back(triangle);
             }
         }
+        if(triangles.size()) out.push_back(triangles);
     }
 
     return out;

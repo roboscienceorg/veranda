@@ -159,7 +159,7 @@ int main(int argc, char** argv)
 
     SimulatorCore sim(physics, userinterface, node, &app);
 
-    sim.addSimObjects({new WorldObject({})});
+    sim.addSimObjects({QSharedPointer<WorldObject>(new WorldObject({}))});
 
     qDebug() << "Starting Simulation";
     sim.start();

@@ -77,7 +77,7 @@ public slots:
     void physicsStarted();
 
     //Slot to throw an error message to the user
-    void errorMessage(QString error){}
+    void errorMessage(QString error);
 
     void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
 
@@ -86,7 +86,7 @@ public slots:
         show();
 
         //setWorldBounds(-200, 200, -200, 200);
-        setWorldBounds(-50, 50, -50, 50);
+        setWorldBounds(-100, 100, -100, 100);
     }
 
     void closeEvent(QCloseEvent *)
@@ -145,6 +145,7 @@ signals:
     void objectIsSelected(object_id id);
     void nothingIsSelected();
     void windowClosed();
+    void error(QString);
 };
 
 #endif // MAINWINDOW_H

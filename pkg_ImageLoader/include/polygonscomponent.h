@@ -14,7 +14,7 @@ class PolygonsComponent : public WorldObjectComponent
 
     b2Body* _polyBody = nullptr;
     QVector<b2Fixture*> _polyFixtures;
-    b2World* _world;
+    b2World* _world = nullptr;
 
     Property _numShapes = Property(PropertyInfo(true, false, PropertyInfo::INT, "Number of polygons in the shape"),
                                    QVariant(0));

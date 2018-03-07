@@ -44,7 +44,7 @@ private slots:
     }
 
 public:
-    ImageOptions(uint64_t imageWidth, uint64_t imageHeight, QWidget* parent=nullptr) :
+    ImageOptions(uint64_t imageWidth=0, uint64_t imageHeight=0, QWidget* parent=nullptr) :
         QDialog(parent), _width(imageWidth), _height(imageHeight)
     {
         QFormLayout* form = new QFormLayout(this);

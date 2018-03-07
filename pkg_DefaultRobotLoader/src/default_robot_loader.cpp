@@ -1,19 +1,19 @@
 #include "default_robot_loader.h"
 #include <QDebug>
 
-QVector<WorldObject*> DefaultRobotLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
+QVector<QSharedPointer<WorldObject> > DefaultRobotLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
-    WorldObject* robot1 = makeDiffDriveBot(plugins);
+    QSharedPointer<WorldObject> robot1(makeDiffDriveBot(plugins));
     robot1->getProperties()["GlobalPos/X"]->set(20, true);
     robot1->getProperties()["GlobalPos/Y"]->set(0, true);
     robot1->getProperties()["GlobalPos/Theta"]->set(0, true);
 
-    WorldObject* robot2 = makeAckermannBot(plugins);
+    QSharedPointer<WorldObject> robot2(makeAckermannBot(plugins));
     robot2->getProperties()["GlobalPos/X"]->set(0, true);
     robot2->getProperties()["GlobalPos/Y"]->set(0, true);
     robot2->getProperties()["GlobalPos/Theta"]->set(0, true);
 
-    return QVector<WorldObject*>{robot1, robot2};
+    return {robot1, robot2};
 }
 
 WorldObject* DefaultRobotLoader::makeDiffDriveBot(QMap<QString, WorldObjectComponent_Plugin_If *> plugins)

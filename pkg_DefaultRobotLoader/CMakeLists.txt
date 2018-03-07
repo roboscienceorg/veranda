@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator_default_robot_loader_plugin)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
 ## Compile as C++11 Library
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 11)

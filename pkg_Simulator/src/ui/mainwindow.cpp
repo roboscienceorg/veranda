@@ -22,6 +22,9 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     makeWidget(factory), componentPlugins(components),
     ui(new Ui::MainWindow)
 {
+    qRegisterMetaType<QVector<object_id>>("QVector<object_id>");
+    qRegisterMetaType<QVector<QSharedPointer<WorldObject>>>("QVector<QSharedPointer<WorldObject>>");
+
     ui->setupUi(this);
 
     ui->centralWidget->setLayout(ui->mainLayout);
@@ -349,7 +352,7 @@ void MainWindow::importMapButtonClick()
           qDebug() << "Able to load files:" << worldLoaders.keys();
           for(QString k : worldLoaders.keys())
               if(k.size())
-                types += "(*." + k + ");;";
+                types += k + ";;";
 
           types = types.left(types.size()-2);
 
@@ -359,32 +362,48 @@ void MainWindow::importMapButtonClick()
           if(path.length())
           {
               QString ext = QFileInfo(path).suffix();
-              QVector<WorldObject*> loadedObjs;
 
-              for(WorldLoader_If* wl : worldLoaders[ext])
-                  if(!loadedObjs.size())
-                  {
-                      try
-                      {
-                          qDebug() << "Load file";
-                          loadedObjs=wl->loadFile(path, componentPlugins);
-                      }catch(std::exception& ex){}
-                  }
-
-              if(loadedObjs.size())
+              bool done = false;
+              for(auto it = worldLoaders.begin(); it != worldLoaders.end() && !done; it++)
               {
-                  qDebug() << "Clear world";
-                  userRemoveWorldObjectsFromSimulation(worldObjects.keys().toVector());
+                  if(it.key().contains(ext))
+                      for(WorldLoader_If* wl : it.value())
 
-                  qDebug() << "Build new world";
-                  userAddWorldObjectsToSimulation(loadedObjs);
-                  qDeleteAll(loadedObjs);
-              }
-              else
-              {
-                  QMessageBox err;
-                  err.setText("Unable to open \'" + path + "\' as a world file");
-                  err.exec();
+                          //Find the first loader that can load this file
+                          //and try to load. If it fails, we can't load it
+                          if(!done && wl->canLoadFile(path))
+                          {
+                              //Get user options in main thread
+                              wl->getUserOptions(path);
+
+                              //Spin up side thread to actually load it
+                              QtConcurrent::run([this, path, wl](){
+                                  QVector<QSharedPointer<WorldObject>> loadedObjs;
+                                  try
+                                  {
+                                      //Load file in separate thread
+                                      qDebug() << "Load file";
+                                      loadedObjs=wl->loadFile(path, componentPlugins);
+                                  }catch(std::exception& ex){}
+
+                                  if(loadedObjs.size())
+                                  {
+                                      qDebug() << "Clear world";
+                                      userRemoveWorldObjectsFromSimulation(worldObjects.keys().toVector());
+
+                                      qDebug() << "Build new world";
+                                      userAddWorldObjectsToSimulation(loadedObjs);
+                                  }
+                                  else
+                                  {
+                                    emit error("Unable to open \'" + path + "\' as a world file");
+                                  }
+                              });
+
+                              //Stop looking for a file handler
+                              //for this file
+                              done = true;
+                          }
               }
           }
 
@@ -567,3 +586,10 @@ void MainWindow::simObjectRotateDragged(object_id id, double dt)
 //objects are stored separately, we can index into the correct list
 void MainWindow::buildObjectMoveDragged(object_id id, double dx, double dy){}
 void MainWindow::buildObjectRotateDragged(object_id id, double dt){}
+
+void MainWindow::errorMessage(QString error)
+{
+    QMessageBox err;
+    err.setText(error);
+    err.exec();
+}
