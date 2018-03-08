@@ -45,6 +45,7 @@ def main():
         
         speed = msg.axes[1]
         steer = msg.axes[0]
+        print(speed, steer)
 
         phi1 = 1/R * (speed * SPEED + L * steer)
         phi2 = 1/R * (speed * SPEED - L * steer)

@@ -44,19 +44,23 @@ class SDSMT_SIMULATOR_API WorldObjectComponent : public QObject
         {"LocalPos/X", &_locX},
         {"LocalPos/Y", &_locY},
         {"LocalPos/Theta", &_locTheta},
-        {"GlobalPos/X", &_globX},
-        {"GlobalPos/Y", &_globY},
-        {"GlobalPos/Theta", &_globTheta}
+        {"PhysicsPos/X", &_globX},
+        {"PhysicsPos/Y", &_globY},
+        {"PhysicsPos/Theta", &_globTheta}
     };
 
-    Model* _masterModel;
+    b2Body* _mainBody = nullptr;
+    QVector<Model*> _models;
     QMap<b2Body*, QVector<Model*>> _bodies;
 
-    QTransform worldTransform;
-    QTransform localTranslate, localRotate;
-    QTransform invTransform;
+    QTransform parentTransform, parentInverse;
+    QTransform localTransform;
+    QTransform globalTransform;
+    double globalRadians = 0;
+    b2Vec2 globalPos = b2Vec2(0, 0);
+    bool hasParent = false;
 
-    void adjustTransform(const QTransform& tOldI, const QTransform& tNew);
+    void shiftBodies(const QTransform& tOldI, const QTransform& tNew);
     void updateProperties();
 
 protected:
@@ -64,7 +68,7 @@ protected:
     //during transforms to other object local space
     //Adding representations to a body means that they will be updated
     //to have the same location as the body each tick
-    void registerBody(b2Body* bod, const QVector<Model*>& reprentations = {});
+    void registerBody(b2Body* bod, const QVector<Model*>& reprentations = {}, bool isMainBody = false);
     void unregisterBody(b2Body* bod);
 
     //Register models so they will be handled during
@@ -84,7 +88,7 @@ public:
     WorldObjectComponent* clone(QObject* newParent = nullptr);
 
     //Drawing Interactions
-    QVector<Model*> getModels(){ return {_masterModel}; }
+    QVector<Model*> getModels(){ return _models; }
 
     //UI Interactions
     QMap<QString, QSharedPointer<PropertyView>> getProperties();
@@ -92,7 +96,6 @@ public:
 
     void translate(double x, double y);
     void rotate(double degrees);
-    void getTransform(double& x, double& y, double& degrees);
 
     //Interactions with ROS
     virtual void setROSNode(std::shared_ptr<rclcpp::Node> node){}
@@ -107,12 +110,12 @@ public slots:
 
     void worldTicked(const double t);
     void syncModels();
-    void setParentTransform(const QTransform& t);
+    void setParentTransform(QTransform t, bool cascade);
 
 protected slots:
 
 signals:
-    void transformChanged(QTransform t);
+    void transformChanged(QTransform t, bool cascade);
 };
 
 #endif // WORLD_OBJECT_COMPONENT_H

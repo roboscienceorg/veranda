@@ -16,9 +16,6 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
     for(auto iter = groupcounts.begin(); iter != groupcounts.end(); iter++)
         if(iter.value() > 1) multiples.insert(iter.key());
 
-
-    childrenModel = new Model();
-
     //Initialize all aggregates
     for(WorldObjectComponent* c : _components)
     {
@@ -51,19 +48,22 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
         * Models
         *************/
         for(Model* m : c->getModels())
-            childrenModel->addChildren({m});
+            registerModel(m);
 
        /*************
         * Channels
         *************/
         if(c->usesChannels()) _useChannels = true;
 
+        //Connect the children to our global transform
+        //and initialize their local transform relative to us
+        //Since this is construction, our transform is 0, 0, 0
         connect(this, &WorldObjectComponent::transformChanged, c, &WorldObjectComponent::setParentTransform);
+        c->setParentTransform(QTransform(), false);
     }
 
     debugModel = new Model();
     registerModel(debugModel);
-    registerModel(childrenModel);
 }
 
 WorldObject* WorldObject::_clone(QObject *newParent)
@@ -106,7 +106,7 @@ void WorldObject::generateBodies(b2World* world, object_id oId, b2Body* anchorBo
     b2BodyDef anchorDef;
     anchorDef.type = b2_dynamicBody;
     anchorBody = world->CreateBody(&anchorDef);
-    registerBody(anchorBody, {childrenModel, debugModel});
+    registerBody(anchorBody, {debugModel}, true);
 
     b2CircleShape* circ = new b2CircleShape;
     circ->m_p = b2Vec2(0, 0);

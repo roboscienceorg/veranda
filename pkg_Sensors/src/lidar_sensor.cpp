@@ -123,7 +123,7 @@ void Lidar_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
     b2BodyDef bDef;
     bDef.type = b2_dynamicBody;
     sensorBody = world->CreateBody(&bDef);
-    registerBody(sensorBody, {sensor_model, scan_model});
+    registerBody(sensorBody, {sensor_model, scan_model}, true);
 
     b2WeldJointDef weldDef;
     auto anchorPt = anchor->GetWorldCenter();

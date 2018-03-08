@@ -3,16 +3,17 @@
 
 QVector<QSharedPointer<WorldObject> > DefaultRobotLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
-
+    qDebug() << "Building default robots......................................";
     QSharedPointer<WorldObject> robot1(makeDiffDriveBot(plugins));
-    robot1->getProperties()["GlobalPos/X"]->set(20, true);
-    robot1->getProperties()["GlobalPos/Y"]->set(-8, true);
-    robot1->getProperties()["GlobalPos/Theta"]->set(40, true);
+    robot1->getProperties()["LocalPos/X"]->set(10, true);
+    robot1->getProperties()["LocalPos/Y"]->set(0, true);
+    robot1->getProperties()["LocalPos/Theta"]->set(0, true);
 
     QSharedPointer<WorldObject> robot2(makeAckermannBot(plugins));
-    robot2->getProperties()["GlobalPos/X"]->set(-3, true);
-    robot2->getProperties()["GlobalPos/Y"]->set(10, true);
-    robot2->getProperties()["GlobalPos/Theta"]->set(20, true);
+    robot2->getProperties()["LocalPos/X"]->set(-3, true);
+    robot2->getProperties()["LocalPos/Y"]->set(10, true);
+    robot2->getProperties()["LocalPos/Theta"]->set(20, true);
+    qDebug() << "Done building default robots.................................";
 
     return {robot1, robot2};
 }
