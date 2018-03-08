@@ -100,7 +100,6 @@ private slots:
     void _attachWheelFixture();
     void _buildModels();
     void _jointWheels();
-    void _syncModels();
 
 public slots:
     //Connects to all ROS topics

@@ -46,7 +46,7 @@ void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
     b2BodyDef bDef;
     bDef.type = b2_dynamicBody;
     _wheelBody = world->CreateBody(&bDef);
-    registerBody(_wheelBody, {_wheelModel});
+    registerBody(_wheelBody, {_wheelModel}, true);
 
     b2WeldJointDef weldDef;
     auto anchorPt = anchor->GetWorldCenter();

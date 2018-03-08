@@ -22,7 +22,6 @@ class SDSMT_SIMULATOR_API WorldObject : public WorldObjectComponent
     bool _useChannels = false;
 
     Model* debugModel = nullptr;
-    Model* childrenModel = nullptr;
     b2Body* anchorBody = nullptr;
     QVector<b2Body*> childBodies;
 

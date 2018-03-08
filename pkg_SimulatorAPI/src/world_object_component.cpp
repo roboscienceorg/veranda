@@ -12,12 +12,12 @@
 
 const double EPSILON = 0.0001;
 
-QTransform rotation(double rad)
+QTransform transform(const b2Vec2& pos, const double& rad)
 {
     double sina = sin(rad);
     double cosa = cos(rad);
 
-    return QTransform(cosa, sina, -sina, cosa, 0, 0);
+    return QTransform(cosa, sina, -sina, cosa, pos.x, pos.y);
 }
 
 double radians(const QTransform& t)
@@ -27,52 +27,53 @@ double radians(const QTransform& t)
 
 QTransform bodyTransform(const b2Body* b)
 {
-    return rotation(b->GetAngle()) * QTransform(1, 0, 0, 1, b->GetPosition().x, b->GetPosition().y);
+    return transform(b->GetPosition(), b->GetAngle());
 }
 
 WorldObjectComponent::WorldObjectComponent(QString defaultName, QObject* parent) : QObject(parent)
 {
     _objName.set(defaultName);
 
+    //If any of the data values are adjusted manually,
+    //we change our global location by the difference
+    //and then update our local location
     connect(&_locX, &Property::valueRequested, [this](){
        //qDebug() << "Local translation";
-        double diff = _locX.get().toDouble() - localTranslate.dx();
+        double diff = _locX.get().toDouble() - localTransform.dx();
         translate(diff, 0);
     });
 
     connect(&_locY, &Property::valueRequested, [this](){
        //qDebug() << "Local translation";
-        double diff = _locY.get().toDouble() - localTranslate.dy();
+        double diff = _locY.get().toDouble() - localTransform.dy();
         translate(0, diff);
     });
 
     connect(&_locTheta, &Property::valueRequested, [this](){
        //qDebug() << "Local rotation";
-        double rad = radians(localRotate);
+        double rad = radians(localTransform);
         double diff = _locTheta.get().toDouble() - (rad < 0 ? PI*2 + rad : rad)*RAD2DEG;
         rotate(diff);
     });
 
     connect(&_globX, &Property::valueRequested, [this](){
         //qDebug() << "Global translation";
-        double diff = _globX.get().toDouble() - worldTransform.dx();
+        double diff = _globX.get().toDouble() - globalPos.x;
         translate(diff, 0);
     });
 
     connect(&_globY, &Property::valueRequested, [this](){
         //qDebug() << "Global translation";
-        double diff = _globY.get().toDouble() - worldTransform.dy();
+        double diff = _globY.get().toDouble() - globalPos.y;
         translate(0, diff);
     });
 
     connect(&_globTheta, &Property::valueRequested, [this](){
         //qDebug() << "Global rotation";
-        double rad = radians(worldTransform);
-        double diff = _globTheta.get().toDouble() - (rad < 0 ? PI*2 + rad : rad)*RAD2DEG;
+        double rad = globalRadians;
+        double diff = _globTheta.get().toDouble() - rad*RAD2DEG;
         rotate(diff);
     });
-
-    _masterModel = new Model();
 }
 
 WorldObjectComponent* WorldObjectComponent::clone(QObject* newParent)
@@ -91,14 +92,26 @@ WorldObjectComponent* WorldObjectComponent::clone(QObject* newParent)
 //during transforms to other object local space
 //Adding representations to a body means that they will be updated
 //to have the same location as the body each tick
-void WorldObjectComponent::registerBody(b2Body* bod, const QVector<Model*>& reprentations)
+void WorldObjectComponent::registerBody(b2Body* bod, const QVector<Model*>& reprentations, bool isMainBody)
 {
     _bodies[bod] = reprentations;
 
+    b2Vec2 start = bod->GetPosition();
+
     //Move body to it's location within local space of this body
     //which, in turn, is in the local space of its parent
-    QTransform newLoc = bodyTransform(bod) * localRotate * localTranslate * worldTransform;
+    QTransform newLoc = bodyTransform(bod) * globalTransform;
     bod->SetTransform(b2Vec2(newLoc.dx(), newLoc.dy()), radians(newLoc));
+
+    //qDebug() << this << "Move body (" << start.x << start.y <<") -> (" << bod->GetPosition().x << bod->GetPosition().y << ")";
+    //qDebug() << newLoc * invTransform;
+
+    if(isMainBody)
+    {
+        _mainBody = bod;
+        updateProperties();
+    }
+
     //qDebug() << "Body added to" << this << bod;
     //qDebug() << _bodies.keys();
 }
@@ -106,6 +119,11 @@ void WorldObjectComponent::registerBody(b2Body* bod, const QVector<Model*>& repr
 void WorldObjectComponent::unregisterBody(b2Body* bod)
 {
     _bodies.remove(bod);
+    if(_mainBody == bod)
+    {
+        _mainBody = nullptr;
+        updateProperties();
+    }
     //qDebug() << "Body removed from" << this << bod;
     //qDebug() << _bodies.keys();
 }
@@ -114,105 +132,140 @@ void WorldObjectComponent::unregisterBody(b2Body* bod)
 //transforms
 void WorldObjectComponent::registerModel(Model* mod)
 {
-    _masterModel->addChildren({mod});
+    _models += mod;
 }
 
 void WorldObjectComponent::unregisterModel(Model* mod)
 {
-    _masterModel->removeChildren({mod});
+    _models.removeAll(mod);
 }
 
-void WorldObjectComponent::adjustTransform(const QTransform& tOldI, const QTransform& tNew)
+void WorldObjectComponent::shiftBodies(const QTransform& tOldI, const QTransform& tNew)
 {
     QTransform tDiff = tOldI * tNew;
 
     for(b2Body* b : _bodies.keys())
     {
         b2Vec2 start = b->GetPosition();
+
         //Multiply by inverse of old transform to get local space location,
         //then multiply by new transform to get new location
         QTransform newLoc = bodyTransform(b) * tDiff;
-        //qDebug() << "Move body (" << start.x << start.y <<") -> (" << b->GetPosition().x << b->GetPosition().y << ")";
+
+        //qDebug() << this << "Move body (" << start.x << start.y <<") -> (" << b->GetPosition().x << b->GetPosition().y << ")";
+
         b->SetTransform(b2Vec2(newLoc.dx(), newLoc.dy()), radians(newLoc));
     }
-
-    syncModels();
 }
 
 void WorldObjectComponent::updateProperties()
 {
-    _locX.set(localTranslate.dx());
-    _locY.set(localTranslate.dy());
-    _locTheta.set(radians(localRotate) * RAD2DEG);
+    _locX.set(localTransform.dx());
+    _locY.set(localTransform.dy());
+    _locTheta.set(radians(localTransform) * RAD2DEG);
 
-    QTransform globalTransform = localRotate * localTranslate * worldTransform;
-    _globX.set(globalTransform.dx());
-    _globY.set(globalTransform.dy());
-    _globTheta.set(radians(globalTransform) * RAD2DEG);
+    _globX.set(globalPos.x);
+    _globY.set(globalPos.y);
+    _globTheta.set(globalRadians * RAD2DEG);
 }
 
 void WorldObjectComponent::translate(double x, double y)
 {
     if(std::abs(x) < EPSILON && std::abs(y) < EPSILON) return;
 
-    double tmpx = localTranslate.dx(), tmpy = localTranslate.dy();
-    localTranslate.translate(x, y);
-   //qDebug() << this << "Translate" << x << y << " from " << tmpx << tmpy << " to " << localTranslate.dx() << localTranslate.dy();
-    QTransform tNew = localRotate * localTranslate * worldTransform;
+    globalPos.x += x;
+    globalPos.y += y;
+    //qDebug() << this << "adjust location by " << x << y << " : " << globalPos.x << globalPos.y;
 
+    QTransform unGlobal = globalTransform.inverted();
+    globalTransform = transform(globalPos, globalRadians);
+
+    //Calculate local tranform from current parent
+    if(hasParent)
+        localTransform = globalTransform * parentInverse;
+
+    //Move bodies by going from old global to new global
+    shiftBodies(unGlobal, globalTransform);
+
+    //Update children of global location;
+    //and have them move to preserve their local transform
+    transformChanged(transform(globalPos, globalRadians), true);
+
+    syncModels();
     updateProperties();
-
-    //If any bodies exist, physically move them and then update the models to them
-    //Otherwise, move the models
-    if(_bodies.size())
-        adjustTransform(invTransform, tNew);
-    else
-        _masterModel->setTransform(_locX.get().toDouble(), _locY.get().toDouble(), _locTheta.get().toDouble() * RAD2DEG);
-
-    bool inverted;
-    invTransform = tNew.inverted(&inverted);
-    if(!inverted)qDebug() << "Failed to invert";
-
-    emit transformChanged(tNew);
 }
 
 void WorldObjectComponent::rotate(double degrees)
 {
     if(std::abs(degrees) < EPSILON) return;
 
-    localRotate.rotate(degrees);
-    QTransform tNew = localRotate * localTranslate * worldTransform;
+    globalRadians += degrees*DEG2RAD;
+    if(globalRadians > 2*PI)
+        globalRadians -= 2*PI*((int)globalRadians/(2*PI));
+    else if(globalRadians < 0)
+        globalRadians += 2*PI*((int)globalRadians/(2*PI) + 1);
 
+    QTransform unGlobal = globalTransform.inverted();
+    globalTransform = transform(globalPos, globalRadians);
+
+    //Calculate local tranform from current parent
+    if(hasParent)
+        localTransform = globalTransform * parentInverse;
+
+    //Move bodies by going from old global to new global
+    shiftBodies(unGlobal, globalTransform);
+
+    //Update children of global location;
+    //and have them move to preserve their local transform
+    transformChanged(globalTransform, true);
+
+    syncModels();
     updateProperties();
-
-    //If any bodies exist, physically move them and then update the models to them
-    //Otherwise, move the models
-    if(_bodies.size())
-        adjustTransform(invTransform, tNew);
-    else
-        _masterModel->setTransform(_locX.get().toDouble(), _locY.get().toDouble(), _locTheta.get().toDouble() * RAD2DEG);
-
-    bool inverted;
-    invTransform = tNew.inverted(&inverted);
-    if(!inverted)qDebug() << "Failed to invert";
-
-    emit transformChanged(tNew);
-
 }
 
-void WorldObjectComponent::setParentTransform(const QTransform& t)
+void WorldObjectComponent::setParentTransform(QTransform t, bool cascade)
 {
-    worldTransform = t;
-    QTransform tNew = localRotate * localTranslate * worldTransform;
-   //qDebug() << this << "Parent moved";
-    adjustTransform(invTransform, tNew);
+    hasParent = true;
 
-    bool inverted;
-    invTransform = tNew.inverted(&inverted);
-    if(!inverted)qDebug() << "Failed to invert";
+    //Update parent's global transform
+    parentTransform = t;
+    parentInverse = t.inverted();
+    //qDebug() << this << "Parent transform changed";
 
-    emit transformChanged(tNew);
+    //If cascading, then move self
+    //so that our local transform doesn't change
+    if(cascade)
+    {
+        //qDebug() << "Cascading; local transform is" << localTransform.dx() << localTransform.dy() << radians(localTransform) * RAD2DEG;
 
+        //Find transform from global to new localspace
+        //and from old localspace to global
+        QTransform unGlobal = globalTransform.inverted();
+        globalTransform = localTransform * parentTransform;
+
+       //qDebug() << this << "Parent moved";
+
+        //Move bodies by going from old local to global
+        //then to new local
+        shiftBodies(unGlobal, globalTransform);
+
+        //Update models
+        syncModels();
+
+        //Update transform to children; have them
+        //update
+        emit transformChanged(globalTransform, true);
+    }
+    //If not cascading, adjust our local transform
+    //so our global doesn't change
+    else
+    {
+        //Recalculate our local tranform from the new parent location
+        localTransform = globalTransform * parentInverse;
+        //qDebug() << "Not Cascading; local transform is" << localTransform.dx() << localTransform.dy() << radians(localTransform) * RAD2DEG;
+    }
+
+    //Update local and global views
     updateProperties();
 }
 
@@ -223,25 +276,59 @@ void WorldObjectComponent::worldTicked(const double t)
 
 void WorldObjectComponent::syncModels()
 {
-    _masterModel->setTransform(0, 0, 0);
-    QTransform diff = invTransform * localRotate * localTranslate;
+    //Nothing to do if no bodies are registered
+    if(!_bodies.size()) return;
+
+    //For every model tied to a body
+    //update it's transform to that body's
+    //global location
     for(auto iter = _bodies.begin(); iter != _bodies.end(); iter++)
     {
         if(iter.value().size())
         {
-            QTransform localLoc = bodyTransform(iter.key()) * diff;
-            double x = localLoc.dx();
-            double y = localLoc.dy();
-            double t = radians(localLoc)*RAD2DEG;
+            b2Vec2 pos = iter.key()->GetPosition();
+            double t = iter.key()->GetAngle()*RAD2DEG;
 
-           //qDebug() << this << "Sync model to body at" << iter.key()->GetPosition().x << iter.key()->GetPosition().y << ":" << x << y;
+            //qDebug() << this << "Sync models to body at " << pos.x << pos.y << t;
 
             for(Model* m : iter.value())
-                m->setTransform(x, y, t);
+                m->setTransform(pos.x, pos.y, t);
         }
     }
 
+    //If there's a main body, update
+    //our global transform to match it
+    //If we have a parent, recalculate our local transform
+    //Publish our new global location to children, and have
+    //them update their local location
+    if(!_mainBody)
+    {
+        //qDebug() << "No main body defined for component " << this;
+    }
+    else
+    {
+        //Calculate global transform
+        globalPos = _mainBody->GetPosition();
+        globalRadians = _mainBody->GetAngle();
+
+        if(globalRadians > 2*PI)
+            globalRadians -= 2*PI*((int)globalRadians/(2*PI));
+        else if(globalRadians < 0)
+            globalRadians += 2*PI*((int)globalRadians/(2*PI) + 1);
+
+        globalTransform = transform(globalPos, globalRadians);
+
+        //Calculate local tranform from current parent
+        if(hasParent)
+            localTransform = globalTransform * parentInverse;
+
+        //Update children of global location;
+        //but don't trigger them to shift
+        transformChanged(transform(globalPos, globalRadians), false);
+    }
+
     _syncModels();
+    updateProperties();
 }
 
 QMap<QString, QSharedPointer<PropertyView>> WorldObjectComponent::getProperties()
@@ -252,11 +339,4 @@ QMap<QString, QSharedPointer<PropertyView>> WorldObjectComponent::getProperties(
         out[iter.key()] = QSharedPointer<PropertyView>(new PropertyView(iter.value()));
 
     return out;
-}
-
-void WorldObjectComponent::getTransform(double& x, double& y, double& degrees)
-{
-    x = localTranslate.dx();
-    y = localTranslate.dy();
-    degrees = radians(localRotate) * RAD2DEG;
 }

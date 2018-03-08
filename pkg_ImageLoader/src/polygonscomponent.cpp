@@ -44,7 +44,7 @@ void PolygonsComponent::generateBodies(b2World* world, object_id oId, b2Body* an
     b2BodyDef bDef;
     bDef.type = b2_staticBody;
     _polyBody = world->CreateBody(&bDef);
-    registerBody(_polyBody, {_polyModel});
+    registerBody(_polyBody, {_polyModel}, true);
 
     for(b2Shape* p : _shapePtrs)
     {

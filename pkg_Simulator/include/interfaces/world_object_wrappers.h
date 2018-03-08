@@ -44,7 +44,6 @@ public:
 
     void translate(double x, double y){ _comp->translate(x, y); }
     void rotate(double degrees){ _comp->rotate(degrees); }
-    void getTransform(double& x, double& y, double& degrees){ _comp->getTransform(x, y, degrees); }
 
 public slots:
     void connectChannels()
