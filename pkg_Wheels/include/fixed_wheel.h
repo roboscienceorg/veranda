@@ -60,7 +60,7 @@ class Fixed_Wheel : public WorldObjectComponent
     b2Fixture* _wheelFix = nullptr;
     b2Joint* _weldJoint = nullptr;
 
-    b2World* _world;
+    b2World* _world = nullptr;
 
     //Data published
     double _targetAngularVelocity = 0;
@@ -99,7 +99,7 @@ public slots:
     //Disconnects all ROS topics
     virtual void disconnectChannels();
 
-    virtual void worldTicked(const double);
+    virtual void _worldTicked(const double);
 };
 
 #endif // FLOATER_DRIVETRAIN_H

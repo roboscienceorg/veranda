@@ -94,6 +94,7 @@ int main(int argc, char** argv)
     QVector<WorldObjectSaver_If*> objectSavers;
     QVector<WorldLoader_If*> worldLoaders;
     QVector<WorldSaver_If*> worldSavers;
+    WorldLoader_If* defaultLoader = nullptr;
 
     QPluginLoader plugLoader;
 
@@ -116,7 +117,12 @@ int main(int argc, char** argv)
             QObject* plugin = plugLoader.instance();
             QString iid = plugLoader.metaData()["IID"].toString();
 
-            if(qobject_cast<WorldObjectComponent_Plugin_If*>(plugin))
+            if(iid == "org.sdsmt.sim.2d.fileHandlers.defaultBot")
+            {
+                qInfo() << "Found default robot loader";
+                defaultLoader = qobject_cast<WorldFileHandler_Plugin_If*>(plugin)->getLoaders()[0];
+            }
+            else if(qobject_cast<WorldObjectComponent_Plugin_If*>(plugin))
             {
                 qInfo() << "Component Plugin Accepted";
                 componentPlugins[iid] = qobject_cast<WorldObjectComponent_Plugin_If*>(plugin);
@@ -155,11 +161,15 @@ int main(int argc, char** argv)
     };
 
     Simulator_Physics_If* physics = new BasicPhysics;
-    Simulator_Ui_If* userinterface = new MainWindow(visuals, componentPlugins, objectLoaders, objectSavers, worldLoaders, worldSavers);
+    Simulator_Ui_If* userinterface = new MainWindow(visuals, componentPlugins, objectLoaders, objectSavers, worldLoaders, worldSavers, defaultLoader);
 
     SimulatorCore sim(physics, userinterface, node, &app);
 
-    sim.addSimObjects({QSharedPointer<WorldObject>(new WorldObject({}))});
+    if(defaultLoader)
+    {
+        auto def = defaultLoader->loadFile("", componentPlugins);
+        sim.addSimObjects(def);
+    }
 
     qDebug() << "Starting Simulation";
     sim.start();

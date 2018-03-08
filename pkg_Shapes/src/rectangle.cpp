@@ -84,7 +84,7 @@ void Rectangle::clearBodies()
     {
         _world->DestroyJoint(joint);
         _world->DestroyBody(body);
-
+        unregisterBody(body);
         fixture = nullptr;
         body = nullptr;
         joint = nullptr;

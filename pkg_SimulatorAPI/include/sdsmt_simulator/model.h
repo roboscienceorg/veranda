@@ -76,6 +76,8 @@ public:
         _y = y;
         _theta = theta;
 
+        //qDebug() << "Model adjusted by" << dx << dy << "to" << x << y;
+
         //if(abs(dx) > 0.001 || abs(dy) > 0.001 || abs(dt) > 0.001)
             transformChanged(this, dx, dy, dt);
     }

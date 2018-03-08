@@ -35,32 +35,38 @@ WorldObjectComponent::WorldObjectComponent(QString defaultName, QObject* parent)
     _objName.set(defaultName);
 
     connect(&_locX, &Property::valueRequested, [this](){
-        double diff = _locX.get().toDouble() - localTransform.dx();
+       //qDebug() << "Local translation";
+        double diff = _locX.get().toDouble() - localTranslate.dx();
         translate(diff, 0);
     });
 
     connect(&_locY, &Property::valueRequested, [this](){
-        double diff = _locY.get().toDouble() - localTransform.dy();
+       //qDebug() << "Local translation";
+        double diff = _locY.get().toDouble() - localTranslate.dy();
         translate(0, diff);
     });
 
     connect(&_locTheta, &Property::valueRequested, [this](){
-        double rad = radians(localTransform);
+       //qDebug() << "Local rotation";
+        double rad = radians(localRotate);
         double diff = _locTheta.get().toDouble() - (rad < 0 ? PI*2 + rad : rad)*RAD2DEG;
         rotate(diff);
     });
 
     connect(&_globX, &Property::valueRequested, [this](){
+        //qDebug() << "Global translation";
         double diff = _globX.get().toDouble() - worldTransform.dx();
         translate(diff, 0);
     });
 
-    connect(&_globX, &Property::valueRequested, [this](){
+    connect(&_globY, &Property::valueRequested, [this](){
+        //qDebug() << "Global translation";
         double diff = _globY.get().toDouble() - worldTransform.dy();
         translate(0, diff);
     });
 
-    connect(&_globX, &Property::valueRequested, [this](){
+    connect(&_globTheta, &Property::valueRequested, [this](){
+        //qDebug() << "Global rotation";
         double rad = radians(worldTransform);
         double diff = _globTheta.get().toDouble() - (rad < 0 ? PI*2 + rad : rad)*RAD2DEG;
         rotate(diff);
@@ -91,13 +97,17 @@ void WorldObjectComponent::registerBody(b2Body* bod, const QVector<Model*>& repr
 
     //Move body to it's location within local space of this body
     //which, in turn, is in the local space of its parent
-    QTransform newLoc = bodyTransform(bod) * localTransform * worldTransform;
+    QTransform newLoc = bodyTransform(bod) * localRotate * localTranslate * worldTransform;
     bod->SetTransform(b2Vec2(newLoc.dx(), newLoc.dy()), radians(newLoc));
+    //qDebug() << "Body added to" << this << bod;
+    //qDebug() << _bodies.keys();
 }
 
 void WorldObjectComponent::unregisterBody(b2Body* bod)
 {
     _bodies.remove(bod);
+    //qDebug() << "Body removed from" << this << bod;
+    //qDebug() << _bodies.keys();
 }
 
 //Register models so they will be handled during
@@ -118,9 +128,11 @@ void WorldObjectComponent::adjustTransform(const QTransform& tOldI, const QTrans
 
     for(b2Body* b : _bodies.keys())
     {
+        b2Vec2 start = b->GetPosition();
         //Multiply by inverse of old transform to get local space location,
         //then multiply by new transform to get new location
         QTransform newLoc = bodyTransform(b) * tDiff;
+        //qDebug() << "Move body (" << start.x << start.y <<") -> (" << b->GetPosition().x << b->GetPosition().y << ")";
         b->SetTransform(b2Vec2(newLoc.dx(), newLoc.dy()), radians(newLoc));
     }
 
@@ -129,21 +141,24 @@ void WorldObjectComponent::adjustTransform(const QTransform& tOldI, const QTrans
 
 void WorldObjectComponent::updateProperties()
 {
-    _locX.set(localTransform.dx());
-    _locY.set(localTransform.dy());
-    _locTheta.set(radians(localTransform) * RAD2DEG);
+    _locX.set(localTranslate.dx());
+    _locY.set(localTranslate.dy());
+    _locTheta.set(radians(localRotate) * RAD2DEG);
 
-    _globX.set(worldTransform.dx());
-    _globY.set(worldTransform.dy());
-    _globTheta.set(radians(worldTransform) * RAD2DEG);
+    QTransform globalTransform = localRotate * localTranslate * worldTransform;
+    _globX.set(globalTransform.dx());
+    _globY.set(globalTransform.dy());
+    _globTheta.set(radians(globalTransform) * RAD2DEG);
 }
 
 void WorldObjectComponent::translate(double x, double y)
 {
     if(std::abs(x) < EPSILON && std::abs(y) < EPSILON) return;
 
-    localTransform.translate(x, y);
-    QTransform tNew = localTransform * worldTransform;
+    double tmpx = localTranslate.dx(), tmpy = localTranslate.dy();
+    localTranslate.translate(x, y);
+   //qDebug() << this << "Translate" << x << y << " from " << tmpx << tmpy << " to " << localTranslate.dx() << localTranslate.dy();
+    QTransform tNew = localRotate * localTranslate * worldTransform;
 
     updateProperties();
 
@@ -153,7 +168,10 @@ void WorldObjectComponent::translate(double x, double y)
         adjustTransform(invTransform, tNew);
     else
         _masterModel->setTransform(_locX.get().toDouble(), _locY.get().toDouble(), _locTheta.get().toDouble() * RAD2DEG);
-    invTransform = tNew.inverted();
+
+    bool inverted;
+    invTransform = tNew.inverted(&inverted);
+    if(!inverted)qDebug() << "Failed to invert";
 
     emit transformChanged(tNew);
 }
@@ -162,8 +180,8 @@ void WorldObjectComponent::rotate(double degrees)
 {
     if(std::abs(degrees) < EPSILON) return;
 
-    localTransform.rotate(degrees);
-    QTransform tNew = localTransform * worldTransform;
+    localRotate.rotate(degrees);
+    QTransform tNew = localRotate * localTranslate * worldTransform;
 
     updateProperties();
 
@@ -174,7 +192,9 @@ void WorldObjectComponent::rotate(double degrees)
     else
         _masterModel->setTransform(_locX.get().toDouble(), _locY.get().toDouble(), _locTheta.get().toDouble() * RAD2DEG);
 
-    invTransform = tNew.inverted();
+    bool inverted;
+    invTransform = tNew.inverted(&inverted);
+    if(!inverted)qDebug() << "Failed to invert";
 
     emit transformChanged(tNew);
 
@@ -183,10 +203,13 @@ void WorldObjectComponent::rotate(double degrees)
 void WorldObjectComponent::setParentTransform(const QTransform& t)
 {
     worldTransform = t;
-    QTransform tNew = localTransform * worldTransform;
-
+    QTransform tNew = localRotate * localTranslate * worldTransform;
+   //qDebug() << this << "Parent moved";
     adjustTransform(invTransform, tNew);
-    invTransform = tNew.inverted();
+
+    bool inverted;
+    invTransform = tNew.inverted(&inverted);
+    if(!inverted)qDebug() << "Failed to invert";
 
     emit transformChanged(tNew);
 
@@ -195,19 +218,23 @@ void WorldObjectComponent::setParentTransform(const QTransform& t)
 
 void WorldObjectComponent::worldTicked(const double t)
 {
-    syncModels();
+    _worldTicked(t);
 }
 
 void WorldObjectComponent::syncModels()
 {
+    _masterModel->setTransform(0, 0, 0);
+    QTransform diff = invTransform * localRotate * localTranslate;
     for(auto iter = _bodies.begin(); iter != _bodies.end(); iter++)
     {
         if(iter.value().size())
         {
-            QTransform localLoc = bodyTransform(iter.key()) * invTransform * localTransform;
+            QTransform localLoc = bodyTransform(iter.key()) * diff;
             double x = localLoc.dx();
             double y = localLoc.dy();
             double t = radians(localLoc)*RAD2DEG;
+
+           //qDebug() << this << "Sync model to body at" << iter.key()->GetPosition().x << iter.key()->GetPosition().y << ":" << x << y;
 
             for(Model* m : iter.value())
                 m->setTransform(x, y, t);
@@ -229,7 +256,7 @@ QMap<QString, QSharedPointer<PropertyView>> WorldObjectComponent::getProperties(
 
 void WorldObjectComponent::getTransform(double& x, double& y, double& degrees)
 {
-    x = localTransform.dx();
-    y = localTransform.dy();
-    degrees = radians(localTransform) * RAD2DEG;
+    x = localTranslate.dx();
+    y = localTranslate.dy();
+    degrees = radians(localRotate) * RAD2DEG;
 }

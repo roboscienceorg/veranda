@@ -3,15 +3,16 @@
 
 QVector<QSharedPointer<WorldObject> > DefaultRobotLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
+
     QSharedPointer<WorldObject> robot1(makeDiffDriveBot(plugins));
     robot1->getProperties()["GlobalPos/X"]->set(20, true);
-    robot1->getProperties()["GlobalPos/Y"]->set(0, true);
-    robot1->getProperties()["GlobalPos/Theta"]->set(0, true);
+    robot1->getProperties()["GlobalPos/Y"]->set(-8, true);
+    robot1->getProperties()["GlobalPos/Theta"]->set(40, true);
 
     QSharedPointer<WorldObject> robot2(makeAckermannBot(plugins));
-    robot2->getProperties()["GlobalPos/X"]->set(0, true);
-    robot2->getProperties()["GlobalPos/Y"]->set(0, true);
-    robot2->getProperties()["GlobalPos/Theta"]->set(0, true);
+    robot2->getProperties()["GlobalPos/X"]->set(-3, true);
+    robot2->getProperties()["GlobalPos/Y"]->set(10, true);
+    robot2->getProperties()["GlobalPos/Theta"]->set(20, true);
 
     return {robot1, robot2};
 }
@@ -84,7 +85,7 @@ WorldObject* DefaultRobotLoader::makeDiffDriveBot(QMap<QString, WorldObjectCompo
         components.push_back(circle);
     }
 
-    return new WorldObject(components);
+    return new WorldObject(components, "Differential Turtle");
 }
 
 WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
@@ -115,7 +116,6 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
         props["LocalPos/Y"]->set(0, true);
         props["height"]->set(4, true);
         props["width"]->set(2, true);
-        props["rotation"]->set(0, true);
 
         components.push_back(rectangle);
     }
@@ -175,5 +175,5 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
         components.push_back(steer);
     }
 
-    return new WorldObject(components);
+    return new WorldObject(components, "Ackermann Box");
 }

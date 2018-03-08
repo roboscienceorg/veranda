@@ -17,13 +17,15 @@
 
 MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If *> components,
                        QVector<WorldObjectLoader_If*> oloaders, QVector<WorldObjectSaver_If*> osavers,
-                       QVector<WorldLoader_If *> wloaders, QVector<WorldSaver_If *> wsavers, QWidget *parent) :
+                       QVector<WorldLoader_If *> wloaders, QVector<WorldSaver_If *> wsavers, WorldLoader_If* defaultLoader_, QWidget *parent) :
     Simulator_Ui_If(parent),
     makeWidget(factory), componentPlugins(components),
     ui(new Ui::MainWindow)
 {
     qRegisterMetaType<QVector<object_id>>("QVector<object_id>");
     qRegisterMetaType<QVector<QSharedPointer<WorldObject>>>("QVector<QSharedPointer<WorldObject>>");
+
+    defaultLoader = defaultLoader_;
 
     ui->setupUi(this);
 
@@ -393,6 +395,17 @@ void MainWindow::importMapButtonClick()
 
                                       qDebug() << "Build new world";
                                       userAddWorldObjectsToSimulation(loadedObjs);
+
+                                      //Add default robots
+                                      if(defaultLoader && defaultLoader->canLoadFile(path))
+                                      {
+                                          loadedObjs.clear();
+                                          try
+                                          {
+                                              loadedObjs=defaultLoader->loadFile(path, componentPlugins);
+                                          }catch(std::exception& ex){}
+                                          userAddWorldObjectsToSimulation(loadedObjs);
+                                      }
                                   }
                                   else
                                   {

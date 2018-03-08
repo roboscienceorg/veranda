@@ -21,6 +21,7 @@ class ImageOptions : public QDialog
     QLineEdit* _mx;
     QLineEdit* _my;
     QLineEdit* _color;
+    QLineEdit* _crossThresh;
 
     uint64_t _width, _height;
 
@@ -56,6 +57,9 @@ public:
         form->addRow(new QLabel("Color Options", this));
         form->addRow(QString("Black/White Threshold:"), _color = new QLineEdit("125", this));
 
+        form->addRow(new QLabel("Parsing Options", this));
+        form->addRow(QString("'Straight' threshold"), _crossThresh = new QLineEdit("1", this));
+
         form->addRow(new QLabel("Scaling Options", this));
         form->addRow(QString("Image Width (px):"), new QLabel(width, this));
         form->addRow(QString("Image Height (px):"), new QLabel(height, this));
@@ -77,6 +81,8 @@ public:
 
         _color->setValidator(new QIntValidator(0, 255, this));
 
+        _crossThresh->setValidator(new QIntValidator(0, std::numeric_limits<int>::max(), this));
+
         connect(_pxpmx, &QLineEdit::editingFinished, this, &ImageOptions::constrain1);
         connect(_pxpmy, &QLineEdit::editingFinished, this, &ImageOptions::constrain1);
 
@@ -87,6 +93,11 @@ public:
     uint64_t getBlackWhiteThreshold()
     {
         return _color->text().toInt();
+    }
+
+    uint64_t getCrossProductThreshold()
+    {
+        return _crossThresh->text().toInt();
     }
 
     double getPxPerWidth()

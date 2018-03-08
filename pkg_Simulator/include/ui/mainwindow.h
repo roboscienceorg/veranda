@@ -43,6 +43,7 @@ private:
 
     QMap<QString, QVector<WorldLoader_If*>> worldLoaders;
     QMap<QString, QVector<WorldSaver_If*>> worldSavers;
+    WorldLoader_If* defaultLoader = nullptr;
 
     int speed;
     bool play;
@@ -60,7 +61,7 @@ private:
 public:
     explicit MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If*> components,
                         QVector<WorldObjectLoader_If*> oloaders, QVector<WorldObjectSaver_If*> osavers,
-                        QVector<WorldLoader_If*> wloaders, QVector<WorldSaver_If*> wsavers, QWidget *parent = 0);
+                        QVector<WorldLoader_If*> wloaders, QVector<WorldSaver_If*> wsavers, WorldLoader_If *defaultLoader_=nullptr, QWidget *parent = 0);
     ~MainWindow();
 
 public slots:
@@ -86,7 +87,7 @@ public slots:
         show();
 
         //setWorldBounds(-200, 200, -200, 200);
-        setWorldBounds(-100, 100, -100, 100);
+        setWorldBounds(-50, 50, -50, 50);
     }
 
     void closeEvent(QCloseEvent *)

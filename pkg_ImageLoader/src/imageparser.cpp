@@ -15,7 +15,7 @@
 typedef ImageParser::Shape Shape;
 using std::vector;
 
-QVector<QVector<QPolygonF>> ImageParser::parseImage(QString fileName, const uint64_t& threshold, uint64_t &width, uint64_t &height)
+QVector<QVector<QPolygonF>> ImageParser::parseImage(QString fileName, const uint64_t& colorThreshold, const uint64_t& crossThreshold, uint64_t &width, uint64_t &height)
 {
     qDebug() << "Opening file...";
     QImage loaded(fileName);
@@ -26,10 +26,10 @@ QVector<QVector<QPolygonF>> ImageParser::parseImage(QString fileName, const uint
     width = loaded.width();
     height = loaded.height();
 
-    return parseImage(loaded, threshold);
+    return parseImage(loaded, colorThreshold, crossThreshold);
 }
 
-QVector<QVector<QPolygonF>> ImageParser::parseImage(const QImage& image, const uint64_t& threshold)
+QVector<QVector<QPolygonF>> ImageParser::parseImage(const QImage& image, const uint64_t& colorThreshold, const uint64_t& crossThreshold)
 {
     qDebug() << "Reading image colors...";
     QVector<QVector<QRgb>> pixMap(image.height(), QVector<QRgb>(image.width()));
@@ -42,10 +42,10 @@ QVector<QVector<QPolygonF>> ImageParser::parseImage(const QImage& image, const u
         }
     }
 
-    return parseImage(pixMap, threshold);
+    return parseImage(pixMap, colorThreshold, crossThreshold);
 }
 
-QVector<QVector<QPolygonF> > ImageParser::parseImage(const QVector<QVector<QRgb>>& pixMap, const uint64_t& threshold)
+QVector<QVector<QPolygonF> > ImageParser::parseImage(const QVector<QVector<QRgb>>& pixMap, const uint64_t& colorThreshold, const uint64_t& crossThreshold)
 {
     qDebug() << "Making black and white...";
     if(!pixMap.size() || !pixMap[0].size())
@@ -56,14 +56,14 @@ QVector<QVector<QPolygonF> > ImageParser::parseImage(const QVector<QVector<QRgb>
     {
         for(int j=0; j<pixMap[i].size(); j++)
         {
-            blackWhite[i][j] = qGray(pixMap[i][j]) > threshold;
+            blackWhite[i][j] = qGray(pixMap[i][j]) > colorThreshold;
         }
     }
 
-    return _findShapes(blackWhite);
+    return _findShapes(blackWhite, crossThreshold);
 }
 
-QVector<QVector<QPolygonF>> ImageParser::_findShapes(QVector<QVector<bool> >& bwImage)
+QVector<QVector<QPolygonF>> ImageParser::_findShapes(QVector<QVector<bool> >& bwImage, const uint64_t& crossThreshold)
 {
     qDebug() << "Searching for shapes...";
     QVector<QVector<bool>> singleShape;
@@ -104,7 +104,7 @@ QVector<QVector<QPolygonF>> ImageParser::_findShapes(QVector<QVector<bool> >& bw
     for(Shape& s : shapes)
     {
         //qDebug() << "Simplify";
-        _simplify(s);
+        _simplify(s, crossThreshold);
 
         _transform(s, bwImage[0].size(), bwImage.size(), 0.5);
 
@@ -340,18 +340,16 @@ QPolygonF ImageParser::_followBoundary(const QVector<QVector<bool>>& bwImage, in
     return points;
 }
 
-void ImageParser::_simplify(Shape &s)
+void ImageParser::_simplify(Shape &s, const uint64_t& crossThreshold)
 {
-    s.outer = _simplify(s.outer);
+    s.outer = _simplify(s.outer, crossThreshold);
     for(QPolygonF& p : s.inner)
-        p = _simplify(p);
+        p = _simplify(p, crossThreshold);
 }
 
-QPolygonF ImageParser::_simplify(const QPolygonF &p)
+QPolygonF ImageParser::_simplify(const QPolygonF &p, const uint64_t& crossThreshold)
 {
     if(p.size() <= 3) return p;
-
-    const double EPSILON = 0.001;
 
     //Cross product of vectors AB, AC using points A, B, C
     const std::function<double(const QPointF&, const QPointF&, const QPointF&)> cross =
@@ -381,7 +379,7 @@ QPolygonF ImageParser::_simplify(const QPolygonF &p)
         //qDebug() << indexA << indexB << indexC;
         //qDebug() << indexB/(double)p.size() * 100;
         double cProd = abs(cross(pointA, p[indexB], p[indexC]));
-        if(cProd > EPSILON)
+        if(cProd > crossThreshold)
         {
             //qDebug() << "Corner";
 

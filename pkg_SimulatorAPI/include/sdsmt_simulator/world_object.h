@@ -22,6 +22,7 @@ class SDSMT_SIMULATOR_API WorldObject : public WorldObjectComponent
     bool _useChannels = false;
 
     Model* debugModel = nullptr;
+    Model* childrenModel = nullptr;
     b2Body* anchorBody = nullptr;
     QVector<b2Body*> childBodies;
 
@@ -36,6 +37,7 @@ protected:
 
 protected slots:
     void _worldTicked(const double t);
+    void _syncModels();
 
 public:
     WorldObject(QVector<WorldObjectComponent*> components, QString name = "object", QObject* parent = nullptr);

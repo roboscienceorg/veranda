@@ -27,14 +27,14 @@ class Rectangle : public WorldObjectComponent
 
     QMap<QString, QSharedPointer<PropertyView>> _properties{
         {"width", QSharedPointer<PropertyView>::create(&width)},
-        {"heigh", QSharedPointer<PropertyView>::create(&height)}
+        {"height", QSharedPointer<PropertyView>::create(&height)}
     };
 
     Model* shape_model = nullptr;
 
     b2Body* body = nullptr;
     b2WeldJoint* joint = nullptr;
-    b2Fixture* fixture;
+    b2Fixture* fixture = nullptr;
 
     b2World* _world = nullptr;
 

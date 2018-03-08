@@ -52,7 +52,6 @@ void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anch
 
     b2BodyDef bDef;
     bDef.type = b2_dynamicBody;
-    bDef.angle = 90*DEG2RAD;
     _lWheelBody = world->CreateBody(&bDef);
     _rWheelBody = world->CreateBody(&bDef);
     _cBody = world->CreateBody(&bDef);
@@ -138,13 +137,14 @@ void Ackermann_Steer::clearBodies()
     {
         _world->DestroyJoint(_lRevJoint);
         _world->DestroyBody(_lWheelBody);
-
+        unregisterBody(_lWheelBody);
         _lRevJoint = nullptr;
         _lWheelBody = nullptr;
         _lWheelFix = nullptr;
 
         _world->DestroyJoint(_rRevJoint);
         _world->DestroyBody(_rWheelBody);
+        unregisterBody(_rWheelBody);
 
         _rRevJoint = nullptr;
         _rWheelBody = nullptr;
@@ -152,6 +152,7 @@ void Ackermann_Steer::clearBodies()
 
         _world->DestroyJoint(_cJoint);
         _world->DestroyBody(_cBody);
+        unregisterBody(_cBody);
 
         _cJoint = nullptr;
         _cBody = nullptr;
@@ -297,7 +298,7 @@ void Ackermann_Steer::_syncModels()
     }
 }
 
-void Ackermann_Steer::worldTicked(const double)
+void Ackermann_Steer::_worldTicked(const double)
 {
     if(_lWheelBody && _rWheelBody)
     {

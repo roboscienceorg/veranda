@@ -81,7 +81,7 @@ void Circle::clearBodies()
     {
         _world->DestroyJoint(joint);
         _world->DestroyBody(body);
-
+        unregisterBody(body);
         body = nullptr;
         fixture = nullptr;
         joint = nullptr;

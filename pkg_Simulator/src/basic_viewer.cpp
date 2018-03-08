@@ -90,6 +90,8 @@ QGraphicsItem* BasicViewer::_drawModel(Model* m)
     double x, y, t;
     m->getTransform(x, y, t);
 
+    //qDebug() << "Drew model at " << x << y << t << "from parent";
+
     baseItem->moveBy(x * WORLD_SCALE, -y*WORLD_SCALE);
     baseItem->setRotation(-t);
 
@@ -107,9 +109,12 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
     QColor newColor = _color(Solid, false);
     _drawLevels[id] = Solid;
 
+    //qDebug() << "Add object " << id;
+
     QGraphicsItemGroup* group = new QGraphicsItemGroup();
     for(Model* m : objects)
     {
+        //qDebug() << "Draw top level model";
         QGraphicsItem* graphic = addModel(m, id);
 
         group->addToGroup(graphic);
@@ -123,6 +128,7 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 
 QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
 {
+    //qDebug() << "Add model " << m << " with " << m->children().size() << " children";
     QGraphicsItem* graphic = _drawModel(m);
 
     _shapes[m] = graphic;
@@ -138,8 +144,8 @@ QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
 
     for(Model* child : m->children())
     {
+        //qDebug() << "Draw child of " << m;
         QGraphicsItem* cGraph = addModel(child, id);
-
         cGraph->setParentItem(graphic);
     }
 

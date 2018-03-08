@@ -44,7 +44,7 @@ void PolygonsComponent::generateBodies(b2World* world, object_id oId, b2Body* an
     b2BodyDef bDef;
     bDef.type = b2_staticBody;
     _polyBody = world->CreateBody(&bDef);
-    registerBody(_polyBody);
+    registerBody(_polyBody, {_polyModel});
 
     for(b2Shape* p : _shapePtrs)
     {
@@ -59,7 +59,7 @@ void PolygonsComponent::clearBodies()
         for(b2Fixture* f : _polyFixtures)
             _polyBody->DestroyFixture(f);
         _world->DestroyBody(_polyBody);
-
+        unregisterBody(_polyBody);
         _polyFixtures.clear();
     }
     _world = nullptr;

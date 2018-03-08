@@ -16,6 +16,9 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
     for(auto iter = groupcounts.begin(); iter != groupcounts.end(); iter++)
         if(iter.value() > 1) multiples.insert(iter.key());
 
+
+    childrenModel = new Model();
+
     //Initialize all aggregates
     for(WorldObjectComponent* c : _components)
     {
@@ -48,7 +51,7 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
         * Models
         *************/
         for(Model* m : c->getModels())
-            registerModel(m);
+            childrenModel->addChildren({m});
 
        /*************
         * Channels
@@ -60,6 +63,7 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
 
     debugModel = new Model();
     registerModel(debugModel);
+    registerModel(childrenModel);
 }
 
 WorldObject* WorldObject::_clone(QObject *newParent)
@@ -69,11 +73,6 @@ WorldObject* WorldObject::_clone(QObject *newParent)
         childClones.push_back(c->_clone());
 
     WorldObject* copy = new WorldObject(childClones, getName(), newParent);
-    double x, y, theta;
-    getTransform(x, y, theta);
-    copy->translate(x, y);
-    copy->rotate(theta);
-
     return copy;
 }
 
@@ -88,6 +87,7 @@ void WorldObject::clearBodies()
         for(WorldObjectComponent* c : components)
             c->clearBodies();
 
+        unregisterBody(anchorBody);
         _world->DestroyBody(anchorBody);
         anchorBody = nullptr;
     }
@@ -106,7 +106,7 @@ void WorldObject::generateBodies(b2World* world, object_id oId, b2Body* anchorBo
     b2BodyDef anchorDef;
     anchorDef.type = b2_dynamicBody;
     anchorBody = world->CreateBody(&anchorDef);
-    registerBody(anchorBody, {debugModel});
+    registerBody(anchorBody, {childrenModel, debugModel});
 
     b2CircleShape* circ = new b2CircleShape;
     circ->m_p = b2Vec2(0, 0);
@@ -146,6 +146,12 @@ void WorldObject::_worldTicked(const double t)
 {
     for(WorldObjectComponent* c : _components)
         c->worldTicked(t);
+}
+
+void WorldObject::_syncModels()
+{
+    for(WorldObjectComponent* c : _components)
+        c->syncModels();
 }
 
 void WorldObject::setROSNode(std::shared_ptr<rclcpp::Node> node)

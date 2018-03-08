@@ -53,7 +53,7 @@ class SDSMT_SIMULATOR_API WorldObjectComponent : public QObject
     QMap<b2Body*, QVector<Model*>> _bodies;
 
     QTransform worldTransform;
-    QTransform localTransform;
+    QTransform localTranslate, localRotate;
     QTransform invTransform;
 
     void adjustTransform(const QTransform& tOldI, const QTransform& tNew);

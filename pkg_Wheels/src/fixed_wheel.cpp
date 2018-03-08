@@ -68,7 +68,7 @@ void Fixed_Wheel::clearBodies()
     {
         _world->DestroyJoint(_weldJoint);
         _world->DestroyBody(_wheelBody);
-
+        unregisterBody(_wheelBody);
         _weldJoint = nullptr;
         _wheelBody = nullptr;
         _wheelFix = nullptr;
@@ -165,7 +165,7 @@ void Fixed_Wheel::_buildModels()
     delete newModel;
 }
 
-void Fixed_Wheel::worldTicked(const double)
+void Fixed_Wheel::_worldTicked(const double)
 {
     if(_wheelBody)
     {

@@ -107,7 +107,7 @@ void Lidar_Sensor::clearBodies()
     {
         _world->DestroyJoint(weldJoint);
         _world->DestroyBody(sensorBody);
-
+        unregisterBody(sensorBody);
         weldJoint = nullptr;
         sensorBody = nullptr;
         sensorFix = nullptr;
