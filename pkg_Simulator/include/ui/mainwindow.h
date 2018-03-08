@@ -86,8 +86,7 @@ public slots:
     void showMainWindow(){
         show();
 
-        //setWorldBounds(-200, 200, -200, 200);
-        setWorldBounds(-25, 25, -25, 25);
+        setWorldBounds(-100, 100, -100, 100);
     }
 
     void closeEvent(QCloseEvent *)

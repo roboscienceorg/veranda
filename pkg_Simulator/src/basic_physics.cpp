@@ -72,6 +72,8 @@ void BasicPhysics::addWorldObjects(QVector<QPair<WorldObjectPhysics*, object_id>
 
         obj->syncModels();
     }
+
+    qDebug() << "Added objects; world contains" << world->GetBodyCount() << "bodies";
 }
 
 void BasicPhysics::removeWorldObjects(QVector<object_id> oIds)
@@ -86,6 +88,8 @@ void BasicPhysics::removeWorldObjects(QVector<object_id> oIds)
             objects.remove(oId);
         }
     }
+
+    qDebug() << "Removed objects; world contains" << world->GetBodyCount() << "bodies";
 }
 
 void BasicPhysics::step()

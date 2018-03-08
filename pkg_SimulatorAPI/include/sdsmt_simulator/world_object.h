@@ -21,10 +21,8 @@ class SDSMT_SIMULATOR_API WorldObject : public WorldObjectComponent
 
     bool _useChannels = false;
 
-    Model* debugModel = nullptr;
-    b2Body* anchorBody = nullptr;
-    QVector<b2Body*> childBodies;
-
+    Model* _debugModel = nullptr;
+    b2Body* _anchorBody = nullptr;
     b2World* _world = nullptr;
 
     QMap<QString, QSharedPointer<PropertyView>> _properties;

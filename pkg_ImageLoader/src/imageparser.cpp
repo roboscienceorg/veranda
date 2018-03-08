@@ -79,6 +79,7 @@ QVector<QVector<QPolygonF>> ImageParser::_findShapes(QVector<QVector<bool> >& bw
         }
     };
 
+    int lastPct = 0;
     for(int i=0; i<bwImage.size(); i++)
     {
         for(int j=0; j<bwImage[i].size(); j++)
@@ -95,7 +96,8 @@ QVector<QVector<QPolygonF>> ImageParser::_findShapes(QVector<QVector<bool> >& bw
                 shapes += newShape;
             }
         }
-        qDebug() << double(i*bwImage[0].size())/(bwImage.size()*bwImage[0].size()) * 100 << "%";
+        if(lastPct + 4 < (int)(double(i*bwImage[0].size())/(bwImage.size()*bwImage[0].size()) * 100))
+            qDebug() << (lastPct = (int)(double(i*bwImage[0].size())/(bwImage.size()*bwImage[0].size()) * 100)) << "%";
     }
 
     QVector<QVector<QPolygonF>> out;

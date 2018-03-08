@@ -62,8 +62,8 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
         c->setParentTransform(QTransform(), false);
     }
 
-    debugModel = new Model();
-    registerModel(debugModel);
+    _debugModel = new Model();
+    registerModel(_debugModel);
 }
 
 WorldObject* WorldObject::_clone(QObject *newParent)
@@ -80,17 +80,13 @@ void WorldObject::clearBodies()
 {
     if(!_world) return;
 
-    QVector<WorldObjectComponent*> components = getComponents();
+    for(WorldObjectComponent* c : _components)
+        c->clearBodies();
 
-    if(anchorBody)
-    {
-        for(WorldObjectComponent* c : components)
-            c->clearBodies();
+    unregisterBody(_anchorBody);
+    _world->DestroyBody(_anchorBody);
+    _anchorBody = nullptr;
 
-        unregisterBody(anchorBody);
-        _world->DestroyBody(anchorBody);
-        anchorBody = nullptr;
-    }
     _world = nullptr;
 }
 
@@ -105,8 +101,8 @@ void WorldObject::generateBodies(b2World* world, object_id oId, b2Body* anchorBo
 
     b2BodyDef anchorDef;
     anchorDef.type = b2_dynamicBody;
-    anchorBody = world->CreateBody(&anchorDef);
-    registerBody(anchorBody, {debugModel}, true);
+    _anchorBody = world->CreateBody(&anchorDef);
+    registerBody(_anchorBody, {_debugModel}, true);
 
     b2CircleShape* circ = new b2CircleShape;
     circ->m_p = b2Vec2(0, 0);
@@ -116,12 +112,12 @@ void WorldObject::generateBodies(b2World* world, object_id oId, b2Body* anchorBo
     fix.shape = circ;
     fix.density = 1;
     fix.isSensor = true;
-    anchorBody->CreateFixture(&fix);
+    _anchorBody->CreateFixture(&fix);
 
-    debugModel->addShapes(QVector<b2Shape*>{circ});
+    _debugModel->addShapes(QVector<b2Shape*>{circ});
 
     for(int i = 0; i < components.size(); i++)
-        components[i]->generateBodies(world, oId, anchorBody);
+        components[i]->generateBodies(world, oId, _anchorBody);
 }
 
 void WorldObject::connectChannels()
