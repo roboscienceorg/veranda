@@ -6,18 +6,9 @@ project(sdsmt_simulator)
 
 ## Compile as C++11
 set(CMAKE_CXX_STANDARD 11)
-
-# Remove -g from general builds
-string(REPLACE -g "" CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS)
-
-# Always use -Wall
-set(CMAKE_CXX_FLAGS "-Wall")
-
-# Add -g to debug builds
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-
-# Use O3 for release builds
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endif()
 
 ## Find required ROS packages
 find_package(ament_cmake REQUIRED)
@@ -133,6 +124,25 @@ install(
   TARGETS sdsmt_simulator
   DESTINATION lib/sdsmt_simulator
 )
+
+## On windows, we need to run windeployqt
+## To set up plugins and dlls because Windows
+if(WIN32)
+    install(CODE 
+        "
+        MESSAGE(\"Running WindDeployQt.\")
+
+        execute_process (
+            COMMAND cmd /c echo ${CMAKE_INSTALL_PREFIX}
+        )
+
+        execute_process (
+            COMMAND cmd /c \"%QT5_DIR%/bin/windeployqt sdsmt_simulator.exe --no-compiler-runtime  --no-translations\"
+            WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib/sdsmt_simulator
+        )
+        "
+    )
+endif()
 
 ament_package()
 

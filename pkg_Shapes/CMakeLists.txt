@@ -4,18 +4,9 @@ project(sdsmt_simulator_shape_plugins)
 ## Compile as C++11 Library
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 11)
-
-# Remove -g from general builds
-string(REPLACE -g "" CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS)
-
-# Always use -Wall
-set(CMAKE_CXX_FLAGS "-Wall")
-
-# Add -g to debug builds
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-
-# Use O3 for release builds
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
