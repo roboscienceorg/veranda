@@ -10,8 +10,6 @@
 #include "sdsmt_simulator/property.h"
 #include "sdsmt_simulator/world_object_component.h"
 
-const double EPSILON = 0.0001;
-
 QTransform transform(const b2Vec2& pos, const double& rad)
 {
     double sina = sin(rad);

@@ -10,6 +10,7 @@
 
 #include "model.h"
 #include "dllapi.h"
+#include "const.h"
 
 typedef int32_t object_id;
 
@@ -44,7 +45,7 @@ public:
         bool valid;
         _new.toDouble(&valid);
         if(valid)
-            return _new;
+            return std::abs(_new.toDouble()) < EPSILON ? 0.0 : _new;
         return _old;
     }
 
@@ -77,7 +78,7 @@ public:
         bool isDouble;
         double asDouble = _new.toDouble(&isDouble);
         if(isDouble && asDouble >= 0 && asDouble <= 360)
-            return _new;
+            return std::abs(_new.toDouble()) < EPSILON ? 0.0 : _new;
         return _old;
     }
 

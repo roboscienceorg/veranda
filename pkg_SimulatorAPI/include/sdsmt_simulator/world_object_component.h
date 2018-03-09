@@ -44,9 +44,9 @@ class SDSMT_SIMULATOR_API WorldObjectComponent : public QObject
         {"LocalPos/X", &_locX},
         {"LocalPos/Y", &_locY},
         {"LocalPos/Theta", &_locTheta},
-        {"PhysicsPos/X", &_globX},
-        {"PhysicsPos/Y", &_globY},
-        {"PhysicsPos/Theta", &_globTheta}
+        {"GlobalPos/X", &_globX},
+        {"GlobalPos/Y", &_globY},
+        {"GlobalPos/Theta", &_globTheta}
     };
 
     b2Body* _mainBody = nullptr;

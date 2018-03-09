@@ -42,13 +42,11 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
 
     _translater = _makeTranslater();
     _rotater = _makeRotater();
-    //_transformer->setScale(std::min(_viewer->height(), _viewer->width()) * TOOL_SCALE);
 
     _tools = new QGraphicsItemGroup;
     _tools->addToGroup(_translater);
     _tools->addToGroup(_rotater);
     _translater->moveBy(-_rotater->boundingRect().width()*1.5, 0);
-    _tools->setScale(3);
 
     setWorldBounds(-200, 200, -200, 200);
 }
@@ -381,6 +379,9 @@ void BasicViewer::setWorldBounds(QRectF rect)
     _viewer->setSceneRect(rect);
 
     _rescale();
+
+    _tools->setScale(std::min(_viewer->sceneRect().width(), _viewer->sceneRect().height()) * 0.001);
+    _placeTools();
 }
 
 void BasicViewer::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
@@ -463,11 +464,14 @@ void BasicViewer::objectSelected(object_id id)
 
 void BasicViewer::_placeTools()
 {
-    QRectF bound = _topShapes[_currSelection]->childrenBoundingRect();
-    double rightEdge = bound.x() + bound.width(), bottomEdge = bound.y() + bound.height();
+    if(_topShapes.contains(_currSelection) && _tools)
+    {
+        QRectF bound = _topShapes[_currSelection]->childrenBoundingRect();
+        double rightEdge = bound.x() + bound.width(), bottomEdge = bound.y() + bound.height();
 
-    QRectF toolBound = _tools->childrenBoundingRect();
-    _tools->setPos(rightEdge /*+ toolBound.width()*0.5*/, bottomEdge + toolBound.height());
+        QRectF toolBound = _tools->childrenBoundingRect();
+        _tools->setPos(rightEdge /*+ toolBound.width()*0.5*/, bottomEdge + toolBound.height());
+    }
 }
 
 //No objects are selected, draw without highlights

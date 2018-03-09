@@ -12,10 +12,10 @@ QVector<QSharedPointer<WorldObject> > DefaultRobotLoader::loadFile(QString fileP
     QSharedPointer<WorldObject> robot2(makeAckermannBot(plugins));
     robot2->getProperties()["LocalPos/X"]->set(-3, true);
     robot2->getProperties()["LocalPos/Y"]->set(10, true);
-    robot2->getProperties()["LocalPos/Theta"]->set(20, true);
+    robot2->getProperties()["LocalPos/Theta"]->set(0, true);
     qDebug() << "Done building default robots.................................";
 
-    return {/*robot1,*/ robot2};
+    return {robot1, robot2};
 }
 
 WorldObject* DefaultRobotLoader::makeDiffDriveBot(QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
@@ -89,28 +89,17 @@ WorldObject* DefaultRobotLoader::makeDiffDriveBot(QMap<QString, WorldObjectCompo
     if(plugins.contains("org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar"))
     {
         WorldObjectComponent* lidar1 = plugins["org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar"]->createComponent();
-        WorldObjectComponent* lidar2 = plugins["org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar"]->createComponent();
         QMap<QString, QSharedPointer<PropertyView>> props1 = lidar1->getProperties();
-        QMap<QString, QSharedPointer<PropertyView>> props2 = lidar2->getProperties();
 
         props1["LocalPos/X"]->set(0, true);
         props1["LocalPos/Y"]->set(0, true);
-        props1["LocalPos/Theta"]->set(0, true);
+        props1["LocalPos/Theta"]->set(90, true);
         props1["scan_radius"]->set(10, true);
-        props1["scan_range"]->set(180, true);
-        props1["scan_points"]->set(20, true);
+        props1["scan_range"]->set(360, true);
+        props1["scan_points"]->set(50, true);
         props1["scan_rate"]->set(10, true);
 
-        props2["LocalPos/X"]->set(0, true);
-        props2["LocalPos/Y"]->set(0, true);
-        props1["LocalPos/Theta"]->set(180, true);
-        props2["scan_radius"]->set(10, true);
-        props2["scan_range"]->set(180, true);
-        props2["scan_points"]->set(20, true);
-        props2["scan_rate"]->set(10, true);
-
         components.push_back(lidar1);
-        components.push_back(lidar2);
     }
 
     return new WorldObject(components, "Differential Turtle");
@@ -127,6 +116,7 @@ WorldObject* DefaultRobotLoader::makeAckermannBot(QMap<QString, WorldObjectCompo
 
         props["LocalPos/X"]->set(0, true);
         props["LocalPos/Y"]->set(2, true);
+        props["LocalPos/Theta"]->set(90, true);
         props["scan_radius"]->set(5, true);
         props["scan_range"]->set(90, true);
         props["scan_points"]->set(20, true);
