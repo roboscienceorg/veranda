@@ -15,7 +15,7 @@ QVector<QSharedPointer<WorldObject> > DefaultRobotLoader::loadFile(QString fileP
     robot2->getProperties()["LocalPos/Theta"]->set(20, true);
     qDebug() << "Done building default robots.................................";
 
-    return {robot1, robot2};
+    return {/*robot1,*/ robot2};
 }
 
 WorldObject* DefaultRobotLoader::makeDiffDriveBot(QMap<QString, WorldObjectComponent_Plugin_If *> plugins)

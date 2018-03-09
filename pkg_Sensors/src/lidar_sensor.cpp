@@ -234,7 +234,7 @@ void Lidar_Sensor::_worldTicked(const double dt)
                 b2Vec2 localEndpoint = _getRayPoint(curr_angle, scan_radius);
                 b2Vec2 worldEndpoint = sensorBody->GetWorldPoint(localEndpoint);
 
-                QPair<b2Vec2, double> rayCastResult = _rayCaster.rayCast(_world, worldOrigin, worldEndpoint);
+                QPair<b2Vec2, double> rayCastResult = _rayCaster.rayCast(_world, worldOrigin, worldEndpoint, objectId);
 
                 b2EdgeShape* thisLine = dynamic_cast<b2EdgeShape*>(scan_image[i]);
                 thisLine->m_vertex2 = sensorBody->GetLocalPoint(rayCastResult.first);

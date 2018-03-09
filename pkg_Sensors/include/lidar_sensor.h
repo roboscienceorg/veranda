@@ -28,9 +28,14 @@ class Lidar_Sensor : public WorldObjectComponent
 
         b2Vec2 _startPoint;
 
+        int64_t _collisionGroup;
+
     public:
         float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
         {
+            //Ignore non-colliding fixtures
+            if(fixture->IsSensor() || fixture->GetFilterData().groupIndex == _collisionGroup) return 1;
+
             double d = b2DistanceSquared(_startPoint, point);
             if(d < _bestDist)
             {
@@ -41,11 +46,12 @@ class Lidar_Sensor : public WorldObjectComponent
             return fraction;
         }
 
-        QPair<b2Vec2, double> rayCast(const b2World* world, b2Vec2 p1, b2Vec2 p2)
+        QPair<b2Vec2, double> rayCast(const b2World* world, b2Vec2 p1, b2Vec2 p2, int64_t collisonGroup)
         {
             _bestDist = std::numeric_limits<double>::infinity();
             _bestPoint = p2;
             _startPoint = p1;
+            _collisionGroup = collisonGroup;
 
             world->RayCast(this, p1, p2);
 

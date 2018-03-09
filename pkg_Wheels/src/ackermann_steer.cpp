@@ -286,6 +286,7 @@ void Ackermann_Steer::_worldTicked(const double)
 {
     if(_lWheelBody && _rWheelBody)
     {
+        //qDebug() << "Steered to" << _lWheelBody->GetAngle()*RAD2DEG << _rWheelBody->GetAngle()*RAD2DEG;
         Basic_Wheel::applyNoSlideConstraint(_lWheelBody, _wradius.get().toDouble());
         Basic_Wheel::applyNoSlideConstraint(_rWheelBody, _wradius.get().toDouble());
     }
@@ -298,7 +299,7 @@ void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr da
     double targetAngle = std::min(PI/2.0, std::max(-PI/2.0, (double)data->data));
     _steerAngle.set(targetAngle);
 
-    //qDebug() << "Steer angle:" << targetAngle;
+    qDebug() << "Steer angle:" << targetAngle;
 
     double targetLeft = 0, targetRight = 0;
     if(targetAngle < -0.001 || targetAngle > 0.001)
@@ -318,5 +319,4 @@ void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr da
 
     ((b2RevoluteJoint*)_lRevJoint)->SetLimits(targetLeft, targetLeft);
     ((b2RevoluteJoint*)_rRevJoint)->SetLimits(targetRight, targetRight);
-
 }
