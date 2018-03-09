@@ -8,6 +8,10 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joy.hpp"
+#include "std_msgs/msg/float64.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
+#include "std_msgs/msg/multi_array_dimension.hpp"
+#include "std_msgs/msg/multi_array_layout.hpp"
 
 #include <sdsmt_simulator/world_object.h>
 
@@ -40,6 +44,8 @@ class SimulatorCore : public QObject
 
     QMap<QString, joymsg> _joysticks;
 
+    std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Float64MultiArray>> _timestampChannel;
+    std::shared_ptr<std_msgs::msg::Float64MultiArray> _timestampMsg;
 
 public:
     SimulatorCore(Simulator_Physics_If* physics, Simulator_Ui_If* ui, std::shared_ptr<rclcpp::Node> node,

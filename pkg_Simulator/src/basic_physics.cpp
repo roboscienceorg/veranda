@@ -49,9 +49,18 @@ void BasicPhysics::setTick(double rate_hz, double duration_s)
     tickRate = rate_hz;
     stepTime = duration_s;
 
-    //TODO :: Update QTimer with new rate settings
+    tick->setInterval(1000.0f / tickRate);
 
     emit physicsTickSet(tickRate, stepTime);
+}
+
+void BasicPhysics::setTickMultiplier(double mult)
+{
+    tickMult = mult;
+
+    tick->setInterval(1000.0f / (tickRate * tickMult));
+
+    physicsTickMultiplierSet(tickMult);
 }
 
 void BasicPhysics::addWorldObjects(QVector<QPair<WorldObjectPhysics*, object_id>> objs)
@@ -65,8 +74,8 @@ void BasicPhysics::addWorldObjects(QVector<QPair<WorldObjectPhysics*, object_id>
 
         objectWorldData& worldDat = objects[oId];
         worldDat.obj = obj;
-        connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics::worldTicked);
-        connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics::syncModels);
+        connect(this, &BasicPhysics::physicsTicked, obj, &WorldObjectPhysics::worldTicked);
+        connect(this, &BasicPhysics::physicsTicked, obj, &WorldObjectPhysics::syncModels);
 
         obj->generateBodies(world, oId);
 
@@ -84,6 +93,7 @@ void BasicPhysics::removeWorldObjects(QVector<object_id> oIds)
         {
             objectWorldData& dat = objects[oId];
             dat.obj->clearBodies();
+            disconnect(this, 0, dat.obj, 0);
 
             objects.remove(oId);
         }
@@ -96,5 +106,5 @@ void BasicPhysics::step()
 {
     world->Step(stepTime, 8, 3); //suggested values for velocity and position iterations
 
-    emit worldTick(stepTime);
+    emit physicsTicked(stepTime);
 }

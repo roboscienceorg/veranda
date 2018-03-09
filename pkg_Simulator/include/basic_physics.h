@@ -23,7 +23,7 @@ class BasicPhysics : public Simulator_Physics_If
 
     double tickRate;
     double stepTime;
-
+    double tickMult;
 
 public:
     BasicPhysics(QObject* parent = nullptr);
@@ -37,6 +37,7 @@ public slots:
 
     //Set tick rate and duration
     virtual void setTick(double rate_hz, double duration_s) override;
+    virtual void setTickMultiplier(double mult) override;
 
     //Adds world objects to simulation
     virtual void addWorldObjects(QVector<QPair<WorldObjectPhysics*, object_id>> objs) override;
@@ -45,9 +46,6 @@ public slots:
     virtual void removeWorldObjects(QVector<object_id> oIds) override;
 
     void step();
-
-signals:
-    void worldTick(const double);
 };
 
 #endif // BASIC_PHYSICS_H

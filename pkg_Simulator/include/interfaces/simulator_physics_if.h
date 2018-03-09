@@ -25,6 +25,9 @@ public slots:
     //Set tick rate and duration
     virtual void setTick(double rate_hz, double duration_s) = 0;
 
+    //Easy way to speed up or slow down by a factor
+    virtual void setTickMultiplier(double mult) = 0;
+
     //Adds world objects to simulation
     virtual void addWorldObjects(QVector<QPair<WorldObjectPhysics*, object_id>>) = 0;
 
@@ -35,6 +38,8 @@ signals:
     void physicsStarted();
     void physicsStopped();
     void physicsTickSet(double, double);
+    void physicsTickMultiplierSet(double);
+    void physicsTicked(double /*seconds*/);
 };
 
 #endif // SIMULATOR_PHYSICS_H

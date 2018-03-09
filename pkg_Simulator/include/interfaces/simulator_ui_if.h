@@ -37,6 +37,7 @@ signals:
     //If these go through successfully, the corresponding slots
     //will get called
     void userSetPhysicsTick(double rate_hz, double duration_s);
+    void userSetPhysicsTickMultiplier(double mult);
     void userStopPhysics();
     void userStartPhysics();
 
@@ -59,6 +60,7 @@ public slots:
 
     //Slots to indicate that physics settings changed
     virtual void physicsTickChanged(double rate_hz, double duration_s) = 0;
+    virtual void physicsTickMultiplierChanged(double mult) = 0;
     virtual void physicsStopped() = 0;
     virtual void physicsStarted() = 0;
 

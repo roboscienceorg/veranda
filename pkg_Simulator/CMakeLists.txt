@@ -125,6 +125,9 @@ install(
   DESTINATION lib/sdsmt_simulator
 )
 
+## Install python timer object
+ament_python_install_package(sdsmt_simulator)
+
 ## On windows, we need to run windeployqt
 ## To set up plugins and dlls because Windows
 if(WIN32)

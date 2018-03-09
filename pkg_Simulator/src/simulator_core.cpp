@@ -41,16 +41,42 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     connect(_userInterface, &Simulator_Ui_If::userStartPhysics, this, &SimulatorCore::userStartPhysics);
     connect(_userInterface, &Simulator_Ui_If::userStopPhysics, this, &SimulatorCore::userStopPhysics);
     connect(_userInterface, &Simulator_Ui_If::userSetPhysicsTick, this, &SimulatorCore::userSetPhysicsTick);
+    connect(_userInterface, &Simulator_Ui_If::userSetPhysicsTickMultiplier, _physicsEngine, &Simulator_Physics_If::setTickMultiplier);
 
     connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, this, &SimulatorCore::physicsStarted);
     connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, this, &SimulatorCore::physicsStopped);
     connect(_physicsEngine, &Simulator_Physics_If::physicsTickSet, this, &SimulatorCore::physicsTickSet);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsTickMultiplierSet, _userInterface, &Simulator_Ui_If::physicsTickMultiplierChanged);
 
     connect(_userInterface, &Simulator_Ui_If::joystickButtonPress, this, &SimulatorCore::joystickButtonDown);
     connect(_userInterface, &Simulator_Ui_If::joystickButtonRelease, this, &SimulatorCore::joystickButtonUp);
     connect(_userInterface, &Simulator_Ui_If::joystickMoved, this, &SimulatorCore::joystickMoved);
 
     connect(this, &SimulatorCore::errorMsg, _userInterface, &Simulator_Ui_If::errorMessage);
+
+    //Create and set up timestamp message
+    _timestampMsg = std::make_shared<std_msgs::msg::Float64MultiArray>();
+    _timestampMsg->data.resize(2, 0);
+    _timestampMsg->layout.data_offset = 0;
+    _timestampMsg->layout.dim.push_back(std_msgs::msg::MultiArrayDimension());
+    _timestampMsg->layout.dim[0].label = "times";
+    _timestampMsg->layout.dim[0].size = 2;
+    _timestampMsg->layout.dim[0].stride = 2;
+
+    //Create channel to publish timestamps on
+    rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
+    custom_qos_profile.depth = 7;
+
+    _timestampChannel = _node->create_publisher<std_msgs::msg::Float64MultiArray>("sdsmt_simulator/timestamp", custom_qos_profile);
+
+    //Publish on every physics tick
+    connect(_physicsEngine, &Simulator_Physics_If::physicsTicked,
+    [this](double elapsed)
+    {
+        _timestampMsg->data[0] += elapsed;
+        _timestampMsg->data[1] = elapsed;
+        _timestampChannel->publish(_timestampMsg);
+    });
 }
 
 SimulatorCore::~SimulatorCore()
@@ -69,7 +95,8 @@ SimulatorCore::~SimulatorCore()
 void SimulatorCore::start()
 {
     //Set default physics tick rate
-    userSetPhysicsTick(100.0, 1.0/100.0);
+    _physicsEngine->setTick(30.0, 1.0/30.0);
+    _physicsEngine->setTickMultiplier(1.0);
 
     //Show UI
     _userInterface->showMainWindow();

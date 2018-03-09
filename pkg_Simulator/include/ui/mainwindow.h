@@ -7,6 +7,7 @@
 #include <QProgressBar>
 #include <QVector>
 #include <QPair>
+#include <QMap>
 
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/simulator_visual_if.h"
@@ -45,10 +46,17 @@ private:
     QMap<QString, QVector<WorldSaver_If*>> worldSavers;
     WorldLoader_If* defaultLoader = nullptr;
 
-    int speed;
     bool play;
     bool record;
+    uint64_t speed = 0;
     object_id selected;
+    const QVector<QPair<double, QPair<QString, QString>>> SPEEDBUTTONS
+    {
+        {1.0, {"Speed x1", ":/sim/SpeedOneSimIcon"}},
+        {2.0, {"Speed x2", ":/sim/SpeedTwoSimIcon"}},
+        {3.0, {"Speed x3", ":/sim/SpeedThreeSimIcon"}},
+        {0.5, {"Speed x1/2", ":/sim/SpeedHalfSimIcon"}}
+    };
 
     QStandardItemModel* propertiesModel = nullptr;
 
@@ -74,6 +82,7 @@ public slots:
 
     //Slots to indicate that physics settings changed
     void physicsTickChanged(double rate_hz, double duration_s){}
+    void physicsTickMultiplierChanged(double mult);
     void physicsStopped();
     void physicsStarted();
 

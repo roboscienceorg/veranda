@@ -14,6 +14,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <limits>
 
 MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If *> components,
                        QVector<WorldObjectLoader_If*> oloaders, QVector<WorldObjectSaver_If*> osavers,
@@ -301,30 +302,25 @@ void MainWindow::playSimButtonClick()
 
 void MainWindow::speedSimButtonClick()
 {
-    if (speed == 1)
+    uint64_t next = (speed + 1) % SPEEDBUTTONS.size();
+    userSetPhysicsTickMultiplier(SPEEDBUTTONS[next].first);
+}
+
+void MainWindow::physicsTickMultiplierChanged(double mult)
+{
+    double closest = std::numeric_limits<double>::max();
+    for(int i=0; i<SPEEDBUTTONS.size(); i++)
     {
-        speed = 2;
-        ui->speedSimButton->setToolTip("Speed x3");
-        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedTwoSimIcon"));
+        double diff = std::abs(SPEEDBUTTONS[i].first - mult);
+        if(diff < closest)
+        {
+            closest = diff;
+            speed = i;
+        }
     }
-    else if (speed == 2)
-    {
-        speed = 3;
-        ui->speedSimButton->setToolTip("Speed 1/2");
-        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedThreeSimIcon"));
-    }
-    else if (speed == 3)
-    {
-        speed = 0;
-        ui->speedSimButton->setToolTip("Speed x1");
-        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedHalfSimIcon"));
-    }
-    else if (speed == 0)
-    {
-        speed = 1;
-        ui->speedSimButton->setToolTip("Speed x2");
-        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedOneSimIcon"));
-    }
+
+    ui->speedSimButton->setToolTip(SPEEDBUTTONS[speed].second.first);
+    ui->speedSimButton->setIcon(QIcon(SPEEDBUTTONS[speed].second.second));
     ui->speedSimButton->setIconSize(QSize(32,32));
 }
 
