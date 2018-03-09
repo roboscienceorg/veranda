@@ -72,8 +72,9 @@ class BasicViewer : public Simulator_Visual_If
     QGraphicsScene* _scene;
     QLayout* _children;
 
-    QGraphicsItem* _transformer;
+    QGraphicsItem* _translater;
     QGraphicsItem* _rotater;
+    QGraphicsItemGroup* _tools;
     QTransform _transformerTransform;
 
     //Constructs a QAbstractGraphicsShapeItem from a box2d shape
@@ -95,9 +96,10 @@ class BasicViewer : public Simulator_Visual_If
     bool _draggingRotate = false;
     QPointF _dragStart;
 
-    QGraphicsItem* _makeTransformer();
+    QGraphicsItem* _makeTranslater();
     QGraphicsItem* _makeRotater();
     QGraphicsItem* _makeArrow(double pointx, double pointy, double angle, QPen p, QBrush b);
+    void _placeTools();
 
 public:
     BasicViewer(QWidget* parent = nullptr);

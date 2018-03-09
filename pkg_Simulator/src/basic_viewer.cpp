@@ -37,7 +37,15 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     _children->addWidget(_viewer);
     setLayout(_children);
 
-    _transformer = _makeTransformer();
+    _translater = _makeTranslater();
+    _rotater = _makeRotater();
+    //_transformer->setScale(std::min(_viewer->height(), _viewer->width()) * TOOL_SCALE);
+
+    _tools = new QGraphicsItemGroup;
+    _tools->addToGroup(_translater);
+    _tools->addToGroup(_rotater);
+    _translater->moveBy(-_rotater->boundingRect().width()*1.5, 0);
+    _tools->setScale(3);
 
     setWorldBounds(-200, 200, -200, 200);
 }
@@ -169,9 +177,8 @@ void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
     _shapes[m]->moveBy(dx, -dy);
     _shapes[m]->setRotation(-t);
 
-    object_id oid = _modelToObject[m];
-    if(_currSelection == oid)
-        _transformer->moveBy(dx, -dy);
+    if(_modelToObject[m] == _currSelection)
+        _placeTools();
 }
 
 void BasicViewer::modelChanged(Model *m)
@@ -205,8 +212,14 @@ void BasicViewer::viewMousePress(QMouseEvent *event)
     {
         QPointF hit = event->localPos();
 
-        bool startDrag = _transformer->contains(
-                    _transformer->sceneTransform().inverted().map(
+        bool startDrag = _translater->contains(
+                    _translater->sceneTransform().inverted().map(
+                        _viewer->mapToScene(
+                            _viewer->mapFromGlobal(
+                                event->globalPos()))));
+
+        bool startRotate = _rotater->contains(
+                    _rotater->sceneTransform().inverted().map(
                         _viewer->mapToScene(
                             _viewer->mapFromGlobal(
                                 event->globalPos()))));
@@ -214,7 +227,17 @@ void BasicViewer::viewMousePress(QMouseEvent *event)
         if(!_draggingTranslate && startDrag)
         {
             //qDebug() << "Start dragging";
+            _draggingRotate = false;
             _draggingTranslate = true;
+            _dragStart = _viewer->mapToScene(
+                        _viewer->mapFromGlobal(
+                            event->globalPos()));
+        }
+        else if(!_draggingRotate && startRotate)
+        {
+            //qDebug() << "Start rotating";
+            _draggingTranslate = false;
+            _draggingRotate = true;
             _dragStart = _viewer->mapToScene(
                         _viewer->mapFromGlobal(
                             event->globalPos()));
@@ -240,6 +263,27 @@ void BasicViewer::viewMouseMove(QMouseEvent* event)
                         event->globalPos()));
         QPointF delta = (newLocal - _dragStart)/(WORLD_SCALE);
         userDragMoveObject(_currSelection, delta.x(), -delta.y());
+
+        _dragStart = newLocal;
+    }
+    else if(_draggingRotate)
+    {
+        QPointF newLocal = _viewer->mapToScene(
+                    _viewer->mapFromGlobal(
+                        event->globalPos()));
+
+        QRectF bound = _topShapes[_currSelection]->childrenBoundingRect();
+        QPointF center(bound.left() + bound.width()/2.0, bound.top() + bound.height()/2.0);
+        QPointF v1 = _dragStart - center;
+        QPointF v2 = newLocal - center;
+        double delta = (std::atan2(v2.y(),v2.x()) - std::atan2(v1.y(),v1.x())) * RAD2DEG;
+
+        //Filter out jumpiness
+        //There's probably a more technically correct way to do this
+        if(std::abs(delta) < 90)
+        {
+            userDragRotateObject(_currSelection, -delta);
+        }
         _dragStart = newLocal;
     }
 }
@@ -274,6 +318,9 @@ void BasicViewer::_rescale()
     matrix.scale(scale,
                  scale);
     _viewer->setTransform(matrix);
+
+    //Rescale click/drag buttons
+    //_transformer->setScale(std::min(_viewer->height(), _viewer->width()) * TOOL_SCALE);
 }
 
 void BasicViewer::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
@@ -349,12 +396,18 @@ void BasicViewer::objectSelected(object_id id)
         newColor = _color(_drawLevels[_currSelection], true);
         _setOutlineColor(_topShapes[id], newColor);
 
-        QRectF bound = _topShapes[id]->boundingRect();
-        double leftEdge = bound.x() + bound.width(), bottomEdge = bound.y() + bound.height();
-
-        _transformer->setPos(leftEdge + _transformer->boundingRect().width()*0.5, bottomEdge + _transformer->boundingRect().height()*0.5);
-        _scene->addItem(_transformer);
+        _placeTools();
+        _scene->addItem(_tools);
     }
+}
+
+void BasicViewer::_placeTools()
+{
+    QRectF bound = _topShapes[_currSelection]->childrenBoundingRect();
+    double rightEdge = bound.x() + bound.width(), bottomEdge = bound.y() + bound.height();
+
+    QRectF toolBound = _tools->childrenBoundingRect();
+    _tools->setPos(rightEdge /*+ toolBound.width()*0.5*/, bottomEdge + toolBound.height());
 }
 
 //No objects are selected, draw without highlights
@@ -368,7 +421,7 @@ void BasicViewer::nothingSelected()
             _setOutlineColor(_shapes[m], newColor);
 
         _currSelection = 0;
-        _scene->removeItem(_transformer);
+        _scene->removeItem(_tools);
     }
 }
 
@@ -417,7 +470,7 @@ void BasicViewer::_setOutlineColor(QGraphicsItem* item, const QColor& color)
         _setOutlineColor(i, color);
 }
 
-QGraphicsItem* BasicViewer::_makeTransformer()
+QGraphicsItem* BasicViewer::_makeTranslater()
 {
     QBrush b(QColor(50, 163, 103));
     QPen p(QColor(50, 163, 103));
@@ -444,7 +497,27 @@ QGraphicsItem* BasicViewer::_makeTransformer()
 
 QGraphicsItem* BasicViewer::_makeRotater()
 {
-    return nullptr;
+    QBrush b(QColor(50, 163, 103));
+    QPen p(QColor(50, 163, 103));
+
+    QGraphicsItemGroup* group = new QGraphicsItemGroup;
+
+    QGraphicsRectItem* rect = new QGraphicsRectItem(0.0, -1.0*WORLD_SCALE, 0.5*WORLD_SCALE, 1.25*WORLD_SCALE);
+    rect->setBrush(b);
+    rect->setPen(p);
+    group->addToGroup(rect);
+
+    rect = new QGraphicsRectItem(-1.0*WORLD_SCALE, 0.0, 1.25*WORLD_SCALE, 0.5*WORLD_SCALE);
+    rect->setBrush(b);
+    rect->setPen(p);
+
+    group->addToGroup(rect);
+    group->addToGroup(_makeArrow(.25, -1.3, 0, p, b));
+    //group->addToGroup(_makeArrow(.25, 1.8, 180, p, b));
+    //group->addToGroup(_makeArrow(1.8, .25, 90, p, b));
+    group->addToGroup(_makeArrow(-1.3, .25, 270, p, b));
+
+    return group;
 }
 
 QGraphicsItem* BasicViewer::_makeArrow(double pointx, double pointy, double angle, QPen p, QBrush b)
