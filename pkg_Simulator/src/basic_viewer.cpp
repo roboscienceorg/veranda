@@ -34,6 +34,9 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     connect(_viewer, &CustomGraphicsView::mousePress, this, &BasicViewer::viewMousePress);
     connect(_viewer, &CustomGraphicsView::mouseRelease, this, &BasicViewer::viewMouseRelease);
 
+    connect(_viewer, &CustomGraphicsView::zoomTick, this, &BasicViewer::viewZoom);
+    connect(_viewer, &CustomGraphicsView::screenShift, this, &BasicViewer::viewShift);
+
     _children->addWidget(_viewer);
     setLayout(_children);
 
@@ -337,13 +340,53 @@ void BasicViewer::_rescale()
     //_transformer->setScale(std::min(_viewer->height(), _viewer->width()) * TOOL_SCALE);
 }
 
-void BasicViewer::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
+void BasicViewer::viewShift(int x, int y)
 {
-    QRect viewRect(xMin*WORLD_SCALE, -yMax*WORLD_SCALE, (xMax-xMin)*WORLD_SCALE, (yMax-yMin)*WORLD_SCALE);
-    _scene->setSceneRect(viewRect);
-    _viewer->setSceneRect(viewRect);
+    double pctx = x*0.1;
+    double pcty = y*0.1;
+
+    QRectF rect = _viewer->sceneRect();
+
+    double h = rect.height();
+    double w = rect.width();
+
+    rect.setTop(rect.top() + h * pcty);
+    rect.setBottom(rect.bottom() + h * pcty);
+    rect.setLeft(rect.left() + w * pctx);
+    rect.setRight(rect.right() + w * pctx);
+
+    setWorldBounds(rect);
+}
+
+void BasicViewer::viewZoom(int z)
+{
+    double pct = z*0.1;
+
+    QRectF rect = _viewer->sceneRect();
+
+    double h = rect.height();
+    double w = rect.width();
+
+    rect.setTop(rect.top() + h * pct);
+    rect.setBottom(rect.bottom() - h * pct);
+    rect.setLeft(rect.left() + w * pct);
+    rect.setRight(rect.right() - w * pct);
+
+    setWorldBounds(rect);
+}
+
+void BasicViewer::setWorldBounds(QRectF rect)
+{
+    _scene->setSceneRect(rect);
+    _viewer->setSceneRect(rect);
 
     _rescale();
+}
+
+void BasicViewer::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
+{
+    QRectF viewRect(xMin*WORLD_SCALE, -yMax*WORLD_SCALE, (xMax-xMin)*WORLD_SCALE, (yMax-yMin)*WORLD_SCALE);
+    setWorldBounds(viewRect);
 }
 
 //for after the MVP

@@ -11,6 +11,7 @@
 #include <QLayout>
 #include <QColor>
 #include <QDebug>
+#include <QKeyEvent>
 
 #include <Box2D/Box2D.h>
 #include <sdsmt_simulator/model.h>
@@ -27,6 +28,8 @@ signals:
     void mouseMoved(QMouseEvent* event);
     void mousePress(QMouseEvent* event);
     void mouseRelease(QMouseEvent* event);
+    void zoomTick(int z);
+    void screenShift(int x, int y);
 
 private:
     void mouseMoveEvent(QMouseEvent* event)
@@ -42,6 +45,19 @@ private:
     void mouseReleaseEvent(QMouseEvent* event)
     {
         mouseRelease(event);
+    }
+
+    void keyPressEvent(QKeyEvent* event)
+    {
+        switch(event->key())
+        {
+            case Qt::Key_W: screenShift(0, -1); break;
+            case Qt::Key_A: screenShift(-1, 0); break;
+            case Qt::Key_S: screenShift(0, 1); break;
+            case Qt::Key_D: screenShift(1, 0); break;
+            case Qt::Key_Q: zoomTick(1); break;
+            case Qt::Key_E: zoomTick(-1); break;
+        }
     }
 };
 
@@ -107,6 +123,8 @@ public:
     BasicViewer(QWidget* parent = nullptr);
 
     void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
+    void setWorldBounds(QRectF rect);
+
 public slots:
     void objectAddedToScreen(QVector<Model *> objects, object_id id) override;
     void objectRemovedFromScreen(object_id id) override;
@@ -125,6 +143,9 @@ private slots:
     void viewMouseRelease(QMouseEvent* event);
     void viewMouseMove(QMouseEvent* event);
     void resizeEvent(QResizeEvent* event);
+
+    void viewShift(int x, int y);
+    void viewZoom(int z);
 };
 
 #endif // BASIC_VIEWER_H

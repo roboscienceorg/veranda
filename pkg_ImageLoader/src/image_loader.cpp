@@ -13,10 +13,13 @@ QVector<QSharedPointer<WorldObject> > ImageLoader::loadFile(QString filePath, QM
 {
     try
     {
+        qDebug() << "Loading...";
         QVector<QVector<b2PolygonShape*>> shapes = getShapesFromFile(filePath);
         QVector<QSharedPointer<WorldObject>> objects;
 
         uint64_t objNum = 0;
+
+        qDebug() << "Normalize and build World Objects...";
         for(QVector<b2PolygonShape*>& poly : shapes)
         {
             if(!poly.size()) continue;
@@ -36,7 +39,7 @@ QVector<QSharedPointer<WorldObject> > ImageLoader::loadFile(QString filePath, QM
                 for(b2Vec2* it = s->m_vertices; it < s->m_vertices + s->m_count; it++)
                     *it = (*it) - avg;
 
-            qDebug() << "Loaded obj with min (" << min.x << min.y << ") max (" << max.x << max.y << ") 'center'(" << avg.x << avg.y << ")";
+            //qDebug() << "Loaded obj with min (" << min.x << min.y << ") max (" << max.x << max.y << ") 'center'(" << avg.x << avg.y << ")";
 
             PolygonsComponent* comp = new PolygonsComponent(poly);
             QSharedPointer<WorldObject> obj(new WorldObject({comp}, "Image Chunk #" + QString::number(objNum++)));
@@ -79,6 +82,7 @@ QVector<QVector<b2PolygonShape*>> ImageLoader::getShapesFromFile(QString filePat
     uint64_t colorThreshold = lastOptions->getBlackWhiteThreshold();
     uint64_t crossThreshold = lastOptions->getCrossProductThreshold();
 
+    qDebug() << "Parse image...";
     QVector<QVector<QPolygonF>> shapes = ImageParser::parseImage(img, colorThreshold, crossThreshold);
     QVector<QVector<b2PolygonShape*>> out;
 
@@ -89,6 +93,7 @@ QVector<QVector<b2PolygonShape*>> ImageLoader::getShapesFromFile(QString filePat
     double scalex = lastOptions->getPxPerWidth();
     double scaley = lastOptions->getPxPerHeight();
 
+    qDebug() << "Scale and Build b2Polygons...";
     b2Vec2 triBuffer[3];
     for(int i=0; i<shapes.size(); i++)
     {

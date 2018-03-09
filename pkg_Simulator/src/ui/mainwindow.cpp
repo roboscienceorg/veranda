@@ -151,9 +151,9 @@ void MainWindow::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperti
         listItems[oId] = new QListWidgetItem();
         listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
         ui->simulatorActiveWidget->addItem(listItems[oId]);
-
-        objectSelected(oId);
     }
+    if(objs.size())
+        objectSelected(objs.last().second);
 }
 
 void MainWindow::worldObjectsRemovedFromSimulation(QVector<object_id> oIds)

@@ -78,6 +78,7 @@ void SimulatorCore::start()
 
 void SimulatorCore::addSimObjects(QVector<QSharedPointer<WorldObject>> objs)
 {
+    qDebug() << "Loading batch of" << objs.size() << "Objects";
     QVector<QPair<WorldObjectPhysics*, object_id>> physObjs;
     QVector<QPair<WorldObjectProperties*, object_id>> propObjs;
 
@@ -107,8 +108,9 @@ void SimulatorCore::addSimObjects(QVector<QSharedPointer<WorldObject>> objs)
 
     //Send out object interfaces
     emit objectsAdded(physObjs);
+    qDebug() << "Added to physics";
     emit objectsAdded(propObjs);
-
+    qDebug() << "Added to view";
 }
 
 void SimulatorCore::removeSimObjects(QVector<object_id> oIds)
