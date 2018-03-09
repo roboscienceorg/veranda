@@ -212,13 +212,13 @@ void BasicViewer::viewMousePress(QMouseEvent *event)
     {
         QPointF hit = event->localPos();
 
-        bool startDrag = _translater->contains(
+        bool startDrag = _toolsEnabled && _translater->contains(
                     _translater->sceneTransform().inverted().map(
                         _viewer->mapToScene(
                             _viewer->mapFromGlobal(
                                 event->globalPos()))));
 
-        bool startRotate = _rotater->contains(
+        bool startRotate = _toolsEnabled && _rotater->contains(
                     _rotater->sceneTransform().inverted().map(
                         _viewer->mapToScene(
                             _viewer->mapFromGlobal(
@@ -285,6 +285,20 @@ void BasicViewer::viewMouseMove(QMouseEvent* event)
             userDragRotateObject(_currSelection, -delta);
         }
         _dragStart = newLocal;
+    }
+}
+
+void BasicViewer::setToolsEnabled(bool enabled)
+{
+    _toolsEnabled = enabled;
+    if(enabled && _topShapes.contains(_currSelection))
+    {
+        _placeTools();
+        _scene->addItem(_tools);
+    }
+    else
+    {
+        _scene->removeItem(_tools);
     }
 }
 
@@ -396,8 +410,11 @@ void BasicViewer::objectSelected(object_id id)
         newColor = _color(_drawLevels[_currSelection], true);
         _setOutlineColor(_topShapes[id], newColor);
 
-        _placeTools();
-        _scene->addItem(_tools);
+        if(_toolsEnabled)
+        {
+            _placeTools();
+            _scene->addItem(_tools);
+        }
     }
 }
 

@@ -28,5 +28,6 @@ public slots:
     virtual void objectDrawLevelSet(object_id id, DrawLevel) = 0;
     virtual void objectSelected(object_id id) = 0;
     virtual void nothingSelected() = 0;
+    virtual void setToolsEnabled(bool enabled) = 0;
 };
 #endif // SIMULATOR_VISUAL_H

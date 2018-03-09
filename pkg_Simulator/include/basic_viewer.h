@@ -92,8 +92,10 @@ class BasicViewer : public Simulator_Visual_If
     //Sets a graphics item and all it's children to a specific color pen
     void _setOutlineColor(QGraphicsItem* item, const QColor& color);
 
+    bool _toolsEnabled = true;
     bool _draggingTranslate = false;
     bool _draggingRotate = false;
+
     QPointF _dragStart;
 
     QGraphicsItem* _makeTranslater();
@@ -111,6 +113,7 @@ public slots:
     void objectDrawLevelSet(object_id id, DrawLevel level) override;
     void objectSelected(object_id id) override;
     void nothingSelected() override;
+    void setToolsEnabled(bool enabled);
 
 private slots:
     void modelMoved(Model* m, double dx, double dy, double dt);

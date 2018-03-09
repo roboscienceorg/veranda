@@ -184,6 +184,8 @@ void MainWindow::physicsStarted()
     ui->designerButton->setEnabled(false);
     ui->simulatorToolsList->setEnabled(false);
     ui->simulatorToolsMenu->setEnabled(false);
+
+    visualSimulator->setToolsEnabled(false);
 }
 
 void MainWindow::physicsStopped()
@@ -198,6 +200,8 @@ void MainWindow::physicsStopped()
     ui->designerButton->setEnabled(true);
     ui->simulatorToolsList->setEnabled(true);
     ui->simulatorToolsMenu->setEnabled(true);
+
+    visualSimulator->setToolsEnabled(true);
 }
 
 void MainWindow::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
