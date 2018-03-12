@@ -15,5 +15,5 @@ Designer_Widget::Designer_Widget(WorldObjectProperties *object, visualizerFactor
 
 QString Designer_Widget::getType()
 {
-    setToolTip(properties->getType());
+    return properties->getType();
 }

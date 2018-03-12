@@ -21,7 +21,7 @@ public:
     virtual bool canLoadFile(QString filePath);
     virtual void getUserOptions(QString filePath);
     virtual QVector<QString> fileExts() { return QVector<QString>{"Black and White Image (*.png *.jpg *.jpeg *.bmp)"};}
-    virtual QVector<QSharedPointer<WorldObject>> loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins);
+    virtual QVector<WorldObject*> loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins);
 };
 
 #endif
