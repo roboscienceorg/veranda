@@ -89,12 +89,10 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(this, SIGNAL(nothingIsSelected()), visualSimulator, SLOT(nothingSelected()));
     connect(this, SIGNAL(objectIsSelected(object_id)), visualDesigner, SLOT(objectSelected(object_id)));
     connect(this, SIGNAL(nothingIsSelected()), visualDesigner, SLOT(nothingSelected()));
-
+/*
     //add/delete tools
     connect(this, SIGNAL(addToolToSimulator(WorldObjectProperties*)), visualSimulator, SLOT(OBJECT_ADDED_TO_WORLD(WorldObjectProperties*)));
-    connect(this, SIGNAL(addToolToDesigner(WorldObjectProperties*)), visualDesigner, SLOT(OBJECT_ADDED_TO_WORLD(WorldObjectProperties*)));
-    connect(this, SIGNAL(deleteToolFromSimulator(WorldObjectProperties*)), visualSimulator, SLOT(OBJECT_REMOVED_FROM_WORLD(WorldObjectProperties*)));
-    connect(this, SIGNAL(deleteToolFromDesigner(WorldObjectProperties*)), visualDesigner, SLOT(OBJECT_REMOVED_FROM_WORLD(WorldObjectProperties*)));
+    connect(this, SIGNAL(deleteToolFromSimulator(WorldObjectProperties*)), visualSimulator, SLOT(OBJECT_REMOVED_FROM_WORLD(WorldObjectProperties*)));*/
 
     //Main menu button signals and slots
     connect(ui->showBuildObjectsButton, SIGNAL (released()), this, SLOT (showBuildObjectsButtonClick()));
@@ -117,9 +115,9 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(ui->saveObjectButton, SIGNAL (released()), this, SLOT (saveObjectButtonClick()));
 
     //Simulation mode tool button signals and slots
-    connect(ui->addObjectButton, SIGNAL (released()), this, SLOT (addObjectButtonClick()));
-    connect(ui->deleteObjectButton, SIGNAL (released()), this, SLOT (deleteObjectButtonClick()));
-    connect(ui->loadObjectsButton, SIGNAL (released()), this, SLOT (loadObjectsButtonClick()));
+    connect(ui->addObjectButton, SIGNAL (released()), this, SLOT (addObjectToSimButtonClick()));
+    connect(ui->deleteObjectButton, SIGNAL (released()), this, SLOT (deleteObjectFromButtonClick()));
+    connect(ui->loadObjectsButton, SIGNAL (released()), this, SLOT (loadObjectsForSimButtonClick()));
     //connect(this, SIGNAL(addObjectToWorld()), visualSimulator, SLOT(addObjectButtonClick()));
     //connect(this, SIGNAL(removeObjectFromWorld()), visualDesigner, SLOT(deleteObjectButtonClick()));
 
@@ -149,13 +147,10 @@ MainWindow::~MainWindow()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Public signals and slots                                                                                                  //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
+
 //Add robot to the simulation world view OR tool to the designer world view
-void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties *object, object_id oId)
+/*void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties *object, object_id oId)
 {
-    //if in simulation mode, alter simulator widgets
-    if (simulation)
-    {
         if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
 
         worldObjects[oId] = object;
@@ -170,27 +165,8 @@ void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties *object, obj
 
         //request is complete so enable switching modes
         ui->designerButton->setEnabled(true);
-    }
+} */
 
-    //otherwise alter designer widgets
-    else
-    {
-        if(designerObjects.contains(oId)) throw std::logic_error("designer object " + std::to_string(oId) + " already exists in ui");
-
-        designerObjects[oId] = object;
-
-        visualDesigner->objectAddedToScreen(object->getModels(), oId);
-
-        designerItems[oId] = new QListWidgetItem();
-        designerItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
-        ui->designerActiveWidget->addItem(designerItems[oId]);
-
-        objectSelected(oId);
-
-        //request is complete so enable switching modes
-        ui->simulatorButton->setEnabled(true);
-    }
-*/
 //Add robot to the simulation world view
 void MainWindow::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties *, object_id>> objs)
 {
@@ -528,15 +504,15 @@ void MainWindow::saveObjectButtonClick(){}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Simulation mode tool button signals and slots                                                                             //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void MainWindow::addObjectButtonClick()
+void MainWindow::addObjectToSimButtonClick()
 {
-    ui->simulatorToolsList->currentWidget()->selectedItems();
+    //ui->simulatorToolsList->currentWidget()->selectedItems();
 }
 
-void MainWindow::deleteObjectButtonClick()
+void MainWindow::deleteObjectFromSimButtonClick()
 {}
 
-void MainWindow::loadObjectsButtonClick()
+void MainWindow::loadObjectsForSimButtonClick()
 {
     QFileDialog dialog(this);
     dialog.setDirectory(QDir::homePath());
@@ -551,9 +527,9 @@ void MainWindow::loadObjectsButtonClick()
     for(int i = 0; i < fileNames.size(); i++)
     {
         //create object from file
-        WorldObjectProperties *object;
+        //WorldObjectProperties *object;
 
-        Designer_Widget *newTool = new Designer_Widget(object);
+        //Designer_Widget *newTool = new Designer_Widget(object);
         //check property for "type"
         //match existing type in designerTabs or simulatorTabs?
         //add to tab, else push new tab and add
@@ -573,7 +549,7 @@ void MainWindow::addToolButtonClick()
     ui->simulatorButton->setEnabled(false);
 
     //parameter = (mylist)->designerToolsWidget->getSelected();
-    addToolToDesigner(WorldObjectProperties* parameter);
+    //addToolToDesigner(WorldObjectProperties* parameter);
 
     //need to eventually have this called:
     //worldObjectAddedToSimulation(WorldObjectProperties *object, object_id oId)
@@ -585,7 +561,7 @@ void MainWindow::deleteToolButtonClick()
     ui->simulatorButton->setEnabled(false);
 
     //with only one "selected" item, do I need to differentiate designerObjects/worldObjects just for view?
-    deleteToolFromDesigner(designerObjects[selected]);
+    //deleteToolFromDesigner(designerObjects[selected]);
 
     //TODO: ultimately call this: worldObjectRemovedFromSimulation(WorldObjectProperties *object, object_id oId)
 }
@@ -615,7 +591,7 @@ void MainWindow::loadToolsButtonClick()
     {
         //TODO create WorldObjectProperties* object from file
 
-        newObject = makeWidget();
+        //newObject = makeWidget();
         //TODO add shapes to widget view (can probably do this in Designer_Widget.cpp)
 
         //TODO check properties for "type"
@@ -715,7 +691,7 @@ void MainWindow::updatePropertyInformation()
         ui->propertiesTableView->setUpdatesEnabled(true);
     }
 }
-
+/*
 void MainWindow::updateSimulatorBuildTools()
 {
     //for each world object in folder
@@ -731,7 +707,7 @@ void MainWindow::updateDesignerBuildTools()
         //how many tabs/categories?
         //widget using items from *components in basic viewer + mouse-over description
 }
-
+*/
 void MainWindow::simObjectMoveDragged(object_id id, double dx, double dy)
 {
    auto obj = worldObjects.find(id);

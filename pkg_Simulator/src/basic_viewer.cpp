@@ -450,14 +450,17 @@ void BasicViewer::objectSelected(object_id id)
     {
         nothingSelected();
 
-        _currSelection = id;
-        newColor = _color(_drawLevels[_currSelection], true);
-        _setOutlineColor(_topShapes[id], newColor);
-
-        if(_toolsEnabled)
+        if(_models.contains(id))
         {
-            _placeTools();
-            _scene->addItem(_tools);
+            _currSelection = id;
+            newColor = _color(_drawLevels[_currSelection], true);
+            _setOutlineColor(_topShapes[id], newColor);
+
+            if(_toolsEnabled)
+            {
+                _placeTools();
+                _scene->addItem(_tools);
+            }
         }
     }
 }

@@ -75,6 +75,7 @@ set(CPP_SRCS
     src/ui/mainwindow.cpp
     src/ui/joystickprototype.cpp
     src/ui/settingspopup.cpp
+    src/ui/designer_widget.cpp
     src/main.cpp
     )
 

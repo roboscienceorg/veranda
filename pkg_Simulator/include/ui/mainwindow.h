@@ -142,9 +142,9 @@ private slots:
     void saveObjectButtonClick();
 
     //Simulation mode tool button signals and slots
-    void addObjectButtonClick();
-    void deleteObjectButtonClick();
-    void loadObjectButtonClick();
+    void addObjectToSimButtonClick();
+    void deleteObjectFromSimButtonClick();
+    void loadObjectsForSimButtonClick();
 
     //Designer mode tool button signals and slots
     void addToolButtonClick();
@@ -168,10 +168,8 @@ signals:
     void windowClosed();
 
     //tools menu (rightmost deployable menu)
-    void addToolToSimulator(WorldObjectProperties*);
-    void addToolToDesigner(WorldObjectProperties*);
-    void deleteToolFromSimulator(WorldObjectProperties*);
-    void deleteToolFromDesigner(WorldObjectProperties*);
+    void addToolToSimulator(WorldObjectProperties* properties);
+    void deleteToolFromSimulator(WorldObjectProperties* properties);
     void error(QString);
 };
 
