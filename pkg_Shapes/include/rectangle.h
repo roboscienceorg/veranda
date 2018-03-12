@@ -4,7 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include <Box2D/Box2D.h>
-#include <sdsmt_simulator/world_object_component_if.h>
+#include <sdsmt_simulator/world_object_component.h>
 
 #include <QVector>
 #include <QString>
@@ -13,23 +13,9 @@
 
 #include <memory>
 
-class Rectangle : public WorldObjectComponent_If
+class Rectangle : public WorldObjectComponent
 {
     Q_OBJECT
-
-    constexpr static double PI = 3.14159265359;
-    constexpr static double RAD2DEG = (360.0/(2*PI));
-    constexpr static double DEG2RAD = (1.0/RAD2DEG);
-
-    bool _connected = false;
-
-    Property x = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                          "X position of the shape"), QVariant(0.0),
-                          &Property::double_validator);
-
-    Property y = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                          "Y position of the shape"), QVariant(0.0),
-                          &Property::double_validator);
 
     Property height = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
                                "Height of the rectangle"), QVariant(1.0),
@@ -39,62 +25,36 @@ class Rectangle : public WorldObjectComponent_If
                                "Width of the rectangle"), QVariant(1.0),
                                &Property::abs_double_validator);
 
-    Property rotation = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                               "Degrees clockwise of north"), QVariant(1.0),
-                               &Property::angle_validator);
-
-    QMap<QString, PropertyView> _properties{
-        {"x_pos", &x},
-        {"y_pos", &y},
-        {"height", &height},
-        {"width", &width},
-        {"rotation", &rotation}
+    QMap<QString, QSharedPointer<PropertyView>> _properties{
+        {"width", QSharedPointer<PropertyView>::create(&width)},
+        {"height", QSharedPointer<PropertyView>::create(&height)}
     };
 
     Model* shape_model = nullptr;
 
     b2Body* body = nullptr;
     b2WeldJoint* joint = nullptr;
+    b2Fixture* fixture = nullptr;
+
+    b2World* _world = nullptr;
+
+    object_id _oid;
 
 public:
     Rectangle(QObject* parent=nullptr);
 
-    WorldObjectComponent_If* clone(QObject *newParent);
+    WorldObjectComponent* _clone(QObject *newParent);
 
-    virtual QMap<QString, PropertyView>& getProperties(){
+    virtual QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
         return _properties;
     }
 
-    virtual QString getPropertyGroup(){
-        return "Rectangle";
-    }
-
-    QVector<Model*> getModels(){
-        return {shape_model};
-    }
-
-    bool usesChannels(){
-        return true;
-    }
-
     void generateBodies(b2World *world, object_id oId, b2Body *anchor);
-    void clearBodies(b2World* world);
-    void setROSNode(std::shared_ptr<rclcpp::Node>){}
+    void clearBodies();
 
 private slots:
-    void _channelChanged(QVariant);
     void _buildModels();
-
-public slots:
-    //Connects to all ROS topics
-    virtual void connectChannels(){}
-
-    //Disconnects all ROS topics
-    virtual void disconnectChannels(){}
-
-    virtual void worldTicked(const b2World*, const double);
-
-    virtual void setObjectMass(double mass){}
+    void _makeFixtures();
 };
 
 #endif // FLOATER_DRIVETRAIN_H

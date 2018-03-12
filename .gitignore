@@ -12,6 +12,7 @@ msg/*Goal.msg
 msg/*Result.msg
 msg/_*.py
 *.autosave
+*.vscode*
 
 # Qt build folders
 build-*/

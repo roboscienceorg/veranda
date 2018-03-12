@@ -10,6 +10,7 @@
 
 #include "model.h"
 #include "dllapi.h"
+#include "const.h"
 
 typedef int32_t object_id;
 
@@ -27,6 +28,7 @@ public:
         description(_description), readOnly(_readOnly), isList(_isList), type(_type){}
 };
 
+
 class SDSMT_SIMULATOR_API Property : public QObject
 {
     Q_OBJECT
@@ -43,7 +45,7 @@ public:
         bool valid;
         _new.toDouble(&valid);
         if(valid)
-            return _new;
+            return std::abs(_new.toDouble()) < EPSILON ? 0.0 : _new;
         return _old;
     }
 
@@ -76,7 +78,7 @@ public:
         bool isDouble;
         double asDouble = _new.toDouble(&isDouble);
         if(isDouble && asDouble >= 0 && asDouble <= 360)
-            return _new;
+            return std::abs(_new.toDouble()) < EPSILON ? 0.0 : _new;
         return _old;
     }
 
@@ -101,29 +103,42 @@ public:
     const PropertyInfo& info()
     { return _info; }
 
-    void set(const QVariant& v)
+    void set(const QVariant& v, bool notifyOwner = false)
     {
-        _set(v);
+        //Update to value if valid
+        _value = _validate(_value, v);
+
+        //Notify watchers
+        _update(notifyOwner);
     }
 
 signals:
-    //Signals that the value was changed or attempted to change
+    //Signals an outgoing value that viewers
+    //should listen to
     void valueSet(QVariant);
 
+    //Signals an incoming value that an external
+    //source set
+    void valueRequested(QVariant);
+
 private slots:
-    void _set(QVariant newValue)
+    void _request(QVariant newValue)
     {
         //qDebug() << "Validate value at origin" << this;
         _value = _validate(_value, newValue);
 
         //Push value to viewers created from this one
-        _update();
+        _update(true);
     }
 
-    void _update()
+    void _update(bool isRequest)
     {
         //Publish value to watching objects
         valueSet(_value);
+
+        //Notify owner
+        if(isRequest)
+            valueRequested(_value);
     }
 };
 
@@ -139,7 +154,7 @@ class SDSMT_SIMULATOR_API PropertyView : public QObject
         {
             connect(_origin, &Property::valueSet, this, &PropertyView::valueSet);
             connect(_origin, &Property::destroyed, this, &PropertyView::_invalidate);
-            connect(this, &PropertyView::requestValue, _origin, &Property::_set);
+            connect(this, &PropertyView::requestValue, _origin, &Property::_request);
         }
     }
 

@@ -18,7 +18,7 @@ class Rectangle_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 
 public:
     Rectangle_Plugin();
-    WorldObjectComponent_If* createComponent();
+    WorldObjectComponent *createComponent();
 
 };
 

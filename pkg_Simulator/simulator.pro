@@ -8,7 +8,8 @@ TEMPLATE = app
 INCLUDEPATH += include \
                # Hack to make autocomplete work in qtcreator
                ../pkg_Box2D/include \
-               ../pkg_SimulatorAPI/include
+               ../pkg_SimulatorAPI/include \
+                /opt/ros/ardent/include
 
 SOURCES += \
     src/main.cpp \

@@ -10,9 +10,56 @@
 #include <QGraphicsItem>
 #include <QLayout>
 #include <QColor>
+#include <QDebug>
+#include <QKeyEvent>
 
 #include <Box2D/Box2D.h>
 #include <sdsmt_simulator/model.h>
+
+class CustomGraphicsView : public QGraphicsView
+{
+    Q_OBJECT
+
+public:
+    CustomGraphicsView(QGraphicsScene* scene, QWidget* parent = nullptr) :
+        QGraphicsView(scene, parent){}
+
+signals:
+    void mouseMoved(QMouseEvent* event);
+    void mousePress(QMouseEvent* event);
+    void mouseRelease(QMouseEvent* event);
+    void zoomTick(int z);
+    void screenShift(int x, int y);
+
+private:
+    void mouseMoveEvent(QMouseEvent* event)
+    {
+        mouseMoved(event);
+    }
+
+    void mousePressEvent(QMouseEvent* event)
+    {
+        mousePress(event);
+    }
+
+    void mouseReleaseEvent(QMouseEvent* event)
+    {
+        mouseRelease(event);
+    }
+
+    void keyPressEvent(QKeyEvent* event)
+    {
+        switch(event->key())
+        {
+            case Qt::Key_W: screenShift(0, -1); break;
+            case Qt::Key_A: screenShift(-1, 0); break;
+            case Qt::Key_S: screenShift(0, 1); break;
+            case Qt::Key_D: screenShift(1, 0); break;
+            case Qt::Key_Q: zoomTick(1); break;
+            case Qt::Key_E: zoomTick(-1); break;
+        }
+    }
+};
 
 class BasicViewer : public Simulator_Visual_If
 {
@@ -24,8 +71,9 @@ class BasicViewer : public Simulator_Visual_If
     QMap<object_id, QVector<Model*>> _models;
 
     //Top-level parent shape for objects
+    QMap<object_id, QGraphicsItemGroup*> _topShapes;
     QMap<Model*, QGraphicsItem*> _shapes;
-    QMap<QGraphicsItem*, Model*> _shapeToModel;
+    QMap<QGraphicsItem*, object_id> _shapeToObject;
     QMap<Model*, object_id> _modelToObject;
     QMap<Model*, QVector<Model*>> _modelChildren;
 
@@ -36,9 +84,14 @@ class BasicViewer : public Simulator_Visual_If
     object_id _currSelection = 0;
 
     //Viewer, scene, and widget layout
-    QGraphicsView* _viewer;
+    CustomGraphicsView* _viewer;
     QGraphicsScene* _scene;
     QLayout* _children;
+
+    QGraphicsItem* _translater;
+    QGraphicsItem* _rotater;
+    QGraphicsItemGroup* _tools;
+    QTransform _transformerTransform;
 
     //Constructs a QAbstractGraphicsShapeItem from a box2d shape
     QGraphicsItem* _drawb2Shape(b2Shape* s, QGraphicsItem* itemParent = nullptr);
@@ -55,16 +108,30 @@ class BasicViewer : public Simulator_Visual_If
     //Sets a graphics item and all it's children to a specific color pen
     void _setOutlineColor(QGraphicsItem* item, const QColor& color);
 
+    bool _toolsEnabled = true;
+    bool _draggingTranslate = false;
+    bool _draggingRotate = false;
+
+    QPointF _dragStart;
+
+    QGraphicsItem* _makeTranslater();
+    QGraphicsItem* _makeRotater();
+    QGraphicsItem* _makeArrow(double pointx, double pointy, double angle, QPen p, QBrush b);
+    void _placeTools();
+
 public:
     BasicViewer(QWidget* parent = nullptr);
 
     void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
+    void setWorldBounds(QRectF rect);
+
 public slots:
     void objectAddedToScreen(QVector<Model *> objects, object_id id) override;
     void objectRemovedFromScreen(object_id id) override;
     void objectDrawLevelSet(object_id id, DrawLevel level) override;
     void objectSelected(object_id id) override;
     void nothingSelected() override;
+    void setToolsEnabled(bool enabled);
 
 private slots:
     void modelMoved(Model* m, double dx, double dy, double dt);
@@ -72,8 +139,13 @@ private slots:
     void removeModel(Model* m);
     QGraphicsItem* addModel(Model* m, object_id id);
 
-    void mousePressEvent(QMouseEvent *event);
+    void viewMousePress(QMouseEvent *event);
+    void viewMouseRelease(QMouseEvent* event);
+    void viewMouseMove(QMouseEvent* event);
     void resizeEvent(QResizeEvent* event);
+
+    void viewShift(int x, int y);
+    void viewZoom(int z);
 };
 
 #endif // BASIC_VIEWER_H

@@ -18,12 +18,13 @@
 #include <QDebug>
 #include <QTextStream>
 #include <QMap>
+#include <QFileDialog>
 
 #include "basic_physics.h"
 #include "basic_viewer.h"
 
 #include <sdsmt_simulator/world_object_component_plugin.h>
-#include <sdsmt_simulator/world_object_file_handler_plugin.h>
+#include <sdsmt_simulator/file_handler_plugin.h>
 
 #include "simulator_core.h"
 
@@ -91,7 +92,9 @@ int main(int argc, char** argv)
     QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
     QVector<WorldObjectLoader_If*> objectLoaders;
     QVector<WorldObjectSaver_If*> objectSavers;
-    WorldObjectLoader_If* defaultBots = nullptr;
+    QVector<WorldLoader_If*> worldLoaders;
+    QVector<WorldSaver_If*> worldSavers;
+    WorldLoader_If* defaultLoader = nullptr;
 
     QPluginLoader plugLoader;
 
@@ -114,20 +117,29 @@ int main(int argc, char** argv)
             QObject* plugin = plugLoader.instance();
             QString iid = plugLoader.metaData()["IID"].toString();
 
-            if(qobject_cast<WorldObjectComponent_Plugin_If*>(plugin))
+            if(iid == "org.sdsmt.sim.2d.fileHandlers.defaultBot")
+            {
+                qInfo() << "Found default robot loader";
+                defaultLoader = qobject_cast<WorldFileHandler_Plugin_If*>(plugin)->getLoaders()[0];
+            }
+            else if(qobject_cast<WorldObjectComponent_Plugin_If*>(plugin))
             {
                 qInfo() << "Component Plugin Accepted";
                 componentPlugins[iid] = qobject_cast<WorldObjectComponent_Plugin_If*>(plugin);
             }
             else if(qobject_cast<WorldObjectFileHandler_Plugin_If*>(plugin))
             {
-                qInfo() << "Filehandler Plugin Accepted";
+                qInfo() << "Object Filehandler Plugin Accepted";
                 WorldObjectFileHandler_Plugin_If* p = qobject_cast<WorldObjectFileHandler_Plugin_If*>(plugin);
                 objectLoaders += p->getLoaders();
                 objectSavers += p->getSavers();
-
-                if(iid == "org.sdsmt.sim.2d.fileHandlers.defaultBot")
-                    defaultBots = p->getLoaders()[0];
+            }
+            else if(qobject_cast<WorldFileHandler_Plugin_If*>(plugin))
+            {
+                qInfo() << "World Filehandler Plugin Accepted";
+                WorldFileHandler_Plugin_If* p = qobject_cast<WorldFileHandler_Plugin_If*>(plugin);
+                worldLoaders += p->getLoaders();
+                worldSavers += p->getSavers();
             }
             else
             {
@@ -149,17 +161,14 @@ int main(int argc, char** argv)
     };
 
     Simulator_Physics_If* physics = new BasicPhysics;
-    Simulator_Ui_If* userinterface = new MainWindow(visuals, componentPlugins, objectLoaders, objectSavers);
+    Simulator_Ui_If* userinterface = new MainWindow(visuals, componentPlugins, objectLoaders, objectSavers, worldLoaders, worldSavers, defaultLoader);
 
     SimulatorCore sim(physics, userinterface, node, &app);
 
-    if(defaultBots)
+    if(defaultLoader)
     {
-        for(WorldObject* wo : defaultBots->loadFile("", componentPlugins))
-        {
-            sim.addSimObject(wo);
-            delete wo;
-        }
+        auto def = defaultLoader->loadFile("", componentPlugins);
+        sim.addSimObjects(def);
     }
 
     qDebug() << "Starting Simulation";

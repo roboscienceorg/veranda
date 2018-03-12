@@ -4,9 +4,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator_api)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
 ## Compile as C++11
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 11)
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -19,7 +18,7 @@ find_package(rclcpp REQUIRED)
 
 ## Find and configure QT
 find_package(Qt5 REQUIRED COMPONENTS
-  Core
+  Core Gui
 )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -46,7 +45,7 @@ set(MOC_HDRS
     include/sdsmt_simulator/world_object.h
     include/sdsmt_simulator/model.h
     include/sdsmt_simulator/property.h
-    include/sdsmt_simulator/world_object_component_if.h
+    include/sdsmt_simulator/world_object_component.h
 )
 
 set(CPP_HDRS
@@ -58,6 +57,7 @@ set(CPP_HDRS
 
 set(CPP_SRCS
     src/world_object.cpp
+    src/world_object_component.cpp
 )
 
 ###########
@@ -75,16 +75,13 @@ endif()
 ## Run MOC on files with Qt Keywords and Macros
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 
-## Add fPIC for library exports
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 ## Build Library
 add_definitions(-DSDSMT_SIMULATOR_DLL)
 add_library(sdsmt_simulator_api SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to library
 ## this will find all the headers and link all the libraries
-qt5_use_modules(sdsmt_simulator_api Core)
+qt5_use_modules(sdsmt_simulator_api Core Gui)
 
 ## Pull in stuff exported from other packages
 ament_target_dependencies(sdsmt_simulator_api

@@ -1,6 +1,8 @@
 import rclpy
 from rclpy.node import Node
 
+from sdsmt_simulator.SimTimer import SimTimer
+
 from std_msgs.msg import Float32
 
 import math
@@ -56,36 +58,25 @@ def main():
 
     publeft = node.create_publisher(Float32, 'robot0/left_wheel')
     pubright = node.create_publisher(Float32, 'robot0/right_wheel')
+
+    simTime = SimTimer(True, "sdsmt_simulator/timestamp", node)
     
     # Factor to scale down speed by
     speedScale = 2
-
-    # Start time at pi because that's the function lines up
-    # with the robot starting location I've set
-    t = math.pi
-
-    # Start time at multiple of pi because the location
-    # function will divide the scale back out
-    t *= speedScale
 
     # Tick time at 10 hz
     dt = 0.1
 
     def cb():
-        nonlocal t
-
         # Calculate wheel velocities for current time
-        phi1, phi2 = DD_IK(x_t, y_t, t, speedScale)
+        phi1, phi2 = DD_IK(x_t, y_t, simTime.global_time() + 2*math.pi, speedScale)
 
         print(phi1, phi2)
-
-        # Increment time
-        t += dt
 
         # Publish velocities
         publishWheelVelocity(publeft, pubright, phi1, phi2)
 
-    timer = node.create_timer(dt, cb)
+    simTime.create_timer(dt, cb)
 
     rclpy.spin(node)
     node.destroy_node()

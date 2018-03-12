@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <cmath>
 
-Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent_If(parent)
+Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent("Fixed Wheel", parent)
 {
     qRegisterMetaType<std_msgs::msg::Float32::SharedPtr>("std_msgs::msg::Float32::SharedPtr");
 
@@ -23,11 +23,9 @@ Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent_If(parent)
     connect(&_density, &Property::valueSet,
     [=](QVariant d)
     {
-        if(_wheelFix && _wheelBody)
+        if(_wheelFix)
         {
             _wheelFix->SetDensity(d.toDouble());
-            _wheelBody->ResetMassData();
-            massChanged(this, _wheelBody->GetMass());
         }
     });
 
@@ -35,17 +33,20 @@ Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent_If(parent)
     connect(this, &Fixed_Wheel::_receiveMessage, this, &Fixed_Wheel::_processMessage);
 
     _wheelModel = new Model({}, {}, this);
+    registerModel(_wheelModel);
+
+    _buildModels();
 }
 
 void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
 {
-    clearBodies(world);
+    clearBodies();
+    _world = world;
 
     b2BodyDef bDef;
     bDef.type = b2_dynamicBody;
     _wheelBody = world->CreateBody(&bDef);
-
-    moveBodyToLocalSpaceOfOtherBody(_wheelBody, anchor, _xLocal.get().toDouble(), _yLocal.get().toDouble(), _thetaLocal.get().toDouble());
+    registerBody(_wheelBody, {_wheelModel}, true);
 
     b2WeldJointDef weldDef;
     auto anchorPt = anchor->GetWorldCenter();
@@ -59,22 +60,20 @@ void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
     _objectId = oId;
 
     _attachWheelFixture();
-    _buildModels();
 }
 
-void Fixed_Wheel::clearBodies(b2World *world)
+void Fixed_Wheel::clearBodies()
 {
-    if(nullptr != _wheelBody)
+    if(_world)
     {
-        world->DestroyJoint(_weldJoint);
-        world->DestroyBody(_wheelBody);
-
+        _world->DestroyJoint(_weldJoint);
+        _world->DestroyBody(_wheelBody);
+        unregisterBody(_wheelBody);
         _weldJoint = nullptr;
         _wheelBody = nullptr;
         _wheelFix = nullptr;
-
-        massChanged(this, 0);
     }
+    _world = nullptr;
 }
 
 void Fixed_Wheel::_attachWheelFixture()
@@ -100,20 +99,13 @@ void Fixed_Wheel::_attachWheelFixture()
 
         _wheelFix = _wheelBody->CreateFixture(&fixDef);
 
-        massChanged(this, _wheelBody->GetMass());
-
         delete wheel;
     }
 }
 
-WorldObjectComponent_If *Fixed_Wheel::clone(QObject *newParent)
+WorldObjectComponent *Fixed_Wheel::_clone(QObject *newParent)
 {
     Fixed_Wheel* out = new Fixed_Wheel(newParent);
-
-    for(QString s : _properties.keys())
-    {
-        out->_properties[s].set(_properties[s].get(), true);
-    }
 
     return out;
 }
@@ -173,17 +165,12 @@ void Fixed_Wheel::_buildModels()
     delete newModel;
 }
 
-void Fixed_Wheel::worldTicked(const b2World*, const double)
+void Fixed_Wheel::_worldTicked(const double)
 {
     if(_wheelBody)
     {
         Basic_Wheel::applyNoSlideConstraint(_wheelBody, _radius.get().toDouble());
         Basic_Wheel::applyNoSlipConstraint(_wheelBody, _radius.get().toDouble(), _targetAngularVelocity);
-
-        double x = _wheelBody->GetWorldCenter().x;
-        double y = _wheelBody->GetWorldCenter().y;
-        double t = _wheelBody->GetAngle();
-        _wheelModel->setTransform(x, y, t*RAD2DEG);
     }
 }
 

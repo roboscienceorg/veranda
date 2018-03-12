@@ -19,6 +19,8 @@ public:
 signals:
     //Signals that the user clicked on a robot
     void userSelectedObject(object_id id);
+    void userDragMoveObject(object_id, double dx, double dy);
+    void userDragRotateObject(object_id, double dt);
 
 public slots:
     virtual void objectAddedToScreen(QVector<Model*> objects, object_id oId) = 0;
@@ -26,5 +28,6 @@ public slots:
     virtual void objectDrawLevelSet(object_id id, DrawLevel) = 0;
     virtual void objectSelected(object_id id) = 0;
     virtual void nothingSelected() = 0;
+    virtual void setToolsEnabled(bool enabled) = 0;
 };
 #endif // SIMULATOR_VISUAL_H

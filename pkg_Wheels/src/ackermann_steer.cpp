@@ -5,7 +5,7 @@
 #include <cmath>
 #include <functional>
 
-Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent_If(parent)
+Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent("Ackermann Steer", parent)
 {
     qRegisterMetaType<std_msgs::msg::Float32::SharedPtr>("std_msgs::msg::Float32::SharedPtr");
 
@@ -30,12 +30,7 @@ Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent_If(pare
         if(_world)
         {
             _lWheelFix->SetDensity(d.toDouble());
-            _lWheelBody->ResetMassData();
-
             _rWheelFix->SetDensity(d.toDouble());
-            _rWheelBody->ResetMassData();
-
-            massChanged(this, _lWheelBody->GetMass() + _rWheelBody->GetMass() + _cBody->GetMass());
         }
     });
 
@@ -46,19 +41,24 @@ Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent_If(pare
     _lWheelModel = new Model({}, {}, this);
     _rWheelModel = new Model({}, {}, this);
     _debugModel = new Model({}, {}, this);
-
-    _wheelModel->addChildren({_lWheelModel, _rWheelModel/*, _debugModel*/});
+    registerModel(_wheelModel);
+    registerModel(_lWheelModel);
+    registerModel(_rWheelModel);
+    //registerModel(_debugModel);
 }
 
 void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anchor)
 {
-    clearBodies(world);
+    clearBodies();
 
     b2BodyDef bDef;
     bDef.type = b2_dynamicBody;
     _lWheelBody = world->CreateBody(&bDef);
     _rWheelBody = world->CreateBody(&bDef);
     _cBody = world->CreateBody(&bDef);
+    registerBody(_lWheelBody, {_lWheelModel});
+    registerBody(_rWheelBody, {_rWheelModel});
+    registerBody(_cBody, {_wheelModel}, true);
 
     _anchor = anchor;
     _world = world;
@@ -68,7 +68,6 @@ void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anch
     _objectId = oId;
 
     _attachWheelFixture();
-    _buildModels();
 }
 
 void Ackermann_Steer::_jointWheels()
@@ -82,10 +81,13 @@ void Ackermann_Steer::_jointWheels()
             _world->DestroyJoint(_cJoint);
         }
 
-        //Leverage the move body function rather than do math manually
-        moveBodyToLocalSpaceOfOtherBody(_cBody, _anchor, _xLocal.get().toDouble(), _yLocal.get().toDouble(), _thetaLocal.get().toDouble());
-        moveBodyToLocalSpaceOfOtherBody(_rWheelBody, _cBody, _l1.get().toDouble()/2.0, 0, 90);
-        moveBodyToLocalSpaceOfOtherBody(_lWheelBody, _cBody, -_l1.get().toDouble()/2.0, 0, 90);
+        //Re-register the wheel bodies to get them positioned where they need to
+        //be relative to the local origin
+        _rWheelBody->SetTransform(b2Vec2(_l1.get().toDouble()/2.0, 0), 90*DEG2RAD);
+        registerBody(_rWheelBody, {_rWheelModel});
+
+        _lWheelBody->SetTransform(b2Vec2(-_l1.get().toDouble()/2.0, 0), 90*DEG2RAD);
+        registerBody(_lWheelBody, {_lWheelModel});
 
         //qDebug() << "Main body:" << _cBody->GetWorldCenter().x << _cBody->GetWorldCenter().y << _cBody->GetAngle();
         //qDebug() << "Left body:" << _lWheelBody->GetWorldCenter().x << _lWheelBody->GetWorldCenter().y << _lWheelBody->GetAngle();
@@ -122,29 +124,34 @@ void Ackermann_Steer::_jointWheels()
         weldDef.localAnchorB = _cBody->GetLocalPoint(anchorPt);
         weldDef.referenceAngle = _cBody->GetAngle() - _anchor->GetAngle();
         _cJoint = _world->CreateJoint(&weldDef);
+
+        //Redraw wheels
+        syncModels();
     }
 }
 
-void Ackermann_Steer::clearBodies(b2World *world)
+void Ackermann_Steer::clearBodies()
 {
     if(_world)
     {
-        world->DestroyJoint(_lRevJoint);
-        world->DestroyBody(_lWheelBody);
-
+        _world->DestroyJoint(_lRevJoint);
+        _world->DestroyBody(_lWheelBody);
+        unregisterBody(_lWheelBody);
         _lRevJoint = nullptr;
         _lWheelBody = nullptr;
         _lWheelFix = nullptr;
 
-        world->DestroyJoint(_rRevJoint);
-        world->DestroyBody(_rWheelBody);
+        _world->DestroyJoint(_rRevJoint);
+        _world->DestroyBody(_rWheelBody);
+        unregisterBody(_rWheelBody);
 
         _rRevJoint = nullptr;
         _rWheelBody = nullptr;
         _rWheelFix = nullptr;
 
-        world->DestroyJoint(_cJoint);
-        world->DestroyBody(_cBody);
+        _world->DestroyJoint(_cJoint);
+        _world->DestroyBody(_cBody);
+        unregisterBody(_cBody);
 
         _cJoint = nullptr;
         _cBody = nullptr;
@@ -153,8 +160,6 @@ void Ackermann_Steer::clearBodies(b2World *world)
 
     _anchor = nullptr;
     _world = nullptr;
-
-    massChanged(this, 0);
 }
 
 void Ackermann_Steer::_attachWheelFixture()
@@ -197,20 +202,13 @@ void Ackermann_Steer::_attachWheelFixture()
 
         _cFix = _cBody->CreateFixture(&fixDef);
 
-        massChanged(this, _lWheelBody->GetMass() + _rWheelBody->GetMass());
-
         delete sh;
     }
 }
 
-WorldObjectComponent_If *Ackermann_Steer::clone(QObject *newParent)
+WorldObjectComponent *Ackermann_Steer::_clone(QObject *newParent)
 {
     Ackermann_Steer* out = new Ackermann_Steer(newParent);
-
-    for(QString s : _properties.keys())
-    {
-        out->_properties[s].set(_properties[s].get(), true);
-    }
 
     return out;
 }
@@ -267,18 +265,13 @@ void Ackermann_Steer::_buildModels()
     qDeleteAll(_rWheelModel->shapes());
     _rWheelModel->removeShapes(_rWheelModel->shapes());
 
-    _wheelModel->removeChildren({_lWheelModel, _rWheelModel});
+    Model* tmp = Basic_Wheel::makeWheelModel(_wradius.get().toDouble(), _wwidth.get().toDouble());
+    _lWheelModel->addShapes(tmp->shapes());
+    delete tmp;
 
-    delete _lWheelModel;
-    delete _rWheelModel;
-
-    _lWheelModel = Basic_Wheel::makeWheelModel(_wradius.get().toDouble(), _wwidth.get().toDouble());
-    _rWheelModel = Basic_Wheel::makeWheelModel(_wradius.get().toDouble(), _wwidth.get().toDouble());
-
-    _lWheelModel->setParent(this);
-    _rWheelModel->setParent(this);
-
-    _wheelModel->addChildren({_lWheelModel, _rWheelModel});
+    tmp = Basic_Wheel::makeWheelModel(_wradius.get().toDouble(), _wwidth.get().toDouble());
+    _rWheelModel->addShapes(tmp->shapes());
+    delete tmp;
 
     b2EdgeShape* line = new b2EdgeShape;
     line->m_vertex1 = b2Vec2(-_l1.get().toDouble()/2.0, 0);
@@ -286,31 +279,16 @@ void Ackermann_Steer::_buildModels()
 
     _wheelModel->addShapes({line});
 
-    _updateModelLocations();
+    syncModels();
 }
 
-void Ackermann_Steer::_updateModelLocations()
-{
-    if(_world)
-    {
-        double t = _cBody->GetAngle();
-        double x = _cBody->GetWorldCenter().x;
-        double y = _cBody->GetWorldCenter().y;
-        _wheelModel->setTransform(x, y, t * RAD2DEG);
-
-        _lWheelModel->setTransform(-_l1.get().toDouble()/2.0, 0, (_lWheelBody->GetAngle() - t) * RAD2DEG);
-        _rWheelModel->setTransform(_l1.get().toDouble()/2.0, 0, (_rWheelBody->GetAngle() - t) * RAD2DEG);
-    }
-}
-
-void Ackermann_Steer::worldTicked(const b2World*, const double)
+void Ackermann_Steer::_worldTicked(const double)
 {
     if(_lWheelBody && _rWheelBody)
     {
+        //qDebug() << "Steered to" << _lWheelBody->GetAngle()*RAD2DEG << _rWheelBody->GetAngle()*RAD2DEG;
         Basic_Wheel::applyNoSlideConstraint(_lWheelBody, _wradius.get().toDouble());
         Basic_Wheel::applyNoSlideConstraint(_rWheelBody, _wradius.get().toDouble());
-
-        _updateModelLocations();
     }
 }
 
@@ -321,7 +299,7 @@ void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr da
     double targetAngle = std::min(PI/2.0, std::max(-PI/2.0, (double)data->data));
     _steerAngle.set(targetAngle);
 
-    //qDebug() << "Steer angle:" << targetAngle;
+    qDebug() << "Steer angle:" << targetAngle;
 
     double targetLeft = 0, targetRight = 0;
     if(targetAngle < -0.001 || targetAngle > 0.001)
@@ -341,5 +319,4 @@ void Ackermann_Steer::_processMessage(const std_msgs::msg::Float32::SharedPtr da
 
     ((b2RevoluteJoint*)_lRevJoint)->SetLimits(targetLeft, targetLeft);
     ((b2RevoluteJoint*)_rRevJoint)->SetLimits(targetRight, targetRight);
-
 }

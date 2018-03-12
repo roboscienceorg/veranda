@@ -8,27 +8,50 @@
 #include <QStandardItemModel>
 #include <QThread>
 #include <QListWidgetItem>
+#include <QProgressBar>
+#include <QtConcurrent/QtConcurrent>
 #include <QWindow>
+
 #include <stdexcept>
 #include <string>
+#include <limits>
 
 MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If *> components,
-                       QVector<WorldObjectLoader_If*> loaders, QVector<WorldObjectSaver_If*> savers, QWidget *parent) :
+                       QVector<WorldObjectLoader_If*> oloaders, QVector<WorldObjectSaver_If*> osavers,
+                       QVector<WorldLoader_If *> wloaders, QVector<WorldSaver_If *> wsavers, WorldLoader_If* defaultLoader_, QWidget *parent) :
     Simulator_Ui_If(parent),
     makeWidget(factory), componentPlugins(components),
     ui(new Ui::MainWindow)
 {
+    qRegisterMetaType<QVector<object_id>>("QVector<object_id>");
+    qRegisterMetaType<QVector<QSharedPointer<WorldObject>>>("QVector<QSharedPointer<WorldObject>>");
+
+    defaultLoader = defaultLoader_;
+
     ui->setupUi(this);
 
     ui->centralWidget->setLayout(ui->mainLayout);
 
-    for(WorldObjectLoader_If* l : loaders)
+    for(WorldObjectLoader_If* l : oloaders)
         for(QString e : l->fileExts())
-            objectLoaders[e] = l;
+            objectLoaders[e] += l;
 
-    for(WorldObjectSaver_If* s : savers)
+    for(WorldObjectSaver_If* s : osavers)
         for(QString e : s->fileExts())
-            objectSavers[e] = s;
+            objectSavers[e] += s;
+
+    for(WorldLoader_If* l : wloaders)
+        for(QString e : l->fileExts())
+            worldLoaders[e] += l;
+
+    for(WorldSaver_If* s : wsavers)
+        for(QString e : s->fileExts())
+            worldSavers[e] += s;
+
+    //If no world loader plugins exist,
+    //don't present button to user
+    if(wloaders.size() == 0)
+        ui->importMapButton->setVisible(false);
 
     speed = 1;
     play = false;
@@ -53,7 +76,15 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
 
     ui->propertiesTableView->verticalHeader()->setVisible(false);
     connect(visualSimulator, SIGNAL(userSelectedObject(object_id)), this, SLOT(objectSelected(object_id)));
+
     connect(visualDesigner, SIGNAL(userSelectedObject(object_id)), this, SLOT(toolSelected(object_id)));
+
+    //connect(visualDesigner, SIGNAL(userSelectedTool(tool_id)), this, SLOT(toolSelected(t_id)));
+    connect(visualSimulator, SIGNAL(userDragMoveObject(object_id,double,double)), this, SLOT(simObjectMoveDragged(object_id,double,double)));
+    connect(visualSimulator, SIGNAL(userDragRotateObject(object_id,double)), this, SLOT(simObjectRotateDragged(object_id,double)));
+    connect(visualDesigner, SIGNAL(userDragMoveObject(object_id,double,double)), this, SLOT(buildObjectMoveDragged(object_id,double,double)));
+    connect(visualDesigner, SIGNAL(userDragRotateObject(object_id,double)), this, SLOT(buildObjectRotateDragged(object_id,double)));
+
     connect(this, SIGNAL(objectIsSelected(object_id)), visualSimulator, SLOT(objectSelected(object_id)));
     connect(this, SIGNAL(nothingIsSelected()), visualSimulator, SLOT(nothingSelected()));
     connect(this, SIGNAL(objectIsSelected(object_id)), visualDesigner, SLOT(objectSelected(object_id)));
@@ -118,7 +149,7 @@ MainWindow::~MainWindow()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Public signals and slots                                                                                                  //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 //Add robot to the simulation world view OR tool to the designer world view
 void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties *object, object_id oId)
 {
@@ -159,12 +190,32 @@ void MainWindow::worldObjectAddedToSimulation(WorldObjectProperties *object, obj
         //request is complete so enable switching modes
         ui->simulatorButton->setEnabled(true);
     }
+*/
+//Add robot to the simulation world view
+void MainWindow::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties *, object_id>> objs)
+{
+    for(auto& p : objs)
+    {
+        object_id& oId = p.second;
+        WorldObjectProperties* object = p.first;
+
+        if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
+
+        worldObjects[oId] = object;
+
+        visualSimulator->objectAddedToScreen(object->getModels(), oId);
+
+        listItems[oId] = new QListWidgetItem();
+        listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
+        ui->simulatorActiveWidget->addItem(listItems[oId]);
+    }
+    if(objs.size())
+        objectSelected(objs.last().second);
 }
 
-void MainWindow::worldObjectRemovedFromSimulation(object_id oId)
+void MainWindow::worldObjectsRemovedFromSimulation(QVector<object_id> oIds)
 {
-    //if in simulation mode, alter simulator widgets
-    if (simulation)
+    for(object_id oId : oIds)
     {
         visualSimulator->objectRemovedFromScreen(oId);
         worldObjects.remove(oId);
@@ -176,26 +227,8 @@ void MainWindow::worldObjectRemovedFromSimulation(object_id oId)
         if(selected == oId)
             nothingSelected();
 
-
         //request is complete so enable switching modes
         ui->designerButton->setEnabled(true);
-    }
-
-    //otherwise alter designer widgets
-    else
-    {
-        visualDesigner->objectRemovedFromScreen(oId);
-        designerObjects.remove(oId);
-
-        ui->designerActiveWidget->removeItemWidget(designerItems[oId]);
-        delete designerItems[oId];
-        designerItems.remove(oId);
-
-        if(selected == oId)
-            nothingSelected();
-
-        //request is complete so enable switching modes
-        ui->simulatorButton->setEnabled(true);
     }
 }
 
@@ -211,6 +244,8 @@ void MainWindow::physicsStarted()
     ui->designerButton->setEnabled(false);
     ui->simulatorToolsList->setEnabled(false);
     ui->simulatorToolsMenu->setEnabled(false);
+
+    visualSimulator->setToolsEnabled(false);
 }
 
 void MainWindow::physicsStopped()
@@ -225,6 +260,8 @@ void MainWindow::physicsStopped()
     ui->designerButton->setEnabled(true);
     ui->simulatorToolsList->setEnabled(true);
     ui->simulatorToolsMenu->setEnabled(true);
+
+    visualSimulator->setToolsEnabled(true);
 }
 
 void MainWindow::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
@@ -328,30 +365,25 @@ void MainWindow::playSimButtonClick()
 
 void MainWindow::speedSimButtonClick()
 {
-    if (speed == 1)
+    uint64_t next = (speed + 1) % SPEEDBUTTONS.size();
+    userSetPhysicsTickMultiplier(SPEEDBUTTONS[next].first);
+}
+
+void MainWindow::physicsTickMultiplierChanged(double mult)
+{
+    double closest = std::numeric_limits<double>::max();
+    for(int i=0; i<SPEEDBUTTONS.size(); i++)
     {
-        speed = 2;
-        ui->speedSimButton->setToolTip("Speed x3");
-        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedTwoSimIcon"));
+        double diff = std::abs(SPEEDBUTTONS[i].first - mult);
+        if(diff < closest)
+        {
+            closest = diff;
+            speed = i;
+        }
     }
-    else if (speed == 2)
-    {
-        speed = 3;
-        ui->speedSimButton->setToolTip("Speed 1/2");
-        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedThreeSimIcon"));
-    }
-    else if (speed == 3)
-    {
-        speed = 0;
-        ui->speedSimButton->setToolTip("Speed x1");
-        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedHalfSimIcon"));
-    }
-    else if (speed == 0)
-    {
-        speed = 1;
-        ui->speedSimButton->setToolTip("Speed x2");
-        ui->speedSimButton->setIcon(QIcon(":/sim/SpeedOneSimIcon"));
-    }
+
+    ui->speedSimButton->setToolTip(SPEEDBUTTONS[speed].second.first);
+    ui->speedSimButton->setIcon(QIcon(SPEEDBUTTONS[speed].second.second));
     ui->speedSimButton->setIconSize(QSize(32,32));
 }
 
@@ -381,22 +413,74 @@ void MainWindow::importMapButtonClick()
     switch (ret) {
       case QMessageBox::Yes:
     {
+          QString types;
+          qDebug() << "Able to load files:" << worldLoaders.keys();
+          for(QString k : worldLoaders.keys())
+              if(k.size())
+                types += k + ";;";
+
+          types = types.left(types.size()-2);
+
           // Save was clicked
-          QString path = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", tr("Json files (*.json);;Images (*.png *.jpg)"));
+          QString path = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", types);
 
           if(path.length())
           {
-              /*Map* map = mapLoader->loadMapFile(path);
-              if(map)
-              {
-                  //Clear out simulation
-                  while(worldObjects.size())
-                      userRemoveWorldObjectFromSimulation(worldObjects.firstKey());
+              QString ext = QFileInfo(path).suffix();
 
-                  //Add map into new simulation
-                  userAddWorldObjectToSimulation(map);
-                  delete map;
-              }*/
+              bool done = false;
+              for(auto it = worldLoaders.begin(); it != worldLoaders.end() && !done; it++)
+              {
+                  if(it.key().contains(ext))
+                      for(WorldLoader_If* wl : it.value())
+
+                          //Find the first loader that can load this file
+                          //and try to load. If it fails, we can't load it
+                          if(!done && wl->canLoadFile(path))
+                          {
+                              //Get user options in main thread
+                              wl->getUserOptions(path);
+
+                              //Spin up side thread to actually load it
+                              QtConcurrent::run([this, path, wl](){
+                                  QVector<QSharedPointer<WorldObject>> loadedObjs;
+                                  try
+                                  {
+                                      //Load file in separate thread
+                                      qDebug() << "Load file";
+                                      loadedObjs=wl->loadFile(path, componentPlugins);
+                                  }catch(std::exception& ex){}
+
+                                  if(loadedObjs.size())
+                                  {
+                                      qDebug() << "Clear world";
+                                      userRemoveWorldObjectsFromSimulation(worldObjects.keys().toVector());
+
+                                      qDebug() << "Build new world";
+                                      userAddWorldObjectsToSimulation(loadedObjs);
+
+                                      //Add default robots
+                                      if(defaultLoader && defaultLoader->canLoadFile(path))
+                                      {
+                                          loadedObjs.clear();
+                                          try
+                                          {
+                                              loadedObjs=defaultLoader->loadFile(path, componentPlugins);
+                                          }catch(std::exception& ex){}
+                                          userAddWorldObjectsToSimulation(loadedObjs);
+                                      }
+                                  }
+                                  else
+                                  {
+                                    emit error("Unable to open \'" + path + "\' as a world file");
+                                  }
+                              });
+
+                              //Stop looking for a file handler
+                              //for this file
+                              done = true;
+                          }
+              }
           }
 
           break;
@@ -562,9 +646,9 @@ void MainWindow::objectSelected(object_id id)
         WorldObjectProperties* obj = worldObjects[id];
         QStandardItemModel* model = propertiesModel;
 
-        QMap<QString, PropertyView>& objProps = obj->getProperties();
-        QStringList propKeys = objProps.keys();
-        model->setRowCount(objProps.size());
+        selectedProps = obj->getProperties();
+        QStringList propKeys = selectedProps.keys();
+        model->setRowCount(selectedProps.size());
 
         int i = 0;
         for(QString k : propKeys)
@@ -575,7 +659,7 @@ void MainWindow::objectSelected(object_id id)
            ind = model->index(i, 0);
            model->setData(ind, k);
 
-           connect(&objProps[k], &PropertyView::valueSet, this, &MainWindow::updatePropertyInformation);
+           connect(selectedProps[k].data(), &PropertyView::valueSet, this, &MainWindow::updatePropertyInformation);
 
            displayed_properties[i] = k;
            i++;
@@ -584,7 +668,7 @@ void MainWindow::objectSelected(object_id id)
         connect(model, &QStandardItemModel::dataChanged, [this, obj, model](QModelIndex tl, QModelIndex br)
         {
            for(int i = tl.row(); i <= br.row(); i++)
-               obj->getProperties()[displayed_properties[i]].set(model->data(model->index(i, 1)));
+               selectedProps[displayed_properties[i]]->set(model->data(model->index(i, 1)));
         });
 
         updatePropertyInformation();
@@ -602,9 +686,10 @@ void MainWindow::nothingSelected()
 
     if(worldObjects.contains(selected))
     {
-        for(auto iter : worldObjects[selected]->getProperties())
-            disconnect(&iter, 0, this, 0);
+        for(auto iter : selectedProps)
+            disconnect(iter.data(), 0, this, 0);
     }
+    selectedProps.clear();
     selected = 0;
 
     nothingIsSelected();
@@ -619,15 +704,56 @@ void MainWindow::updatePropertyInformation()
 {
     if(worldObjects.contains(selected))
     {
-        QMap<QString, PropertyView>& ppts = worldObjects[selected]->getProperties();
         QStandardItemModel* model = propertiesModel;
 
         ui->propertiesTableView->setUpdatesEnabled(false);
-        for(int i=0; i<ppts.size(); i++)
+        for(int i=0; i<selectedProps.size(); i++)
         {
             QString key = model->data(model->index(i, 0)).toString();
-            model->setData(model->index(i, 1), ppts[key].get().toString(), Qt::DisplayRole);
+            model->setData(model->index(i, 1), selectedProps[key]->get().toString(), Qt::DisplayRole);
         }
         ui->propertiesTableView->setUpdatesEnabled(true);
     }
+}
+
+void MainWindow::updateSimulatorBuildTools()
+{
+    //for each world object in folder
+        //create new widget and display in
+        //put name of build object? can I add an icon for each build object? would be useful
+}
+
+void MainWindow::updateDesignerBuildTools()
+{
+    //for(auto iter = robot->getProperties().begin(); iter != robot->getProperties().end(); iter++)
+        //connect(&iter.value(), &PropertyView::valueSet, [](QVariant v){qDebug() << v;});
+    //for each file in folder
+        //how many tabs/categories?
+        //widget using items from *components in basic viewer + mouse-over description
+}
+
+void MainWindow::simObjectMoveDragged(object_id id, double dx, double dy)
+{
+   auto obj = worldObjects.find(id);
+   if(obj != worldObjects.end())
+       obj.value()->translate(dx, dy);
+}
+
+void MainWindow::simObjectRotateDragged(object_id id, double dt)
+{
+    auto obj = worldObjects.find(id);
+    if(obj != worldObjects.end())
+        obj.value()->rotate(dt);
+}
+
+//These two slots exist so that if build objects and simulation
+//objects are stored separately, we can index into the correct list
+void MainWindow::buildObjectMoveDragged(object_id id, double dx, double dy){}
+void MainWindow::buildObjectRotateDragged(object_id id, double dt){}
+
+void MainWindow::errorMessage(QString error)
+{
+    QMessageBox err;
+    err.setText(error);
+    err.exec();
 }

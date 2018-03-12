@@ -8,6 +8,10 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joy.hpp"
+#include "std_msgs/msg/float64.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
+#include "std_msgs/msg/multi_array_dimension.hpp"
+#include "std_msgs/msg/multi_array_layout.hpp"
 
 #include <sdsmt_simulator/world_object.h>
 
@@ -40,6 +44,8 @@ class SimulatorCore : public QObject
 
     QMap<QString, joymsg> _joysticks;
 
+    std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Float64MultiArray>> _timestampChannel;
+    std::shared_ptr<std_msgs::msg::Float64MultiArray> _timestampMsg;
 
 public:
     SimulatorCore(Simulator_Physics_If* physics, Simulator_Ui_If* ui, std::shared_ptr<rclcpp::Node> node,
@@ -52,10 +58,10 @@ private:
     joymsg initJoystick(QString channel);
 
 signals:
-    void objectRemoved(object_id rId);
+    void objectsRemoved(QVector<object_id> rId);
 
-    void objectAdded(WorldObjectPhysics* interface, object_id id);
-    void objectAdded(WorldObjectProperties* interface, object_id id);
+    void objectsAdded(QVector<QPair<WorldObjectPhysics*, object_id>> objs);
+    void objectsAdded(QVector<QPair<WorldObjectProperties*, object_id>> objs);
 
     void errorMsg(QString);
 
@@ -75,8 +81,8 @@ private slots:
     void clearJoystickChannels();
 
 public slots:
-    void addSimObject(WorldObject* obj);
-    void removeSimObject(object_id oId);
+    void addSimObjects(QVector<QSharedPointer<WorldObject> > objs);
+    void removeSimObjects(QVector<object_id> oIds);
 };
 
 #endif // SDSMT_SIMULATOR_H

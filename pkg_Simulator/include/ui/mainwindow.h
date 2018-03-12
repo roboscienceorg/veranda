@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QStandardItem>
 #include <QListWidgetItem>
+#include <QProgressBar>
+#include <QVector>
+#include <QPair>
+#include <QMap>
 
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/simulator_visual_if.h"
@@ -12,8 +16,8 @@
 #include "ui/designer_widget.h"
 
 #include <sdsmt_simulator/world_object_component_plugin.h>
-#include <sdsmt_simulator/world_object_loader_if.h>
-#include <sdsmt_simulator/world_object_saver_if.h>
+#include <sdsmt_simulator/object_loader_if.h>
+#include <sdsmt_simulator/object_saver_if.h>
 
 namespace Ui {
 class MainWindow;
@@ -33,24 +37,39 @@ private:
     Simulator_Visual_If* visualDesigner;
 
     QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
-    QMap<QString, WorldObjectLoader_If*> objectLoaders;
-    QMap<QString, WorldObjectSaver_If*> objectSavers;
 
     //tools tab widget holders, each list belongs to a tab
     QMap<QString, QListWidget*> designerTabs;
     QMap<QString, QListWidget*> simulatorTabs;
 
-    int speed;
+    bool simulation;
+
+    QMap<QString, QVector<WorldObjectLoader_If*>> objectLoaders;
+    QMap<QString, QVector<WorldObjectSaver_If*>> objectSavers;
+
+    QMap<QString, QVector<WorldLoader_If*>> worldLoaders;
+    QMap<QString, QVector<WorldSaver_If*>> worldSavers;
+    WorldLoader_If* defaultLoader = nullptr;
+
     bool play;
     bool record;
-    bool simulation;
+    uint64_t speed = 0;
+
     object_id selected;
+    const QVector<QPair<double, QPair<QString, QString>>> SPEEDBUTTONS
+    {
+        {1.0, {"Speed x1", ":/sim/SpeedOneSimIcon"}},
+        {2.0, {"Speed x2", ":/sim/SpeedTwoSimIcon"}},
+        {3.0, {"Speed x3", ":/sim/SpeedThreeSimIcon"}},
+        {0.5, {"Speed x1/2", ":/sim/SpeedHalfSimIcon"}}
+    };
 
     QStandardItemModel* propertiesModel = nullptr;
 
     //simulator objects
     QMap<object_id, WorldObjectProperties*> worldObjects;
     QMap<object_id, QListWidgetItem*> listItems;
+    QMap<QString, QSharedPointer<PropertyView>> selectedProps;
 
     //designer objects
     QMap<object_id, WorldObjectProperties*> designerObjects;
@@ -60,24 +79,26 @@ private:
 
 public:
     explicit MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If*> components,
-                        QVector<WorldObjectLoader_If*> loaders, QVector<WorldObjectSaver_If*> savers, QWidget *parent = 0);
+                        QVector<WorldObjectLoader_If*> oloaders, QVector<WorldObjectSaver_If*> osavers,
+                        QVector<WorldLoader_If*> wloaders, QVector<WorldSaver_If*> wsavers, WorldLoader_If *defaultLoader_=nullptr, QWidget *parent = 0);
     ~MainWindow();
 
 public slots:
     //Simulator core added something to the simulation
     //Do not delete the world object when it is removed; that will be handled elsewhere
-    virtual void worldObjectAddedToSimulation(WorldObjectProperties* object, object_id oId);
+    virtual void worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>> objs);
 
     //Simulator core removed something from simulation
-    virtual void worldObjectRemovedFromSimulation(object_id oId);
+    virtual void worldObjectsRemovedFromSimulation(QVector<object_id> oIds);
 
     //Slots to indicate that physics settings changed
     void physicsTickChanged(double rate_hz, double duration_s){}
+    void physicsTickMultiplierChanged(double mult);
     void physicsStopped();
     void physicsStarted();
 
     //Slot to throw an error message to the user
-    void errorMessage(QString error){}
+    void errorMessage(QString error);
 
     void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
 
@@ -85,13 +106,18 @@ public slots:
     void showMainWindow(){
         show();
 
-        setWorldBounds(-30, 30, -30, 30);
+        setWorldBounds(-100, 100, -100, 100);
     }
 
     void closeEvent(QCloseEvent *)
     {
         emit windowClosed();
     }
+
+    void simObjectMoveDragged(object_id id, double dx, double dy);
+    void simObjectRotateDragged(object_id id, double dt);
+    void buildObjectMoveDragged(object_id id, double dx, double dy);
+    void buildObjectRotateDragged(object_id id, double dt);
 
 private slots:
 
@@ -146,6 +172,7 @@ signals:
     void addToolToDesigner(WorldObjectProperties*);
     void deleteToolFromSimulator(WorldObjectProperties*);
     void deleteToolFromDesigner(WorldObjectProperties*);
+    void error(QString);
 };
 
 #endif // MAINWINDOW_H

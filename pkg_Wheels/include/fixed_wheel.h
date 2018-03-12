@@ -4,7 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
 
-#include <sdsmt_simulator/world_object_component_if.h>
+#include <sdsmt_simulator/world_object_component.h>
 #include <Box2D/Box2D.h>
 
 #include <QVector>
@@ -14,7 +14,7 @@
 
 #include <memory>
 
-class Fixed_Wheel : public WorldObjectComponent_If
+class Fixed_Wheel : public WorldObjectComponent
 {
     Q_OBJECT
 
@@ -22,15 +22,6 @@ class Fixed_Wheel : public WorldObjectComponent_If
 
     std::shared_ptr<rclcpp::Node> _rosNode;
     rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr _receiveChannel;
-
-    Property _xLocal = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X location of component within object"),
-                                QVariant(0.0), &Property::double_validator);
-
-    Property _yLocal = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y location of component within object"),
-                                QVariant(0.0), &Property::double_validator);
-
-    Property _thetaLocal = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of component within object"),
-                                QVariant(0.0), &Property::angle_validator);
 
     Property _inputChannel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
                                                     "Input channel for drive speed"), "");
@@ -49,16 +40,15 @@ class Fixed_Wheel : public WorldObjectComponent_If
     Property _density = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Density of the wheel"),
                                  QVariant(1.0), &Property::abs_double_validator);
 
-    QMap<QString, PropertyView> _properties{
-        {"channels/input_speed", &_inputChannel},
-        {"x_local", &_xLocal},
-        {"y_local", &_yLocal},
-        {"theta_local", &_thetaLocal},
-        {"wheel_radius", &_radius},
-        {"wheel_width", &_width},
-        {"is_driven", &_driven},
-        {"density", &_density}
+ #define pview(a) QSharedPointer<PropertyView>::create(a)
+    QMap<QString, QSharedPointer<PropertyView>> _properties{
+        {"channels/input_speed", pview(&_inputChannel)},
+        {"wheel_radius", pview(&_radius)},
+        {"wheel_width", pview(&_width)},
+        {"is_driven", pview(&_driven)},
+        {"density", pview(&_density)}
     };
+#undef pview
 
     object_id _objectId;
 
@@ -70,24 +60,18 @@ class Fixed_Wheel : public WorldObjectComponent_If
     b2Fixture* _wheelFix = nullptr;
     b2Joint* _weldJoint = nullptr;
 
+    b2World* _world = nullptr;
+
     //Data published
     double _targetAngularVelocity = 0;
 
 public:
     Fixed_Wheel(QObject* parent=nullptr);
 
-    WorldObjectComponent_If* clone(QObject *newParent);
+    WorldObjectComponent* _clone(QObject *newParent);
 
-    virtual QMap<QString, PropertyView>& getProperties(){
+    virtual QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
         return _properties;
-    }
-
-    virtual QString getPropertyGroup(){
-        return "Fixed Wheel";
-    }
-
-    QVector<Model*> getModels(){
-        return {_wheelModel};
     }
 
     bool usesChannels(){
@@ -95,7 +79,7 @@ public:
     }
 
     void generateBodies(b2World* world, object_id oId, b2Body* anchor);
-    void clearBodies(b2World *world);
+    void clearBodies();
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
@@ -115,12 +99,7 @@ public slots:
     //Disconnects all ROS topics
     virtual void disconnectChannels();
 
-    virtual void worldTicked(const b2World*, const double);
-
-    virtual void setObjectMass(double mass)
-    {
-        _objectMass = mass;
-    }
+    virtual void _worldTicked(const double);
 };
 
 #endif // FLOATER_DRIVETRAIN_H

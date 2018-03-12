@@ -88,7 +88,7 @@ void JoystickPrototype::rotationMoved(int val)
 {
     joystickUi->setChannel->clearFocus();
 
-    qDebug() << "joystick moved " << joystickWidget->xVector << " " << joystickWidget->yVector << " " << val - rotationWidget->maximum()/2;
+    //qDebug() << "joystick moved " << joystickWidget->xVector << " " << joystickWidget->yVector << " " << val - rotationWidget->maximum()/2;
 
     joystickMoved(joystickWidget->xVector, joystickWidget->yVector,
                   val - rotationWidget->maximum()/2,
@@ -99,7 +99,7 @@ void JoystickPrototype::joystickMoved()
 {
     joystickUi->setChannel->clearFocus();
 
-    qDebug() << "joystick moved " << joystickWidget->xVector << " " << joystickWidget->yVector << " " << rotationWidget->value - rotationWidget->maximum()/2;
+    //qDebug() << "joystick moved " << joystickWidget->xVector << " " << joystickWidget->yVector << " " << rotationWidget->value - rotationWidget->maximum()/2;
 
     joystickMoved(joystickWidget->xVector, joystickWidget->yVector,
                   rotationWidget->value - rotationWidget->maximum()/2,

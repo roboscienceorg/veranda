@@ -3,30 +3,22 @@
 #include <QDebug>
 #include <cmath>
 
-Circle::Circle(QObject *parent) : WorldObjectComponent_If(parent)
+Circle::Circle(QObject *parent) : WorldObjectComponent("Circle", parent)
 {
     shape_model = new Model({}, {}, this);
+    registerModel(shape_model);
+
+    _buildModels();
+
+    connect(&radius, &Property::valueSet, this, &Circle::_buildModels);
+    connect(&radius, &Property::valueSet, this, &Circle::_makeFixtures);
 }
 
-WorldObjectComponent_If *Circle::clone(QObject *newParent)
+WorldObjectComponent *Circle::_clone(QObject *newParent)
 {
     Circle* out = new Circle(newParent);
 
-    for(QString s : _properties.keys())
-    {
-        out->_properties[s].set(_properties[s].get(), true);
-    }
-
     return out;
-}
-
-void Circle::_channelChanged(QVariant)
-{
-    if(_connected)
-    {
-        disconnectChannels();
-        connectChannels();
-    }
 }
 
 void Circle::_buildModels()
@@ -45,44 +37,54 @@ void Circle::_buildModels()
 
 void Circle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
+    clearBodies();
+    _world = world;
+    _oid = oId;
+
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
-    bodyDef.angle = 0;
     body = world->CreateBody(&bodyDef);
+    registerBody(body, {shape_model}, true);
 
-    moveBodyToLocalSpaceOfOtherBody(body, anchor, x.get().toFloat(), y.get().toFloat());
+    b2WeldJointDef weldDef;
+    auto anchorPt = anchor->GetWorldCenter();
+    weldDef.bodyA = anchor;
+    weldDef.bodyB = body;
+    weldDef.localAnchorA = anchor->GetLocalPoint(anchorPt);
+    weldDef.localAnchorB = body->GetLocalPoint(anchorPt);
+    weldDef.referenceAngle = body->GetAngle() - anchor->GetAngle();
+    joint = (b2WeldJoint*) world->CreateJoint(&weldDef);
 
-    b2CircleShape circleShape;
-    circleShape.m_radius = radius.get().toFloat();
-    b2FixtureDef circleFixtureDef;
-    circleFixtureDef.shape = &circleShape;
-    circleFixtureDef.density = 1;
-    circleFixtureDef.filter.groupIndex = -oId;
-    body->CreateFixture(&circleFixtureDef);
-
-    b2WeldJointDef jointDef;
-    jointDef.bodyA = body;
-    jointDef.bodyB = anchor;
-    jointDef.collideConnected = false;
-
-    joint = (b2WeldJoint*)world->CreateJoint(&jointDef);
-
-    _buildModels();
-
-    massChanged(this, body->GetMass());
+    _makeFixtures();
 }
 
-void Circle::clearBodies(b2World* world)
+void Circle::_makeFixtures()
 {
-    world->DestroyJoint(joint);
-    world->DestroyBody(body);
-    massChanged(this, 0);
+    if(body)
+    {
+        if(fixture)
+            body->DestroyFixture(fixture);
+
+        b2CircleShape circleShape;
+        circleShape.m_radius = radius.get().toFloat();
+        b2FixtureDef circleFixtureDef;
+        circleFixtureDef.shape = &circleShape;
+        circleFixtureDef.density = 1;
+        circleFixtureDef.filter.groupIndex = -_oid;
+        fixture = body->CreateFixture(&circleFixtureDef);
+    }
 }
 
-void Circle::worldTicked(const b2World*, const double)
+void Circle::clearBodies()
 {
-    double x = body->GetWorldCenter().x;
-    double y = body->GetWorldCenter().y;
-    double t = body->GetAngle();
-    shape_model->setTransform(x, y, t*RAD2DEG);
+    if(_world)
+    {
+        _world->DestroyJoint(joint);
+        _world->DestroyBody(body);
+        unregisterBody(body);
+        body = nullptr;
+        fixture = nullptr;
+        joint = nullptr;
+    }
+    _world = nullptr;
 }

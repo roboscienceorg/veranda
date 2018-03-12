@@ -26,13 +26,29 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     _children = new QVBoxLayout(this);
 
     _scene = new QGraphicsScene(this);
-    _viewer = new QGraphicsView(_scene, this);
+    _viewer = new CustomGraphicsView(_scene, this);
     _viewer->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+    _viewer->setMouseTracking(true);
+
+    connect(_viewer, &CustomGraphicsView::mouseMoved, this, &BasicViewer::viewMouseMove);
+    connect(_viewer, &CustomGraphicsView::mousePress, this, &BasicViewer::viewMousePress);
+    connect(_viewer, &CustomGraphicsView::mouseRelease, this, &BasicViewer::viewMouseRelease);
+
+    connect(_viewer, &CustomGraphicsView::zoomTick, this, &BasicViewer::viewZoom);
+    connect(_viewer, &CustomGraphicsView::screenShift, this, &BasicViewer::viewShift);
 
     _children->addWidget(_viewer);
     setLayout(_children);
 
-    setWorldBounds(-30, 30, -30, 30);
+    _translater = _makeTranslater();
+    _rotater = _makeRotater();
+
+    _tools = new QGraphicsItemGroup;
+    _tools->addToGroup(_translater);
+    _tools->addToGroup(_rotater);
+    _translater->moveBy(-_rotater->boundingRect().width()*1.5, 0);
+
+    setWorldBounds(-200, 200, -200, 200);
 }
 
 QGraphicsItem* BasicViewer::_drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
@@ -83,6 +99,8 @@ QGraphicsItem* BasicViewer::_drawModel(Model* m)
     double x, y, t;
     m->getTransform(x, y, t);
 
+    //qDebug() << "Drew model at " << x << y << t << "from parent";
+
     baseItem->moveBy(x * WORLD_SCALE, -y*WORLD_SCALE);
     baseItem->setRotation(-t);
 
@@ -100,22 +118,30 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
     QColor newColor = _color(Solid, false);
     _drawLevels[id] = Solid;
 
+    //qDebug() << "Add object " << id;
+
+    QGraphicsItemGroup* group = new QGraphicsItemGroup();
     for(Model* m : objects)
     {
+        //qDebug() << "Draw top level model";
         QGraphicsItem* graphic = addModel(m, id);
 
-        _setOutlineColor(graphic, newColor);
-        _scene->addItem(graphic);
+        group->addToGroup(graphic);
     }
+    _setOutlineColor(group, newColor);
+    _scene->addItem(group);
+
+    _shapeToObject[group] = id;
+    _topShapes[id] = group;
 }
 
 QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
 {
+    //qDebug() << "Add model " << m << " with " << m->children().size() << " children";
     QGraphicsItem* graphic = _drawModel(m);
 
-
     _shapes[m] = graphic;
-    _shapeToModel[graphic] = m;
+    _shapeToObject[graphic] = id;
     _modelToObject[m] = id;
     _modelChildren[m] = m->children();
 
@@ -127,8 +153,8 @@ QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
 
     for(Model* child : m->children())
     {
+        //qDebug() << "Draw child of " << m;
         QGraphicsItem* cGraph = addModel(child, id);
-
         cGraph->setParentItem(graphic);
     }
 
@@ -151,6 +177,9 @@ void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
 
     _shapes[m]->moveBy(dx, -dy);
     _shapes[m]->setRotation(-t);
+
+    if(_modelToObject[m] == _currSelection)
+        _placeTools();
 }
 
 void BasicViewer::modelChanged(Model *m)
@@ -174,24 +203,110 @@ void BasicViewer::modelChanged(Model *m)
     _setOutlineColor(replace, newColor);
 
     if(parent == nullptr)
-    {
         _scene->addItem(replace);
-    }
 }
 
 //World View Clicked
-void BasicViewer::mousePressEvent(QMouseEvent *event)
+void BasicViewer::viewMousePress(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
         QPointF hit = event->localPos();
-        QGraphicsItem* shape = _viewer->itemAt((int)(hit.x()+0.5), (int)(hit.y() + 0.5));
-        while(shape && shape->parentItem())
-            shape = shape->parentItem();
-        Model* m = _shapeToModel[shape];
-        object_id oid = _modelToObject[m];
-        userSelectedObject(oid);
+
+        bool startDrag = _toolsEnabled && _translater->contains(
+                    _translater->sceneTransform().inverted().map(
+                        _viewer->mapToScene(
+                            _viewer->mapFromGlobal(
+                                event->globalPos()))));
+
+        bool startRotate = _toolsEnabled && _rotater->contains(
+                    _rotater->sceneTransform().inverted().map(
+                        _viewer->mapToScene(
+                            _viewer->mapFromGlobal(
+                                event->globalPos()))));
+
+        if(!_draggingTranslate && startDrag)
+        {
+            //qDebug() << "Start dragging";
+            _draggingRotate = false;
+            _draggingTranslate = true;
+            _dragStart = _viewer->mapToScene(
+                        _viewer->mapFromGlobal(
+                            event->globalPos()));
+        }
+        else if(!_draggingRotate && startRotate)
+        {
+            //qDebug() << "Start rotating";
+            _draggingTranslate = false;
+            _draggingRotate = true;
+            _dragStart = _viewer->mapToScene(
+                        _viewer->mapFromGlobal(
+                            event->globalPos()));
+        }
+        else
+        {
+            QGraphicsItem* shape = _viewer->itemAt((int)(hit.x()+0.5), (int)(hit.y() + 0.5));
+            while(shape && shape->parentItem())
+                shape = shape->parentItem();
+            object_id oid = _shapeToObject[shape];
+
+            userSelectedObject(oid);
+        }
     }
+}
+
+void BasicViewer::viewMouseMove(QMouseEvent* event)
+{
+    if(_draggingTranslate)
+    {
+        QPointF newLocal = _viewer->mapToScene(
+                    _viewer->mapFromGlobal(
+                        event->globalPos()));
+        QPointF delta = (newLocal - _dragStart)/(WORLD_SCALE);
+        userDragMoveObject(_currSelection, delta.x(), -delta.y());
+
+        _dragStart = newLocal;
+    }
+    else if(_draggingRotate)
+    {
+        QPointF newLocal = _viewer->mapToScene(
+                    _viewer->mapFromGlobal(
+                        event->globalPos()));
+
+        QRectF bound = _topShapes[_currSelection]->childrenBoundingRect();
+        QPointF center(bound.left() + bound.width()/2.0, bound.top() + bound.height()/2.0);
+        QPointF v1 = _dragStart - center;
+        QPointF v2 = newLocal - center;
+        double delta = (std::atan2(v2.y(),v2.x()) - std::atan2(v1.y(),v1.x())) * RAD2DEG;
+
+        //Filter out jumpiness
+        //There's probably a more technically correct way to do this
+        if(std::abs(delta) < 90)
+        {
+            userDragRotateObject(_currSelection, -delta);
+        }
+        _dragStart = newLocal;
+    }
+}
+
+void BasicViewer::setToolsEnabled(bool enabled)
+{
+    _toolsEnabled = enabled;
+    if(enabled && _topShapes.contains(_currSelection))
+    {
+        _placeTools();
+        _scene->addItem(_tools);
+    }
+    else
+    {
+        _scene->removeItem(_tools);
+    }
+}
+
+void BasicViewer::viewMouseRelease(QMouseEvent *event)
+{
+    _draggingTranslate = false;
+    _draggingRotate = false;
 }
 
 void BasicViewer::resizeEvent(QResizeEvent *event)
@@ -218,15 +333,61 @@ void BasicViewer::_rescale()
     matrix.scale(scale,
                  scale);
     _viewer->setTransform(matrix);
+
+    //Rescale click/drag buttons
+    //_transformer->setScale(std::min(_viewer->height(), _viewer->width()) * TOOL_SCALE);
+}
+
+void BasicViewer::viewShift(int x, int y)
+{
+    double pctx = x*0.1;
+    double pcty = y*0.1;
+
+    QRectF rect = _viewer->sceneRect();
+
+    double h = rect.height();
+    double w = rect.width();
+
+    rect.setTop(rect.top() + h * pcty);
+    rect.setBottom(rect.bottom() + h * pcty);
+    rect.setLeft(rect.left() + w * pctx);
+    rect.setRight(rect.right() + w * pctx);
+
+    setWorldBounds(rect);
+}
+
+void BasicViewer::viewZoom(int z)
+{
+    double pct = z*0.1;
+
+    QRectF rect = _viewer->sceneRect();
+
+    double h = rect.height();
+    double w = rect.width();
+
+    rect.setTop(rect.top() + h * pct);
+    rect.setBottom(rect.bottom() - h * pct);
+    rect.setLeft(rect.left() + w * pct);
+    rect.setRight(rect.right() - w * pct);
+
+    setWorldBounds(rect);
+}
+
+void BasicViewer::setWorldBounds(QRectF rect)
+{
+    _scene->setSceneRect(rect);
+    _viewer->setSceneRect(rect);
+
+    _rescale();
+
+    _tools->setScale(std::min(_viewer->sceneRect().width(), _viewer->sceneRect().height()) * 0.001);
+    _placeTools();
 }
 
 void BasicViewer::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
 {
-    QRect viewRect(xMin*WORLD_SCALE, -yMax*WORLD_SCALE, (xMax-xMin)*WORLD_SCALE, (yMax-yMin)*WORLD_SCALE);
-    _scene->setSceneRect(viewRect);
-    _viewer->setSceneRect(viewRect);
-
-    _rescale();
+    QRectF viewRect(xMin*WORLD_SCALE, -yMax*WORLD_SCALE, (xMax-xMin)*WORLD_SCALE, (yMax-yMin)*WORLD_SCALE);
+    setWorldBounds(viewRect);
 }
 
 //for after the MVP
@@ -242,6 +403,10 @@ void BasicViewer::objectRemovedFromScreen(object_id id)
         }
         _models.remove(id);
         _drawLevels.remove(id);
+        _shapeToObject.remove(_topShapes[id]);
+
+        delete _topShapes[id];
+        _topShapes.remove(id);
     }
     if(_currSelection == id) _currSelection = 0;
 }
@@ -253,8 +418,8 @@ void BasicViewer::removeModel(Model *m)
 
     //Stop drawing shapes
     _modelToObject.remove(m);
-    _shapeToModel.remove(_shapes[m]);
     _modelChildren.remove(m);
+    _shapeToObject.remove(_shapes[m]);
 
     delete _shapes[m];
 
@@ -283,17 +448,29 @@ void BasicViewer::objectSelected(object_id id)
     QColor newColor;
     if(id != _currSelection)
     {
-        if(_currSelection != 0)
-        {
-            newColor = _color(_drawLevels[_currSelection], false);
-            for(Model* m : _models[_currSelection])
-                _setOutlineColor(_shapes[m], newColor);
-        }
+        nothingSelected();
 
         _currSelection = id;
         newColor = _color(_drawLevels[_currSelection], true);
-        for(Model* m : _models[_currSelection])
-            _setOutlineColor(_shapes[m], newColor);
+        _setOutlineColor(_topShapes[id], newColor);
+
+        if(_toolsEnabled)
+        {
+            _placeTools();
+            _scene->addItem(_tools);
+        }
+    }
+}
+
+void BasicViewer::_placeTools()
+{
+    if(_topShapes.contains(_currSelection) && _tools)
+    {
+        QRectF bound = _topShapes[_currSelection]->childrenBoundingRect();
+        double rightEdge = bound.x() + bound.width(), bottomEdge = bound.y() + bound.height();
+
+        QRectF toolBound = _tools->childrenBoundingRect();
+        _tools->setPos(rightEdge /*+ toolBound.width()*0.5*/, bottomEdge + toolBound.height());
     }
 }
 
@@ -306,6 +483,9 @@ void BasicViewer::nothingSelected()
         newColor = _color(_drawLevels[_currSelection], false);
         for(Model* m : _models[_currSelection])
             _setOutlineColor(_shapes[m], newColor);
+
+        _currSelection = 0;
+        _scene->removeItem(_tools);
     }
 }
 
@@ -352,4 +532,76 @@ void BasicViewer::_setOutlineColor(QGraphicsItem* item, const QColor& color)
 
     for(QGraphicsItem* i : item->childItems())
         _setOutlineColor(i, color);
+}
+
+QGraphicsItem* BasicViewer::_makeTranslater()
+{
+    QBrush b(QColor(50, 163, 103));
+    QPen p(QColor(50, 163, 103));
+
+    QGraphicsItemGroup* group = new QGraphicsItemGroup;
+
+    QGraphicsRectItem* rect = new QGraphicsRectItem(0.0, -1.0*WORLD_SCALE, 0.5*WORLD_SCALE, 2.5*WORLD_SCALE);
+    rect->setBrush(b);
+    rect->setPen(p);
+    group->addToGroup(rect);
+
+    rect = new QGraphicsRectItem(-1.0*WORLD_SCALE, 0.0, 2.5*WORLD_SCALE, 0.5*WORLD_SCALE);
+    rect->setBrush(b);
+    rect->setPen(p);
+
+    group->addToGroup(rect);
+    group->addToGroup(_makeArrow(.25, -1.3, 0, p, b));
+    group->addToGroup(_makeArrow(.25, 1.8, 180, p, b));
+    group->addToGroup(_makeArrow(1.8, .25, 90, p, b));
+    group->addToGroup(_makeArrow(-1.3, .25, 270, p, b));
+
+    return group;
+}
+
+QGraphicsItem* BasicViewer::_makeRotater()
+{
+    QBrush b(QColor(50, 163, 103));
+    QPen p(QColor(50, 163, 103));
+
+    QGraphicsItemGroup* group = new QGraphicsItemGroup;
+
+    QGraphicsRectItem* rect = new QGraphicsRectItem(0.0, -1.0*WORLD_SCALE, 0.5*WORLD_SCALE, 1.25*WORLD_SCALE);
+    rect->setBrush(b);
+    rect->setPen(p);
+    group->addToGroup(rect);
+
+    rect = new QGraphicsRectItem(-1.0*WORLD_SCALE, 0.0, 1.25*WORLD_SCALE, 0.5*WORLD_SCALE);
+    rect->setBrush(b);
+    rect->setPen(p);
+
+    group->addToGroup(rect);
+    group->addToGroup(_makeArrow(.25, -1.3, 0, p, b));
+    //group->addToGroup(_makeArrow(.25, 1.8, 180, p, b));
+    //group->addToGroup(_makeArrow(1.8, .25, 90, p, b));
+    group->addToGroup(_makeArrow(-1.3, .25, 270, p, b));
+
+    return group;
+}
+
+QGraphicsItem* BasicViewer::_makeArrow(double pointx, double pointy, double angle, QPen p, QBrush b)
+{
+    QGraphicsItemGroup* group = new QGraphicsItemGroup;
+
+    QGraphicsRectItem* rect = new QGraphicsRectItem(0, 0, 1.0*WORLD_SCALE, .25*WORLD_SCALE);
+    rect->setBrush(b);
+    rect->setPen(p);
+    rect->setRotation(45);
+    group->addToGroup(rect);
+
+    rect = new QGraphicsRectItem(0, 0, .25*WORLD_SCALE, 1*WORLD_SCALE);
+    rect->setBrush(b);
+    rect->setPen(p);
+    rect->setRotation(45);
+    group->addToGroup(rect);
+
+    group->setPos(pointx*WORLD_SCALE, pointy*WORLD_SCALE);
+    group->setRotation(angle);
+
+    return group;
 }

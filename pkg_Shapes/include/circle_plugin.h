@@ -18,7 +18,7 @@ class Circle_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 
 public:
     Circle_Plugin();
-    WorldObjectComponent_If* createComponent();
+    WorldObjectComponent *createComponent();
 
 };
 

@@ -4,8 +4,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(sdsmt_simulator)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
 ## Compile as C++11
 set(CMAKE_CXX_STANDARD 11)
 if(NOT WIN32)
@@ -126,6 +124,28 @@ install(
   TARGETS sdsmt_simulator
   DESTINATION lib/sdsmt_simulator
 )
+
+## Install python timer object
+ament_python_install_package(sdsmt_simulator)
+
+## On windows, we need to run windeployqt
+## To set up plugins and dlls because Windows
+if(WIN32)
+    install(CODE 
+        "
+        MESSAGE(\"Running WindDeployQt.\")
+
+        execute_process (
+            COMMAND cmd /c echo ${CMAKE_INSTALL_PREFIX}
+        )
+
+        execute_process (
+            COMMAND cmd /c \"%QT5_DIR%/bin/windeployqt sdsmt_simulator.exe --no-compiler-runtime  --no-translations\"
+            WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib/sdsmt_simulator
+        )
+        "
+    )
+endif()
 
 ament_package()
 

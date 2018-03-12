@@ -49,46 +49,62 @@ void BasicPhysics::setTick(double rate_hz, double duration_s)
     tickRate = rate_hz;
     stepTime = duration_s;
 
-    //TODO :: Update QTimer with new rate settings
+    tick->setInterval(1000.0f / tickRate);
 
     emit physicsTickSet(tickRate, stepTime);
 }
 
-void BasicPhysics::addWorldObject(WorldObjectPhysics* obj, object_id oId)
+void BasicPhysics::setTickMultiplier(double mult)
 {
-    if(objects.contains(oId)) throw std::logic_error("object with id " + std::to_string(oId) + " already exists");
+    tickMult = mult;
 
-    objectWorldData& worldDat = objects[oId];
-    worldDat.obj = obj;
-    connect(this, &BasicPhysics::worldTick, obj, &WorldObjectPhysics::worldTicked);
-    
-    obj->generateBodies(world, oId);
+    tick->setInterval(1000.0f / (tickRate * tickMult));
 
-    obj->worldTicked(world, 0);
+    physicsTickMultiplierSet(tickMult);
 }
 
-void BasicPhysics::removeWorldObject(object_id oId)
+void BasicPhysics::addWorldObjects(QVector<QPair<WorldObjectPhysics*, object_id>> objs)
 {
-    if(objects.contains(oId))
+    for(auto& p : objs)
     {
-        objectWorldData& dat = objects[oId];
+        object_id& oId = p.second;
+        WorldObjectPhysics* obj = p.first;
 
-        for(b2Joint* j : dat.joints)
-            world->DestroyJoint(j);
+        if(objects.contains(oId)) throw std::logic_error("object with id " + std::to_string(oId) + " already exists");
 
-        for(b2Body* s : dat.staticBodies)
-            world->DestroyBody(s);
+        objectWorldData& worldDat = objects[oId];
+        worldDat.obj = obj;
+        connect(this, &BasicPhysics::physicsTicked, obj, &WorldObjectPhysics::worldTicked);
+        connect(this, &BasicPhysics::physicsTicked, obj, &WorldObjectPhysics::syncModels);
 
-        for(b2Body* d : dat.dynamicBodies)
-            world->DestroyBody(d);
+        obj->generateBodies(world, oId);
 
-       objects.remove(oId);
+        obj->syncModels();
     }
+
+    qDebug() << "Added objects; world contains" << world->GetBodyCount() << "bodies";
+}
+
+void BasicPhysics::removeWorldObjects(QVector<object_id> oIds)
+{
+    for(object_id oId : oIds)
+    {
+        if(objects.contains(oId))
+        {
+            objectWorldData& dat = objects[oId];
+            dat.obj->clearBodies();
+            disconnect(this, 0, dat.obj, 0);
+
+            objects.remove(oId);
+        }
+    }
+
+    qDebug() << "Removed objects; world contains" << world->GetBodyCount() << "bodies";
 }
 
 void BasicPhysics::step()
 {
     world->Step(stepTime, 8, 3); //suggested values for velocity and position iterations
 
-    emit worldTick(world, stepTime);
+    emit physicsTicked(stepTime);
 }

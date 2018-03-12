@@ -37,13 +37,14 @@ signals:
     //If these go through successfully, the corresponding slots
     //will get called
     void userSetPhysicsTick(double rate_hz, double duration_s);
+    void userSetPhysicsTickMultiplier(double mult);
     void userStopPhysics();
     void userStartPhysics();
 
     //User requests that something be added to or removed from
     //the simulation
-    void userAddWorldObjectToSimulation(WorldObject* obj);
-    void userRemoveWorldObjectFromSimulation(object_id oId);
+    void userAddWorldObjectsToSimulation(QVector<QSharedPointer<WorldObject>>);
+    void userRemoveWorldObjectsFromSimulation(QVector<object_id>);
 
     void joystickMoved(double x, double y, double z, QString channel);
     void joystickButtonPress(int key, QString channel);
@@ -52,13 +53,14 @@ signals:
 public slots:
     //Simulator core added something to the simulation
     //Do not delete the world object when it is removed; that will be handled elsewhere
-    virtual void worldObjectAddedToSimulation(WorldObjectProperties* object, object_id oId) = 0;
+    virtual void worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>) = 0;
 
     //Simulator core removed something from simulation
-    virtual void worldObjectRemovedFromSimulation(object_id oId) = 0;
+    virtual void worldObjectsRemovedFromSimulation(QVector<object_id> oId) = 0;
 
     //Slots to indicate that physics settings changed
     virtual void physicsTickChanged(double rate_hz, double duration_s) = 0;
+    virtual void physicsTickMultiplierChanged(double mult) = 0;
     virtual void physicsStopped() = 0;
     virtual void physicsStarted() = 0;
 

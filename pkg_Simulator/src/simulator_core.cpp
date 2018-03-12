@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QThread>
+#include <QSharedPointer>
 
 using namespace std;
 
@@ -14,15 +15,15 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
 {
     qRegisterMetaType<object_id>("object_id");
 
-    connect(_userInterface, &Simulator_Ui_If::userRemoveWorldObjectFromSimulation, this, &SimulatorCore::removeSimObject);
-    connect(this, &SimulatorCore::objectRemoved, _userInterface, &Simulator_Ui_If::worldObjectRemovedFromSimulation);
-    connect(this, &SimulatorCore::objectRemoved, _physicsEngine, &Simulator_Physics_If::removeWorldObject);
+    connect(_userInterface, &Simulator_Ui_If::userRemoveWorldObjectsFromSimulation, this, &SimulatorCore::removeSimObjects);
+    connect(this, &SimulatorCore::objectsRemoved, _userInterface, &Simulator_Ui_If::worldObjectsRemovedFromSimulation);
+    connect(this, &SimulatorCore::objectsRemoved, _physicsEngine, &Simulator_Physics_If::removeWorldObjects);
 
-    connect(_userInterface, &Simulator_Ui_If::userAddWorldObjectToSimulation, this, &SimulatorCore::addSimObject);
-    connect(this, static_cast<void (SimulatorCore::*)(WorldObjectPhysics*, object_id)>(&SimulatorCore::objectAdded),
-            _physicsEngine, &Simulator_Physics_If::addWorldObject);
-    connect(this, static_cast<void (SimulatorCore::*)(WorldObjectProperties*, object_id)>(&SimulatorCore::objectAdded),
-            _userInterface, &Simulator_Ui_If::worldObjectAddedToSimulation);
+    connect(_userInterface, &Simulator_Ui_If::userAddWorldObjectsToSimulation, this, &SimulatorCore::addSimObjects);
+    connect(this, static_cast<void (SimulatorCore::*)(QVector<QPair<WorldObjectPhysics*, object_id>>)>(&SimulatorCore::objectsAdded),
+            _physicsEngine, &Simulator_Physics_If::addWorldObjects);
+    connect(this, static_cast<void (SimulatorCore::*)(QVector<QPair<WorldObjectProperties*, object_id>>)>(&SimulatorCore::objectsAdded),
+            _userInterface, &Simulator_Ui_If::worldObjectsAddedToSimulation);
 
     connect(this, &SimulatorCore::userStartPhysics, _physicsEngine, &Simulator_Physics_If::start);
     connect(this, &SimulatorCore::userStopPhysics, _physicsEngine, &Simulator_Physics_If::stop);
@@ -40,23 +41,48 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     connect(_userInterface, &Simulator_Ui_If::userStartPhysics, this, &SimulatorCore::userStartPhysics);
     connect(_userInterface, &Simulator_Ui_If::userStopPhysics, this, &SimulatorCore::userStopPhysics);
     connect(_userInterface, &Simulator_Ui_If::userSetPhysicsTick, this, &SimulatorCore::userSetPhysicsTick);
+    connect(_userInterface, &Simulator_Ui_If::userSetPhysicsTickMultiplier, _physicsEngine, &Simulator_Physics_If::setTickMultiplier);
 
     connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, this, &SimulatorCore::physicsStarted);
     connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, this, &SimulatorCore::physicsStopped);
     connect(_physicsEngine, &Simulator_Physics_If::physicsTickSet, this, &SimulatorCore::physicsTickSet);
+    connect(_physicsEngine, &Simulator_Physics_If::physicsTickMultiplierSet, _userInterface, &Simulator_Ui_If::physicsTickMultiplierChanged);
 
     connect(_userInterface, &Simulator_Ui_If::joystickButtonPress, this, &SimulatorCore::joystickButtonDown);
     connect(_userInterface, &Simulator_Ui_If::joystickButtonRelease, this, &SimulatorCore::joystickButtonUp);
     connect(_userInterface, &Simulator_Ui_If::joystickMoved, this, &SimulatorCore::joystickMoved);
 
     connect(this, &SimulatorCore::errorMsg, _userInterface, &Simulator_Ui_If::errorMessage);
+
+    //Create and set up timestamp message
+    _timestampMsg = std::make_shared<std_msgs::msg::Float64MultiArray>();
+    _timestampMsg->data.resize(2, 0);
+    _timestampMsg->layout.data_offset = 0;
+    _timestampMsg->layout.dim.push_back(std_msgs::msg::MultiArrayDimension());
+    _timestampMsg->layout.dim[0].label = "times";
+    _timestampMsg->layout.dim[0].size = 2;
+    _timestampMsg->layout.dim[0].stride = 2;
+
+    //Create channel to publish timestamps on
+    rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
+    custom_qos_profile.depth = 7;
+
+    _timestampChannel = _node->create_publisher<std_msgs::msg::Float64MultiArray>("sdsmt_simulator/timestamp", custom_qos_profile);
+
+    //Publish on every physics tick
+    connect(_physicsEngine, &Simulator_Physics_If::physicsTicked,
+    [this](double elapsed)
+    {
+        _timestampMsg->data[0] += elapsed;
+        _timestampMsg->data[1] = elapsed;
+        _timestampChannel->publish(_timestampMsg);
+    });
 }
 
 SimulatorCore::~SimulatorCore()
 {
     //Destroy all remaining objects
-    while(_worldObjects.size())
-        removeSimObject(_worldObjects.firstKey());
+    removeSimObjects(_worldObjects.keys().toVector());
 
     //Stop physics engine
     userStopPhysics();
@@ -69,56 +95,63 @@ SimulatorCore::~SimulatorCore()
 void SimulatorCore::start()
 {
     //Set default physics tick rate
-    userSetPhysicsTick(100.0, 1.0/100.0);
+    _physicsEngine->setTick(30.0, 1.0/30.0);
+    _physicsEngine->setTickMultiplier(1.0);
 
     //Show UI
     _userInterface->showMainWindow();
 }
 
 
-void SimulatorCore::addSimObject(WorldObject *obj)
+void SimulatorCore::addSimObjects(QVector<QSharedPointer<WorldObject>> objs)
 {
-    //Clone object to have local copy for distributing
-    obj = obj->clone();
+    qDebug() << "Loading batch of" << objs.size() << "Objects";
+    QVector<QPair<WorldObjectPhysics*, object_id>> physObjs;
+    QVector<QPair<WorldObjectProperties*, object_id>> propObjs;
 
-    obj->setROSNode(_node);
+    for(QSharedPointer<WorldObject> oldObj : objs)
+    {
+        //Clone object to have local copy for distributing
+        WorldObject* obj = qobject_cast<WorldObject*>(oldObj->clone());
 
-    connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &WorldObject::connectChannels);
-    connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &WorldObject::disconnectChannels);
+        obj->setROSNode(_node);
 
-    WorldObjectPhysics* phys_interface = new WorldObjectPhysics(obj, obj);
-    WorldObjectProperties* prop_interface = new WorldObjectProperties(obj, obj);
+        connect(_physicsEngine, &Simulator_Physics_If::physicsStarted, obj, &WorldObject::connectChannels);
+        connect(_physicsEngine, &Simulator_Physics_If::physicsStopped, obj, &WorldObject::disconnectChannels);
+
+        physObjs += {new WorldObjectPhysics(obj, obj), _nextObject};
+        propObjs += {new WorldObjectProperties(obj, obj), _nextObject};
+
+        //Keep references to robot and thread
+        _worldObjects[_nextObject] = obj;
+
+        _nextObject++;
+
+        if(_physicsEngine->running())
+            obj->connectChannels();
+        else
+            obj->disconnectChannels();
+    }
 
     //Send out object interfaces
-    emit objectAdded(phys_interface, _nextObject);
-    emit objectAdded(prop_interface, _nextObject);
-
-    //Keep references to robot and thread
-    _worldObjects[_nextObject] = obj;
-
-    _nextObject++;
-
-    if(_physicsEngine->running())
-        obj->connectChannels();
-    else
-        obj->disconnectChannels();
-
-    /*Map* asMap = qobject_cast<Map*>(obj);
-    if(asMap)
-    {
-        double xMin, xMax, yMin, yMax;
-        asMap->getBounds(xMin, yMin, xMax, yMax);
-        _userInterface->setWorldBounds(xMin, xMax, yMin, yMax);
-    }*/
+    emit objectsAdded(physObjs);
+    qDebug() << "Added to physics";
+    emit objectsAdded(propObjs);
+    qDebug() << "Added to view";
 }
 
-void SimulatorCore::removeSimObject(object_id oId)
+void SimulatorCore::removeSimObjects(QVector<object_id> oIds)
 {
-    if(_worldObjects.contains(oId))
-    {
-        //Signal that object is no longer in simulation
-        emit objectRemoved(oId);
+    QVector<object_id> removes;
+    for(object_id oId : oIds)
+        if(_worldObjects.contains(oId))
+            removes += oId;
 
+    //Signal that object is no longer in simulation
+    emit objectsRemoved(removes);
+
+    for(object_id oId : removes)
+    {
         //Delete object
         //This should delete all object interfaces; they are children to it
         delete _worldObjects[oId];

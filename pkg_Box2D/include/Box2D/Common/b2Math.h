@@ -114,6 +114,17 @@ struct BOX2D_API b2Vec2
 		return b2Vec2(x*a, y*a);
 	}
 
+	/// Divide this vector by a scalar.
+	void operator /= (float32 a)
+	{
+		x /= a; y /= a;
+	}
+
+	b2Vec2 operator / (float32 a)
+	{
+		return b2Vec2(x/a, y/a);
+	}
+
 	/// Get the length of this vector (the norm).
 	float32 Length() const
 	{

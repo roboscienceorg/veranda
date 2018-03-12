@@ -6,7 +6,7 @@ Fixed_Wheel_Plugin::Fixed_Wheel_Plugin()
 
 }
 
-WorldObjectComponent_If* Fixed_Wheel_Plugin::createComponent()
+WorldObjectComponent* Fixed_Wheel_Plugin::createComponent()
 {
     return new Fixed_Wheel;
 }

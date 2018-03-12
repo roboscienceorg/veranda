@@ -6,7 +6,7 @@ Rectangle_Plugin::Rectangle_Plugin()
 
 }
 
-WorldObjectComponent_If* Rectangle_Plugin::createComponent()
+WorldObjectComponent* Rectangle_Plugin::createComponent()
 {
     return new Rectangle;
 }

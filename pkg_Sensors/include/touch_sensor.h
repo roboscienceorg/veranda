@@ -4,7 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/byte_multi_array.hpp"
 
-#include <sdsmt_simulator/world_object_component_if.h>
+#include <sdsmt_simulator/world_object_component.h>
 #include <Box2D/Box2D.h>
 
 #include <QVector>
@@ -14,7 +14,7 @@
 
 #include <memory>
 
-class Touch_Sensor : public WorldObjectComponent_If
+class Touch_Sensor : public WorldObjectComponent
 {
     Q_OBJECT
 
@@ -24,15 +24,6 @@ class Touch_Sensor : public WorldObjectComponent_If
 
     std::shared_ptr<rclcpp::Node> _rosNode;
     rclcpp::Publisher<std_msgs::msg::ByteMultiArray>::SharedPtr _sendChannel;
-
-    Property x_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X location of component within object"),
-                                QVariant(0.0), &Property::double_validator);
-
-    Property y_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y location of component within object"),
-                                QVariant(0.0), &Property::double_validator);
-
-    Property theta_local = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of component within object"),
-                                QVariant(0.0), &Property::angle_validator);
 
     Property output_channel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
                                                     "Output channel for touch messages"), "");
@@ -60,16 +51,15 @@ class Touch_Sensor : public WorldObjectComponent_If
                                                         return _old;
                                                   });
 
-    QMap<QString, PropertyView> _properties{
-        {"channels/output_touches", &output_channel},
-        {"x_local", &x_local},
-        {"y_local", &y_local},
-        {"theta_local", &theta_local},
-        {"angle_start", &angle_start},
-        {"angle_end", &angle_end},
-        {"ring_radius", &radius},
-        {"sensor_count", &sensor_count}
+#define pview(a) QSharedPointer<PropertyView>(new PropertyView(a))
+    QMap<QString, QSharedPointer<PropertyView>> _properties{
+        {"channels/output_touches", pview(&output_channel)},
+        {"angle_start", pview(&angle_start)},
+        {"angle_end", pview(&angle_end)},
+        {"ring_radius", pview(&radius)},
+        {"sensor_count", pview(&sensor_count)}
     };
+#undef pview
 
     Model* buttons_model = nullptr;
     Model* touches_model = nullptr;
@@ -87,21 +77,15 @@ class Touch_Sensor : public WorldObjectComponent_If
     //All possible touches
     QVector<b2Shape*> touch_image;
 
+    b2World* _world = nullptr;
+
 public:
     Touch_Sensor(QObject* parent=nullptr);
 
-    WorldObjectComponent_If* clone(QObject *newParent);
+    WorldObjectComponent* _clone(QObject *newParent);
 
-    QMap<QString, PropertyView>& getProperties(){
+    QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
         return _properties;
-    }
-
-    QString getPropertyGroup(){
-        return "Touch Ring";
-    }
-
-    QVector<Model*> getModels(){
-        return {buttons_model, touches_model};
     }
 
     bool usesChannels(){
@@ -109,7 +93,7 @@ public:
     }
 
     void generateBodies(b2World *world, object_id oId, b2Body *anchor);
-    void clearBodies(b2World *world);
+    void clearBodies();
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
@@ -127,9 +111,7 @@ public slots:
     //Disconnects all ROS topics
     virtual void disconnectChannels();
 
-    virtual void worldTicked(const b2World*, const double);
-
-    virtual void setObjectMass(double mass){}
+    virtual void _worldTicked(const double);
 };
 
-#endif // FLOATER_DRIVETRAIN_H
+#endif
