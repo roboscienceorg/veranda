@@ -23,6 +23,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     makeWidget(factory), componentPlugins(components),
     ui(new Ui::MainWindow)
 {
+    factory = factory;
     qRegisterMetaType<QVector<object_id>>("QVector<object_id>");
     qRegisterMetaType<QVector<QSharedPointer<WorldObject>>>("QVector<QSharedPointer<WorldObject>>");
 
@@ -514,23 +515,40 @@ void MainWindow::deleteObjectFromSimButtonClick()
 
 void MainWindow::loadObjectsForSimButtonClick()
 {
+
+    QString types;
+    qDebug() << "Able to load files:" << objectLoaders.keys();
+    for(QString k : objectLoaders.keys())
+        if(k.size())
+          types += k + ";;";
+
+    types = types.left(types.size()-2);
+
     QFileDialog dialog(this);
     dialog.setDirectory(QDir::homePath());
     dialog.setFileMode(QFileDialog::ExistingFiles);
-    //dialog.setNameFilter(trUtf8("Splits (*.json *.whatever)"));
+    //dialog.setNameFilter(trUtf8(types));
+
+
+    qDebug() << "types:" << types;
+
     QStringList fileNames;
     if (dialog.exec())
         fileNames = dialog.selectedFiles();
+
 
     ui->simulatorToolsList->clear();
 
     for(int i = 0; i < fileNames.size(); i++)
     {
-        //create object from file
-        //WorldObjectProperties *object;
+        QString path = fileNames[i];
 
-        //Designer_Widget *newTool = new Designer_Widget(object);
-        //check property for "type"
+        //TODO create WorldObjectProperties* object from file
+
+        //newObject = makeWidget();
+        //TODO add shapes to widget view (can probably do this in Designer_Widget.cpp)
+
+        //TODO check properties for "type"
         //match existing type in designerTabs or simulatorTabs?
         //add to tab, else push new tab and add
 
@@ -577,29 +595,23 @@ void MainWindow::exportObjectButtonClick()
 
 void MainWindow::loadToolsButtonClick()
 {
-    QFileDialog dialog(this);
-    dialog.setDirectory(QDir::homePath());
-    dialog.setFileMode(QFileDialog::ExistingFiles);
-    //dialog.setNameFilter(trUtf8("Splits (*.json *.whatever)"));
-    QStringList fileNames;
-    if (dialog.exec())
-        fileNames = dialog.selectedFiles();
-
     ui->designerToolsList->clear();
 
-    for(int i = 0; i < fileNames.size(); i++)
+    for( auto it = componentPlugins.begin(); it != componentPlugins.end(); it++)
     {
-        //TODO create WorldObjectProperties* object from file
+        WorldObjectComponent* component = it.value()->createComponent();
+        //manually set WorldObjectComponent to WorldObjectProperties
+        Designer_Widget* tile = new Designer_Widget(component, factory, this);
 
-        //newObject = makeWidget();
-        //TODO add shapes to widget view (can probably do this in Designer_Widget.cpp)
+        //if tab does not exist, create it then add new designer widget
+        if(designerTabs[tile->getType()] == nullptr)
+        {
+            designerTabs[tile->getType()] = new QListWidget();
+            ui->designerToolsList->addTab(designerTabs[tile->getType()], tile->getType());
+        }
 
-        //TODO check properties for "type"
-        //match existing type in designerTabs or simulatorTabs?
-        //add to tab, else push new tab and add
-
-        designerTabs[QString::number(i)] = new QListWidget();
-        ui->designerToolsList->addTab(designerTabs[QString::number(i)], QString::number(i));
+        //add new designer widget to a tab
+        designerTabs[tile->getType()]->addItem(tile);
     }
 }
 

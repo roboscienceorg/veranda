@@ -32,6 +32,7 @@ public:
 private:
     Q_OBJECT
 
+    visualizerFactory factory;
     visualizerFactory makeWidget;
     Simulator_Visual_If* visualSimulator;
     Simulator_Visual_If* visualDesigner;
