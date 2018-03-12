@@ -475,7 +475,7 @@
        </item>
        <item>
         <widget class="QWidget" name="buildToolsWidget" native="true">
-         <layout class="QVBoxLayout" name="buildToolsLayout" stretch="0,0,0,1,1">
+         <layout class="QVBoxLayout" name="buildToolsLayout" stretch="0,0,0,0,0">
           <item>
            <widget class="QLabel" name="buildToolsLabel">
             <property name="frameShape">
@@ -526,6 +526,26 @@
                <property name="icon">
                 <iconset resource="resources.qrc">
                  <normaloff>:/des/DeleteFileIcon</normaloff>:/des/DeleteFileIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="loadToolsButton">
+               <property name="toolTip">
+                <string>Load Components</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/sim/ImportMapIcon</normaloff>:/sim/ImportMapIcon</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -601,14 +621,59 @@
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QToolButton" name="loadObjectsButton">
+               <property name="toolTip">
+                <string>Load Objects</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/sim/ImportMapIcon</normaloff>:/sim/ImportMapIcon</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="simulatorToolsList"/>
+           <widget class="QTabWidget" name="simulatorToolsList">
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <widget class="QWidget" name="tab">
+             <attribute name="title">
+              <string>Tab 1</string>
+             </attribute>
+            </widget>
+            <widget class="QWidget" name="tab_2">
+             <attribute name="title">
+              <string>Tab 2</string>
+             </attribute>
+            </widget>
+           </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="designerToolsList"/>
+           <widget class="QTabWidget" name="designerToolsList">
+            <widget class="QWidget" name="tab_3">
+             <attribute name="title">
+              <string>Tab 1</string>
+             </attribute>
+            </widget>
+            <widget class="QWidget" name="tab_4">
+             <attribute name="title">
+              <string>Tab 2</string>
+             </attribute>
+            </widget>
+           </widget>
           </item>
          </layout>
         </widget>

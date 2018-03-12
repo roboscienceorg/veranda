@@ -19,7 +19,8 @@ SOURCES += \
     src/simulator_core.cpp \
     src/ui/joystickprototype.cpp \
     ui/settingspopup.cpp \
-    src/ui/settingspopup.cpp
+    src/ui/settingspopup.cpp \
+    src/ui/designer_widget.cpp
 
 HEADERS += \
 \
@@ -36,7 +37,9 @@ HEADERS += \
     include/interfaces/world_object_wrappers.h \
     include/ui/joystickprototype.h \
     ui/settingspopup.h \
-    include/ui/settingspopup.h
+    include/ui/settingspopup.h \
+    src/ui/designer_widget.h \
+    include/ui/designer_widget.h
 
 FORMS    += \
     ui/mainwindow.ui \

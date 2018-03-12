@@ -8,8 +8,8 @@
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/simulator_visual_if.h"
 #include "interfaces/world_object_wrappers.h"
-//#include "interfaces/joystickprototype_if.h"
 #include "ui/joystickprototype.h"
+#include "ui/designer_widget.h"
 
 #include <sdsmt_simulator/world_object_component_plugin.h>
 #include <sdsmt_simulator/world_object_loader_if.h>
@@ -31,21 +31,30 @@ private:
     visualizerFactory makeWidget;
     Simulator_Visual_If* visualSimulator;
     Simulator_Visual_If* visualDesigner;
-    //QMap<QWindow*, JoystickPrototype*> joysticks;
 
     QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
     QMap<QString, WorldObjectLoader_If*> objectLoaders;
     QMap<QString, WorldObjectSaver_If*> objectSavers;
 
+    //tools tab widget holders, each list belongs to a tab
+    QMap<QString, QListWidget*> designerTabs;
+    QMap<QString, QListWidget*> simulatorTabs;
+
     int speed;
     bool play;
     bool record;
+    bool simulation;
     object_id selected;
 
     QStandardItemModel* propertiesModel = nullptr;
 
+    //simulator objects
     QMap<object_id, WorldObjectProperties*> worldObjects;
     QMap<object_id, QListWidgetItem*> listItems;
+
+    //designer objects
+    QMap<object_id, WorldObjectProperties*> designerObjects;
+    QMap<object_id, QListWidgetItem*> designerItems;
 
     QMap<uint64_t, QString> displayed_properties;
 
@@ -109,17 +118,17 @@ private slots:
     //Simulation mode tool button signals and slots
     void addObjectButtonClick();
     void deleteObjectButtonClick();
+    void loadObjectButtonClick();
 
     //Designer mode tool button signals and slots
     void addToolButtonClick();
     void deleteToolButtonClick();
     void exportObjectButtonClick();
+    void loadToolsButtonClick();
 
     //World view signals and slots
     void objectSelected(object_id id);
     void nothingSelected();
-    void updateDesignerBuildTools();
-    void updateSimulatorBuildTools();
     void robotItemClicked(QListWidgetItem* item);
     void updatePropertyInformation();
 
@@ -127,9 +136,16 @@ private:
     Ui::MainWindow *ui;
 
 signals:
+    //selection slots for clicks on the world view
     void objectIsSelected(object_id id);
     void nothingIsSelected();
     void windowClosed();
+
+    //tools menu (rightmost deployable menu)
+    void addToolToSimulator(WorldObjectProperties*);
+    void addToolToDesigner(WorldObjectProperties*);
+    void deleteToolFromSimulator(WorldObjectProperties*);
+    void deleteToolFromDesigner(WorldObjectProperties*);
 };
 
 #endif // MAINWINDOW_H
