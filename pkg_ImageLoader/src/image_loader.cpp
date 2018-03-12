@@ -9,13 +9,13 @@
 #include <stdexcept>
 #include <limits>
 
-QVector<QSharedPointer<WorldObject> > ImageLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
+QVector<WorldObject *> ImageLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
     try
     {
         qDebug() << "Loading...";
         QVector<QVector<b2PolygonShape*>> shapes = getShapesFromFile(filePath);
-        QVector<QSharedPointer<WorldObject>> objects;
+        QVector<WorldObject*> objects;
 
         uint64_t objNum = 0;
 
@@ -42,7 +42,7 @@ QVector<QSharedPointer<WorldObject> > ImageLoader::loadFile(QString filePath, QM
             //qDebug() << "Loaded obj with min (" << min.x << min.y << ") max (" << max.x << max.y << ") 'center'(" << avg.x << avg.y << ")";
 
             PolygonsComponent* comp = new PolygonsComponent(poly);
-            QSharedPointer<WorldObject> obj(new WorldObject({comp}, "Image Chunk #" + QString::number(objNum++)));
+            WorldObject* obj(new WorldObject({comp}, "Image Chunk #" + QString::number(objNum++)));
             obj->translate(avg.x, avg.y);
             objects.push_back(obj);
 

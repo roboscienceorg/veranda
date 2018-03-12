@@ -420,7 +420,8 @@ void MainWindow::importMapButtonClick()
 
                               //Spin up side thread to actually load it
                               QtConcurrent::run([this, path, wl](){
-                                  QVector<QSharedPointer<WorldObject>> loadedObjs;
+                                  QVector<QSharedPointer<WorldObject>> sharedObjs;
+                                  QVector<WorldObject*> loadedObjs;
                                   try
                                   {
                                       //Load file in separate thread
@@ -434,17 +435,25 @@ void MainWindow::importMapButtonClick()
                                       userRemoveWorldObjectsFromSimulation(worldObjects.keys().toVector());
 
                                       qDebug() << "Build new world";
-                                      userAddWorldObjectsToSimulation(loadedObjs);
+                                      for(WorldObject* w : loadedObjs)
+                                        sharedObjs.push_back(QSharedPointer<WorldObject>(w));
+
+                                      userAddWorldObjectsToSimulation(sharedObjs);
 
                                       //Add default robots
                                       if(defaultLoader && defaultLoader->canLoadFile(path))
                                       {
                                           loadedObjs.clear();
+                                          sharedObjs.clear();
                                           try
                                           {
                                               loadedObjs=defaultLoader->loadFile(path, componentPlugins);
                                           }catch(std::exception& ex){}
-                                          userAddWorldObjectsToSimulation(loadedObjs);
+
+                                          for(WorldObject* w : loadedObjs)
+                                            sharedObjs.push_back(QSharedPointer<WorldObject>(w));
+
+                                          userAddWorldObjectsToSimulation(sharedObjs);
                                       }
                                   }
                                   else
