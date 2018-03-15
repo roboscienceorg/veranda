@@ -1,19 +1,23 @@
 #include "include/ui/designer_widget.h"
 
-Designer_Widget::Designer_Widget(WorldObjectProperties *object, visualizerFactory factory, QListWidget *parent) :
+Designer_Widget::Designer_Widget(WorldObjectComponent *object, WorldObjectProperties *object2, visualizerFactory factory, QListWidget *parent) :
               QListWidgetItem(parent)
 {
-    makeWidget = factory;
+    view = factory();
+    component = object;
+    properties = object2;
 
-    view = makeWidget();
-    properties = object;
+    QHBoxLayout* tileLayout = new QHBoxLayout();
+    tileLayout->addWidget(view);
 
     //set tooltip to be property info for key "name"
-
     setToolTip(properties->getName());
+
+    view->objectAddedToScreen(properties->getModels(), 0);
+
+    QPixmap pixmap(view->size());
+    view->render(&pixmap);
+    setIcon(QIcon(pixmap));
+
 }
 
-QString Designer_Widget::getType()
-{
-    return properties->getType();
-}

@@ -42,6 +42,8 @@ public:
     WorldObjectComponent* getComponent()
     { return _comp; }
 
+    //void getPosition(double x, double y){ _comp->getPosition(x, y); }
+    void translateView(double x, double y, double degrees){ _comp->translateView(x, y, degrees); }
     void translate(double x, double y){ _comp->translate(x, y); }
     void rotate(double degrees){ _comp->rotate(degrees); }
 
