@@ -7,12 +7,10 @@ Designer_Widget::Designer_Widget(WorldObjectComponent *object, WorldObjectProper
     component = object;
     properties = object2;
 
-    QHBoxLayout* tileLayout = new QHBoxLayout();
-    tileLayout->addWidget(view);
-
     //set tooltip to be property info for key "name"
     setToolTip(properties->getName());
 
+    view->setWorldBounds(-1, 1, -1, 1);
     view->objectAddedToScreen(properties->getModels(), 0);
 
     QPixmap pixmap(view->size());
@@ -20,4 +18,3 @@ Designer_Widget::Designer_Widget(WorldObjectComponent *object, WorldObjectProper
     setIcon(QIcon(pixmap));
 
 }
-

@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QListWidgetItem>
-#include <QLayout>
 
 #include "interfaces/simulator_ui_if.h"
 #include "interfaces/simulator_visual_if.h"

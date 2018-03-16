@@ -217,6 +217,9 @@
              </item>
              <item>
               <widget class="QToolButton" name="speedSimButton">
+               <property name="toolTip">
+                <string>Speed x2</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -234,6 +237,9 @@
              </item>
              <item>
               <widget class="QToolButton" name="playSimButton">
+               <property name="toolTip">
+                <string>Play Simulation</string>
+               </property>
                <property name="text">
                 <string/>
                </property>

@@ -27,17 +27,20 @@ class Mode_Controller: public QObject
     typedef std::function<Simulator_Visual_If*()> visualizerFactory;
 
 public:
-    Mode_Controller(visualizerFactory factory, QListWidget* pActive, QTableView* pProperties, QTabWidget* pTabs, QWidget *parent = nullptr);
+    Mode_Controller(visualizerFactory factory, QToolButton* pModeButton, QWidget* pMenu, QWidget* pToolsMenu, QListWidget* pActive, QTableView* pProperties, QTabWidget* pTabs, QWidget *parent = nullptr);
     void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
-    Simulator_Visual_If* visual;
     QMap<object_id, WorldObjectProperties*> worldObjects;
-    object_id idIncrementer = 1;
-    QListWidget* active;
-    QTabWidget* tabs;
-    QMap<QString, QListWidget*> toolTabs;
+    Simulator_Visual_If* visual;
     bool simulator = false;
 
 private:
+    object_id idIncrementer = 1;
+    QToolButton* modeButton;
+    QWidget* menu;
+    QWidget* toolsMenu;
+    QListWidget* active;
+    QTabWidget* tabs;
+    QMap<QString, QListWidget*> toolTabs;
     visualizerFactory makeWidget;
 
     object_id selected;
@@ -65,6 +68,7 @@ public slots:
     void addObjectToView();
     void deleteObjectFromView();
     void addObjectToTools(WorldObjectComponent* component);
+    //WorldObjectComponent *getItemAsComponent();
 
     void objectSelected(object_id id);
     void nothingSelected();

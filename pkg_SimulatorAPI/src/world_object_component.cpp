@@ -169,7 +169,6 @@ void WorldObjectComponent::updateProperties()
 
 void WorldObjectComponent::translateView(double x, double y, double degrees)
 {
-    qDebug() << this << "DEG2RAD " << DEG2RAD;
     if(std::abs(x) < EPSILON && std::abs(y) < EPSILON && std::abs(degrees) < EPSILON) return;
 
     globalPos.x += x;
@@ -216,7 +215,6 @@ void WorldObjectComponent::translate(double x, double y)
 
 void WorldObjectComponent::rotate(double degrees)
 {
-    qDebug() << this << "DEG2RAD " << DEG2RAD;
     if(std::abs(degrees) < EPSILON) return;
 
     globalRadians += degrees*DEG2RAD;

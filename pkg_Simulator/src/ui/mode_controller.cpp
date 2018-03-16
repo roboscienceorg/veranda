@@ -1,10 +1,13 @@
 #include "include/ui/mode_controller.h"
 
-Mode_Controller::Mode_Controller(visualizerFactory factory, QListWidget* pActive, QTableView* pProperties, QTabWidget* pTabs, QWidget *parent)
+Mode_Controller::Mode_Controller(visualizerFactory factory, QToolButton *pModeButton, QWidget* pMenu, QWidget* pToolsMenu, QListWidget* pActive, QTableView* pProperties, QTabWidget* pTabs, QWidget *parent)
 {
     makeWidget = factory;
     visual = factory();
     active = pActive;
+    menu = pMenu;
+    toolsMenu = pToolsMenu;
+    modeButton = pModeButton;
     properties = pProperties;
     tabs = pTabs;
     tabs->clear();
@@ -39,7 +42,10 @@ void Mode_Controller::open()
     visual->setVisible(true);
     tabs->setVisible(true);
     active->setVisible(true);
-    properties->setVisible(true);
+    properties->setVisible(true);    
+    modeButton->setEnabled(false);
+    menu->setVisible(true);
+    toolsMenu->setVisible(true);
 
     nothingSelected();
 }
@@ -51,6 +57,9 @@ void Mode_Controller::close()
     tabs->setVisible(false);
     active->setVisible(false);
     properties->setVisible(false);
+    modeButton->setEnabled(true);
+    menu->setVisible(false);
+    toolsMenu->setVisible(false);
 
     nothingSelected();
 }
@@ -107,7 +116,8 @@ void Mode_Controller::setWorldBounds(double xMin, double xMax, double yMin, doub
 
 bool Mode_Controller::cloneSelectedTool()
 {
-    qDebug() << "cloning ";
+    if(toolTabs.size() < 1)
+        return false;
 
     QList<QListWidgetItem*> l = toolTabs[tabs->currentWidget()->accessibleName()]->selectedItems();
     if ( ! l.empty()) {
@@ -130,8 +140,7 @@ void Mode_Controller::addObjectToView()
     {
         WorldObjectProperties* object = selectedTool;
 
-        qDebug() << "here";
-        //ad object to active list
+        //add object to active list
         object_id oId = getNextId();
         worldObjects[oId] = object;
         listItems[oId] = new QListWidgetItem();
@@ -155,6 +164,69 @@ void Mode_Controller::deleteObjectFromView()
 
     nothingSelected();
 }
+/*
+void Mode_Controller::addObjectToSimulatorTools(QVector<QPair<WorldObjectProperties *, object_id> > objs)
+{
+
+    WorldObjectProperties* properties = new WorldObjectProperties(component, this);
+
+    //if tab does not exist, create it then add new designer widget
+    if(toolTabs[properties->getType()] == nullptr)
+    {
+        toolTabs[properties->getType()] = new QListWidget();
+        tabs->addTab(toolTabs[properties->getType()], properties->getType());
+        toolTabs[properties->getType()]->setViewMode(QListWidget::IconMode);
+        toolTabs[properties->getType()]->setResizeMode(QListWidget::Adjust);
+        toolTabs[properties->getType()]->setIconSize(QSize(150, 150));
+    }
+
+    //add new designer widget to a tab
+    Designer_Widget* tile = new Designer_Widget(component, properties, makeWidget, toolTabs[properties->getType()]);
+    toolTabs[properties->getType()]->addItem(tile);
+
+    for(auto& p : objs)
+    {
+        object_id& oId = p.second;
+        WorldObjectProperties* object = p.first;
+
+        if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
+
+        worldObjects[oId] = object;
+
+        visual->objectAddedToScreen(object->getModels(), oId);
+
+        listItems[oId] = new QListWidgetItem();
+        listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
+        active->addItem(listItems[oId]);
+    }
+    if(objs.size())
+        objectSelected(objs.last().second);
+}
+
+QVector<QPair<WorldObjectProperties *, object_id> > Mode_Controller::getItemAsPropertiesVector()
+{
+    QVector<QPair<WorldObjectProperties *, object_id> > rVector;
+
+    foreach( int key, worldObjects.keys() )
+    {
+        //fout << key << "," << extensions.value( key ) << '\n';
+        object_id oId = key;
+        WorldObjectProperties* object = worldObjects.value(key);
+
+        rVector.append(new QPair<WorldObjectProperties *, object_id>(object, oId));
+    }
+
+    //worldObjects is QMap<object_id, WorldObjectProperties*>
+    for(auto e : worldObjects.keys())
+    {
+        object_id oId = e->key();
+        WorldObjectProperties* object = e->value();
+
+        rVector->append(new QPair<WorldObjectProperties *, object_id>(object, oId));
+    }
+
+    return rVector;
+}*/
 
 void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
 {
@@ -166,8 +238,8 @@ void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
         toolTabs[properties->getType()] = new QListWidget();
         tabs->addTab(toolTabs[properties->getType()], properties->getType());
         toolTabs[properties->getType()]->setViewMode(QListWidget::IconMode);
-        toolTabs[properties->getType()]->setIconSize(QSize(150,150));
         toolTabs[properties->getType()]->setResizeMode(QListWidget::Adjust);
+        toolTabs[properties->getType()]->setIconSize(QSize(150, 150));
     }
 
     //add new designer widget to a tab
@@ -272,7 +344,7 @@ void Mode_Controller::simObjectMoveDragged(object_id id, double dx, double dy)
 
 void Mode_Controller::simObjectRotateDragged(object_id id, double dt)
 {
-    qDebug() << "Yo yo " << dt;
+    //qDebug() << "Yo yo " << dt;
     auto obj = worldObjects.find(id);
     if(obj != worldObjects.end())
     {
