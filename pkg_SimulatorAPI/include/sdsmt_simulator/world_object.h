@@ -5,6 +5,8 @@
 #include <QString>
 #include <QMap>
 #include <QVector>
+#include <QJsonArray>
+#include <QJsonObject>
 
 #include "sdsmt_simulator/world_object_component.h"
 #include "sdsmt_simulator/model.h"
@@ -55,6 +57,11 @@ public:
 
     //ROS Interactions
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
+
+    void readJson(const QJsonObject &json);
+    void writeJson(QJsonObject &json) const;
+
+    QString getPluginName() { return ""; }
 
 public slots:
     void connectChannels();

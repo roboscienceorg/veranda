@@ -338,3 +338,17 @@ QMap<QString, QSharedPointer<PropertyView>> WorldObjectComponent::getProperties(
 
     return out;
 }
+
+void WorldObjectComponent::writeJson(QJsonObject &json) const
+{
+    QJsonArray propArray;
+    for (QMap::iterator it = _properties.begin(); it != _properties.end(); it++)
+    {
+        QJsonObject propObj;
+        propObj["key"] = it.key();
+        propObj["value"] = it.value().get();
+        propArray.append(propObj);
+    }
+    json["pluginName"] = this->getPluginName();
+    json["properties"] = propArray;
+}

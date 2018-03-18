@@ -97,12 +97,16 @@ public:
     void translate(double x, double y);
     void rotate(double degrees);
 
+    void writeJson(QJsonObject &json) const;
+
     //Interactions with ROS
     virtual void setROSNode(std::shared_ptr<rclcpp::Node> node){}
     virtual bool usesChannels(){return false;}
 
     virtual void generateBodies(b2World* world, object_id oId, b2Body* anchor){}
     virtual void clearBodies(){}
+
+    virtual QString getPluginName() = 0;
 
 public slots:
     virtual void connectChannels(){}

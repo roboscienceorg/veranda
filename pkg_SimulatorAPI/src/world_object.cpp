@@ -155,3 +155,74 @@ void WorldObject::setROSNode(std::shared_ptr<rclcpp::Node> node)
     for(WorldObjectComponent* c : _components)
         c->setROSNode(node);
 }
+
+void WorldObject::readJson(const QJsonObject &json)
+{
+    if (json.contains("properties") && json["properties"].isArray())
+    {
+        QJsonArray propertyArray = json["properties"].toArray();
+        for (int i = 0; i < propertyArray.size(); i++)
+        {
+            QJsonObject propertyObject = propertyArray[i].toObject();
+            if (propertyObject.contains("key") && propertyObject["key"].isObject()
+             && propertyObject.contains("value") && propertyObject["value"].isObject())
+            {
+                PropertyView v;
+                v.set(propertyObject["value"].toString(), true);
+                QSharedPointer p(&v);
+                _properties[propertyObject["key"].toString()] = p;
+            }
+        }
+    }
+
+    if (json.contains("components") && json["components"].isArray())
+    {
+        QJsonArray componentArray = json["components"].toArray();
+        for (int i = 0; i < componentArray.size(); i++)
+        {
+            QJsonObject componentObject = componentArray[i].toObject();
+            if (componentObject.contains("pluginName") && componentObject["pluginName"].isObject() && plugins.contains(componentObject["pluginName"]))
+            {
+                WorldObjectComponent* comp = plugins[componentObject["pluginName"]]->createComponent();
+                QMap<QString, PropertyView> props = comp->getProperties();
+
+                if (componentObject.contains("properties") && componentObject["properties"].isArray())
+                {
+                    QJSonArray propArray = componentObject["properties"].toArray();
+                    for (int j = 0; j < propArray.size(); j++)
+                    {
+                        QJsonObject propertyObject = propArray[j].toObject();
+                        if (propertyObject.contains("key") && componenetObject["key"].isObject()
+                         && propertyObject.contains("value") && componenetObject["value"].isObject())
+                        {
+                            props[propertyObject["key"]].set(propertyObject["value"], true);
+                        }
+                    }
+                }
+                _components.push_back(comp);
+            }
+        }
+    }
+}
+
+void WorldObject::writeJson(QJsonObject &json) const
+{
+    QJsonArray propArray;
+    for (QMap::iterator it = _properties.begin();it != _properties.end(); it++)
+    {
+        QJsonObject propObj;
+        propObj["key"] = it.key();
+        propObj["value"] = it.value().get();
+        propArray.append(propObj);
+    }
+    json["properties"] = propArray;
+
+    QJsonArray compArray;
+    foreach (const WorldObjectComponent comp, _components)
+    {
+        QJsonObject compObject;
+        comp.writeJson(compObject);
+        compArray.append(compObject);
+    }
+    json["components"] = compArray;
+}

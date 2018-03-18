@@ -48,6 +48,11 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
         for(QString e : s->fileExts())
             worldSavers[e] += s;
 
+    //TEMP
+    JsonWorldSaver test;
+    for(QString e : test.fileExts())
+        worldSavers[e] += &test;
+
     //If no world loader plugins exist,
     //don't present button to user
     if(wloaders.size() == 0)
