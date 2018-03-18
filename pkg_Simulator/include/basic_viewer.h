@@ -144,8 +144,8 @@ private slots:
     void viewMouseMove(QMouseEvent* event);
     void resizeEvent(QResizeEvent* event);
 
-    void viewShift(int x, int y);
     void viewZoom(int z);
+    void viewShift(int x, int y);
 };
 
 #endif // BASIC_VIEWER_H

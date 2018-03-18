@@ -167,13 +167,33 @@ void WorldObjectComponent::updateProperties()
     _globTheta.set(globalRadians * RAD2DEG);
 }
 
+void WorldObjectComponent::translateView(double x, double y, double degrees)
+{
+    if(std::abs(x) < EPSILON && std::abs(y) < EPSILON && std::abs(degrees) < EPSILON) return;
+
+    globalPos.x += x;
+    globalPos.y += y;
+
+    globalRadians += degrees*DEG2RAD;
+    if(globalRadians > 2*PI)
+        globalRadians -= 2*PI*((int)globalRadians/(2*PI));
+    else if(globalRadians < 0)
+        globalRadians += 2*PI*((int)globalRadians/(2*PI) + 1);
+
+    qDebug() << this << "ME: change pos and angle to " << globalPos.x << globalPos.y << degrees << " " << globalRadians;
+
+    for(Model* m : getModels())
+        m->setTransform(globalPos.x, globalPos.y, globalRadians);
+    updateProperties();
+}
+
 void WorldObjectComponent::translate(double x, double y)
 {
     if(std::abs(x) < EPSILON && std::abs(y) < EPSILON) return;
 
     globalPos.x += x;
     globalPos.y += y;
-    //qDebug() << this << "adjust location by " << x << y << " : " << globalPos.x << globalPos.y;
+    qDebug() << this << "adjust location by " << x << y << " : " << globalPos.x << globalPos.y;
 
     QTransform unGlobal = globalTransform.inverted();
     globalTransform = transform(globalPos, globalRadians);
@@ -277,6 +297,7 @@ void WorldObjectComponent::syncModels()
     //Nothing to do if no bodies are registered
     if(!_bodies.size()) return;
 
+    qDebug() << "syncing models ";
     //For every model tied to a body
     //update it's transform to that body's
     //global location

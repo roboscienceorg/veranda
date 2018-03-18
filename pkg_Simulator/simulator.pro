@@ -21,7 +21,8 @@ SOURCES += \
     src/ui/joystickprototype.cpp \
     ui/settingspopup.cpp \
     src/ui/settingspopup.cpp \
-    src/ui/designer_widget.cpp
+    src/ui/designer_widget.cpp \
+    src/ui/mode_controller.cpp
 
 HEADERS += \
 \
@@ -40,7 +41,9 @@ HEADERS += \
     ui/settingspopup.h \
     include/ui/settingspopup.h \
     src/ui/designer_widget.h \
-    include/ui/designer_widget.h
+    include/ui/designer_widget.h \
+    src/ui/mode_controller.h \
+    include/ui/mode_controller.h
 
 FORMS    += \
     ui/mainwindow.ui \

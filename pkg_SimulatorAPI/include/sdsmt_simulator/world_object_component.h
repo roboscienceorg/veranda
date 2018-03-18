@@ -94,6 +94,7 @@ public:
     QMap<QString, QSharedPointer<PropertyView>> getProperties();
     QString getName(){ return _objName.get().toString(); }
 
+    void translateView(double x, double y, double degrees);
     void translate(double x, double y);
     void rotate(double degrees);
 

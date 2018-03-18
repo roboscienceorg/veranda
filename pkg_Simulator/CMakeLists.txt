@@ -57,6 +57,7 @@ set(MOC_HDRS
 
     include/ui/mainwindow.h
     include/ui/joystickprototype.h
+    include/ui/mode_controller.h
     include/ui/settingspopup.h
     )
 
@@ -74,6 +75,7 @@ set(CPP_SRCS
 
     src/ui/mainwindow.cpp
     src/ui/joystickprototype.cpp
+    src/ui/mode_controller.cpp
     src/ui/settingspopup.cpp
     src/ui/designer_widget.cpp
     src/main.cpp
