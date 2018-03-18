@@ -68,6 +68,7 @@ public slots:
     void addObjectToView();
     void deleteObjectFromView();
     void addObjectToTools(WorldObjectComponent* component);
+    //void addObjectToSimTools(QMap<object_id, WorldObjectProperties*> objs);
     //WorldObjectComponent *getItemAsComponent();
 
     void objectSelected(object_id id);

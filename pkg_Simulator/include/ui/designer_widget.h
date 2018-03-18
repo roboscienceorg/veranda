@@ -23,7 +23,7 @@ public:
 
 private:
     
-    //there will be x amount of these widgets, each one for a different TAB of either the Designer or Simulator visual widget lists   
+    //there will be x amount of these widgets, each one for a different TAB of the Designer visual widget lists
 };
 
 #endif // DESIGNER_WIDGET_H
