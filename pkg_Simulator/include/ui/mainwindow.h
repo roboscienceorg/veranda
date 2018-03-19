@@ -47,15 +47,22 @@ private:
 
     QMap<QString, QVector<WorldLoader_If*>> worldLoaders;
     QMap<QString, QVector<WorldSaver_If*>> worldSavers;
+
+    QMap<object_id, WorldObjectProperties*> objects;
     WorldLoader_If* defaultLoader = nullptr;
 
     void worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>> objs)
     {
+        for(QPair<WorldObjectProperties*, object_id>& p : objs)
+            objects[p.second] = p.first;
+
         objectsAddedToSimulation(objs);
     }
     void worldObjectsRemovedFromSimulation(QVector<object_id> oId)
     {
-        qDebug() << "World objects destroyed" << oId;
+        for(object_id i : oId)
+            objects.remove(i);
+
         objectsRemovedFromSimulation(oId);
     }
     void setWorldBounds(double xMin, double xMax, double yMin, double yMax){}
@@ -104,7 +111,7 @@ private slots:
     void playSimButtonClick();
     void speedSimButtonClick();
     void screenshotSimButtonClick();
-    void importMapButtonClick();
+    void loadSimButtonClick();
     void joystickButtonClick();
     void saveSimButtonClick();
     void restartSimButtonClick();

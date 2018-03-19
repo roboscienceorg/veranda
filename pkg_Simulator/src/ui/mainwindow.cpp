@@ -76,7 +76,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     //Simulation mode button signals and slots
     connect(ui->playSimButton, SIGNAL (released()), this, SLOT (playSimButtonClick()));
     connect(ui->speedSimButton, SIGNAL (released()), this, SLOT (speedSimButtonClick()));
-    connect(ui->importMapButton, SIGNAL (released()), this, SLOT (importMapButtonClick()));
+    connect(ui->importMapButton, SIGNAL (released()), this, SLOT (loadSimButtonClick()));
     connect(ui->screenshotSimButton, SIGNAL (released()), this, SLOT (screenshotSimButtonClick()));
     connect(ui->joystickButton, SIGNAL (released()), this, SLOT (joystickButtonClick()));
     connect(ui->saveSimButton, SIGNAL (released()), this, SLOT (saveSimButtonClick()));
@@ -241,7 +241,7 @@ void MainWindow::screenshotSimButtonClick()
     pixmap.save(&file, "PNG");
 }
 
-void MainWindow::importMapButtonClick()
+void MainWindow::loadSimButtonClick()
 {
     QMessageBox msgBox;
     msgBox.setText("WARNING: Changing the map will delete all world objects from this simulation.");
@@ -356,7 +356,48 @@ void MainWindow::joystickButtonClick()
     joystick->show();
 }
 
-void MainWindow::saveSimButtonClick(){}
+void MainWindow::saveSimButtonClick()
+{
+    QString types;
+    qDebug() << "Able to save files:" << worldSavers.keys();
+    for(QString k : worldSavers.keys())
+      if(k.size())
+        types += k + ";;";
+
+    types = types.left(types.size()-2);
+
+    // Save was clicked
+    QString path = QFileDialog::getSaveFileName(this, tr("Save File"), "/home", types);
+
+    if(path.length())
+    {
+        QString ext = QFileInfo(path).suffix();
+
+        for(auto it = worldSavers.begin(); it != worldSavers.end(); it++)
+        {
+            if(it.key().contains(ext))
+            {
+                QVector<WorldObject*> worldObjs;
+                for(WorldObjectProperties* prop : objects)
+                {
+                    WorldObject* cast = prop->getObject();
+                    if(cast)
+                        worldObjs.push_back(cast);
+                }
+
+                try
+                {
+                    it.value()[0]->saveFile(path, worldObjs);
+                }catch(std::exception& ex){
+                    error("Unable to save file " + path + ": " + QString::fromStdString(ex.what()));
+                }
+
+                return;
+            }
+        }
+    }
+}
+
 void MainWindow::restartSimButtonClick(){}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
