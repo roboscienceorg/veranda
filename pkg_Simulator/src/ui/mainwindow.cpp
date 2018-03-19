@@ -76,7 +76,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     //Simulation mode button signals and slots
     connect(ui->playSimButton, SIGNAL (released()), this, SLOT (playSimButtonClick()));
     connect(ui->speedSimButton, SIGNAL (released()), this, SLOT (speedSimButtonClick()));
-    connect(ui->importMapButton, SIGNAL (released()), this, SLOT (importMapButtonClick()));
+    connect(ui->importMapButton, SIGNAL (released()), this, SLOT (loadSimButtonClick()));
     connect(ui->screenshotSimButton, SIGNAL (released()), this, SLOT (screenshotSimButtonClick()));
     connect(ui->joystickButton, SIGNAL (released()), this, SLOT (joystickButtonClick()));
     connect(ui->saveSimButton, SIGNAL (released()), this, SLOT (saveSimButtonClick()));
@@ -88,6 +88,8 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(ui->saveObjectButton, SIGNAL (released()), this, SLOT (saveObjectButtonClick()));
 
     //Simulation mode tool button signals and slots
+    connect(simulator, SIGNAL (requestAddWorldObject(QVector<WorldObject*>, bool)), this, SIGNAL (userAddWorldObjectsToSimulation(QVector<WorldObject*>, bool)));
+    connect(simulator, SIGNAL (requestRemoveWorldObject(QVector<object_id>)), this, SIGNAL (userRemoveWorldObjectsFromSimulation(QVector<object_id>)));
     connect(ui->addObjectButton, SIGNAL (released()), simulator, SLOT (addObjectToView()));
     connect(ui->deleteObjectButton, SIGNAL (released()), simulator, SLOT (deleteObjectFromView()));
     connect(ui->loadObjectsButton, SIGNAL (released()), this, SLOT (loadObjectsForSimButtonClick()));
@@ -101,10 +103,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     loadToolsButtonClick();
 
     connect(this, SIGNAL (objectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)), simulator, SLOT (worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)));
-    connect(this, SIGNAL (objectsRemovedFromSimulation(QVector<object_id> oId)), simulator, SLOT (worldObjectsRemovedFromSimulation(QVector<object_id> oId)));
-
-    connect(this, SIGNAL (objectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)), designer, SLOT (worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)));
-    connect(this, SIGNAL (objectsRemovedFromSimulation(QVector<object_id> oId)), designer, SLOT (worldObjectsRemovedFromSimulation(QVector<object_id> oId)));
+    connect(this, SIGNAL (objectsRemovedFromSimulation(QVector<object_id>)), simulator, SLOT (worldObjectsRemovedFromSimulation(QVector<object_id>)));
 
     //connect(this, SIGNAL (addObjectToSimulation(QVector<QSharedPointer<WorldObject>>)), simulator, SLOT (getItemAsVector(QVector<QSharedPointer<WorldObject>>));
 
@@ -242,7 +241,7 @@ void MainWindow::screenshotSimButtonClick()
     pixmap.save(&file, "PNG");
 }
 
-void MainWindow::importMapButtonClick()
+void MainWindow::loadSimButtonClick()
 {
     QMessageBox msgBox;
     msgBox.setText("WARNING: Changing the map will delete all world objects from this simulation.");
@@ -357,7 +356,48 @@ void MainWindow::joystickButtonClick()
     joystick->show();
 }
 
-void MainWindow::saveSimButtonClick(){}
+void MainWindow::saveSimButtonClick()
+{
+    QString types;
+    qDebug() << "Able to save files:" << worldSavers.keys();
+    for(QString k : worldSavers.keys())
+      if(k.size())
+        types += k + ";;";
+
+    types = types.left(types.size()-2);
+
+    // Save was clicked
+    QString path = QFileDialog::getSaveFileName(this, tr("Save File"), "/home", types);
+
+    if(path.length())
+    {
+        QString ext = QFileInfo(path).suffix();
+
+        for(auto it = worldSavers.begin(); it != worldSavers.end(); it++)
+        {
+            if(it.key().contains(ext))
+            {
+                QVector<WorldObject*> worldObjs;
+                for(WorldObjectProperties* prop : objects)
+                {
+                    WorldObject* cast = prop->getObject();
+                    if(cast)
+                        worldObjs.push_back(cast);
+                }
+
+                try
+                {
+                    it.value()[0]->saveFile(path, worldObjs);
+                }catch(std::exception& ex){
+                    error("Unable to save file " + path + ": " + QString::fromStdString(ex.what()));
+                }
+
+                return;
+            }
+        }
+    }
+}
+
 void MainWindow::restartSimButtonClick(){}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -483,12 +523,10 @@ void MainWindow::loadObjectsForSimButtonClick()
 void MainWindow::exportObjectButtonClick()
 {
     //WorldObject takes pointers to WorldObjectComponents and returns object
-    //simulator->addObjectToSimTools(designer->worldObjects);
-    //if(propertyType)
-    //simulatorTabs[QString::number(5)] = new QListWidget();
-    //ui->simulatorToolsList->addTab(simulatorTabs[QString::number(5)], QString::number(5));
+    //popup ask for name
 
-    //simulator->addObjectToTools(designer->get());
+    WorldObject *object = new WorldObject(designer->getComponents(), "test", this);
+    simulator->addObjectToTools(object);
 }
 
 void MainWindow::loadToolsButtonClick()

@@ -66,10 +66,9 @@ public slots:
     void close();
     int getNextId();
     void addObjectToView();
+    QVector<WorldObjectComponent*> getComponents();
     void deleteObjectFromView();
     void addObjectToTools(WorldObjectComponent* component);
-    //void addObjectToSimTools(QMap<object_id, WorldObjectProperties*> objs);
-    //WorldObjectComponent *getItemAsComponent();
 
     void objectSelected(object_id id);
     void nothingSelected();
@@ -81,7 +80,9 @@ public slots:
 
 signals:
     //selection slots for clicks on the world view
-    void objectIsSelected(object_id id);
+    void requestAddWorldObject(QVector<WorldObject*>, bool);
+    void requestRemoveWorldObject(QVector<object_id>);
+    void objectIsSelected(object_id);
     void nothingIsSelected();
 };
 

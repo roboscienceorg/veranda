@@ -130,7 +130,14 @@ void WorldObjectComponent::unregisterBody(b2Body* bod)
 //transforms
 void WorldObjectComponent::registerModel(Model* mod)
 {
+    _models.removeAll(mod);
     _models += mod;
+
+    double x, y, t;
+    mod->getTransform(x, y, t);
+    QTransform newLoc = transform(b2Vec2(x, y), t*DEG2RAD) * globalTransform;
+
+    mod->setTransform(newLoc.dx(), newLoc.dy(), radians(newLoc)*RAD2DEG);
 }
 
 void WorldObjectComponent::unregisterModel(Model* mod)

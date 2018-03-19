@@ -63,7 +63,7 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
     }
 
     _debugModel = new Model();
-    registerModel(_debugModel);
+    //registerModel(_debugModel);
 }
 
 WorldObject* WorldObject::_clone(QObject *newParent)

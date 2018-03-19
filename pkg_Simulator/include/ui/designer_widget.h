@@ -16,10 +16,11 @@ class Designer_Widget : public QListWidgetItem
 
 public:
     Simulator_Visual_If* view;
+    WorldObject* simulatorObject;
     WorldObjectComponent* component;
     WorldObjectProperties* properties;
 
-    Designer_Widget(WorldObjectComponent *object, WorldObjectProperties* object2, visualizerFactory factory, QListWidget *parent=nullptr);
+    Designer_Widget(WorldObjectComponent *object, WorldObjectProperties *object2, visualizerFactory factory, QListWidget *parent=nullptr);
 
 private:
     

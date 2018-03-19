@@ -89,8 +89,10 @@ void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectPro
 
 void Mode_Controller::worldObjectsRemovedFromSimulation(QVector<object_id> oIds)
 {
+    qDebug() << "Objects destroyed" << oIds;
     for(object_id oId : oIds)
     {
+        qDebug() << "Undraw" << oId;
         visual->objectRemovedFromScreen(oId);
         worldObjects.remove(oId);
 
@@ -141,115 +143,59 @@ void Mode_Controller::addObjectToView()
     {
         WorldObjectProperties* object = selectedTool;
 
-        //add object to active list
-        object_id oId = getNextId();
-        worldObjects[oId] = object;
-        listItems[oId] = new QListWidgetItem();
-        listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
-        active->addItem(listItems[oId]);
-
-        //add object to view
-        visual->objectAddedToScreen(object->getModels(), oId);
+        //add object to view if designer
+        if(simulator)
+        {
+            QVector<WorldObject*> rVector;
+            rVector.push_back(object->getObject());
+            requestAddWorldObject(rVector, true);
+        }
+        else
+        {
+            //add object to active list
+            object_id oId = getNextId();
+            worldObjects[oId] = object;
+            listItems[oId] = new QListWidgetItem();
+            listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
+            active->addItem(listItems[oId]);
+            visual->objectAddedToScreen(object->getModels(), oId);
+        }
     }
 }
 
 void Mode_Controller::deleteObjectFromView()
 {
     object_id oId = selected;
-    visual->objectRemovedFromScreen(oId);
-    worldObjects.remove(oId);
-
-    active->removeItemWidget(listItems[oId]);
-    delete listItems[oId];
-    listItems.remove(oId);
-
-    nothingSelected();
-}
-/*
-void Mode_Controller::addObjectToSimulatorTools(QVector<QPair<WorldObjectProperties *, object_id> > objs)
-{
-
-    WorldObjectProperties* properties = new WorldObjectProperties(component, this);
-
-    //if tab does not exist, create it then add new designer widget
-    if(toolTabs[properties->getType()] == nullptr)
+    if(simulator)
     {
-        toolTabs[properties->getType()] = new QListWidget();
-        tabs->addTab(toolTabs[properties->getType()], properties->getType());
-        toolTabs[properties->getType()]->setViewMode(QListWidget::IconMode);
-        toolTabs[properties->getType()]->setResizeMode(QListWidget::Adjust);
-        toolTabs[properties->getType()]->setIconSize(QSize(150, 150));
+        QVector<object_id> rVector;
+        rVector.push_back(oId);
+        requestRemoveWorldObject(rVector);
     }
-
-    //add new designer widget to a tab
-    Designer_Widget* tile = new Designer_Widget(component, properties, makeWidget, toolTabs[properties->getType()]);
-    toolTabs[properties->getType()]->addItem(tile);
-
-    for(auto& p : objs)
+    else
     {
-        object_id& oId = p.second;
-        WorldObjectProperties* object = p.first;
+        visual->objectRemovedFromScreen(oId);
+        worldObjects.remove(oId);
 
-        if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
-
-        worldObjects[oId] = object;
-
-        visual->objectAddedToScreen(object->getModels(), oId);
-
-        listItems[oId] = new QListWidgetItem();
-        listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
-        active->addItem(listItems[oId]);
+        active->removeItemWidget(listItems[oId]);
+        delete listItems[oId];
+        listItems.remove(oId);
+        nothingSelected();
     }
-    if(objs.size())
-        objectSelected(objs.last().second);
 }
 
-QVector<QPair<WorldObjectProperties *, object_id> > Mode_Controller::getItemAsPropertiesVector()
+QVector<WorldObjectComponent*> Mode_Controller::getComponents()
 {
-    QVector<QPair<WorldObjectProperties *, object_id> > rVector;
+    QVector<WorldObjectComponent*> rVector;
 
-    foreach( int key, worldObjects.keys() )
-    {
-        //fout << key << "," << extensions.value( key ) << '\n';
-        object_id oId = key;
-        WorldObjectProperties* object = worldObjects.value(key);
-
-        rVector.append(new QPair<WorldObjectProperties *, object_id>(object, oId));
-    }
-
-    //worldObjects is QMap<object_id, WorldObjectProperties*>
     for(auto e : worldObjects.keys())
     {
-        object_id oId = e->key();
-        WorldObjectProperties* object = e->value();
-
-        rVector->append(new QPair<WorldObjectProperties *, object_id>(object, oId));
+      WorldObjectProperties* object = worldObjects.value(e);
+      rVector.push_back(object->getComponent());
     }
 
     return rVector;
 }
-
-void Mode_Controller::addObjectToSimTools(QMap<object_id, WorldObjectProperties*> objs)
-{
-    QVector<QPair<WorldObjectProperties *, object_id> > *rVector;
-
-    foreach( int key, objs.keys() )
-    {
-        //fout << key << "," << extensions.value( key ) << '\n';
-        object_id oId = key;
-        WorldObjectProperties* object = objs.value(key);
-        QPair<WorldObjectProperties *, object_id> *rPair = new QPair<WorldObjectProperties *, object_id>(object, oId);
-        rVector->append(*rPair);
-    }
-
-    tabs->addTab(toolTabs[""], "");
-
-    //add new designer widget to a tab
-    Simulator_Widget* tile = new Simulator_Widget(*rVector, makeWidget, toolTabs[""]);
-    toolTabs[""]->addItem(tile);
-
-    qDebug() << rVector;
-}*/
 
 void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
 {
@@ -306,7 +252,7 @@ void Mode_Controller::objectSelected(object_id id)
         connect(model, &QStandardItemModel::dataChanged, [this, obj, model](QModelIndex tl, QModelIndex br)
         {
            for(int i = tl.row(); i <= br.row(); i++)
-               selectedProps[displayed_properties[i]]->set(model->data(model->index(i, 1)));
+               selectedProps[displayed_properties[i]]->set(model->data(model->index(i, 1)), !simulator);
         });
 
         updatePropertyInformation();

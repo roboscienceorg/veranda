@@ -45,6 +45,8 @@ Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent("Ackerm
     registerModel(_lWheelModel);
     registerModel(_rWheelModel);
     //registerModel(_debugModel);
+
+    _buildModels();
 }
 
 void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anchor)
@@ -278,6 +280,11 @@ void Ackermann_Steer::_buildModels()
     line->m_vertex2 = b2Vec2(_l1.get().toDouble()/2.0, 0);
 
     _wheelModel->addShapes({line});
+
+    _lWheelModel->setTransform(-_l1.get().toDouble()/2.0, 0, 90);
+    registerModel(_lWheelModel);
+    _rWheelModel->setTransform(_l1.get().toDouble()/2.0, 0, 90);
+    registerModel(_rWheelModel);
 
     syncModels();
 }

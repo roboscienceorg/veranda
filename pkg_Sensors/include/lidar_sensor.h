@@ -72,15 +72,15 @@ class Lidar_Sensor : public WorldObjectComponent
                                                     "Output channel for touch messages"), "");
 
     Property angle_range = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                    "Total angle covered by the scan (degrees)"), QVariant(0.0),
+                                    "Total angle covered by the scan (degrees)"), QVariant(360),
                                     &Property::angle_validator);
 
     Property radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                  "Radius of the scan (degrees)"), QVariant(0.0),
+                                  "Radius of the scan (meters)"), QVariant(1),
                                   &Property::angle_validator);
 
     Property scan_points = Property(PropertyInfo(false, false, PropertyInfo::INT,
-                                                  "Number of points per scan"), QVariant(2),
+                                                  "Number of points per scan"), QVariant(10),
                                                   [](QVariant _old, QVariant _new)
                                                   {
                                                         bool valid;
