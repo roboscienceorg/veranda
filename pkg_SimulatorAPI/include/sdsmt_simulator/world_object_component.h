@@ -94,11 +94,8 @@ public:
     QMap<QString, QSharedPointer<PropertyView>> getProperties();
     QString getName(){ return _objName.get().toString(); }
 
-    void translateView(double x, double y, double degrees);
     void translate(double x, double y);
     void rotate(double degrees);
-
-    void writeJson(QJsonObject &json) const;
 
     //Interactions with ROS
     virtual void setROSNode(std::shared_ptr<rclcpp::Node> node){}

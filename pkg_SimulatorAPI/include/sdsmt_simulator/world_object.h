@@ -58,8 +58,9 @@ public:
     //ROS Interactions
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
-    void readJson(const QJsonObject &json);
-    void writeJson(QJsonObject &json) const;
+    //WILL BE USED TO OUTPUT ADDITIONAL INFO
+    //void readJson(const QJsonObject &json);
+    //void writeJson(QJsonObject &json) const;
 
     QString getPluginName() { return ""; }
 

@@ -29,31 +29,4 @@ public:
     virtual void saveFile(QString filePath, QVector<WorldObject*> objects) = 0;
 };
 
-class JsonWorldSaver : public WorldSaver_If
-{
-public:
-    QVector<QString> fileExts()
-    {
-        QVector<QString> exts;
-        exts.append("json");
-        return exts;
-    }
-
-    void saveFile(QString filePath, QVector<WorldObject*> objects)
-    {
-        QFile saveFile(filePath);
-        QJsonObject everything;
-        QJsonArray worldObjectArray;
-        foreach(WorldObject* obj, objects)
-        {
-            QJsonObject worldObject;
-            obj->writeJson(worldObject);
-            worldObjectArray.append(worldObject);
-        }
-        everything["worldObjects"] = worldObjectArray;
-        QJsonDocument saveDoc(everything);
-        saveFile.write(saveDoc.toJson());
-    }
-};
-
 #endif
