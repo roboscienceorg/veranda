@@ -148,8 +148,15 @@ void Mode_Controller::addObjectToView()
         listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
         active->addItem(listItems[oId]);
 
-        //add object to view
-        visual->objectAddedToScreen(object->getModels(), oId);
+        //add object to view if designer
+        if(simulator)
+        {
+            QVector<WorldObject> rVector;
+            rVector.push_back(object->getObject());
+            requestAddWorldObject(rVector);
+        }
+        else
+            visual->objectAddedToScreen(object->getModels(), oId);
     }
 }
 
@@ -165,91 +172,41 @@ void Mode_Controller::deleteObjectFromView()
 
     nothingSelected();
 }
+
+QVector<WorldObjectComponent *> Mode_Controller::getComponents()
+{
+    QVector<WorldObjectComponent*> rVector;
 /*
-void Mode_Controller::addObjectToSimulatorTools(QVector<QPair<WorldObjectProperties *, object_id> > objs)
-{
-
-    WorldObjectProperties* properties = new WorldObjectProperties(component, this);
-
-    //if tab does not exist, create it then add new designer widget
-    if(toolTabs[properties->getType()] == nullptr)
+    for(auto& p : worldObjects)
     {
-        toolTabs[properties->getType()] = new QListWidget();
-        tabs->addTab(toolTabs[properties->getType()], properties->getType());
-        toolTabs[properties->getType()]->setViewMode(QListWidget::IconMode);
-        toolTabs[properties->getType()]->setResizeMode(QListWidget::Adjust);
-        toolTabs[properties->getType()]->setIconSize(QSize(150, 150));
+        WorldObjectProperties* object = p->second;
+
+        rVector->append(object->getComponent());
     }
 
-    //add new designer widget to a tab
-    Designer_Widget* tile = new Designer_Widget(component, properties, makeWidget, toolTabs[properties->getType()]);
-    toolTabs[properties->getType()]->addItem(tile);
-
-    for(auto& p : objs)
+    for( QMap<object_id,WorldObjectProperties*>::iterator it = worldObjects.begin(); it != worldObjects.end(); )
     {
-        object_id& oId = p.second;
-        WorldObjectProperties* object = p.first;
+        WorldObjectProperties* object = it->value;
 
-        if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
+        rVector->append(object->getComponent());
 
-        worldObjects[oId] = object;
 
-        visual->objectAddedToScreen(object->getModels(), oId);
-
-        listItems[oId] = new QListWidgetItem();
-        listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
-        active->addItem(listItems[oId]);
-    }
-    if(objs.size())
-        objectSelected(objs.last().second);
-}
-
-QVector<QPair<WorldObjectProperties *, object_id> > Mode_Controller::getItemAsPropertiesVector()
-{
-    QVector<QPair<WorldObjectProperties *, object_id> > rVector;
-
-    foreach( int key, worldObjects.keys() )
-    {
-        //fout << key << "," << extensions.value( key ) << '\n';
-        object_id oId = key;
-        WorldObjectProperties* object = worldObjects.value(key);
-
-        rVector.append(new QPair<WorldObjectProperties *, object_id>(object, oId));
-    }
-
-    //worldObjects is QMap<object_id, WorldObjectProperties*>
+        if( it->value == something )
+        {
+            map.insert(it.key()+10,it.value());
+            it = map.erase(it);
+        } else {
+            ++it;
+        }*/
     for(auto e : worldObjects.keys())
     {
-        object_id oId = e->key();
-        WorldObjectProperties* object = e->value();
-
-        rVector->append(new QPair<WorldObjectProperties *, object_id>(object, oId));
+      WorldObjectProperties* object = worldObjects.value(e);
+      rVector.push_back(object->getComponent());
     }
+
 
     return rVector;
 }
-
-void Mode_Controller::addObjectToSimTools(QMap<object_id, WorldObjectProperties*> objs)
-{
-    QVector<QPair<WorldObjectProperties *, object_id> > *rVector;
-
-    foreach( int key, objs.keys() )
-    {
-        //fout << key << "," << extensions.value( key ) << '\n';
-        object_id oId = key;
-        WorldObjectProperties* object = objs.value(key);
-        QPair<WorldObjectProperties *, object_id> *rPair = new QPair<WorldObjectProperties *, object_id>(object, oId);
-        rVector->append(*rPair);
-    }
-
-    tabs->addTab(toolTabs[""], "");
-
-    //add new designer widget to a tab
-    Simulator_Widget* tile = new Simulator_Widget(*rVector, makeWidget, toolTabs[""]);
-    toolTabs[""]->addItem(tile);
-
-    qDebug() << rVector;
-}*/
 
 void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
 {

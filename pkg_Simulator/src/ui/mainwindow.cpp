@@ -88,6 +88,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(ui->saveObjectButton, SIGNAL (released()), this, SLOT (saveObjectButtonClick()));
 
     //Simulation mode tool button signals and slots
+    connect(simulator, SIGNAL (requestAddWorldObject(QVector<WorldObject>)), parent, SLOT (userAddWorldObjectsToSimulation(QVector<WorldObject>)));
     connect(ui->addObjectButton, SIGNAL (released()), simulator, SLOT (addObjectToView()));
     connect(ui->deleteObjectButton, SIGNAL (released()), simulator, SLOT (deleteObjectFromView()));
     connect(ui->loadObjectsButton, SIGNAL (released()), this, SLOT (loadObjectsForSimButtonClick()));
@@ -491,12 +492,10 @@ void MainWindow::loadObjectsForSimButtonClick()
 void MainWindow::exportObjectButtonClick()
 {
     //WorldObject takes pointers to WorldObjectComponents and returns object
-    //simulator->addObjectToSimTools(designer->worldObjects);
-    //if(propertyType)
-    //simulatorTabs[QString::number(5)] = new QListWidget();
-    //ui->simulatorToolsList->addTab(simulatorTabs[QString::number(5)], QString::number(5));
+    //popup ask for name
 
-    //simulator->addObjectToTools(designer->get());
+    WorldObject *object = new WorldObject(designer->getComponents(), "test", this);
+    simulator->addObjectToTools(object->getComponents()[0]);
 }
 
 void MainWindow::loadToolsButtonClick()

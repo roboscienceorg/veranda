@@ -19,7 +19,7 @@ public:
     WorldObjectComponent* component;
     WorldObjectProperties* properties;
 
-    Designer_Widget(WorldObjectComponent *object, WorldObjectProperties* object2, visualizerFactory factory, QListWidget *parent=nullptr);
+    Designer_Widget(WorldObjectComponent *object, WorldObjectProperties *object2, visualizerFactory factory, QListWidget *parent=nullptr);
 
 private:
     
