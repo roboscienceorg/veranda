@@ -182,8 +182,8 @@ void Lidar_Sensor::_buildModels()
 
     b2EdgeShape* line = new b2EdgeShape;
     double x = sqrt(3.0)/2.0 * SHAPE_RADIUS;
-    line->m_vertex1.Set(-x, 0.5*SHAPE_RADIUS);
-    line->m_vertex2.Set(x, 0.5*SHAPE_RADIUS);
+    line->m_vertex1.Set(0.5*SHAPE_RADIUS, x);
+    line->m_vertex2.Set(0.5*SHAPE_RADIUS, -x);
     sensor_model->addShapes({ring, line});
 
     //Clear sensor-hits shapes

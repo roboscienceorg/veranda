@@ -33,7 +33,7 @@ class Touch_Sensor : public WorldObjectComponent
                                     &Property::angle_validator);
 
     Property angle_end = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                  "End angle of the sensors (degrees)"), QVariant(0.0),
+                                  "End angle of the sensors (degrees)"), QVariant(360.0),
                                   &Property::angle_validator);
 
     Property radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
@@ -41,7 +41,7 @@ class Touch_Sensor : public WorldObjectComponent
                                &Property::abs_double_validator);
 
     Property sensor_count = Property(PropertyInfo(false, false, PropertyInfo::INT,
-                                                  "Number of sensors on the ring"), QVariant(1),
+                                                  "Number of sensors on the ring"), QVariant(10),
                                                   [](QVariant _old, QVariant _new)
                                                   {
                                                         bool valid;

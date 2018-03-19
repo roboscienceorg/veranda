@@ -34,6 +34,7 @@ Touch_Sensor::Touch_Sensor(QObject *parent) : WorldObjectComponent("Touch Ring",
     data->layout.dim[0].label = "hits";
 
     _updateDataMessageDimensions();
+    _buildModels();
 }
 
 void Touch_Sensor::_updateDataMessageDimensions()
@@ -129,7 +130,6 @@ void Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
     objectId = oId;
 
     _attachSensorFixture();
-    _buildModels();
 }
 
 void Touch_Sensor::_attachSensorFixture()
