@@ -60,7 +60,7 @@ class SDSMT_SIMULATOR_API WorldObjectComponent : public QObject
     b2Vec2 globalPos = b2Vec2(0, 0);
     bool hasParent = false;
 
-    void shiftBodies(const QTransform& tOldI, const QTransform& tNew);
+    void shiftComponent(const QTransform& tOldI, const QTransform& tNew);
     void updateProperties();
 
 protected:

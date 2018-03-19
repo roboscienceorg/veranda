@@ -292,10 +292,13 @@ void BasicViewer::viewMouseMove(QMouseEvent* event)
 void BasicViewer::setToolsEnabled(bool enabled)
 {
     _toolsEnabled = enabled;
-    if(enabled && _topShapes.contains(_currSelection))
+    if(enabled)
     {
-        _placeTools();
-        _scene->addItem(_tools);
+        if(_topShapes.contains(_currSelection))
+        {
+            _placeTools();
+            _scene->addItem(_tools);
+        }
     }
     else
     {
@@ -408,7 +411,8 @@ void BasicViewer::objectRemovedFromScreen(object_id id)
         delete _topShapes[id];
         _topShapes.remove(id);
     }
-    if(_currSelection == id) _currSelection = 0;
+    if(_currSelection == id)
+        nothingSelected();
 }
 
 void BasicViewer::removeModel(Model *m)

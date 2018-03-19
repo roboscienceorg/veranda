@@ -138,21 +138,36 @@ void WorldObjectComponent::unregisterModel(Model* mod)
     _models.removeAll(mod);
 }
 
-void WorldObjectComponent::shiftBodies(const QTransform& tOldI, const QTransform& tNew)
+void WorldObjectComponent::shiftComponent(const QTransform& tOldI, const QTransform& tNew)
 {
     QTransform tDiff = tOldI * tNew;
-
-    for(b2Body* b : _bodies.keys())
+    //If no bodies exist, we shift all of the models
+    //and retain their relative positions
+    if(!_bodies.size())
     {
-        b2Vec2 start = b->GetPosition();
+        for(Model* m :_models)
+        {
+            double x, y, t;
+            m->getTransform(x, y, t);
+            QTransform newLoc = transform(b2Vec2(x, y), t*DEG2RAD) * tDiff;
 
-        //Multiply by inverse of old transform to get local space location,
-        //then multiply by new transform to get new location
-        QTransform newLoc = bodyTransform(b) * tDiff;
+            m->setTransform(newLoc.dx(), newLoc.dy(), radians(newLoc)*RAD2DEG);
+        }
+    }
+    //If bodies do exist, we shift them instead and
+    //then later the models will be synchronized with them
+    else
+    {
+        for(b2Body* b : _bodies.keys())
+        {
+            //Multiply by inverse of old transform to get local space location,
+            //then multiply by new transform to get new location
+            QTransform newLoc = bodyTransform(b) * tDiff;
 
-        //qDebug() << this << "Move body (" << start.x << start.y <<") -> (" << b->GetPosition().x << b->GetPosition().y << ")";
+            //qDebug() << this << "Move body (" << start.x << start.y <<") -> (" << b->GetPosition().x << b->GetPosition().y << ")";
 
-        b->SetTransform(b2Vec2(newLoc.dx(), newLoc.dy()), radians(newLoc));
+            b->SetTransform(b2Vec2(newLoc.dx(), newLoc.dy()), radians(newLoc));
+        }
     }
 }
 
@@ -183,7 +198,7 @@ void WorldObjectComponent::translate(double x, double y)
         localTransform = globalTransform * parentInverse;
 
     //Move bodies by going from old global to new global
-    shiftBodies(unGlobal, globalTransform);
+    shiftComponent(unGlobal, globalTransform);
 
     //Update children of global location;
     //and have them move to preserve their local transform
@@ -211,7 +226,7 @@ void WorldObjectComponent::rotate(double degrees)
         localTransform = globalTransform * parentInverse;
 
     //Move bodies by going from old global to new global
-    shiftBodies(unGlobal, globalTransform);
+    shiftComponent(unGlobal, globalTransform);
 
     //Update children of global location;
     //and have them move to preserve their local transform
@@ -245,7 +260,7 @@ void WorldObjectComponent::setParentTransform(QTransform t, bool cascade)
 
         //Move bodies by going from old local to global
         //then to new local
-        shiftBodies(unGlobal, globalTransform);
+        shiftComponent(unGlobal, globalTransform);
 
         //Update models
         syncModels();
@@ -275,7 +290,11 @@ void WorldObjectComponent::worldTicked(const double t)
 void WorldObjectComponent::syncModels()
 {
     //Nothing to do if no bodies are registered
-    if(!_bodies.size()) return;
+    if(!_bodies.size())
+    {
+        _syncModels();
+        return;
+    }
 
     //For every model tied to a body
     //update it's transform to that body's

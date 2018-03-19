@@ -81,7 +81,7 @@ private slots:
     void clearJoystickChannels();
 
 public slots:
-    void addSimObjects(QVector<QSharedPointer<WorldObject> > objs);
+    void addSimObjects(QVector<WorldObject *> objs, bool makeCopies);
     void removeSimObjects(QVector<object_id> oIds);
 };
 
