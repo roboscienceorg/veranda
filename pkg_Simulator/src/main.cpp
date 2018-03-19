@@ -168,10 +168,7 @@ int main(int argc, char** argv)
     if(defaultLoader)
     {
         auto def = defaultLoader->loadFile("", componentPlugins);
-        QVector<QSharedPointer<WorldObject>> shared;
-        for(WorldObject* w : def)
-                shared.push_back(QSharedPointer<WorldObject>(w));
-        sim.addSimObjects(shared);
+        sim.addSimObjects(def, false);
     }
 
     qDebug() << "Starting Simulation";

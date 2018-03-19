@@ -335,10 +335,7 @@ void Mode_Controller::simObjectMoveDragged(object_id id, double dx, double dy)
     auto obj = worldObjects.find(id);
     if(obj != worldObjects.end())
     {
-        if(simulator)
-            obj.value()->translate(dx, dy);
-        else
-            obj.value()->translateView(dx, dy, 0);
+        obj.value()->translate(dx, dy);
     }
 }
 
@@ -348,9 +345,6 @@ void Mode_Controller::simObjectRotateDragged(object_id id, double dt)
     auto obj = worldObjects.find(id);
     if(obj != worldObjects.end())
     {
-        if(simulator)
-            obj.value()->rotate(dt);
-        else
-            obj.value()->translateView(0, 0, dt);
+        obj.value()->rotate(dt);
     }
 }

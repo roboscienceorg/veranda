@@ -284,7 +284,6 @@ void MainWindow::importMapButtonClick()
 
                               //Spin up side thread to actually load it
                               QtConcurrent::run([this, path, wl](){
-                                  QVector<QSharedPointer<WorldObject>> sharedObjs;
                                   QVector<WorldObject*> loadedObjs;
                                   try
                                   {
@@ -299,25 +298,18 @@ void MainWindow::importMapButtonClick()
                                       userRemoveWorldObjectsFromSimulation(simulator->worldObjects.keys().toVector());
 
                                       qDebug() << "Build new world";
-                                      for(WorldObject* w : loadedObjs)
-                                        sharedObjs.push_back(QSharedPointer<WorldObject>(w));
-
-                                      userAddWorldObjectsToSimulation(sharedObjs);
+                                      userAddWorldObjectsToSimulation(loadedObjs, false);
 
                                       //Add default robots
                                       if(defaultLoader && defaultLoader->canLoadFile(path))
                                       {
                                           loadedObjs.clear();
-                                          sharedObjs.clear();
                                           try
                                           {
                                               loadedObjs=defaultLoader->loadFile(path, componentPlugins);
                                           }catch(std::exception& ex){}
 
-                                          for(WorldObject* w : loadedObjs)
-                                            sharedObjs.push_back(QSharedPointer<WorldObject>(w));
-
-                                          userAddWorldObjectsToSimulation(sharedObjs);
+                                          userAddWorldObjectsToSimulation(loadedObjs, false);
                                       }
                                   }
                                   else
