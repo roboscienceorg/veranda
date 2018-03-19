@@ -71,6 +71,7 @@ void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectPro
     {
         object_id& oId = p.second;
         WorldObjectProperties* object = p.first;
+        qDebug() << oId;
 
         if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
 
@@ -226,6 +227,28 @@ QVector<QPair<WorldObjectProperties *, object_id> > Mode_Controller::getItemAsPr
     }
 
     return rVector;
+}
+
+void Mode_Controller::addObjectToSimTools(QMap<object_id, WorldObjectProperties*> objs)
+{
+    QVector<QPair<WorldObjectProperties *, object_id> > *rVector;
+
+    foreach( int key, objs.keys() )
+    {
+        //fout << key << "," << extensions.value( key ) << '\n';
+        object_id oId = key;
+        WorldObjectProperties* object = objs.value(key);
+        QPair<WorldObjectProperties *, object_id> *rPair = new QPair<WorldObjectProperties *, object_id>(object, oId);
+        rVector->append(*rPair);
+    }
+
+    tabs->addTab(toolTabs[""], "");
+
+    //add new designer widget to a tab
+    Simulator_Widget* tile = new Simulator_Widget(*rVector, makeWidget, toolTabs[""]);
+    toolTabs[""]->addItem(tile);
+
+    qDebug() << rVector;
 }*/
 
 void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
