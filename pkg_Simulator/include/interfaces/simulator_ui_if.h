@@ -43,7 +43,7 @@ signals:
 
     //User requests that something be added to or removed from
     //the simulation
-    void userAddWorldObjectsToSimulation(QVector<QSharedPointer<WorldObject>>);
+    void userAddWorldObjectsToSimulation(QVector<WorldObject*>, bool);
     void userRemoveWorldObjectsFromSimulation(QVector<object_id>);
 
     void joystickMoved(double x, double y, double z, QString channel);

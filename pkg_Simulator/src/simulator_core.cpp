@@ -103,16 +103,16 @@ void SimulatorCore::start()
 }
 
 
-void SimulatorCore::addSimObjects(QVector<QSharedPointer<WorldObject>> objs)
+void SimulatorCore::addSimObjects(QVector<WorldObject*> objs, bool makeCopies)
 {
     qDebug() << "Loading batch of" << objs.size() << "Objects";
     QVector<QPair<WorldObjectPhysics*, object_id>> physObjs;
     QVector<QPair<WorldObjectProperties*, object_id>> propObjs;
 
-    for(QSharedPointer<WorldObject> oldObj : objs)
+    for(WorldObject* oldObj : objs)
     {
         //Clone object to have local copy for distributing
-        WorldObject* obj = qobject_cast<WorldObject*>(oldObj->clone());
+        WorldObject* obj = makeCopies ? qobject_cast<WorldObject*>(oldObj->clone()) : oldObj;
 
         obj->setROSNode(_node);
 
