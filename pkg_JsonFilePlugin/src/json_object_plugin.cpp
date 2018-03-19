@@ -6,12 +6,12 @@ Json_Object_Plugin::Json_Object_Plugin()
 
 }
 
-QVector<WorldLoader_If*> Json_Object_Plugin::getLoaders()
+QVector<WorldObjectLoader_If*> Json_Object_Plugin::getLoaders()
 {
-    return QVector<WorldLoader_If*>{ new JsonObjectLoader };
+    return QVector<WorldObjectLoader_If*>{ new JsonObjectLoader };
 }
 
-QVector<WorldLoader_If*> Json_Object_Plugin::getSavers()
+QVector<WorldObjectSaver_If*> Json_Object_Plugin::getSavers()
 {
-    return QVector<WorldLoader_If*>{ new JsonObjectSaver };
+    return QVector<WorldObjectSaver_If*>{ new JsonObjectSaver };
 }

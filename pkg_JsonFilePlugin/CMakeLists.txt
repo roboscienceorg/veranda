@@ -30,25 +30,38 @@ include_directories( include )
 ## TODO If possible: Figure out how to mark Qt as a dependency
 ament_export_dependencies(    
     rclcpp
-    std_msgs
     sdsmt_simulator_api
     sdsmt_simulator_box2d
 )
 
-###################
-## FILE LISTINGS ##
-###################
 
-## Files that have any Qt macros or keywords in them
-## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
-set(MOC_HDRS
-    include/json_object.h
-    include/json_object_plugin.h)
+###########################################
+## Make a plugin from source and headers ##
+###########################################
+function(make_plugin plugin_name plugin_moc_hdrs plugin_srcs)
 
-## Any other source files
-set(CPP_SRCS
-    src/json_object.cpp
-    src/json_object_plugin.cpp)
+    ## Run MOC on files with Qt Keywords and Macros
+    qt5_wrap_cpp(plugin_moc_srcs ${plugin_moc_hdrs})
+
+    ## Build the plugin lib
+    add_library(${plugin_name} SHARED ${plugin_srcs} ${plugin_moc_srcs})
+
+    ## Add qt module dependencies to executable
+    ## this will find all the headers and link all the libraries
+    qt5_use_modules(${plugin_name} Core Gui)
+
+    ## Pull in stuff exported from other packages
+    ament_target_dependencies(${plugin_name}
+        "rclcpp"
+        "sdsmt_simulator_box2d"
+        "sdsmt_simulator_api")
+
+    ## Install lib into same directory as simulator executable
+    install(
+      TARGETS ${plugin_name}
+      DESTINATION lib
+    )
+endfunction()
 
 ###########
 ## Build ##
@@ -62,28 +75,14 @@ if(NOT ${CMAKE_VERSION} VERSION_LESS "3.10")
     cmake_policy(SET CMP0071 NEW)
 endif()
 
-## Run MOC on files with Qt Keywords and Macros
-qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
+set(headers include/json_object.h include/json_object_plugin.h)
+set(sources src/json_object.cpp src/json_object_plugin.cpp)
+make_plugin(json_object_file_plugin "${headers}" "${sources}")
 
-## Build the executable
-add_library(default_robot_loader_plugin SHARED ${CPP_SRCS} ${MOC_SRCS})
+set(headers include/json_world.h include/json_world_plugin.h)
+set(sources src/json_world.cpp src/json_world_plugin.cpp)
+make_plugin(json_world_file_plugin "${headers}" "${sources}")
 
-## Add qt module dependencies to executable
-## this will find all the headers and link all the libraries
-qt5_use_modules(default_robot_loader_plugin Core Gui)
-
-## Pull in stuff exported from other packages
-ament_target_dependencies(default_robot_loader_plugin
-    "sdsmt_simulator_api"
-    "sdsmt_simulator_box2d"
-    "rclcpp"
-)
-
-## Install lib into same directory as simulator executable
-install(
-  TARGETS json_file_plugin
-  DESTINATION lib
-)
 
 ament_package()
 

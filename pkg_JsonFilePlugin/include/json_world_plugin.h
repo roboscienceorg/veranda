@@ -1,5 +1,5 @@
-#ifndef JSON_OBJECT_PLUGIN_H
-#define JSON_OBJECT_PLUGIN_H
+#ifndef JSON_WORLD_PLUGIN_H
+#define JSON_WORLD_PLUGIN_H
 
 #include <QObject>
 
@@ -10,17 +10,17 @@
 //do conditional compilation so this would be used only on windows
 #include "../../../install/include/sdsmt_simulator/file_handler_plugin.h"
 
-class Json_Object_Plugin : public QObject, public WorldObjectFileHandler_Plugin_If
+class Json_World_Plugin : public QObject, public WorldFileHandler_Plugin_If
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.sdsmt.sim.2d.fileHandlers.jsonObject")
-    Q_INTERFACES(WorldObjectFileHandler_Plugin_If)
+    Q_PLUGIN_METADATA(IID "org.sdsmt.sim.2d.fileHandlers.jsonWorld")
+    Q_INTERFACES(WorldFileHandler_Plugin_If)
 
 public:
-    Json_Object_Plugin();
+    Json_World_Plugin();
 
-    virtual QVector<WorldObjectLoader_If*> getLoaders();
-    virtual QVector<WorldObjectSaver_If*> getSavers();
+    virtual QVector<WorldLoader_If*> getLoaders();
+    virtual QVector<WorldSaver_If*> getSavers();
 };
 
 #endif

@@ -19,21 +19,21 @@ WorldObject* JsonObjectLoader::loadFile(QString filePath, QMap<QString, WorldObj
         for (int i = 0; i < componentArray.size(); i++)
         {
             QJsonObject componentObject = componentArray[i].toObject();
-            if (componentObject.contains("pluginName") && componentObject["pluginName"].isObject() && plugins.contains(componentObject["pluginName"]))
+            if (componentObject.contains("pluginName") && componentObject["pluginName"].isObject() && plugins.contains(componentObject["pluginName"].toString()))
             {
-                WorldObjectComponent* comp = plugins[componentObject["pluginName"]]->createComponent();
-                QMap<QString, PropertyView> props = comp->getProperties();
+                WorldObjectComponent* comp = plugins[componentObject["pluginName"].toString()]->createComponent();
+                QMap<QString, QSharedPointer<PropertyView>> props = comp->getProperties();
 
                 if (componentObject.contains("properties") && componentObject["properties"].isArray())
                 {
-                    QJSonArray propArray = componentObject["properties"].toArray();
+                    QJsonArray propArray = componentObject["properties"].toArray();
                     for (int j = 0; j < propArray.size(); j++)
                     {
                         QJsonObject propertyObject = propArray[j].toObject();
-                        if (propertyObject.contains("key") && componenetObject["key"].isObject()
-                         && propertyObject.contains("value") && componenetObject["value"].isObject())
+                        if (propertyObject.contains("key") && componentObject["key"].isObject()
+                         && propertyObject.contains("value") && componentObject["value"].isObject())
                         {
-                            props[propertyObject["key"]].set(propertyObject["value"], true);
+                            props[propertyObject["key"].toString()]->set(propertyObject["value"].toVariant(), true);
                         }
                     }
                 }
@@ -53,7 +53,7 @@ WorldObject* JsonObjectLoader::loadFile(QString filePath, QMap<QString, WorldObj
             if (propertyObject.contains("key") && propertyObject["key"].isObject()
              && propertyObject.contains("value") && propertyObject["value"].isObject())
             {
-                robot->getProperties()[propertyObject["key"]]->set(propertyObject["value"]);
+                robot->getProperties()[propertyObject["key"].toString()]->set(propertyObject["value"].toVariant(), true);
             }
         }
     }
@@ -61,39 +61,39 @@ WorldObject* JsonObjectLoader::loadFile(QString filePath, QMap<QString, WorldObj
     return robot;
 }
 
-virtual void JsonObjectSaver::saveFile(QString filePath, WorldObject* object)
+void JsonObjectSaver::saveFile(QString filePath, WorldObject* object)
 {
     QFile saveFile(filePath);
 
     QJsonObject robotObject;
 
     QJsonArray compArray;
-    foreach (const WorldObjectComponent comp, object->getComponents())
+    foreach (WorldObjectComponent* comp, object->getComponents())
     {
         QJsonObject compObject;
         QJsonArray propArray;
-        for (QMap::iterator it = comp.getProperties().begin(); it != comp.getProperties().end(); it++)
+        for (QMap<QString, QSharedPointer<PropertyView>>::iterator it = comp->getProperties().begin(); it != comp->getProperties().end(); it++)
         {
             QJsonObject propObj;
             propObj["key"] = it.key();
-            propObj["value"] = it.value().get();
+            propObj["value"] = QJsonValue::fromVariant(it.value()->get());
             propArray.append(propObj);
         }
-        json["pluginName"] = comp.getPluginName();
-        json["properties"] = propArray;
+        compObject["pluginName"] = comp->getPluginName();
+        compObject["properties"] = propArray;
         compArray.append(compObject);
     }
-    json["components"] = compArray;
+    robotObject["components"] = compArray;
 
     QJsonArray propArray;
-    for (QMap::iterator it = _properties.begin();it != _properties.end(); it++)
+    for (QMap<QString, QSharedPointer<PropertyView>>::iterator it = object->getProperties().begin();it != object->getProperties().end(); it++)
     {
         QJsonObject propObj;
         propObj["key"] = it.key();
-        propObj["value"] = it.value().get();
+        propObj["value"] = QJsonValue::fromVariant(it.value()->get());
         propArray.append(propObj);
     }
-    json["properties"] = propArray;
+    robotObject["properties"] = propArray;
 
     QJsonDocument saveDoc(robotObject);
     saveFile.write(saveDoc.toJson());

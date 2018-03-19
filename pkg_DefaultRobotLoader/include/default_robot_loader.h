@@ -5,7 +5,6 @@
 #include <QString>
 
 #include <sdsmt_simulator/object_loader_if.h>
-#include <sdsmt_simulator/object_saver_if.h>
 
 class DefaultRobotLoader : public WorldLoader_If
 {

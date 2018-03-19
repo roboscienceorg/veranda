@@ -104,7 +104,7 @@ public:
     virtual void generateBodies(b2World* world, object_id oId, b2Body* anchor){}
     virtual void clearBodies(){}
 
-    virtual QString getPluginName() = 0;
+    virtual QString getPluginName(){ return ""; }
 
 public slots:
     virtual void connectChannels(){}
