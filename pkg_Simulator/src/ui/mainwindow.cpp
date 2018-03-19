@@ -88,7 +88,8 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(ui->saveObjectButton, SIGNAL (released()), this, SLOT (saveObjectButtonClick()));
 
     //Simulation mode tool button signals and slots
-    connect(simulator, SIGNAL (requestAddWorldObject(QVector<WorldObject>)), parent, SLOT (userAddWorldObjectsToSimulation(QVector<WorldObject>)));
+    connect(simulator, SIGNAL (requestAddWorldObject(QVector<WorldObject*>, bool)), this, SIGNAL (userAddWorldObjectsToSimulation(QVector<WorldObject*>, bool)));
+    connect(simulator, SIGNAL (requestRemoveWorldObject(QVector<object_id>)), this, SIGNAL (userRemoveWorldObjectsFromSimulation(QVector<object_id>)));
     connect(ui->addObjectButton, SIGNAL (released()), simulator, SLOT (addObjectToView()));
     connect(ui->deleteObjectButton, SIGNAL (released()), simulator, SLOT (deleteObjectFromView()));
     connect(ui->loadObjectsButton, SIGNAL (released()), this, SLOT (loadObjectsForSimButtonClick()));
@@ -102,10 +103,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     loadToolsButtonClick();
 
     connect(this, SIGNAL (objectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)), simulator, SLOT (worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)));
-    connect(this, SIGNAL (objectsRemovedFromSimulation(QVector<object_id> oId)), simulator, SLOT (worldObjectsRemovedFromSimulation(QVector<object_id> oId)));
-
-    connect(this, SIGNAL (objectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)), designer, SLOT (worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)));
-    connect(this, SIGNAL (objectsRemovedFromSimulation(QVector<object_id> oId)), designer, SLOT (worldObjectsRemovedFromSimulation(QVector<object_id> oId)));
+    connect(this, SIGNAL (objectsRemovedFromSimulation(QVector<object_id>)), simulator, SLOT (worldObjectsRemovedFromSimulation(QVector<object_id>)));
 
     //connect(this, SIGNAL (addObjectToSimulation(QVector<QSharedPointer<WorldObject>>)), simulator, SLOT (getItemAsVector(QVector<QSharedPointer<WorldObject>>));
 
@@ -487,7 +485,7 @@ void MainWindow::exportObjectButtonClick()
     //popup ask for name
 
     WorldObject *object = new WorldObject(designer->getComponents(), "test", this);
-    simulator->addObjectToTools(object->getComponents()[0]);
+    simulator->addObjectToTools(object);
 }
 
 void MainWindow::loadToolsButtonClick()

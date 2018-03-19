@@ -89,8 +89,10 @@ void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectPro
 
 void Mode_Controller::worldObjectsRemovedFromSimulation(QVector<object_id> oIds)
 {
+    qDebug() << "Objects destroyed" << oIds;
     for(object_id oId : oIds)
     {
+        qDebug() << "Undraw" << oId;
         visual->objectRemovedFromScreen(oId);
         worldObjects.remove(oId);
 
@@ -141,69 +143,56 @@ void Mode_Controller::addObjectToView()
     {
         WorldObjectProperties* object = selectedTool;
 
-        //add object to active list
-        object_id oId = getNextId();
-        worldObjects[oId] = object;
-        listItems[oId] = new QListWidgetItem();
-        listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
-        active->addItem(listItems[oId]);
-
         //add object to view if designer
         if(simulator)
         {
-            QVector<WorldObject> rVector;
+            QVector<WorldObject*> rVector;
             rVector.push_back(object->getObject());
-            requestAddWorldObject(rVector);
+            requestAddWorldObject(rVector, true);
         }
         else
+        {
+            //add object to active list
+            object_id oId = getNextId();
+            worldObjects[oId] = object;
+            listItems[oId] = new QListWidgetItem();
+            listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
+            active->addItem(listItems[oId]);
             visual->objectAddedToScreen(object->getModels(), oId);
+        }
     }
 }
 
 void Mode_Controller::deleteObjectFromView()
 {
     object_id oId = selected;
-    visual->objectRemovedFromScreen(oId);
-    worldObjects.remove(oId);
+    if(simulator)
+    {
+        QVector<object_id> rVector;
+        rVector.push_back(oId);
+        requestRemoveWorldObject(rVector);
+    }
+    else
+    {
+        visual->objectRemovedFromScreen(oId);
+        worldObjects.remove(oId);
 
-    active->removeItemWidget(listItems[oId]);
-    delete listItems[oId];
-    listItems.remove(oId);
-
-    nothingSelected();
+        active->removeItemWidget(listItems[oId]);
+        delete listItems[oId];
+        listItems.remove(oId);
+        nothingSelected();
+    }
 }
 
-QVector<WorldObjectComponent *> Mode_Controller::getComponents()
+QVector<WorldObjectComponent*> Mode_Controller::getComponents()
 {
     QVector<WorldObjectComponent*> rVector;
-/*
-    for(auto& p : worldObjects)
-    {
-        WorldObjectProperties* object = p->second;
 
-        rVector->append(object->getComponent());
-    }
-
-    for( QMap<object_id,WorldObjectProperties*>::iterator it = worldObjects.begin(); it != worldObjects.end(); )
-    {
-        WorldObjectProperties* object = it->value;
-
-        rVector->append(object->getComponent());
-
-
-        if( it->value == something )
-        {
-            map.insert(it.key()+10,it.value());
-            it = map.erase(it);
-        } else {
-            ++it;
-        }*/
     for(auto e : worldObjects.keys())
     {
       WorldObjectProperties* object = worldObjects.value(e);
       rVector.push_back(object->getComponent());
     }
-
 
     return rVector;
 }

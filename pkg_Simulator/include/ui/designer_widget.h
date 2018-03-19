@@ -16,6 +16,7 @@ class Designer_Widget : public QListWidgetItem
 
 public:
     Simulator_Visual_If* view;
+    WorldObject* simulatorObject;
     WorldObjectComponent* component;
     WorldObjectProperties* properties;
 

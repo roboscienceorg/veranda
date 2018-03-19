@@ -55,6 +55,7 @@ private:
     }
     void worldObjectsRemovedFromSimulation(QVector<object_id> oId)
     {
+        qDebug() << "World objects destroyed" << oId;
         objectsRemovedFromSimulation(oId);
     }
     void setWorldBounds(double xMin, double xMax, double yMin, double yMax){}
