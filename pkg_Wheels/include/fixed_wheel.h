@@ -27,11 +27,11 @@ class Fixed_Wheel : public WorldObjectComponent
                                                     "Input channel for drive speed"), "");
 
     Property _radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                    "Wheel radius (meters)"), QVariant(0.1),
+                                    "Wheel radius (meters)"), QVariant(0.5),
                                     &Property::abs_double_validator);
 
     Property _width = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                  "Wheel width (meters)"), QVariant(0.0),
+                                  "Wheel width (meters)"), QVariant(0.2),
                                   &Property::abs_double_validator);
 
     Property _driven = Property(PropertyInfo(false, false, PropertyInfo::BOOL, "Whether or not the wheel is driven"),

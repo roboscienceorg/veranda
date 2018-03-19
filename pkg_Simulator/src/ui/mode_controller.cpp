@@ -252,7 +252,7 @@ void Mode_Controller::objectSelected(object_id id)
         connect(model, &QStandardItemModel::dataChanged, [this, obj, model](QModelIndex tl, QModelIndex br)
         {
            for(int i = tl.row(); i <= br.row(); i++)
-               selectedProps[displayed_properties[i]]->set(model->data(model->index(i, 1)));
+               selectedProps[displayed_properties[i]]->set(model->data(model->index(i, 1)), !simulator);
         });
 
         updatePropertyInformation();

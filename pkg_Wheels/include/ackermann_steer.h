@@ -27,11 +27,11 @@ class Ackermann_Steer : public WorldObjectComponent
                                                     "Input channel for turn angle"), "");
 
     Property _wradius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                    "Wheel radius (meters)"), QVariant(0.1),
+                                    "Wheel radius (meters)"), QVariant(0.5),
                                     &Property::abs_double_validator);
 
     Property _wwidth = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
-                                  "Wheel width (meters)"), QVariant(0.0),
+                                  "Wheel width (meters)"), QVariant(0.2),
                                   &Property::abs_double_validator);
 
     Property _l1 = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
