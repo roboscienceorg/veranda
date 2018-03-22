@@ -5,7 +5,7 @@
 #include <cmath>
 #include <functional>
 
-Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent("Ackermann Steer", parent)
+Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent("Ackermann Steer", "Wheels", parent)
 {
     qRegisterMetaType<std_msgs::msg::Float32::SharedPtr>("std_msgs::msg::Float32::SharedPtr");
 

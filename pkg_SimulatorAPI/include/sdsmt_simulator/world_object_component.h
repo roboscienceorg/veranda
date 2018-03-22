@@ -59,6 +59,7 @@ class SDSMT_SIMULATOR_API WorldObjectComponent : public QObject
     double globalRadians = 0;
     b2Vec2 globalPos = b2Vec2(0, 0);
     bool hasParent = false;
+    QString _type = "", _defaultName = "";
 
     void shiftComponent(const QTransform& tOldI, const QTransform& tNew);
     void updateProperties();
@@ -81,7 +82,7 @@ protected:
     virtual void _syncModels(){}
 
 public:
-    WorldObjectComponent(QString defaultName = "", QObject* parent=nullptr);
+    WorldObjectComponent(QString defaultName = "", QString type = "", QObject* parent=nullptr);
 
     //Constructs copy of component
     virtual WorldObjectComponent* _clone(QObject* newParent=nullptr) = 0;
@@ -93,6 +94,8 @@ public:
     //UI Interactions
     QMap<QString, QSharedPointer<PropertyView>> getProperties();
     QString getName(){ return _objName.get().toString(); }
+    QString getDefaultName() { return _defaultName; }
+    QString getType(){ return _type; }
 
     void translateView(double x, double y, double degrees);
     void translate(double x, double y);

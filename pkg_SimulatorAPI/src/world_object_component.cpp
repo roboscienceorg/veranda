@@ -28,9 +28,11 @@ QTransform bodyTransform(const b2Body* b)
     return transform(b->GetPosition(), b->GetAngle());
 }
 
-WorldObjectComponent::WorldObjectComponent(QString defaultName, QObject* parent) : QObject(parent)
+WorldObjectComponent::WorldObjectComponent(QString defaultName, QString type, QObject* parent) : QObject(parent)
 {
     _objName.set(defaultName);
+    _defaultName = defaultName;
+    _type = type;
 
     //If any of the data values are adjusted manually,
     //we change our global location by the difference
@@ -81,8 +83,10 @@ WorldObjectComponent* WorldObjectComponent::clone(QObject* newParent)
     auto props = getProperties();
     auto outProps = out->getProperties();
     for(QString s : props.keys())
-        outProps[s]->set(props[s]->get(), true);
-
+        if(outProps.contains(s))
+        {
+            outProps[s]->set(props[s]->get(), true);
+        }
     return out;
 }
 
@@ -195,7 +199,7 @@ void WorldObjectComponent::translate(double x, double y)
 
     globalPos.x += x;
     globalPos.y += y;
-    qDebug() << this << "adjust location by " << x << y << " : " << globalPos.x << globalPos.y;
+    //qDebug() << this << "adjust location by " << x << y << " : " << globalPos.x << globalPos.y;
 
     QTransform unGlobal = globalTransform.inverted();
     globalTransform = transform(globalPos, globalRadians);
@@ -303,7 +307,7 @@ void WorldObjectComponent::syncModels()
         return;
     }
 
-    qDebug() << "syncing models ";
+    //qDebug() << "syncing models ";
     //For every model tied to a body
     //update it's transform to that body's
     //global location

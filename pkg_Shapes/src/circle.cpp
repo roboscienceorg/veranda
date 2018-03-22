@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <cmath>
 
-Circle::Circle(QObject *parent) : WorldObjectComponent("Circle", parent)
+Circle::Circle(QObject *parent) : WorldObjectComponent("Circle", "Shapes", parent)
 {
     shape_model = new Model({}, {}, this);
     registerModel(shape_model);

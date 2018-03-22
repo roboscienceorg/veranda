@@ -82,5 +82,14 @@ set(headers include/rectangle.h include/rectangle_plugin.h)
 set(sources src/rectangle.cpp src/rectangle_plugin.cpp)
 make_plugin(rectangle_plugin "${headers}" "${sources}")
 
+find_package(OpenGL REQUIRED)
+include_directories( ${OPENGL_INCLUDE_DIRS} )
+
+set(headers include/polygon.h include/polygon_plugin.h)
+set(sources src/polygon.cpp src/polygon_plugin.cpp src/triangulator.cpp)
+make_plugin(polygon_plugin "${headers}" "${sources}")
+
+target_link_libraries(polygon_plugin ${OPENGL_LIBRARIES} )
+
 ament_package()
 

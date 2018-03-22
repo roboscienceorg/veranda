@@ -24,7 +24,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     ui(new Ui::MainWindow)
 {
     qRegisterMetaType<QVector<object_id>>("QVector<object_id>");
-    qRegisterMetaType<QVector<QSharedPointer<WorldObject>>>("QVector<QSharedPointer<WorldObject>>");
+    qRegisterMetaType<QVector<WorldObject*>>("QVector<WorldObject*>");
 
     defaultLoader = defaultLoader_;
 
@@ -276,10 +276,10 @@ void MainWindow::loadSimButtonClick()
 
                           //Find the first loader that can load this file
                           //and try to load. If it fails, we can't load it
-                          if(!done && wl->canLoadFile(path))
+                          if(!done && wl->canLoadFile(path, componentPlugins))
                           {
                               //Get user options in main thread
-                              wl->getUserOptions(path);
+                              wl->getUserOptions(path, componentPlugins);
 
                               //Spin up side thread to actually load it
                               QtConcurrent::run([this, path, wl](){
@@ -299,8 +299,9 @@ void MainWindow::loadSimButtonClick()
                                       qDebug() << "Build new world";
                                       userAddWorldObjectsToSimulation(loadedObjs, false);
 
+
                                       //Add default robots
-                                      if(defaultLoader && defaultLoader->canLoadFile(path))
+                                      if(defaultLoader && defaultLoader->canLoadFile(path, componentPlugins))
                                       {
                                           loadedObjs.clear();
                                           try
@@ -310,6 +311,7 @@ void MainWindow::loadSimButtonClick()
 
                                           userAddWorldObjectsToSimulation(loadedObjs, false);
                                       }
+
                                   }
                                   else
                                   {
@@ -525,7 +527,11 @@ void MainWindow::exportObjectButtonClick()
     //WorldObject takes pointers to WorldObjectComponents and returns object
     //popup ask for name
 
-    WorldObject *object = new WorldObject(designer->getComponents(), "test", this);
+    QVector<WorldObjectComponent*> newComponents;
+    for(WorldObjectComponent* c : designer->getComponents())
+        newComponents.push_back(c->clone());
+
+    WorldObject *object = new WorldObject(newComponents, "test", this);
     simulator->addObjectToTools(object);
 }
 

@@ -13,8 +13,8 @@ public:
     ~WorldObjectLoader_If(){}
 
     virtual QVector<QString> fileExts() = 0;
-    virtual bool canLoadFile(QString filePath) = 0;
-    virtual void getUserOptions(QString /*filePath*/){}
+    virtual bool canLoadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins) = 0;
+    virtual void getUserOptions(QString /*filePath*/, QMap<QString, WorldObjectComponent_Plugin_If*> /*plugins*/){}
     virtual WorldObject* loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins) = 0;
 };
 
@@ -24,8 +24,8 @@ public:
     ~WorldLoader_If(){}
 
     virtual QVector<QString> fileExts() = 0;
-    virtual bool canLoadFile(QString filePath) = 0;
-    virtual void getUserOptions(QString /*filePath*/){}
+    virtual bool canLoadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins) = 0;
+    virtual void getUserOptions(QString /*filePath*/, QMap<QString, WorldObjectComponent_Plugin_If*> /*plugins*/){}
     virtual QVector<WorldObject*> loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins) = 0;
 };
 

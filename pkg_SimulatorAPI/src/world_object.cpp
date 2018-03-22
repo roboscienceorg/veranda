@@ -2,7 +2,7 @@
 
 #include <QSet>
 
-WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString name, QObject *parent) : WorldObjectComponent(name, parent), _components(components)
+WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString name, QObject *parent) : WorldObjectComponent(name, "Component Group", parent), _components(components)
 {
     QMap<QString, int> groupcounts;
 
@@ -70,7 +70,7 @@ WorldObject* WorldObject::_clone(QObject *newParent)
 {
     QVector<WorldObjectComponent*> childClones;
     for(WorldObjectComponent* c : _components)
-        childClones.push_back(c->_clone());
+        childClones.push_back(c->clone());
 
     WorldObject* copy = new WorldObject(childClones, getName(), newParent);
     return copy;

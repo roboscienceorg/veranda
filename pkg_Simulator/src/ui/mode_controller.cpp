@@ -89,11 +89,12 @@ void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectPro
 
 void Mode_Controller::worldObjectsRemovedFromSimulation(QVector<object_id> oIds)
 {
-    qDebug() << "Objects destroyed" << oIds;
+    //qDebug() << "Objects destroyed" << oIds;
     for(object_id oId : oIds)
     {
-        qDebug() << "Undraw" << oId;
+        //qDebug() << "Undraw" << oId;
         visual->objectRemovedFromScreen(oId);
+        worldObjects[oId]->deleteLater();
         worldObjects.remove(oId);
 
         active->removeItemWidget(listItems[oId]);
@@ -122,7 +123,7 @@ bool Mode_Controller::cloneSelectedTool()
     if(toolTabs.size() < 1)
         return false;
 
-    QList<QListWidgetItem*> l = toolTabs[tabs->currentWidget()->accessibleName()]->selectedItems();
+    QList<QListWidgetItem*> l = toolTabs[tabs->tabText(tabs->currentIndex())]->selectedItems();
     if ( ! l.empty()) {
             selectedTool = new WorldObjectProperties(dynamic_cast<Designer_Widget*>(l.at(0))->component->clone(), this);
             return true;
@@ -132,7 +133,7 @@ bool Mode_Controller::cloneSelectedTool()
 
 int Mode_Controller::getNextId()
 {
-    while(worldObjects[idIncrementer] != nullptr)
+    while(worldObjects.contains(idIncrementer))
         idIncrementer++;
     return idIncrementer;
 }
@@ -149,16 +150,14 @@ void Mode_Controller::addObjectToView()
             QVector<WorldObject*> rVector;
             rVector.push_back(object->getObject());
             requestAddWorldObject(rVector, true);
+            delete object;
         }
         else
         {
             //add object to active list
             object_id oId = getNextId();
-            worldObjects[oId] = object;
-            listItems[oId] = new QListWidgetItem();
-            listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
-            active->addItem(listItems[oId]);
-            visual->objectAddedToScreen(object->getModels(), oId);
+
+            worldObjectsAddedToSimulation({{object, oId}});
         }
     }
 }
@@ -174,13 +173,7 @@ void Mode_Controller::deleteObjectFromView()
     }
     else
     {
-        visual->objectRemovedFromScreen(oId);
-        worldObjects.remove(oId);
-
-        active->removeItemWidget(listItems[oId]);
-        delete listItems[oId];
-        listItems.remove(oId);
-        nothingSelected();
+        worldObjectsRemovedFromSimulation({oId});
     }
 }
 
