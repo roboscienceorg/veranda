@@ -22,6 +22,7 @@ Mode_Controller::Mode_Controller(visualizerFactory factory, QToolButton *pModeBu
 
     connect(visual, SIGNAL(userSelectedObject(object_id)), this, SLOT(objectSelected(object_id)));
 
+    tabs->setAutoFillBackground( false );
     setPropertiesTableView();
 }
 
@@ -156,7 +157,8 @@ void Mode_Controller::addObjectToView()
             object_id oId = getNextId();
             worldObjects[oId] = object;
             listItems[oId] = new QListWidgetItem();
-            listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
+            //listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
+            listItems[oId]->setData(Qt::DisplayRole, QString::number(oId) + " " + object->getName());
             active->addItem(listItems[oId]);
             visual->objectAddedToScreen(object->getModels(), oId);
         }
@@ -219,7 +221,7 @@ void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
         toolTabs[properties->getType()]->setResizeMode(QListWidget::Adjust);
         toolTabs[properties->getType()]->setMovement(QListView::Static);
         toolTabs[properties->getType()]->setIconSize(QSize(160, 160));
-        //toolTabs[properties->getType()]->setAutoFillBackground( false );
+        toolTabs[properties->getType()]->setAutoFillBackground( false );
         //toolTabs[properties->getType()]->setStyleSheet("QListWidget::item { background-color: white; }");
         //toolTabs[properties->getType()]->setBackgroundRole(QPalette::);
     }
@@ -293,7 +295,9 @@ void Mode_Controller::nothingSelected()
 
 void Mode_Controller::robotItemClicked(QListWidgetItem* item)
 {
-    objectSelected(item->data(Qt::DisplayRole).toInt());
+    QString strName = item->data(Qt::DisplayRole).toString().section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
+    qDebug() << strName;
+    objectSelected(strName.toInt());
 }
 
 void Mode_Controller::updatePropertyInformation()
@@ -308,6 +312,9 @@ void Mode_Controller::updatePropertyInformation()
             QString key = model->data(model->index(i, 0)).toString();
             model->setData(model->index(i, 1), selectedProps[key]->get().toString(), Qt::DisplayRole);
         }
+
+        if (!simulator)
+            listItems[selected]->setData(Qt::DisplayRole, QString::number(selected) + " " + worldObjects[selected]->getName());
         properties->setUpdatesEnabled(true);
     }
 }
