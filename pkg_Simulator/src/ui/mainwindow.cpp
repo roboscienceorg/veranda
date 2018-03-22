@@ -81,6 +81,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(ui->joystickButton, SIGNAL (released()), this, SLOT (joystickButtonClick()));
     connect(ui->saveSimButton, SIGNAL (released()), this, SLOT (saveSimButtonClick()));
     connect(ui->restartSimButton, SIGNAL (released()), this, SLOT (restartSimButtonClick()));
+    connect(ui->newSimButton, SIGNAL (released()), this, SLOT (newSimButtonClick()));
 
     //Designer mode button signals and slots
     connect(ui->newObjectButton, SIGNAL (released()), this, SLOT (newObjectButtonClick()));
@@ -400,12 +401,73 @@ void MainWindow::saveSimButtonClick()
     }
 }
 
+void MainWindow::newSimButtonClick()
+{
+    //prompt for save
+
+    QMessageBox msgBox;
+    msgBox.setText("All objects will be removed from the simulation");
+    msgBox.setInformativeText("Would you like to save?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+
+    switch (ret) {
+      case QMessageBox::Yes:
+
+        //do save things
+
+        break;
+
+      case QMessageBox::No:
+          // Don't Save was clicked
+          break;
+      default:
+          // should never be reached
+          break;
+    }
+
+    simulator->clear();
+
+    //disable save (only save as)
+}
+
 void MainWindow::restartSimButtonClick(){}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Designer mode button signals and slots                                                                                    //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void MainWindow::newObjectButtonClick(){}
+void MainWindow::newObjectButtonClick()
+{
+    //prompt for save
+
+    QMessageBox msgBox;
+    msgBox.setText("All components will be removed from the view");
+    msgBox.setInformativeText("Would you like to save?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+
+    switch (ret) {
+      case QMessageBox::Yes:
+
+        //do save things
+
+        break;
+
+      case QMessageBox::No:
+          // Don't Save was clicked
+          break;
+      default:
+          // should never be reached
+          break;
+    }
+
+    designer->clear();
+
+    //disable save (only save as)
+}
 void MainWindow::loadObjectButtonClick(){}
 void MainWindow::saveObjectButtonClick(){}
 
