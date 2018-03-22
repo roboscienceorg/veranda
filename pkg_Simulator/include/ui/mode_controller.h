@@ -64,6 +64,7 @@ public slots:
     void setPropertiesTableView();
     void open();
     void close();
+    void clear();
     int getNextId();
     void addObjectToView();
     QVector<WorldObjectComponent*> getComponents();

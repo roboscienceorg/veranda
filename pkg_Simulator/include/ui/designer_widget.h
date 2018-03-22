@@ -23,7 +23,6 @@ public:
     Designer_Widget(WorldObjectComponent *object, WorldObjectProperties *object2, visualizerFactory factory, QListWidget *parent=nullptr);
 
 private:
-    
     //there will be x amount of these widgets, each one for a different TAB of the Designer visual widget lists
 };
 

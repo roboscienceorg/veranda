@@ -655,6 +655,9 @@
           </item>
           <item>
            <widget class="QTabWidget" name="simulatorToolsList">
+            <property name="tabPosition">
+             <enum>QTabWidget::West</enum>
+            </property>
             <property name="currentIndex">
              <number>1</number>
             </property>
@@ -672,6 +675,12 @@
           </item>
           <item>
            <widget class="QTabWidget" name="designerToolsList">
+            <property name="tabPosition">
+             <enum>QTabWidget::West</enum>
+            </property>
+            <property name="tabShape">
+             <enum>QTabWidget::Rounded</enum>
+            </property>
             <widget class="QWidget" name="tab_3">
              <attribute name="title">
               <string>Tab 1</string>
