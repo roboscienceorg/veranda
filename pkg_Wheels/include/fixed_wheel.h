@@ -83,6 +83,8 @@ public:
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
+    QString getPluginName() { return "org.sdsmt.sim.2d.worldObjectComponent.defaults.fixedwheel"; }
+
 signals:
     void _receiveMessage(const std_msgs::msg::Float32::SharedPtr data);
 

@@ -140,6 +140,8 @@ public:
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
+    QString getPluginName() { return "org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar"; }
+
 private:
     b2Vec2 _getRayPoint(double angle_rad, double dist);
 

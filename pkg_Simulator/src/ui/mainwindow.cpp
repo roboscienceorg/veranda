@@ -25,6 +25,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
 {
     qRegisterMetaType<QVector<object_id>>("QVector<object_id>");
     qRegisterMetaType<QVector<QSharedPointer<WorldObject>>>("QVector<QSharedPointer<WorldObject>>");
+    qRegisterMetaType<QVector<WorldObject*>>("QVector<WorldObject*>");
 
     defaultLoader = defaultLoader_;
 
@@ -282,7 +283,7 @@ void MainWindow::loadSimButtonClick()
                               wl->getUserOptions(path);
 
                               //Spin up side thread to actually load it
-                              QtConcurrent::run([this, path, wl](){
+                              //QtConcurrent::run([this, path, wl](){
                                   QVector<WorldObject*> loadedObjs;
                                   try
                                   {
@@ -300,7 +301,7 @@ void MainWindow::loadSimButtonClick()
                                       userAddWorldObjectsToSimulation(loadedObjs, false);
 
                                       //Add default robots
-                                      if(defaultLoader && defaultLoader->canLoadFile(path))
+                                      /*if(defaultLoader && defaultLoader->canLoadFile(path))
                                       {
                                           loadedObjs.clear();
                                           try
@@ -309,13 +310,13 @@ void MainWindow::loadSimButtonClick()
                                           }catch(std::exception& ex){}
 
                                           userAddWorldObjectsToSimulation(loadedObjs, false);
-                                      }
+                                      }*/
                                   }
                                   else
                                   {
                                     emit error("Unable to open \'" + path + "\' as a world file");
                                   }
-                              });
+                              //});
 
                               //Stop looking for a file handler
                               //for this file

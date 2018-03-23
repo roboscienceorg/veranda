@@ -46,6 +46,8 @@ public:
     void generateBodies(b2World *world, object_id oId, b2Body *anchor);
     void clearBodies();
 
+    QString getPluginName() { return "org.sdsmt.sim.2d.worldObjectComponent.defaults.circle"; }
+
 private slots:
     void _buildModels();
     void _makeFixtures();

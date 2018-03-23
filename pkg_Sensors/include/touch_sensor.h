@@ -97,6 +97,8 @@ public:
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
+    QString getPluginName() { return "org.sdsmt.sim.2d.worldObjectComponent.defaults.touchring"; }
+
 private slots:
     void _channelChanged(QVariant);
     void _attachSensorFixture();
