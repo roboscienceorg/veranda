@@ -1,6 +1,8 @@
 #include "triangulator.h"
 
 #include <functional>
+#include <cmath>
+
 #include <QDebug>
 
 void simplify(Shape &s, const uint64_t& crossThreshold)
@@ -41,7 +43,7 @@ QPolygonF simplify(const QPolygonF &p, const uint64_t& crossThreshold)
     {
         //qDebug() << indexA << indexB << indexC;
         //qDebug() << indexB/(double)p.size() * 100;
-        double cProd = abs(cross(pointA, p[indexB], p[indexC]));
+        double cProd = std::abs(cross(pointA, p[indexB], p[indexC]));
         if(cProd > crossThreshold)
         {
             //qDebug() << "Corner";
