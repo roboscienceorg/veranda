@@ -15,7 +15,8 @@ HEADERS += \
     include/json_object.h \
     include/json_object_plugin.h \
     include/json_world.h \
-    include/json_world_plugin.h
+    include/json_world_plugin.h \
+    include/json_common.h
 
 DISTFILES += \
     CMakeLists.txt \
