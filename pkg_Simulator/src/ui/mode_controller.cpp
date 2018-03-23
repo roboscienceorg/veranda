@@ -22,6 +22,7 @@ Mode_Controller::Mode_Controller(visualizerFactory factory, QToolButton *pModeBu
 
     connect(visual, SIGNAL(userSelectedObject(object_id)), this, SLOT(objectSelected(object_id)));
 
+    tabs->setAutoFillBackground( false );
     setPropertiesTableView();
 }
 
@@ -80,7 +81,7 @@ void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectPro
         visual->objectAddedToScreen(object->getModels(), oId);
 
         listItems[oId] = new QListWidgetItem();
-        listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
+        listItems[oId]->setData(Qt::DisplayRole, QString::number(oId) + " " + object->getName());
         active->addItem(listItems[oId]);
     }
     if(objs.size())
@@ -89,11 +90,12 @@ void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectPro
 
 void Mode_Controller::worldObjectsRemovedFromSimulation(QVector<object_id> oIds)
 {
-    qDebug() << "Objects destroyed" << oIds;
+    //qDebug() << "Objects destroyed" << oIds;
     for(object_id oId : oIds)
     {
-        qDebug() << "Undraw" << oId;
+        //qDebug() << "Undraw" << oId;
         visual->objectRemovedFromScreen(oId);
+        worldObjects[oId]->deleteLater();
         worldObjects.remove(oId);
 
         active->removeItemWidget(listItems[oId]);
@@ -122,7 +124,7 @@ bool Mode_Controller::cloneSelectedTool()
     if(toolTabs.size() < 1)
         return false;
 
-    QList<QListWidgetItem*> l = toolTabs[tabs->currentWidget()->accessibleName()]->selectedItems();
+    QList<QListWidgetItem*> l = toolTabs[tabs->tabText(tabs->currentIndex())]->selectedItems();
     if ( ! l.empty()) {
             selectedTool = new WorldObjectProperties(dynamic_cast<Designer_Widget*>(l.at(0))->component->clone(), this);
             return true;
@@ -132,7 +134,7 @@ bool Mode_Controller::cloneSelectedTool()
 
 int Mode_Controller::getNextId()
 {
-    while(worldObjects[idIncrementer] != nullptr)
+    while(worldObjects.contains(idIncrementer))
         idIncrementer++;
     return idIncrementer;
 }
@@ -149,16 +151,14 @@ void Mode_Controller::addObjectToView()
             QVector<WorldObject*> rVector;
             rVector.push_back(object->getObject());
             requestAddWorldObject(rVector, true);
+            delete object;
         }
         else
         {
             //add object to active list
             object_id oId = getNextId();
-            worldObjects[oId] = object;
-            listItems[oId] = new QListWidgetItem();
-            listItems[oId]->setData(Qt::DisplayRole, QString::number(oId));
-            active->addItem(listItems[oId]);
-            visual->objectAddedToScreen(object->getModels(), oId);
+
+            worldObjectsAddedToSimulation({{object, oId}});
         }
     }
 }
@@ -174,13 +174,16 @@ void Mode_Controller::deleteObjectFromView()
     }
     else
     {
-        visual->objectRemovedFromScreen(oId);
-        worldObjects.remove(oId);
+        worldObjectsRemovedFromSimulation({oId});
+    }
+}
 
-        active->removeItemWidget(listItems[oId]);
-        delete listItems[oId];
-        listItems.remove(oId);
-        nothingSelected();
+void Mode_Controller::clear()
+{
+    for(auto e : worldObjects.keys())
+    {
+      objectSelected(e);
+      deleteObjectFromView();
     }
 }
 
@@ -203,12 +206,16 @@ void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
 
     //if tab does not exist, create it then add new designer widget
     if(toolTabs[properties->getType()] == nullptr)
-    {
+    {       
         toolTabs[properties->getType()] = new QListWidget();
         tabs->addTab(toolTabs[properties->getType()], properties->getType());
         toolTabs[properties->getType()]->setViewMode(QListWidget::IconMode);
         toolTabs[properties->getType()]->setResizeMode(QListWidget::Adjust);
-        toolTabs[properties->getType()]->setIconSize(QSize(150, 150));
+        toolTabs[properties->getType()]->setMovement(QListView::Static);
+        toolTabs[properties->getType()]->setIconSize(QSize(160, 160));
+        toolTabs[properties->getType()]->setAutoFillBackground( false );
+        //toolTabs[properties->getType()]->setStyleSheet("QListWidget::item { background-color: white; }");
+        //toolTabs[properties->getType()]->setBackgroundRole(QPalette::);
     }
 
     //add new designer widget to a tab
@@ -280,7 +287,9 @@ void Mode_Controller::nothingSelected()
 
 void Mode_Controller::robotItemClicked(QListWidgetItem* item)
 {
-    objectSelected(item->data(Qt::DisplayRole).toInt());
+    QString strName = item->data(Qt::DisplayRole).toString().section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
+    qDebug() << strName;
+    objectSelected(strName.toInt());
 }
 
 void Mode_Controller::updatePropertyInformation()
@@ -295,6 +304,9 @@ void Mode_Controller::updatePropertyInformation()
             QString key = model->data(model->index(i, 0)).toString();
             model->setData(model->index(i, 1), selectedProps[key]->get().toString(), Qt::DisplayRole);
         }
+
+        if (!simulator)
+            listItems[selected]->setData(Qt::DisplayRole, QString::number(selected) + " " + worldObjects[selected]->getName());
         properties->setUpdatesEnabled(true);
     }
 }

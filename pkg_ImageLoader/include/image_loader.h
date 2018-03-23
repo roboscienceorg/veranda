@@ -10,16 +10,17 @@
 #include <Box2D/Box2D.h>
 
 #include "optiondialog.h"
+#include "imageparser.h"
 
 class ImageLoader : public WorldLoader_If
 {
 private:
     QSharedPointer<ImageOptions> lastOptions;
-    QVector<QVector<b2PolygonShape *> > getShapesFromFile(QString filePath);
+    QVector<ImageParser::Shape> getShapesFromFile(QString filePath, uint64_t colorThreshold);
 
 public:
-    virtual bool canLoadFile(QString filePath);
-    virtual void getUserOptions(QString filePath);
+    virtual bool canLoadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins);
+    virtual void getUserOptions(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins);
     virtual QVector<QString> fileExts() { return QVector<QString>{"Black and White Image (*.png *.jpg *.jpeg *.bmp)"};}
     virtual QVector<WorldObject*> loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins);
 };

@@ -118,6 +118,7 @@ private slots:
 
     //Designer mode button signals and slots
     void newObjectButtonClick();
+    void newSimButtonClick();
     void loadObjectButtonClick();
     void saveObjectButtonClick();
 

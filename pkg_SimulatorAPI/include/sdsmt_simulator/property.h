@@ -58,7 +58,7 @@ public:
         return _old;
     }
 
-    static QVariant bool_validator(QVariant _old, QVariant _new)
+    static QVariant bool_validator(const QVariant& _old, const QVariant& _new)
     {
         const static QStringList isTrue{"1", "true", "yes"};
         const static QStringList isFalse{"0", "false", "no"};
@@ -68,12 +68,12 @@ public:
         return _old;
     }
 
-    static QVariant abs_double_validator(QVariant _old, QVariant _new)
+    static QVariant abs_double_validator(const QVariant& _old, const QVariant& _new)
     {
         return std::abs(double_validator(_old, _new).toDouble());
     }
 
-    static QVariant angle_validator(QVariant _old, QVariant _new)
+    static QVariant angle_validator(const QVariant& _old, const QVariant& _new)
     {
         bool isDouble;
         double asDouble = _new.toDouble(&isDouble);
@@ -83,7 +83,7 @@ public:
     }
 
     Property(PropertyInfo info = PropertyInfo(), QVariant defaultValue="",
-            const std::function<QVariant(QVariant, QVariant)> validator = [](QVariant, QVariant _new){ return _new; },
+            const std::function<QVariant(const QVariant&, const QVariant&)> validator = [](const QVariant&, const QVariant& _new){ return _new; },
             QObject* parent=nullptr) :
         QObject(parent), _info(info), _validate(validator), _value(defaultValue)
     {

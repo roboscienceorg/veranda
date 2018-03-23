@@ -5,7 +5,7 @@
 #include <cmath>
 #include <limits>
 
-Lidar_Sensor::Lidar_Sensor(QObject *parent) : WorldObjectComponent("Lidar", parent)
+Lidar_Sensor::Lidar_Sensor(QObject *parent) : WorldObjectComponent("Lidar", "Sensors", parent)
 {
     //Update channel out
     connect(&output_channel, &Property::valueSet, this, &Lidar_Sensor::_channelChanged);

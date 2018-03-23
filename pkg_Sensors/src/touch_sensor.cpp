@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <cmath>
 
-Touch_Sensor::Touch_Sensor(QObject *parent) : WorldObjectComponent("Touch Ring", parent)
+Touch_Sensor::Touch_Sensor(QObject *parent) : WorldObjectComponent("Touch Ring", "Sensors", parent)
 {
     //Update channel out
     connect(&output_channel, &Property::valueSet, this, &Touch_Sensor::_channelChanged);

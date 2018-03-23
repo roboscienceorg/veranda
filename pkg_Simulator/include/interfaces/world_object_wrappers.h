@@ -27,7 +27,7 @@ public:
     { return _comp->getName(); }
 
     QString getType()
-    { return ""; }
+    { return _comp->getType(); }
 
     //UI Interactions
     QMap<QString, QSharedPointer<PropertyView>> getProperties()

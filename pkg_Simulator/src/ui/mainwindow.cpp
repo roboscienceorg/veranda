@@ -24,7 +24,10 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     ui(new Ui::MainWindow)
 {
     qRegisterMetaType<QVector<object_id>>("QVector<object_id>");
+<<<<<<< HEAD
     qRegisterMetaType<QVector<QSharedPointer<WorldObject>>>("QVector<QSharedPointer<WorldObject>>");
+=======
+>>>>>>> 4b27135ef495626dc26dd1bd274b8cc478cf6c45
     qRegisterMetaType<QVector<WorldObject*>>("QVector<WorldObject*>");
 
     defaultLoader = defaultLoader_;
@@ -82,6 +85,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(ui->joystickButton, SIGNAL (released()), this, SLOT (joystickButtonClick()));
     connect(ui->saveSimButton, SIGNAL (released()), this, SLOT (saveSimButtonClick()));
     connect(ui->restartSimButton, SIGNAL (released()), this, SLOT (restartSimButtonClick()));
+    connect(ui->newSimButton, SIGNAL (released()), this, SLOT (newSimButtonClick()));
 
     //Designer mode button signals and slots
     connect(ui->newObjectButton, SIGNAL (released()), this, SLOT (newObjectButtonClick()));
@@ -277,10 +281,10 @@ void MainWindow::loadSimButtonClick()
 
                           //Find the first loader that can load this file
                           //and try to load. If it fails, we can't load it
-                          if(!done && wl->canLoadFile(path))
+                          if(!done && wl->canLoadFile(path, componentPlugins))
                           {
                               //Get user options in main thread
-                              wl->getUserOptions(path);
+                              wl->getUserOptions(path, componentPlugins);
 
                               //Spin up side thread to actually load it
                               //QtConcurrent::run([this, path, wl](){
@@ -300,8 +304,9 @@ void MainWindow::loadSimButtonClick()
                                       qDebug() << "Build new world";
                                       userAddWorldObjectsToSimulation(loadedObjs, false);
 
+
                                       //Add default robots
-                                      /*if(defaultLoader && defaultLoader->canLoadFile(path))
+                                      if(defaultLoader && defaultLoader->canLoadFile(path, componentPlugins))
                                       {
                                           loadedObjs.clear();
                                           try
@@ -310,7 +315,7 @@ void MainWindow::loadSimButtonClick()
                                           }catch(std::exception& ex){}
 
                                           userAddWorldObjectsToSimulation(loadedObjs, false);
-                                      }*/
+                                      }
                                   }
                                   else
                                   {
@@ -399,12 +404,73 @@ void MainWindow::saveSimButtonClick()
     }
 }
 
+void MainWindow::newSimButtonClick()
+{
+    //prompt for save
+
+    QMessageBox msgBox;
+    msgBox.setText("All objects will be removed from the simulation");
+    msgBox.setInformativeText("Would you like to save?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+
+    switch (ret) {
+      case QMessageBox::Yes:
+
+        //do save things
+
+        break;
+
+      case QMessageBox::No:
+          // Don't Save was clicked
+          break;
+      default:
+          // should never be reached
+          break;
+    }
+
+    simulator->clear();
+
+    //disable save (only save as)
+}
+
 void MainWindow::restartSimButtonClick(){}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Designer mode button signals and slots                                                                                    //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void MainWindow::newObjectButtonClick(){}
+void MainWindow::newObjectButtonClick()
+{
+    //prompt for save
+
+    QMessageBox msgBox;
+    msgBox.setText("All components will be removed from the view");
+    msgBox.setInformativeText("Would you like to save?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+
+    switch (ret) {
+      case QMessageBox::Yes:
+
+        //do save things
+
+        break;
+
+      case QMessageBox::No:
+          // Don't Save was clicked
+          break;
+      default:
+          // should never be reached
+          break;
+    }
+
+    designer->clear();
+
+    //disable save (only save as)
+}
 void MainWindow::loadObjectButtonClick(){}
 void MainWindow::saveObjectButtonClick(){}
 
@@ -526,7 +592,11 @@ void MainWindow::exportObjectButtonClick()
     //WorldObject takes pointers to WorldObjectComponents and returns object
     //popup ask for name
 
-    WorldObject *object = new WorldObject(designer->getComponents(), "test", this);
+    QVector<WorldObjectComponent*> newComponents;
+    for(WorldObjectComponent* c : designer->getComponents())
+        newComponents.push_back(c->clone());
+
+    WorldObject *object = new WorldObject(newComponents, "test", this);
     simulator->addObjectToTools(object);
 }
 

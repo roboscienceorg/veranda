@@ -1,4 +1,4 @@
-QT       += core widgets
+QT       += core
 
 TARGET = diffDrive_drivetrain
 TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being set
@@ -6,15 +6,14 @@ TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being 
 INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include
 
 SOURCES += \
-    src/image_loader.cpp \
-    src/image_loader_plugin.cpp \
-    src/imageparser.cpp
+    src/polygon_plugin.cpp \
+    src/polygon.cpp \
+    src/triangulator.cpp
 
 HEADERS += \
-    include/image_loader.h \
-    include/image_loader_plugin.h \
-    include/imageparser.h \
-    include/optiondialog.h
+    include/polygon.h \
+    include/polygon_plugin.h \
+    include/triangulator.h
 
 DISTFILES += \
     CMakeLists.txt \

@@ -397,10 +397,10 @@ void BasicViewer::setWorldBounds(double xMin, double xMax, double yMin, double y
 //The object identified by object_id is no longer on the world
 void BasicViewer::objectRemovedFromScreen(object_id id)
 {
-    qDebug() << "Removing object" << id << "?";
+    //qDebug() << "Removing object" << id << "?";
     if(_models.contains(id))
     {
-        qDebug() << "Removing";
+        //qDebug() << "Removing";
         for(Model* m : _models[id])
         {
             _scene->removeItem(_shapes[m]);

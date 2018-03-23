@@ -112,7 +112,8 @@ void SimulatorCore::addSimObjects(QVector<WorldObject*> objs, bool makeCopies)
     for(WorldObject* oldObj : objs)
     {
         //Clone object to have local copy for distributing
-        WorldObject* obj = makeCopies ? qobject_cast<WorldObject*>(oldObj->clone()) : oldObj;
+        WorldObject* obj = qobject_cast<WorldObject*>(oldObj->clone());
+        if(!makeCopies) oldObj->deleteLater();
 
         obj->setROSNode(_node);
 

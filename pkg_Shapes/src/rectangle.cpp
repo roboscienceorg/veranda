@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <cmath>
 
-Rectangle::Rectangle(QObject *parent) : WorldObjectComponent("Rectangle", parent)
+Rectangle::Rectangle(QObject *parent) : WorldObjectComponent("Rectangle", "Shapes", parent)
 {
     shape_model = new Model({}, {}, this);
     registerModel(shape_model);

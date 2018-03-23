@@ -15,8 +15,6 @@ find_package(sdsmt_simulator_box2d REQUIRED)
 find_package(sdsmt_simulator_api REQUIRED)
 find_package(rclcpp REQUIRED)
 
-find_package(OpenGL REQUIRED)
-
 ## Find and configure QT
 find_package(Qt5 REQUIRED COMPONENTS
   Core
@@ -32,8 +30,6 @@ add_definitions(-DQT_SHARED)
 
 include_directories( ${CMAKE_BINARY_DIR} )
 include_directories( include )
-
-include_directories( ${OPENGL_INCLUDE_DIRS} )
 
 ## TODO If possible: Figure out how to mark Qt as a dependency
 ament_export_dependencies(    
@@ -52,14 +48,12 @@ ament_export_dependencies(
 set(MOC_HDRS
     include/image_loader.h
     include/image_loader_plugin.h
-    include/polygonscomponent.h
     include/optiondialog.h)
 
 ## Any other source files
 set(CPP_SRCS
     src/image_loader.cpp
     src/image_loader_plugin.cpp
-    src/polygonscomponent.cpp
     src/imageparser.cpp)
 
 ###########
@@ -90,8 +84,6 @@ ament_target_dependencies(image_loader_plugin
     "sdsmt_simulator_box2d"
     "rclcpp"
 )
-
-target_link_libraries(image_loader_plugin ${OPENGL_LIBRARIES} )
 
 ## Install lib into same directory as simulator executable
 install(
