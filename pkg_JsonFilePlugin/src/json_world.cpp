@@ -2,8 +2,6 @@
 #include <QDebug>
 #include <iostream>
 
-#include "json_common.h"
-
 QVector<WorldObject*> JsonWorldLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
     QFile loadFile(filePath);

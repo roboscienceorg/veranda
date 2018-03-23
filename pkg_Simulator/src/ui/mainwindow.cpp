@@ -24,10 +24,6 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     ui(new Ui::MainWindow)
 {
     qRegisterMetaType<QVector<object_id>>("QVector<object_id>");
-<<<<<<< HEAD
-    qRegisterMetaType<QVector<QSharedPointer<WorldObject>>>("QVector<QSharedPointer<WorldObject>>");
-=======
->>>>>>> 4b27135ef495626dc26dd1bd274b8cc478cf6c45
     qRegisterMetaType<QVector<WorldObject*>>("QVector<WorldObject*>");
 
     defaultLoader = defaultLoader_;
