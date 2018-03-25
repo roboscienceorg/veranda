@@ -160,6 +160,10 @@ int main(int argc, char** argv)
         return new BasicViewer;
     };
 
+    //Get rid of defaultLoader so
+    //default robots aren't used
+    defaultLoader = nullptr;
+
     Simulator_Physics_If* physics = new BasicPhysics;
     Simulator_Ui_If* userinterface = new MainWindow(visuals, componentPlugins, objectLoaders, objectSavers, worldLoaders, worldSavers, defaultLoader);
 
