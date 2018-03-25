@@ -11,7 +11,8 @@ SOURCES += \
 
 HEADERS += \
     include/circle.h \
-    include/circle_plugin.h
+    include/circle_plugin.h \
+    include/defines.h
 
 DISTFILES += \
     CMakeLists.txt \

@@ -12,7 +12,8 @@ SOURCES += \
 HEADERS += \
     include/fixed_wheel.h \
     include/fixed_wheel_plugin.h\
-    include/basic_wheel.h
+    include/basic_wheel.h \
+    include/defines.h
 
 DISTFILES += \
     CMakeLists.txt \

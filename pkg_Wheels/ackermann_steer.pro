@@ -12,7 +12,8 @@ SOURCES += \
 HEADERS += \
     include/ackermann_steer.h \
     include/ackermann_steer_plugin.h \
-    include/basic_wheel.h
+    include/basic_wheel.h \
+    include/defines.h
 
 DISTFILES += \
     CMakeLists.txt \

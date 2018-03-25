@@ -13,6 +13,8 @@
 
 #include <memory>
 
+#include "defines.h"
+
 class Circle : public WorldObjectComponent
 {
     Q_OBJECT
@@ -46,7 +48,7 @@ public:
     void generateBodies(b2World *world, object_id oId, b2Body *anchor);
     void clearBodies();
 
-    QString getPluginName() { return "org.sdsmt.sim.2d.worldObjectComponent.defaults.circle"; }
+    QString getPluginName() { return CIRCLE_IID; }
 
 private slots:
     void _buildModels();

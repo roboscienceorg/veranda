@@ -13,7 +13,8 @@ SOURCES += \
 HEADERS += \
     include/polygon.h \
     include/polygon_plugin.h \
-    include/triangulator.h
+    include/triangulator.h \
+    include/defines.h
 
 DISTFILES += \
     CMakeLists.txt \

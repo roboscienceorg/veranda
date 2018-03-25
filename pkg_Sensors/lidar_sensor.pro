@@ -11,7 +11,8 @@ SOURCES += \
 
 HEADERS += \
     include/lidar_sensor.h \
-    include/lidar_sensor_plugin.h
+    include/lidar_sensor_plugin.h \
+    include/defines.h
 
 DISTFILES += \
     CMakeLists.txt \

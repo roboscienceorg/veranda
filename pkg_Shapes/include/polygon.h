@@ -11,8 +11,11 @@
 #include <QSet>
 #include <QObject>
 #include <QVariantList>
+#include <QVariant>
 
 #include <memory>
+
+#include "defines.h"
 
 class Polygon : public WorldObjectComponent
 {
@@ -26,19 +29,60 @@ class Polygon : public WorldObjectComponent
     QVector<b2Fixture*> _polyFixtures;
     b2World* _world = nullptr;
 
+    static QVariant toPoly(const QVariant& v)
+    {
+        QVariantList poly;
+        QSequentialIterable iterable = v.value<QSequentialIterable>();
+        for (const QVariant &vi : iterable)
+        {
+            if(vi.canConvert<QPointF>())
+            {
+                QPointF p = vi.value<QPointF>();
+                poly.append(QVariant(QVariantList{p.x(), p.y()}));
+            }
+            else
+            {
+                QVariantList pnt;
+                QSequentialIterable iterable2 = vi.value<QSequentialIterable>();
+                for(const QVariant& v : iterable2)
+                {
+                    pnt.append(v.toDouble());
+                    if(pnt.size() == 2) break;
+                }
+                poly.append(QVariant(pnt));
+            }
+        }
+        return poly;
+    }
+
     static bool isPoly(const QVariant& v)
     {
         if (!v.canConvert<QVariantList>()) return false;
         QSequentialIterable iterable = v.value<QSequentialIterable>();
-        qDebug() << "Loop is list";
         uint64_t count = 0;
         // Can use C++11 range-for:
         for (const QVariant &vi : iterable)
         {
-            if(!vi.canConvert<QPointF>()) return false;
+            bool good = false;
+            if(vi.canConvert<QPointF>()) good = true;
+            else if(vi.canConvert<QVariantList>())
+            {
+                QSequentialIterable iterable2 = vi.value<QSequentialIterable>();
+                if(iterable2.size() == 2)
+                {
+                    good = true;
+                    for(const QVariant& vii : iterable2)
+                        if(!vii.canConvert<double>())
+                        {
+                            good = false;
+                            break;
+                        }
+                }
+            }
+            if(!good) return false;
+
             count++;
         }
-        qDebug() << count << "points in loop";
         return count >= 3;
     }
 
@@ -46,11 +90,11 @@ class Polygon : public WorldObjectComponent
                                    QVariant(0));
 
     Property _outerShape = Property(PropertyInfo(true, false, PropertyInfo::INT, "The outermost polygon of the shape"),
-                                    QVariantList{QPointF(0, 0), QPointF(1, 1), QPointF(1, 0)},
+                                    QVariantList{QVariantList{0, 0}, QVariantList{1, 1}, QVariantList{1, 0}},
                                     [](const QVariant& _old, const QVariant& _new)
                                     {
                                         qDebug() << "Validate outer loop";
-                                        if(isPoly(_new)) return _new;
+                                        if(isPoly(_new)) return toPoly(_new);
                                         qDebug() << "Failed";
                                         return _old;
                                     });
@@ -64,15 +108,19 @@ class Polygon : public WorldObjectComponent
                                         qDebug() << "Is a list";
                                         QSequentialIterable iterable = _new.value<QSequentialIterable>();
 
+                                        QVariantList polyList;
                                         // Can use C++11 range-for:
                                         for (const QVariant &vi : iterable)
+                                        {
                                             if(!isPoly(vi))
                                             {
                                                 qDebug() << "Failed";
                                                 return _old;
                                             }
+                                            polyList.append(toPoly(vi));
+                                        }
 
-                                        return _new;
+                                        return QVariant(polyList);
                                     });
 
     Property _fullDraw = Property(PropertyInfo(true, false, PropertyInfo::BOOL, "Whether or not to draw all triangles"),
@@ -116,6 +164,8 @@ public:
 
     void generateBodies(b2World* world, object_id oId, b2Body* anchor);
     void clearBodies();
+
+    QString getPluginName(){ return POLYGON_IID; }
 };
 
 #endif // POLYGON_H

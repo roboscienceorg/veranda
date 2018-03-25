@@ -11,7 +11,8 @@ SOURCES += \
 
 HEADERS += \
     include/touch_sensor.h \
-    include/touch_sensor_plugin.h
+    include/touch_sensor_plugin.h \
+    include/defines.h
 
 DISTFILES += \
     CMakeLists.txt \

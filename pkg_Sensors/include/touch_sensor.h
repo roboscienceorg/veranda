@@ -14,6 +14,8 @@
 
 #include <memory>
 
+#include "defines.h"
+
 class Touch_Sensor : public WorldObjectComponent
 {
     Q_OBJECT
@@ -97,7 +99,7 @@ public:
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
-    QString getPluginName() { return "org.sdsmt.sim.2d.worldObjectComponent.defaults.touchring"; }
+    QString getPluginName() { return TOUCH_IID; }
 
 private slots:
     void _channelChanged(QVariant);

@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "defines.h"
+
 //This should not be fully defined relative; it should be just
 //  <sdsmt_simulator/world_object_component_plugin.h>
 //however, a bug? in MSVC prevents the Qt MOC from resolving interfaces
@@ -13,7 +15,7 @@
 class Circle_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.circle")
+    Q_PLUGIN_METADATA(IID CIRCLE_IID)
     Q_INTERFACES(WorldObjectComponent_Plugin_If)
 
 public:

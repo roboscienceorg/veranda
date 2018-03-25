@@ -13,6 +13,8 @@
 
 #include <memory>
 
+#include "defines.h"
+
 class Rectangle : public WorldObjectComponent
 {
     Q_OBJECT
@@ -52,7 +54,7 @@ public:
     void generateBodies(b2World *world, object_id oId, b2Body *anchor);
     void clearBodies();
 
-    QString getPluginName() { return "org.sdsmt.sim.2d.worldObjectComponent.defaults.rectangle"; }
+    QString getPluginName() { return RECT_IID; }
 
 private slots:
     void _buildModels();

@@ -11,7 +11,8 @@ SOURCES += \
 
 HEADERS += \
     include/rectangle.h \
-    include/rectangle_plugin.h
+    include/rectangle_plugin.h \
+    include/defines.h
 
 DISTFILES += \
     CMakeLists.txt \

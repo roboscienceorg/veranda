@@ -17,6 +17,8 @@
 #include <limits>
 #include <cmath>
 
+#include "defines.h"
+
 class Lidar_Sensor : public WorldObjectComponent
 {
     Q_OBJECT
@@ -140,7 +142,7 @@ public:
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
-    QString getPluginName() { return "org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar"; }
+    QString getPluginName() { return LIDAR_IID; }
 
 private:
     b2Vec2 _getRayPoint(double angle_rad, double dist);

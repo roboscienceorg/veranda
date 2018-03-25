@@ -14,6 +14,8 @@
 
 #include <memory>
 
+#include "defines.h"
+
 class Fixed_Wheel : public WorldObjectComponent
 {
     Q_OBJECT
@@ -83,7 +85,7 @@ public:
 
     void setROSNode(std::shared_ptr<rclcpp::Node> node);
 
-    QString getPluginName() { return "org.sdsmt.sim.2d.worldObjectComponent.defaults.fixedwheel"; }
+    QString getPluginName() { return FIXEDWHEEL_IID; }
 
 signals:
     void _receiveMessage(const std_msgs::msg::Float32::SharedPtr data);

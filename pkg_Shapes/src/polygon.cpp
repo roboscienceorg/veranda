@@ -77,7 +77,9 @@ void toPolygon(const QVariantList& points, QPolygonF& poly)
     auto iter = poly.begin();
     for(const QVariant& v : points)
     {
-        *iter = v.value<QPointF>();
+        QSequentialIterable iterable = v.value<QSequentialIterable>();
+
+        *iter = QPointF(iterable.at(0).toDouble(), iterable.at(1).toDouble());
         iter++;
     }
 }
