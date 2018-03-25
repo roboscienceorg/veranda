@@ -75,11 +75,11 @@ if(NOT ${CMAKE_VERSION} VERSION_LESS "3.10")
     cmake_policy(SET CMP0071 NEW)
 endif()
 
-set(headers include/json_object.h include/json_object_plugin.h include/json_common.h)
+set(headers include/json_object.h include/json_object_plugin.h)
 set(sources src/json_object.cpp src/json_object_plugin.cpp)
 make_plugin(json_object_file_plugin "${headers}" "${sources}")
 
-set(headers include/json_world.h include/json_world_plugin.h include/json_common.h)
+set(headers include/json_world.h include/json_world_plugin.h)
 set(sources src/json_world.cpp src/json_world_plugin.cpp)
 make_plugin(json_world_file_plugin "${headers}" "${sources}")
 

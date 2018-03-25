@@ -4,6 +4,7 @@ SUBDIRS = \
     pkg_Simulator \
     pkg_SimulatorAPI \
     pkg_DefaultRobotLoader \
+    pkg_JSONLoader \
     pkg_ImageLoader \
     sensor_lidar \
     sensor_touch \
@@ -24,3 +25,4 @@ wheel_ackermann.file = ../pkg_Wheels/ackermann_steer.pro
 shape_rect.file = ../pkg_Shapes/rectangle.pro
 shape_circle.file = ../pkg_Shapes/circle.pro
 shape_polygon.file = ../pkg_Shapes/polygon.pro
+pkg_JSONLoader.file = ../pkg_JsonFilePlugin/json_file_plugin.pro

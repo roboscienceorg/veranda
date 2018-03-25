@@ -6,8 +6,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 11)
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-else()
-  add_definitions(-DWINDOWS)
 endif()
 
 find_package(ament_cmake REQUIRED)

@@ -1,5 +1,6 @@
-#include "polygon.h"
+//This header order is important for MSVC
 #include "triangulator.h"
+#include "polygon.h"
 
 Polygon::Polygon(QObject* parent) : WorldObjectComponent("Polygon", "Shapes", parent)
 {
