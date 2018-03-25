@@ -194,7 +194,7 @@ QVector<WorldObjectComponent*> Mode_Controller::getComponents()
     for(auto e : worldObjects.keys())
     {
       WorldObjectProperties* object = worldObjects.value(e);
-      rVector.push_back(object->getComponent());
+      rVector.push_back(object->getComponent()->clone());
     }
 
     return rVector;

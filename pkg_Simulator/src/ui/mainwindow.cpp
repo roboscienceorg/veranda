@@ -66,6 +66,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     simulator->open();
     designer->close();
     ui->addToolButton->setEnabled(false);
+    ui->loadToolsButton->setVisible(false);
 
     //Main menu button signals and slots
     connect(ui->showBuildObjectsButton, SIGNAL (released()), this, SLOT (showBuildObjectsButtonClick()));
@@ -106,6 +107,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(this, SIGNAL (objectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)), simulator, SLOT (worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)));
     connect(this, SIGNAL (objectsRemovedFromSimulation(QVector<object_id>)), simulator, SLOT (worldObjectsRemovedFromSimulation(QVector<object_id>)));
 
+    connect(this, SIGNAL(error(QString)), this, SLOT(errorMessage(QString)));
     //connect(this, SIGNAL (addObjectToSimulation(QVector<QSharedPointer<WorldObject>>)), simulator, SLOT (getItemAsVector(QVector<QSharedPointer<WorldObject>>));
 
 }
@@ -267,12 +269,12 @@ void MainWindow::loadSimButtonClick()
 
           if(path.length())
           {
-              QString ext = QFileInfo(path).suffix();
+              QString ext = QFileInfo(path).suffix().toLower();
 
               bool done = false;
               for(auto it = worldLoaders.begin(); it != worldLoaders.end() && !done; it++)
               {
-                  if(it.key().contains(ext))
+                  if(it.key().toLower().contains(ext))
                       for(WorldLoader_If* wl : it.value())
 
                           //Find the first loader that can load this file
@@ -283,7 +285,7 @@ void MainWindow::loadSimButtonClick()
                               wl->getUserOptions(path, componentPlugins);
 
                               //Spin up side thread to actually load it
-                              //QtConcurrent::run([this, path, wl](){
+                              QtConcurrent::run([this, path, wl](){
                                   QVector<WorldObject*> loadedObjs;
                                   try
                                   {
@@ -317,13 +319,16 @@ void MainWindow::loadSimButtonClick()
                                   {
                                     emit error("Unable to open \'" + path + "\' as a world file");
                                   }
-                              //});
+                              });
 
                               //Stop looking for a file handler
                               //for this file
                               done = true;
                           }
               }
+
+              if(!done) emit error("No plugin to open \'" + path + "\' as a world file");
+
           }
 
           break;
@@ -373,11 +378,11 @@ void MainWindow::saveSimButtonClick()
 
     if(path.length())
     {
-        QString ext = QFileInfo(path).suffix();
+        QString ext = QFileInfo(path).suffix().toLower();
 
         for(auto it = worldSavers.begin(); it != worldSavers.end(); it++)
         {
-            if(it.key().contains(ext))
+            if(it.key().toLower().contains(ext))
             {
                 QVector<WorldObject*> worldObjs;
                 for(WorldObjectProperties* prop : objects)
@@ -391,12 +396,13 @@ void MainWindow::saveSimButtonClick()
                 {
                     it.value()[0]->saveFile(path, worldObjs);
                 }catch(std::exception& ex){
-                    error("Unable to save file " + path + ": " + QString::fromStdString(ex.what()));
+                    error("Unable to save file '" + path + "': " + QString::fromStdString(ex.what()));
                 }
 
                 return;
             }
         }
+        error("No plugin to save file '" + path + "'");
     }
 }
 
@@ -467,14 +473,7 @@ void MainWindow::newObjectButtonClick()
 
     //disable save (only save as)
 }
-void MainWindow::loadObjectButtonClick(){}
-void MainWindow::saveObjectButtonClick(){}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// RIGHT HAND MENU - Tool button signals and slots                                                                          //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void MainWindow::loadObjectsForSimButtonClick()
+void MainWindow::loadObjectButtonClick()
 {
     QString types;
     qDebug() << "Able to load files:" << objectLoaders.keys();
@@ -484,103 +483,130 @@ void MainWindow::loadObjectsForSimButtonClick()
 
     types = types.left(types.size()-2);
 
-    QFileDialog dialog(this);
-    dialog.setDirectory(QDir::homePath());
-    dialog.setFileMode(QFileDialog::ExistingFiles);
-    //dialog.setNameFilter(trUtf8(types));
+    QString objFile = QFileDialog::getOpenFileName(nullptr, "", "", types, nullptr);
+    QString suff = QFileInfo(objFile).suffix().toLower();
 
-
-    qDebug() << "types:" << types;
-
-    QStringList fileNames;
-    if (dialog.exec())
-        fileNames = dialog.selectedFiles();
-
-/*
-    for(int i = 0; i < fileNames.size(); i++)
+    bool done = false;
+    for(QString k : objectLoaders.keys())
     {
-        QString path = fileNames[i];
-
-
-        if(path.length())
+        if(k.toLower().contains(suff))
         {
-            QString ext = QFileInfo(path).suffix();
+            for(WorldObjectLoader_If* l : objectLoaders[k])
+            {
+                if(l->canLoadFile(objFile, componentPlugins))
+                {
+                    l->getUserOptions(objFile, componentPlugins);
 
-                //TODO create WorldObjectComponent* object from file
-                WorldObjectComponent* component = new WorldObjectComponent();
-
-                simulator->addObjectToTools(component);
-        }
-    }
-
-
-    if(path.length())
-    {
-        QString ext = QFileInfo(path).suffix();
-
-        bool done = false;
-        for(auto it = worldLoaders.begin(); it != worldLoaders.end() && !done; it++)
-        {
-            if(it.key().contains(ext))
-                for(WorldLoader_If* wl : it.value())
-
-                    //Find the first loader that can load this file
-                    //and try to load. If it fails, we can't load it
-                    if(!done && wl->canLoadFile(path))
+                    try
                     {
-                        //Get user options in main thread
-                        wl->getUserOptions(path);
+                        WorldObject* wobj = l->loadFile(objFile, componentPlugins);
+                        designer->clear();
+                        object_id i = 1;
+                        for(WorldObjectComponent* c : wobj->getComponents())
+                            designer->worldObjectsAddedToSimulation({{new WorldObjectProperties(c), i++}});
 
-                        //Spin up side thread to actually load it
-                        QtConcurrent::run([this, path, wl](){
-                            QVector<QSharedPointer<WorldObject>> sharedObjs;
-                            QVector<WorldObject*> loadedObjs;
-                            try
-                            {
-                                //Load file in separate thread
-                                qDebug() << "Load file";
-                                loadedObjs=wl->loadFile(path, componentPlugins);
-                            }catch(std::exception& ex){}
-
-                            if(loadedObjs.size())
-                            {
-                                qDebug() << "Clear world";
-                                userRemoveWorldObjectsFromSimulation(simulator->worldObjects.keys().toVector());
-
-                                qDebug() << "Build new world";
-                                for(WorldObject* w : loadedObjs)
-                                  sharedObjs.push_back(QSharedPointer<WorldObject>(w));
-
-                                userAddWorldObjectsToSimulation(sharedObjs);
-
-                                //Add default robots
-                                if(defaultLoader && defaultLoader->canLoadFile(path))
-                                {
-                                    loadedObjs.clear();
-                                    sharedObjs.clear();
-                                    try
-                                    {
-                                        loadedObjs=defaultLoader->loadFile(path, componentPlugins);
-                                    }catch(std::exception& ex){}
-
-                                    for(WorldObject* w : loadedObjs)
-                                      sharedObjs.push_back(QSharedPointer<WorldObject>(w));
-
-                                    userAddWorldObjectsToSimulation(sharedObjs);
-                                }
-                            }
-                            else
-                            {
-                              emit error("Unable to open \'" + path + "\' as a world file");
-                            }
-                        });
-
-                        //Stop looking for a file handler
-                        //for this file
-                        done = true;
+                        return;
+                    }catch(std::exception& ex)
+                    {
+                        error("Unable to load world object file '" + objFile + "'");
                     }
+                    done = true;
+                }
+                if(done) break;
+            }
         }
-    }*/
+        if(done) break;
+    }
+    if(!done) error("No plugin to load world object file '" + objFile + "'");
+}
+
+void MainWindow::saveObjectButtonClick()
+{
+    QVector<WorldObjectComponent*> comps = designer->getComponents();
+    WorldObject wo(comps);
+
+    QString types;
+    qDebug() << "Able to save files:" << objectSavers.keys();
+    for(QString k : objectSavers.keys())
+        if(k.size())
+          types += k + ";;";
+
+    types = types.left(types.size()-2);
+
+    QString objFile = QFileDialog::getSaveFileName(nullptr, "", "", types, nullptr);
+    QString suff = QFileInfo(objFile).suffix().toLower();
+
+    bool done = false;
+    for(QString k : objectSavers.keys())
+    {
+        if(k.toLower().contains(suff))
+        {
+            for(WorldObjectSaver_If* s : objectSavers[k])
+            {
+                try
+                {
+                    s->saveFile(objFile, &wo);
+
+                    return;
+                }catch(std::exception& ex)
+                {
+                    error("Unable to save world object file '" + objFile + "'");
+                }
+                done = true;
+                break;
+            }
+        }
+        if(done) break;
+    }
+    if(!done) error("No plugin to save world object file '" + objFile + "'");
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RIGHT HAND MENU - Tool button signals and slots                                                                          //
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void MainWindow::loadObjectsForSimButtonClick()
+{
+
+    QString types;
+    qDebug() << "Able to load files:" << objectLoaders.keys();
+    for(QString k : objectLoaders.keys())
+        if(k.size())
+          types += k + ";;";
+
+    types = types.left(types.size()-2);
+
+    QString objFile = QFileDialog::getOpenFileName(nullptr, "", "", types, nullptr);
+    QString suff = QFileInfo(objFile).suffix().toLower();
+
+    bool done = false;
+    for(QString k : objectLoaders.keys())
+    {
+        if(k.toLower().contains(suff))
+        {
+            for(WorldObjectLoader_If* l : objectLoaders[k])
+            {
+                if(l->canLoadFile(objFile, componentPlugins))
+                {
+                    l->getUserOptions(objFile, componentPlugins);
+
+                    try
+                    {
+                        WorldObject* wobj = l->loadFile(objFile, componentPlugins);
+                        simulator->addObjectToTools(wobj);
+                        return;
+                    }catch(std::exception& ex)
+                    {
+                        error("Unable to load world object file '" + objFile + "'");
+                    }
+                    done = true;
+                }
+                if(done) break;
+            }
+        }
+        if(done) break;
+    }
+    if(!done) error("No plugin to load world object file '" + objFile + "'");
 }
 
 void MainWindow::exportObjectButtonClick()
