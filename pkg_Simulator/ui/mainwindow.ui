@@ -66,7 +66,7 @@
             <item>
              <widget class="QToolButton" name="designerButton">
               <property name="toolTip">
-               <string>Robot Mode</string>
+               <string>Designer Mode</string>
               </property>
               <property name="text">
                <string/>
@@ -304,7 +304,7 @@
              <item>
               <widget class="QToolButton" name="saveObjectButton">
                <property name="toolTip">
-                <string>Export Object to Simulator</string>
+                <string>Save Object</string>
                </property>
                <property name="text">
                 <string>...</string>

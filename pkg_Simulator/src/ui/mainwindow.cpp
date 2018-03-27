@@ -11,6 +11,7 @@
 #include <QProgressBar>
 #include <QtConcurrent/QtConcurrent>
 #include <QWindow>
+#include <QInputDialog>
 
 #include <stdexcept>
 #include <string>
@@ -132,6 +133,9 @@ void MainWindow::physicsStarted()
     ui->designerButton->setEnabled(false);
     ui->simulatorToolsList->setEnabled(false);
     ui->simulatorToolsMenu->setEnabled(false);
+    ui->importMapButton->setEnabled(false);
+    ui->newSimButton->setEnabled(false);
+    ui->restartSimButton->setEnabled(false);
 
     simulator->visual->setToolsEnabled(false);
 }
@@ -148,6 +152,9 @@ void MainWindow::physicsStopped()
     ui->designerButton->setEnabled(true);
     ui->simulatorToolsList->setEnabled(true);
     ui->simulatorToolsMenu->setEnabled(true);
+    ui->importMapButton->setEnabled(true);
+    ui->newSimButton->setEnabled(true);
+    ui->restartSimButton->setEnabled(true);
 
     simulator->visual->setToolsEnabled(true);
 }
@@ -411,25 +418,27 @@ void MainWindow::newSimButtonClick()
     //prompt for save
 
     QMessageBox msgBox;
-    msgBox.setText("All objects will be removed from the simulation");
+    msgBox.setText("WARNING: All objects will be removed from the simulation.");
     msgBox.setInformativeText("Would you like to save?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
     int ret = msgBox.exec();
 
     switch (ret) {
-      case QMessageBox::Yes:
+        case QMessageBox::Yes:
+            saveSimButtonClick();
+            break;
 
-        //do save things
+        case QMessageBox::No:
+            break;
 
-        break;
+        case QMessageBox::Cancel:
+            // Cancel was clicked (do not clear designer)
+            return;
 
-      case QMessageBox::No:
-          // Don't Save was clicked
-          break;
-      default:
-          // should never be reached
-          break;
+        default:
+            // should never be reached
+            break;
     }
 
     simulator->clear();
@@ -448,25 +457,28 @@ void MainWindow::newObjectButtonClick()
     //prompt for save
 
     QMessageBox msgBox;
-    msgBox.setText("All components will be removed from the view");
+    msgBox.setText("WARNING: All components will be removed from the view.");
     msgBox.setInformativeText("Would you like to save?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
     int ret = msgBox.exec();
 
     switch (ret) {
-      case QMessageBox::Yes:
+        case QMessageBox::Yes:
+            saveObjectButtonClick();
+            break;
 
-        //do save things
+        case QMessageBox::No:
+            // Don't Save was clicked
+            break;
 
-        break;
+        case QMessageBox::Cancel:
+            // Cancel was clicked (do not clear designer)
+            return;
 
-      case QMessageBox::No:
-          // Don't Save was clicked
-          break;
-      default:
-          // should never be reached
-          break;
+        default:
+            // should never be reached
+            break;
     }
 
     designer->clear();
@@ -611,15 +623,29 @@ void MainWindow::loadObjectsForSimButtonClick()
 
 void MainWindow::exportObjectButtonClick()
 {
-    //WorldObject takes pointers to WorldObjectComponents and returns object
-    //popup ask for name
+    //popup ask for name and type
+    bool ok;
 
-    QVector<WorldObjectComponent*> newComponents;
-    for(WorldObjectComponent* c : designer->getComponents())
-        newComponents.push_back(c->clone());
+    QString name = QInputDialog::getText(0, "Name This Robot",
+    "Name:", QLineEdit::Normal,"", &ok);
 
-    WorldObject *object = new WorldObject(newComponents, "test", this);
-    simulator->addObjectToTools(object);
+    QString type = QInputDialog::getText(0, "Give This Robot a Type",
+    "Type:", QLineEdit::Normal,"", &ok);
+
+    //QString t2 = &QInputDialog::getText(parent,"Title","text");
+    if(ok)
+    {
+        QVector<WorldObjectComponent*> newComponents;
+        for(WorldObjectComponent* c : designer->getComponents())
+            newComponents.push_back(c->clone());
+
+        WorldObject *object = new WorldObject(newComponents, "test", this);
+
+        object->setName(name);
+        object->setType(type);
+        simulator->addObjectToTools(object);
+    }
+    else;
 }
 
 void MainWindow::loadToolsButtonClick()

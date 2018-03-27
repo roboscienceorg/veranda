@@ -96,6 +96,8 @@ public:
     QString getName(){ return _objName.get().toString(); }
     QString getDefaultName() { return _defaultName; }
     QString getType(){ return _type; }
+    void setType(QString pType){ _type = pType; }
+    void setName(QString pName){ _objName.set(pName); }
 
     void translate(double x, double y);
     void rotate(double degrees);

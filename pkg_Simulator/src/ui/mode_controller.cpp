@@ -281,6 +281,7 @@ void Mode_Controller::nothingSelected()
             disconnect(iter.data(), 0, this, 0);
     }
     selectedProps.clear();
+    selected = -1;
 
     nothingIsSelected();
 }
