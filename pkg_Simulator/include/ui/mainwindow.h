@@ -114,7 +114,8 @@ private slots:
     void loadSimButtonClick();
     void joystickButtonClick();
     void saveSimButtonClick();
-    void restartSimButtonClick();
+    void quickSaveButtonClick();
+    void quickLoadButtonClick();
 
     //Designer mode button signals and slots
     void newObjectButtonClick();

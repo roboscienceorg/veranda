@@ -209,18 +209,21 @@ void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
     {       
         toolTabs[properties->getType()] = new QListWidget();
         tabs->addTab(toolTabs[properties->getType()], properties->getType());
+        tabs->setMaximumWidth(200);
         toolTabs[properties->getType()]->setViewMode(QListWidget::IconMode);
         toolTabs[properties->getType()]->setResizeMode(QListWidget::Adjust);
         toolTabs[properties->getType()]->setMovement(QListView::Static);
-        toolTabs[properties->getType()]->setIconSize(QSize(160, 160));
         toolTabs[properties->getType()]->setAutoFillBackground( false );
+        toolTabs[properties->getType()]->setIconSize(QSize(150, 150));
+        //toolTabs[properties->getType()]->setMaximumWidth(160);
         //toolTabs[properties->getType()]->setStyleSheet("QListWidget::item { background-color: white; }");
         //toolTabs[properties->getType()]->setBackgroundRole(QPalette::);
     }
 
     //add new designer widget to a tab
     Designer_Widget* tile = new Designer_Widget(component, properties, makeWidget, toolTabs[properties->getType()]);
-    toolTabs[properties->getType()]->addItem(tile);
+    //toolTabs[properties->getType()]->setIconSize(tile->view->size()/5);
+    //toolTabs[properties->getType()]->addItem(tile);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -82,7 +82,8 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(ui->screenshotSimButton, SIGNAL (released()), this, SLOT (screenshotSimButtonClick()));
     connect(ui->joystickButton, SIGNAL (released()), this, SLOT (joystickButtonClick()));
     connect(ui->saveSimButton, SIGNAL (released()), this, SLOT (saveSimButtonClick()));
-    connect(ui->restartSimButton, SIGNAL (released()), this, SLOT (restartSimButtonClick()));
+    connect(ui->quickSaveButton, SIGNAL (released()), this, SLOT (quickSaveButtonClick()));
+    connect(ui->quickLoadButton, SIGNAL (released()), this, SLOT (quickLoadButtonClick()));
     connect(ui->newSimButton, SIGNAL (released()), this, SLOT (newSimButtonClick()));
 
     //Designer mode button signals and slots
@@ -135,7 +136,8 @@ void MainWindow::physicsStarted()
     ui->simulatorToolsMenu->setEnabled(false);
     ui->importMapButton->setEnabled(false);
     ui->newSimButton->setEnabled(false);
-    ui->restartSimButton->setEnabled(false);
+    ui->quickSaveButton->setEnabled(false);
+    ui->quickLoadButton->setEnabled(false);
 
     simulator->visual->setToolsEnabled(false);
 }
@@ -154,7 +156,8 @@ void MainWindow::physicsStopped()
     ui->simulatorToolsMenu->setEnabled(true);
     ui->importMapButton->setEnabled(true);
     ui->newSimButton->setEnabled(true);
-    ui->restartSimButton->setEnabled(true);
+    ui->quickSaveButton->setEnabled(true);
+    ui->quickLoadButton->setEnabled(true);
 
     simulator->visual->setToolsEnabled(true);
 }
@@ -446,7 +449,8 @@ void MainWindow::newSimButtonClick()
     //disable save (only save as)
 }
 
-void MainWindow::restartSimButtonClick(){}
+void MainWindow::quickSaveButtonClick(){}
+void MainWindow::quickLoadButtonClick(){}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

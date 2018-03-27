@@ -13,7 +13,8 @@
     <qresource prefix="/sim">
         <file alias="PlaySimIcon">images/PlayIcon.png</file>
         <file alias="StopSimIcon">images/StopIcon.png</file>
-        <file alias="RestartSimIcon">images/RestartIcon.png</file>
+        <file alias="QuickLoadIcon">images/QuickLoadIcon.png</file>
+        <file alias="QuickSaveIcon">images/QuickSaveIcon.png</file>
         <file alias="ImportMapIcon">images/ImportFileIcon.png</file>
         <file alias="JoystickIcon">images/JoystickIcon.png</file>
         <file alias="SaveFileIcon">images/SaveFileIcon.png</file>

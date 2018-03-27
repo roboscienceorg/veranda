@@ -13,7 +13,6 @@ Designer_Widget::Designer_Widget(WorldObjectComponent *object, WorldObjectProper
     view->setWorldBounds(-1.8, 1.8, -1.2, 1.2);
     view->objectAddedToScreen(properties->getModels(), 0);
 
-
     //setBackgroundColor(Qt::white);
     //view->setMinimumSize(QSize(100, 100));
     //view->setMaximumSize(QSize(150, 150));
@@ -24,4 +23,6 @@ Designer_Widget::Designer_Widget(WorldObjectComponent *object, WorldObjectProper
     view->render(&pixmap);
     setIcon(QIcon(pixmap));
     setSizeHint(QSize(164,164));
+    //QIcon icon = new QIcon()
+    //icon()->setScaledContents(true);
 }
