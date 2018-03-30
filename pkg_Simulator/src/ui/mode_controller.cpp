@@ -217,7 +217,10 @@ void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
     }
 
     //add new designer widget to a tab (initialized with parent, so will automatically add to view)
-    Designer_Widget* tile = new Designer_Widget(component, properties, makeWidget, toolTabs[properties->getType()]);
+    if(simulator)
+        Designer_Widget* tile = new Designer_Widget(component, properties, makeWidget, toolTabs[properties->getType()], true);
+    else
+        Designer_Widget* tile = new Designer_Widget(component, properties, makeWidget, toolTabs[properties->getType()]);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

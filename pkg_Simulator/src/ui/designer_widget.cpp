@@ -1,6 +1,6 @@
 #include "include/ui/designer_widget.h"
 
-Designer_Widget::Designer_Widget(WorldObjectComponent *object, WorldObjectProperties* object2, visualizerFactory factory, QListWidget *parent) :
+Designer_Widget::Designer_Widget(WorldObjectComponent *object, WorldObjectProperties* object2, visualizerFactory factory, QListWidget *parent, bool simulator) :
               QListWidgetItem(parent)
 {
     view = factory();
@@ -10,7 +10,12 @@ Designer_Widget::Designer_Widget(WorldObjectComponent *object, WorldObjectProper
     //set tooltip to be property info for key "name"
     setText(properties->getName());
 
-    view->setWorldBounds(-1.8, 1.8, -1.2, 1.2);
+    //set simulator view larger than designer view
+    if(simulator)
+        view->setWorldBounds(-3, 3, -2, 2);
+    else
+        view->setWorldBounds(-1.8, 1.8, -1.2, 1.2);
+
     view->objectAddedToScreen(properties->getModels(), 0);
 
     //set pixmap to size of view minus obnoxious black border of indetermined origin

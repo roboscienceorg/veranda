@@ -1,27 +1,25 @@
 <RCC>
     <qresource prefix="/modes">
-        <file alias="SimulatorIcon">images/SimulatorIcon.png</file>
-        <file alias="DesignerIcon">images/DesignerIcon.png</file>
-    </qresource>
-    <qresource prefix="/des">
-        <file alias="DeleteFileIcon">images/DeleteIcon.png</file>
-        <file alias="NewFileIcon">images/NewFileIcon.png</file>
-        <file alias="ExportFileIcon">images/ExportFileIcon.png</file>
-        <file alias="MoveLeftIcon">images/MoveLeftIcon.png</file>
-        <file alias="MoveRightIcon">images/MoveRightIcon.png</file>
+        <file alias="Simulator">images/SimulatorIcon.png</file>
+        <file alias="Designer">images/DesignerIcon.png</file>
     </qresource>
     <qresource prefix="/sim">
-        <file alias="PlaySimIcon">images/PlayIcon.png</file>
-        <file alias="StopSimIcon">images/StopIcon.png</file>
-        <file alias="QuickLoadIcon">images/QuickLoadIcon.png</file>
-        <file alias="QuickSaveIcon">images/QuickSaveIcon.png</file>
-        <file alias="ImportMapIcon">images/ImportFileIcon.png</file>
-        <file alias="JoystickIcon">images/JoystickIcon.png</file>
-        <file alias="SaveFileIcon">images/SaveFileIcon.png</file>
-        <file alias="SpeedOneSimIcon">images/SpeedOneIcon.png</file>
-        <file alias="SpeedTwoSimIcon">images/SpeedTwoIcon.png</file>
-        <file alias="SpeedThreeSimIcon">images/SpeedThreeIcon.png</file>
-        <file alias="SpeedHalfSimIcon">images/SpeedHalfIcon.png</file>
-        <file alias="ScreenshotSimIcon">images/ScreenshotIcon.png</file>
+        <file alias="Play">images/PlayIcon.png</file>
+        <file alias="Stop">images/StopIcon.png</file>
+        <file alias="QuickLoad">images/QuickLoadIcon.png</file>
+        <file alias="QuickSave">images/QuickSaveIcon.png</file>
+        <file alias="Joystick">images/JoystickIcon.png</file>
+        <file alias="SpeedOne">images/SpeedOneIcon.png</file>
+        <file alias="SpeedTwo">images/SpeedTwoIcon.png</file>
+        <file alias="SpeedThree">images/SpeedThreeIcon.png</file>
+        <file alias="SpeedHalf">images/SpeedHalfIcon.png</file>
+        <file alias="Screenshot">images/ScreenshotIcon.png</file>
+    </qresource>
+    <qresource prefix="/files">
+        <file alias="Load">images/LoadFileIcon.png</file>
+        <file alias="Save">images/SaveFileIcon.png</file>
+        <file alias="Export">images/ExportFileIcon.png</file>
+        <file alias="Add">images/NewFileIcon.png</file>
+        <file alias="Delete">images/DeleteFileIcon.png</file>
     </qresource>
 </RCC>

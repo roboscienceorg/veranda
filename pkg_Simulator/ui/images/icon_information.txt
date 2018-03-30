@@ -1,0 +1,29 @@
+All icons used in this project were taken from Everaldo Coelho's "Crystal Project Icons" (http://www.everaldo.com CONTACT: everaldo@everaldo.com) and are under the LGPL license (https://www.gnu.org/licenses/lgpl.html).
+
+
+Icon Name in Project		Link			
+	
+DesignerIcon.png		https://www.iconfinder.com/icons/17926/pen_icon#size=256
+SimulatorIcon.png		https://www.iconfinder.com/icons/17827/agt_softwared_icon#size=256
+
+JoystickIcon.png		https://www.iconfinder.com/icons/18286/computer_game_joystick_icon#size=256
+ScreenshotIcon.png		https://www.iconfinder.com/icons/18272/camera_unmount_icon#size=256
+
+PlayIcon.png			https://www.iconfinder.com/icons/18864/play_player_icon#size=256
+StopIcon.png			https://www.iconfinder.com/icons/18863/pause_player_icon#size=256
+
+NewFileIcon.png			https://www.iconfinder.com/icons/18625/add_icon#size=256
+DeleteFileIcon.png		https://www.iconfinder.com/icons/18572/button_cancel_cross_ko_icon#size=256
+SaveFileIcon.png		https://www.iconfinder.com/icons/18652/filesave_icon#size=256
+LoadFileIcon.png		https://www.iconfinder.com/icons/18153/netjaxer_icon#size=256
+
+QuickLoadIcon.png		https://www.iconfinder.com/icons/17918/galeon_icon#size=256
+QuickSaveIcon.png		https://www.iconfinder.com/icons/17921/apps_icon#size=256
+
+SpeedHalfIcon.png		https://www.iconfinder.com/icons/17812/access_icon#size=256
+SpeedOneIcon.png		https://www.iconfinder.com/icons/17875/cnr_icon#size=256
+SpeedTwoIcon.png		https://www.iconfinder.com/icons/18209/restart_icon#size=256
+SpeedThreeIcon.png		https://www.iconfinder.com/icons/17856/browser_icon#size=256
+
+
+

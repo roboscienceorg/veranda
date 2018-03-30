@@ -53,7 +53,7 @@
               </property>
               <property name="icon">
                <iconset resource="resources.qrc">
-                <normaloff>:/modes/SimulatorIcon</normaloff>:/modes/SimulatorIcon</iconset>
+                <normaloff>:/modes/Simulator</normaloff>:/modes/Simulator</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -73,7 +73,7 @@
               </property>
               <property name="icon">
                <iconset resource="resources.qrc">
-                <normaloff>:/modes/DesignerIcon</normaloff>:/modes/DesignerIcon</iconset>
+                <normaloff>:/modes/Designer</normaloff>:/modes/Designer</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -114,185 +114,197 @@
           </item>
           <item>
            <widget class="QWidget" name="simulatorMenuWidget" native="true">
-            <layout class="QHBoxLayout" name="simulationMenuLayout" stretch="0,0,0,0,0,0,0,0,0">
+            <layout class="QVBoxLayout" name="simulatorMenuWidgetLayout">
              <item>
-              <widget class="QToolButton" name="joystickButton">
-               <property name="toolTip">
-                <string>New Joystick</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/sim/JoystickIcon</normaloff>:/sim/JoystickIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
+              <widget class="QWidget" name="firstSimulatorMenuWidget" native="true">
+               <layout class="QHBoxLayout" name="simulationMenuLayout" stretch="0,0,0,0">
+                <item>
+                 <widget class="QToolButton" name="joystickButton">
+                  <property name="toolTip">
+                   <string>New Joystick</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/sim/Joystick</normaloff>:/sim/Joystick</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="screenshotSimButton">
+                  <property name="toolTip">
+                   <string>Take Screenshot</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/sim/Screenshot</normaloff>:/sim/Screenshot</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="speedSimButton">
+                  <property name="toolTip">
+                   <string>Speed x2</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/sim/SpeedOne</normaloff>:/sim/SpeedOne</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="playSimButton">
+                  <property name="toolTip">
+                   <string>Play Simulation</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/sim/Play</normaloff>:/sim/Play</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
              <item>
-              <widget class="QToolButton" name="saveSimButton">
-               <property name="toolTip">
-                <string>Save Simulation</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/sim/SaveFileIcon</normaloff>:/sim/SaveFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="screenshotSimButton">
-               <property name="toolTip">
-                <string>Take Screenshot</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/sim/ScreenshotSimIcon</normaloff>:/sim/ScreenshotSimIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="importMapButton">
-               <property name="toolTip">
-                <string>Import Map</string>
-               </property>
-               <property name="text">
-                <string>Import Map</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/sim/ImportMapIcon</normaloff>:/sim/ImportMapIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="newSimButton">
-               <property name="toolTip">
-                <string>New Object</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/des/NewFileIcon</normaloff>:/des/NewFileIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="quickSaveButton">
-               <property name="toolTip">
-                <string>Quick Save</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/sim/QuickSaveIcon</normaloff>:/sim/QuickSaveIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="quickLoadButton">
-               <property name="toolTip">
-                <string>Quick Load</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/sim/QuickLoadIcon</normaloff>:/sim/QuickLoadIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="speedSimButton">
-               <property name="toolTip">
-                <string>Speed x2</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/sim/SpeedOneSimIcon</normaloff>:/sim/SpeedOneSimIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="playSimButton">
-               <property name="toolTip">
-                <string>Play Simulation</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/sim/PlaySimIcon</normaloff>:/sim/PlaySimIcon</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
+              <widget class="QWidget" name="secondSimulatorMenuWidget" native="true">
+               <layout class="QHBoxLayout" name="simulationMenuLayout_2" stretch="0,0,0,0,0">
+                <item>
+                 <widget class="QToolButton" name="newSimButton">
+                  <property name="toolTip">
+                   <string>New Simulation</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/files/Add</normaloff>:/files/Add</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="saveSimButton">
+                  <property name="toolTip">
+                   <string>Save Simulation</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/files/Save</normaloff>:/files/Save</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="importMapButton">
+                  <property name="toolTip">
+                   <string>Load Map</string>
+                  </property>
+                  <property name="text">
+                   <string>Import Map</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/files/Load</normaloff>:/files/Load</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="quickSaveButton">
+                  <property name="toolTip">
+                   <string>Quick Save</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/sim/QuickSave</normaloff>:/sim/QuickSave</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="quickLoadButton">
+                  <property name="toolTip">
+                   <string>Quick Load</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="resources.qrc">
+                    <normaloff>:/sim/QuickLoad</normaloff>:/sim/QuickLoad</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
@@ -311,7 +323,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/des/NewFileIcon</normaloff>:/des/NewFileIcon</iconset>
+                 <normaloff>:/files/Add</normaloff>:/files/Add</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -331,7 +343,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/sim/SaveFileIcon</normaloff>:/sim/SaveFileIcon</iconset>
+                 <normaloff>:/files/Save</normaloff>:/files/Save</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -351,7 +363,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/sim/ImportMapIcon</normaloff>:/sim/ImportMapIcon</iconset>
+                 <normaloff>:/files/Load</normaloff>:/files/Load</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -373,7 +385,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>Active Objects</string>
+             <string>Objects</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -395,7 +407,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>Object Properties</string>
+             <string>Properties</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -534,7 +546,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>Simulator Build Tools</string>
+             <string>Simulator Tools</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -554,7 +566,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/des/NewFileIcon</normaloff>:/des/NewFileIcon</iconset>
+                 <normaloff>:/files/Add</normaloff>:/files/Add</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -574,7 +586,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/des/DeleteFileIcon</normaloff>:/des/DeleteFileIcon</iconset>
+                 <normaloff>:/files/Delete</normaloff>:/files/Delete</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -594,7 +606,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/sim/ImportMapIcon</normaloff>:/sim/ImportMapIcon</iconset>
+                 <normaloff>:/files/Load</normaloff>:/files/Load</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -614,7 +626,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/des/ExportFileIcon</normaloff>:/des/ExportFileIcon</iconset>
+                 <normaloff>:/files/Export</normaloff>:/files/Export</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -640,7 +652,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/des/NewFileIcon</normaloff>:/des/NewFileIcon</iconset>
+                 <normaloff>:/files/Add</normaloff>:/files/Add</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -660,7 +672,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/des/DeleteFileIcon</normaloff>:/des/DeleteFileIcon</iconset>
+                 <normaloff>:/files/Delete</normaloff>:/files/Delete</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -680,7 +692,7 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/sim/ImportMapIcon</normaloff>:/sim/ImportMapIcon</iconset>
+                 <normaloff>:/files/Load</normaloff>:/files/Load</iconset>
                </property>
                <property name="iconSize">
                 <size>

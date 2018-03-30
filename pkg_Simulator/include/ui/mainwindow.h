@@ -73,10 +73,10 @@ private:
 
     const QVector<QPair<double, QPair<QString, QString>>> SPEEDBUTTONS
     {
-        {1.0, {"Speed x1", ":/sim/SpeedOneSimIcon"}},
-        {2.0, {"Speed x2", ":/sim/SpeedTwoSimIcon"}},
-        {3.0, {"Speed x3", ":/sim/SpeedThreeSimIcon"}},
-        {0.5, {"Speed x1/2", ":/sim/SpeedHalfSimIcon"}}
+        {1.0, {"Speed x1", ":/sim/SpeedOne"}},
+        {2.0, {"Speed x2", ":/sim/SpeedTwo"}},
+        {3.0, {"Speed x3", ":/sim/SpeedThree"}},
+        {0.5, {"Speed x1/2", ":/sim/SpeedHalf"}}
     };
 
 public slots:

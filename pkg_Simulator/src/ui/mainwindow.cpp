@@ -60,6 +60,9 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     designer = new Mode_Controller(factory, ui->designerButton, ui->designerMenuWidget, ui->designerToolsMenu, ui->designerActiveWidget,
                                    ui->designerPropertiesTableView, ui->designerToolsList, this);
 
+    //make designer small to match small components
+    designer->visual->setWorldBounds(-5, 5, -5, 5);
+
     //Initialize designer/simulator start states
     simulator->simulator = true;
     ui->worldViewLayout->addWidget(simulator->visual);
@@ -104,6 +107,7 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(ui->exportObjectButton, SIGNAL (released()), this, SLOT (exportObjectButtonClick()));
     //connect(ui->loadToolsButton, SIGNAL (released()), this, SLOT (loadToolsButtonClick()));
 
+    //load all designer tools available
     loadToolsButtonClick();
 
     connect(this, SIGNAL (objectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)), simulator, SLOT (worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties*, object_id>>)));
@@ -126,7 +130,7 @@ void MainWindow::physicsStarted()
 {
     play = true;
     ui->playSimButton->setToolTip("Stop Simulation");
-    ui->playSimButton->setIcon(QIcon(":/sim/StopSimIcon"));
+    ui->playSimButton->setIcon(QIcon(":/sim/Stop"));
     ui->playSimButton->setIconSize(QSize(32,32));
 
     //disable options while simulation is running
@@ -146,7 +150,7 @@ void MainWindow::physicsStopped()
 {
     play = false;
     ui->playSimButton->setToolTip("Play Simulation");
-    ui->playSimButton->setIcon(QIcon(":/sim/PlaySimIcon"));
+    ui->playSimButton->setIcon(QIcon(":/sim/Play"));
     ui->playSimButton->setIconSize(QSize(32,32));
 
     //enable options while simulation is running
@@ -188,7 +192,7 @@ void MainWindow::simulatorButtonClick()
     simulator->open();
 
     ui->modeLabel->setText("Simulator");
-    ui->buildToolsLabel->setText("Simulation Build Tools");
+    ui->buildToolsLabel->setText("Simulator Tools");
 }
 
 void MainWindow::designerButtonClick()
@@ -197,7 +201,7 @@ void MainWindow::designerButtonClick()
     simulator->close();
 
     ui->modeLabel->setText("Designer");
-    ui->buildToolsLabel->setText("Designer Build Tools");
+    ui->buildToolsLabel->setText("Designer Tools");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
