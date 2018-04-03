@@ -112,5 +112,18 @@ install(
   DESTINATION ${INSTALLDIR}
 )
 
+if(BUILD_TESTING)
+    find_package(sdsmt_simulator_catch_tests REQUIRED)
+
+    ament_export_dependencies(
+        sdsmt_simulator_catch_tests
+    )
+
+    set(CATCH_CMAKE "${sdsmt_simulator_catch_tests_INCLUDE_DIRS}/Catch/ament_cmake_add_catch_test.cmake")
+    include(${CATCH_CMAKE})
+
+    ament_add_catch_test("dummy")
+endif()
+
 ament_package()
 
