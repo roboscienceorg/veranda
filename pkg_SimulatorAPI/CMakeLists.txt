@@ -122,7 +122,13 @@ if(BUILD_TESTING)
     set(CATCH_CMAKE "${sdsmt_simulator_catch_tests_INCLUDE_DIRS}/Catch/ament_cmake_add_catch_test.cmake")
     include(${CATCH_CMAKE})
 
-    ament_add_catch_test("dummy")
+    ament_add_catch_test(
+        "Example_Tests"
+        tests/exampletest.cpp
+        QT_HEADERS tests/exampleheader.h
+        QT_LIBS Core
+        ROS_LIBS "sdsmt_simulator_box2d"
+        )
 endif()
 
 ament_package()
