@@ -1,4 +1,5 @@
 build/
+Documentation/Design\ Docs/Latex\ Docs/Doxygen/
 bin/
 lib/
 msg_gen/
