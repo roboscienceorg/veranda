@@ -14,6 +14,7 @@
 
 
 \begin{document}
+\setcounter{tocdepth}{1}
 
 \frontmatter
 
@@ -27,7 +28,6 @@
 \addcontentsline{toc}{chapter}{List of Tables}
 \listofalgorithms
 \addcontentsline{toc}{chapter}{List of Algorithms}
-
 
 \chapter{Document Preparation and Updates}
 \input{preparation.tex}
@@ -53,7 +53,7 @@
 \input{prototypes.tex}  %% All tracks
 \input{deploy.tex}  %% Normally not research track
 \input{userdocs.tex} %% All tracks
-\input{results.tex}  %% Research track  only
+%\input{results.tex}  %% Research track  only
 
 \bibliographystyle{plain}
 \bibliography{designrefs.bib}
@@ -68,44 +68,44 @@
 \agreement
 
 \chapter{Software Agreement}
-\includepdf[pages={1-5}]{SoftwareContract.pdf}
+%\includepdf[pages={1-5}]{SoftwareContract.pdf}
 
 % In our style file, appendices are numbered with capital letters
 \appendix
 
-\chapter{Product Description}
-\input{productdescription.tex}
+%\chapter{Product Description}
+%\input{productdescription.tex}
 
 
-\input{refman.tex}  %% All tracks
+%\input{refman.tex}  %% All tracks
 
 
-\input{businessplan.tex}   %% Entrepreneur track only 
-\input{log.tex}   %% Research track  only
+%\input{businessplan.tex}   %% Entrepreneur track only 
+%\input{log.tex}   %% Research track  only
 
 
-\chapter{Publications}   %% Research track 
-\input{pubs.tex}
+%\chapter{Publications}   %% Research track 
+%\input{pubs.tex}
 
-\chapter{Acknowledgment}
-\label{SpecialThanks}  
-Thanks  
+%\chapter{Acknowledgment}
+%\label{SpecialThanks}  
+%Thanks  
 
-\chapter{Supporting Materials}
-\input{supporting.tex}
+%\chapter{Supporting Materials}
+%\input{supporting.tex}
 
 % chapters in backmatter don't have numbers, but they appear in the
 % table of contents, and are numbered BM-X where X is the page number
 % relative to where the backmatter begins.
-\backmatter
+%\backmatter
 
 %% Example
 %\chapter{Course Syllabus}
 %\includepdf[pages={1-17}]{syllabus.pdf}
 
 %%% Remove after reading
-\chapter{\LaTeX\ Example}
-\input{latexexample.tex}
+%\chapter{\LaTeX\ Example}
+%\input{latexexample.tex}
 
 
 

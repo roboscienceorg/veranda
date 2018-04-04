@@ -3,42 +3,404 @@
 
 \chapter{Sprint Results and Prototypes}
 
-This chapter is for recording the results of each sprint and documenting the evolving product.    It is a historical record of what you accomplished in 464/465.   This should be organized according to Sprints.  It should have the basic description of the sprint deliverable and what was accomplished.  Screen shots, photos, captures from video, etc should be used.   Expect this to be a long chapter.    
+This chapter discusses the results of each sprint and documents the evolving product. It covers the decisions and progress made in our 2D Robot Simulator during the first semester of our Senior Design class and is organized by Sprints, ranging from the zeroth sprint to the sixth.    
+
+\section{Sprint 0 Report}
+All work before Sept. 21st
+\subsection{Sprint Backlog}
+
+The backlog for the zeroth sprint consisted of choosing a physics engine, setting up all team members with Ubuntu version 16.04 and ROS, and examining the STDR 2D Robot Simulator for possible use. In sprint zero, we also decided to use Git and Trello for repositories and user stories.
+
+\begin{itemize}
+	\item Set up team members in Ubuntu environment
+	\item Decide whether or not to use STDR simualtor
+	\item Determine development tools 
+\end{itemize}
+
+\subsection{Deliverable}
+
+The client initially requested that we alter the functionality of the existing 2D Robot Simulator called STDR. During sprint zero, however, the team established that it would be more effective to move toward the client's change requests by starting a new software entirely. The STDR was used for reference and to assist in setting up our architecture such that it would be more versatile and allow for future plug-ins.
+
+\begin{itemize}
+	\item Team research (MVP)
+	\begin{itemize}
+		\item Decision to start project from scratch rather than alter STDR simualtor
+		\item Box2D as physics engine
+		\item QT Creator as IDE
+	\end{itemize}
+	\item Environment setup
+	\begin{itemize}
+		\item Ubuntu v 16.04 
+		\item ROS kinetic
+	\end{itemize}
+\end{itemize}
+
+\subsection{Results of testing}
+
+In this sprint, the team decided to use QT Creator as a development environment and Box2D as a physics engine, which we decided had enough options to get what our product needed without going overboard on physics capabilities we would never need to implement. The work load was partitioned into four parts, one for each team member, as the GUI, the world view, the physics, and the backend. The STDR was used for reference only, and team members moved forward with learning to use the tools for their partitioned sections of work.
+
+\subsection{Successes and Failures}
+
+Sprint zero was successful because by the end of it the team was structured, the work divided, and the environments set up such that code could be written in the preceeding sprint.
+
+\subsection{Modifications Required}
+
+As this was the first sprint, there were no modifications from previous sprint work or decisions. However, we veered from the initial client request to alter the STDR simulator, as we decided to start a new software from scratch which would implement the use of a physics engine and support future plug-ins.
+
+\subsection{Sprint Review}
+
+Sprint zero was a success in that we established Ubuntu 16.04 as an environment for our development, all team members installed necessary softwares like Qt Creator and ROS, and we met with the client to discuss software requirements.
+
+\subsection{Sprint Retrospective}
+
+In retrospect, the team felt very good about progress made during this sprint. We had planned to do research during the sprint, (on the STDR, architecture, IDE, physics engine, and world view widget), and by the end of the sprint we had enough user stories and information to start writing code. Therefore we exceeded our sprint zero goals and promptly set the product in motion.
+
 
 \section{Sprint 1 Report}
+Sept. 21st - Oct. 5th
 \subsection{Sprint Backlog}
+
+The goals for this sprint included establishing a backlog. Some examples of user stories are supporting multiple robot shapes, being able to build robots from the program, and considering physics options like sticky wheels and moving map objects. These early user stories drove the creation of wireframes in this sprint, and ultimately the choices of the architecture design and tools used.
+
+\begin{itemize}
+	\item Create backlog of user stories
+	\item Create UI wireframes
+	\item Begin structuring architectural layers
+\end{itemize}
+
 \subsection{Deliverable}
+
+At our first couple of client meetings, we discussed uses and overview of the product and delivered wireframes for a product GUI as well as a world view QT widget using Qt Graphics Framework. We also had a physics demonstration which printed out vector coordinates of two objects colliding using Box2D, and one team member determined how to use Catkin to build a Qt Widgets project. It was also during this sprint that we created our software contract. The deliverables were those wireframes, examples,the contract, and a Trello backlog of user stories.
+
+\begin{itemize}
+	\item Team research applications (MVP)
+	\begin{itemize}
+		\item Clickable UI
+		\item Physics simulation example
+		\item Catkin build functionality
+	\end{itemize}
+	\item Tools and documentation
+	\begin{itemize}
+		\item First draft of software contract
+		\item Trello backlog of user stories
+	\end{itemize}
+\end{itemize}
+
 \subsection{Results of testing}
+
+Testing in this sprint was indepenedent among team members: the physics member tested uses and limits of Box2D, the UI member created a clickable UI, the world view member created a QT widget, and the backend member utilized Catkin to develop an easy way to run the project. The client accepted our software contract and approved both the cliackable UI and user stories.
+
 \subsection{Successes and Failures}
-\subsection{Modifications required (product backlog, design, requirements, etc)}
+
+We met the sprint one goals by the end of our two-week sprint. We established a backlog of user stories on Trello and all team members created GUI wireframes which were later used to make an initial clickable GUI and ultimately an MVP in sprint four. By the end of the sprint, the work was partitioned and the beginnings of a layered software architecture had been established.
+
+\subsection{Modifications Required}
+
+There was little modification from the zeroth sprint to the first, except to clear up misunderstandings about specific uses of the software. For example, it was unclear during the previous sprint whether a running simulation should pause when prompted, or reset entirely. We reached the conclusion that Qt Graphics Framework should be used for the world view widget, rather than the OpenGL widget we originally planned for. The main uses remained the same.
+
 \subsection{Sprint Review}
+
+Sprint one was a success in that we had a compilable project by the end of it. The four wireframes produced during the sprint were discussed with the client and we decided to take a single-window approach rather than a multi-window approach. This approach was intended to make the simulator feel like a game design engine, which was deemed desirable because the main users of the application would likely be familiar with game design applications. We established a backlog based on requests given in client meetings and all team members wrote code which applied to their section of work and would ultimately become part of the MVP.
+
 \subsection{Sprint Retrospective}
-\subsection{Sprint Analytics} 
-Place your burndown charts, team velocity information, etc here if they are not discussed above.
+
+In retrospect, the team felt okay about progress made during this sprint. We had planned to have a solid round of deliverables, which we did. We established a first draft of an architecture for the software and completed our software contract without issues. The team felt that the product was moving more slowly than planned, but that that would change once an MVP was produced. We may have lacked a little in communication due to the work being clearly divided, but bi-weekly team meetings held the project's best interests together.
 
 
 \section{Sprint 2 Report}
+Oct. 5th - Oct. 19
 \subsection{Sprint Backlog}
+
+The backlog for sprint two was to create a minimum viable product. This goal involved finishing interfaces, integrating the world view into the UI, and spawning a robot in the world view. The product was to be written in QT Creator such as to include a tab-like design with a simulator, a robot designer, and a map designer. The spawned robot necessary for the MVP was to be run via a python script to loop in a figure-8.
+
+\begin{itemize}
+	\item Create MVP
+	\item Create interfaces for partition communication
+\end{itemize}
+
 \subsection{Deliverable}
+
+Our major deliverable for this sprint was the MVP, which we showed to the client in a demo where we ran the single spawned robot on the figure-8 python script. To accomplish this, we had some minor deliverables like finishing interfaces for the UI and physics engine, and integrating the world view with the UI menus. The robot spawned in the middle of the world view and its velocity could be directly controlled with the python script.
+
+\begin{itemize}
+	\item Minimum Viable Product (MVP)
+	\begin{itemize}
+		\item Spawn single robot in center of world view
+		\item Robot moves via python figure-8 script
+		\item Finish interfaces for physics engine
+		\item Finish interfaces for UI
+		\item Integrate world view widget with UI
+	\end{itemize}
+\end{itemize}
+
 \subsection{Results of testing}
+
+Testing for this sprint was "as viewed" by the team members. The UI designer tested clickability of buttons and display of neccessary menus. The physics member tested a numerical output of two objects colliding. The backend member tested the MVP with the figure-8 python script and spawning of a single robot. During this sprint, we established that our product would, for the most part, have to be tested by users. Much of the code would not be able to be unit tested due to it being UI code or having infinite input parameter options.
+
 \subsection{Successes and Failures}
-\subsection{Modifications required (product backlog, design, requirements, etc)}
+
+In this sprint we succeeded in producing an MVP. We  established interfaces which would later be used to communicate via slots and signals between the UI, the world view, and the physics simulator. The single robot which spawned in the center of the world view could only spawn in the center and was hard-coded to spawn once. 
+
+\subsection{Modifications Required}
+
+There were no modifications from the first sprint to the second because the team was focused on producing an MVP. The client was pleased with said MVP, and no requests for change were made.
+
 \subsection{Sprint Review}
+
+Sprint two was a success in that we produced an MVP able to simulate a single robot on the clickable UI. Though it was hard-coded and our list of deliverables was small, this paved the way for future development. The client was very pleased with our progress and pushed to move toward sprint three goals of robot rotational capabilities and the option to spawn robots in locations other than the center of the world view.
+
 \subsection{Sprint Retrospective}
-\subsection{Sprint Analytics} 
-Place your burndown charts, team velocity information, etc here if they are not discussed above.
+
+In retrospect, the team felt substantial progress was made during this sprint. We produced an MVP and had the interfaces necessary to begin setting up communication between the UI, world view, backend, and physics simulator.
 
 
 \section{Sprint 3 Report}
+Oct. 19th - Nov. 2nd
 \subsection{Sprint Backlog}
+
+The backlog for this sprint involved enhancing the MVP and creating our first client presentation. The MVP allowed for the spawning of a single robot in the center of the world view, so a goal in this sprint was to spawn multiple robots at random orientations and in random locations across the map. We also wanted to be able to display properties for these robots, and select and change the properties displayed.
+
+\begin{itemize}
+	\item Allow for robots spawning at non-center of map
+	\item Allow for robots to rotate while moving
+	\item Be able to display and change robot properties
+	\item Find a way to pass shapes around threads
+\end{itemize}
+
 \subsection{Deliverable}
+
+The deliverable for this sprint was a prototype consisting of three robots which spawned at random locations in various orientations and moved in giant figure-8's across the world view. This was paired with the addition of viewing robot properties for one of the robots. The spawned robots were hard-coded. The progress was shown as a demo in a client meeting.
+
+\begin{itemize}
+	\item Demo of new features
+	\begin{itemize}
+		\item Multiple robots spawning randomly on map with random orientation
+		\item Robots using differential drive kinematics
+		\item Python script to drive differential drive robots in figure 8
+		\item Being able to see and modify properties of robot (velocity, differential drive parameters...)
+	\end{itemize}
+\end{itemize}
+
 \subsection{Results of testing}
+During this sprint, we made a major architectural decision based on experimentation with integrating Box2D and threads. It was determined that continuing the multi-threaded architecture would be difficult and result in many future bugs. 
+
+\begin{itemize}
+	\item Decision was made to abandon multi-threaded design.
+	\begin{itemize}
+		\item Box2D does not play nicely with multiple threads
+		\item It is ok if the simulation lags due to all computation in one thread because eventually timestamps will be published and control code will use that rather than its own internal clock
+	\end{itemize}
+\end{itemize}
+
 \subsection{Successes and Failures}
-\subsection{Modifications required (product backlog, design, requirements, etc)}
+
+In this sprint we succeeded in improving the MVP. We were able to show the client a product where three robots spawned in random locations with random orientations and moved about the world view, sometimes collided. We failed to implement a goal of making those robots selectable such that a specific robot's properties could be set.
+
+\subsection{Modifications Required}
+
+There was an architectural modification in this sprint: the switch from multi-threading to a single thread. This was known to have the potential for a slower program but we justified it with ease of code and lack of bugs. We expected the lag would be a minor issue.
+
 \subsection{Sprint Review}
+Our first team presentation was successful. The client was happy with the prototypes of our MVP and improved MVP. The team felt that good progress was made and despite the delay of switching from multi-threading to a single thread, we were able to get back on track and ready for sprint four.
+
 \subsection{Sprint Retrospective}
-\subsection{Sprint Analytics} 
-Place your burndown charts, team velocity information, etc here if they are not discussed above.
+In retrospect, there was no way to know without applying the project that the original multi-threaded approach wasn't going to work out. Luckily we came to this conclusion in sprint three with plenty of time to correct the architecture. Everything else in this sprint went smoothly, team coding sessions emerged as a form of integrating project partitions and proved successful.
 
-\vdots
+\section{Sprint 4 Report}
+Nov. 2nd - Nov. 16th
+\subsection{Sprint Backlog}
 
+The backlog for this sprint included allowing selection of robots from the world view and a side menu in the UI, implementing LIDAR and touch sensor plugins, loading of obstacle (map) files, and a prototype joystick for the UI. We also had to decide on a direction for the physics aspect of the project because the MVP involved a hard-coded robot a with specific design and we were ready to start looking at alternate robot possibilities.
+
+\begin{itemize}
+	\item Decide between kinematics and full-simulation physics
+	\item Allow selection of robot from main view and UI menu
+	\item Prototype joystick UI
+	\item LIDAR plugin
+	\item Touch sensor plugin
+	\item Load obstacle files
+\end{itemize}
+
+\subsection{Deliverable}
+
+In sprint four, we delivered the ability to select a robot from a menu in the UI and load obstacle files. The touch sensor implementation plus an obstacle file of four squares emulating a "room" assisted in confirming the correct response from collisions. We presented the physics decision to move away from the hard-coded differential drive and the client informed us of some possible changes.
+
+\begin{itemize}
+	\item Demo of new features
+	\begin{itemize}
+		\item Physics decision
+		\item Ability to select a robot from a UI menu
+		\item Ability to load obstacle files
+		\item Confirmed collisions
+		\item Touch sensor implementation
+	\end{itemize}
+\end{itemize}
+
+\subsection{Results of testing}
+
+In this sprint, we decided to change a few things in the project in order to reach an outcome as versatile as possible. After implementing the differential drive with collisions, we decided to rip, root, and reboot the physics aspect of the project. Loading the obstacle files required use of some of the interfaces created in sprint one.
+
+\subsection{Successes and Failures}
+
+Touch sensors and obstacles took longer than expected to implement and required major changes in object interfaces. As a result, the ability to select a robot by clicking its image was delayed and the LIDAR plugin was not written. The joystick prototype was not completed. The client also mentioned ROS 2 as a possible target in developing this project.
+
+\subsection{Modifications Required}
+
+While the touch sensor plugin was being written, it was discovered that Box2D can be leveraged to model a top-down vehicle. As a result, it was decided that this method of modeling robots should be used instead of kinematic modeling. The original robots spawned in the sprint two and three demos used a kinematic differential drive. The client warned us to watch out for possible changes from ROS to ROS 2 and we also discussed changing the foundation of differentiating between map objects and robots. We decided the product would be more useful if robots and map objects were created and treated the same way. Thus, we set out to redo the UI such that "Simulation Mode" would become a "Simulator" while "Map Mode" and "Robot Mode" would merge to become a single "Designer". This would allow for the creation of non-static map objects such as moving doors and doors with sensors. Overall, this would make the software more versatile.
+
+\subsection{Sprint Review}
+
+The client was again pleased with progress made. Our next target features were identified as implementing obstacles and some sort of sensor equipment so that the application could potentially be used in a class project. This along with revamping the UI, fixing the hard-coded kinematic physics, and implementing the Designer for world view objects led the direction we took moving into sprint five.
+
+\subsection{Sprint Retrospective}
+
+In retrospect, sprint four was pivotal as a post-MVP turning point for the product. We had enough code written to determine what was working and what was not, and made decisions that would ultimately push the product to be as versatile as possible.
+
+
+\section{Sprint 5 Report}
+Nov. 16th - Nov. 30th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included no programming. It was a sprint of documentation, client presentation number two, a discussion on ethics, and team evaluations.
+
+\begin{itemize}
+	\item Documentation
+	\begin{itemize}
+		\item Overview
+		\item Project Plan
+		\item Requirements
+		\item Design
+		\item Test Plan
+		\item Prototypes
+		\item Software Contract	
+	\end{itemize}
+	\item Presentation
+	\item Ethics Quiz
+	\item Team Evaluations
+\end{itemize}
+
+\subsection{Deliverable}
+
+In sprint five, we focused on documentation catch-up. We wrote most of this document during sprint five, as well as our second client presentation, our team evaluations, and completeing a quiz on ethics in computer science.
+
+\begin{itemize}
+	\item Client presentation showcasing:
+	\begin{itemize}
+		\item Changes since STDR
+		\item New GUI
+		\item Physics decisions
+		\item Future sensor implementation plans
+	\end{itemize}
+	\item Team evaluations
+	\item Senior Design Final Documentation
+	\item Ethics discussion
+\end{itemize}
+
+\subsection{Results of testing}
+
+Our presentation was well-recieved by the audience and client alike. We decided to split up the documentation as much as possible such that the team members each wrote about sections of code they had written or architectural decisions they had made. We decided to include a side by side comparison in our presentation of our software against the STDR. This video was more effective to show differences than a dotted list would have been.
+
+\subsection{Successes and Failures}
+
+Our presentation was a success. The audience understood the project and we had ample imagery to show the changes we had made. We succeeded in submitting our team evaluations on time and bonded over a long discussion about the ACM code of ethics. We procrastinated a bit on the documentation but in the end, it got completed. 
+
+\subsection{Modifications Required}
+
+There were no major changes made during this sprint, except to shift the team's focus from coding to documentation. We had a lot of changes to make to the documentation, as we previously hadn't had all the information necessary to fill out several sections.
+
+\subsection{Sprint Review}
+
+The team felt that this sprint was successful despite writing no code and looking at the software itself very little. It was used mostly for reference to complete the documentation. We were able to complete all backlog items for this sprint and set up team members' tasks for the winter break.
+
+\subsection{Sprint Retrospective}
+
+In retrospect, sprint five was necessary and felt rushed. Writing documentation is, of course, less enjoyable than writing a 2D robot simulator and therefore we lacked some of the passion we had as a team for the previous five sprints (0-4). The ethics discussion really helped to give us all a sense of each other's priorities when it comes to developing software. Even though our software does not posess much controversy when it comes to ethics, understanding each other as individuals assisted in building a strong team connection.
+
+
+\section{Sprint 6 Report}
+Nov. 30th - Jan. 11th
+\subsection{Sprint Backlog}
+
+The entire Christmas break was designated to this sprint. The backlog for this sprint included fnishing the prototype joystick for the UI, adding Doxygen to the code, implementing image loading for the map, redoing the physics, loading and saving objects, LIDAR and possibly other sensors, time warping the simulation, and more documentation.
+
+\begin{itemize}
+	\item Joystick Prototype
+	\item Doxygen	
+	\item Image Loading
+	\item New Physics
+	\item Object load/save
+	\item LIDAR
+	\item Maybe other easy sensors
+	\item Time Warp
+	\item Full Spring Semester Plan Draft
+\end{itemize}
+
+\subsection{Deliverable}
+
+Deliverables will be viewed and discussed after the break.
+
+\subsection{Results of testing}
+
+
+\subsection{Successes and Failures}
+
+
+\subsection{Modifications Required}
+
+
+\subsection{Sprint Review}
+
+
+\subsection{Sprint Retrospective}
+
+ 
+\section{Prototypes}
+
+\subsection{STDR Simulator}
+
+The STDR was the original 2D robot simulator the client was using in robotics classes. The team was asked to modify it as our senior design project, but after careful deliberation we decided it would be more effective to start a new project. Visible in the figure below is a simulation of two robots implementing many sensors to navigate a maze.
+
+\begin{figure}[!htb]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{./Images/Sprint0_STDR}
+\end{center}
+\caption{The original STDR 2D robot simulator, which the client initially wanted the team to modify.  \label{stdr}}
+\end{figure}
+
+\subsection{Clickable UI}
+
+The clickable UI prototype consisted of buttons and slots partitioned into three sections: Simulation Mode, Map Mode, and Robot Mode. The intention during production of this prototype was to emulate a video game designer and produce a visual deliverable for the client. A blank black widget is visible where the world view is supposed to be, as this prototype did not have the world view integrated into the UI.\newline\newline\newline
+\newline\newline\newline
+\newline\newline\newline
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_SimulationMode}
+\end{center}
+\caption{The clickable UI with Simulation Mode, currently set in Simulation Mode.  \label{clickableuisimulation}}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_MapMode}
+\end{center}
+\caption{The clickable UI, currently set in Map Mode. \label{clickableuimap}}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_NoMenus}
+\end{center}
+\caption{The clickable UI with side menus "minimized", a design decision based on the possible need to view robots moving on a larger map more easily. \label{clickableuinomenus}}
+\end{figure}
+
+\subsection{Modified MVP}
+
+The original MVP consisted of a single robot spawning in the center of the world view and moving in a figure-8 with no obstacles to collide with. Here is the modified MVP from sprint four, in which three robots get spawned randomly throughout the world view. Also pictured is the "room" made up of four map objects which are static squares loaded from an obstacle file. Properties for one of the robots are listed on the menu to the left.
+
+\begin{figure}[!htb]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{./Images/Sprint3_hasBox_originalUI}
+\end{center}
+\caption{The MVP of our product, with a loaded map of four squares and three differential drive robots spawned at random locations in various orientations in the world view. \label{mvp}}
+\end{figure}
