@@ -10,7 +10,7 @@ import sys
 
 R = 0.75
 L = 1.5
-SPEED = 5
+SPEED = 10
 
 # Publishes a set of wheel velocities
 # in the format required by the STDR
@@ -66,7 +66,7 @@ def main():
         publishWheelVelocity(publeft, pubright, phi1, phi2)
         publishWheelSteer(pubsteer, phi3)
 
-    node.create_subscription(Joy, channel, joystick_callback)
+    node.create_subscription(Joy, channelin, joystick_callback)
 
     rclpy.spin(node)
     node.destroy_node()

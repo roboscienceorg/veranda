@@ -59,7 +59,7 @@ def main():
     publeft = node.create_publisher(Float32, 'robot0/left_wheel')
     pubright = node.create_publisher(Float32, 'robot0/right_wheel')
 
-    simTime = SimTimer(True, "sdsmt_simulator/timestamp", node)
+    simTime = SimTimer(False, "sdsmt_simulator/timestamp", node)
     
     # Factor to scale down speed by
     speedScale = 2

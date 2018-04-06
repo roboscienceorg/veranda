@@ -57,7 +57,7 @@ def main():
 
         publishWheelVelocity(publeft, pubright, phi1, phi2)
 
-    node.create_subscription(Joy, channel, joystick_callback)
+    node.create_subscription(Joy, channelin, joystick_callback)
 
     rclpy.spin(node)
     node.destroy_node()
