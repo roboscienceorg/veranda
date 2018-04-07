@@ -90,10 +90,23 @@ WorldObjectComponent* WorldObjectComponent::clone(QObject* newParent)
     return out;
 }
 
-//Register bodies so that they will be handled
-//during transforms to other object local space
-//Adding representations to a body means that they will be updated
-//to have the same location as the body each tick
+/*!
+ * The position of an added body is assumed to be its location relative to the
+ * WorldObjectComponent origin.
+ *
+ * When a body is added, it will be moved in world-space
+ * so that it is in the correct location relative to the component origin.
+ * Any time the component moves, all bodies registered will be moved to maintain their
+ * constraint.
+ *
+ * Models can also be added and tied to a body. Tying a model to a body will keep its
+ * global location the same as the body's. It is not required that models tied to
+ * a body be registered with registerModel()
+ *
+ * One body can be registered as the Main Body of the component. During the simulation,
+ * the location of the main body will be used to update the position of the component.
+ * If multiple main bodies are added, only the last one will be used as the main body
+ */
 void WorldObjectComponent::registerBody(b2Body* bod, const QVector<Model*>& reprentations, bool isMainBody)
 {
     _bodies[bod] = reprentations;
@@ -118,6 +131,17 @@ void WorldObjectComponent::registerBody(b2Body* bod, const QVector<Model*>& repr
     //qDebug() << _bodies.keys();
 }
 
+/*!
+ * If the body removed is the main body, then there will no longer
+ * be a main body and the position of the component will not update
+ * when the simulation runs. This may lead to strange behavior; so only
+ * remove the main body if you plan to put in a new one or the component
+ * is being removed from simulation
+ *
+ * If the body had models tied to it, those constraints will be
+ * broken as well, and the models will no longer auto-update to the
+ * body's location
+ */
 void WorldObjectComponent::unregisterBody(b2Body* bod)
 {
     _bodies.remove(bod);
@@ -130,8 +154,27 @@ void WorldObjectComponent::unregisterBody(b2Body* bod)
     //qDebug() << _bodies.keys();
 }
 
-//Register models so they will be handled during
-//transforms
+/*!
+ * The position of an added model is assumed to be its location relative to the
+ * WorldObjectComponent origin.
+ *
+ * When a body is model, it will be moved in world-space
+ * so that it is in the correct location relative to the component origin.
+ * Any time the component moves, all bodies registered will be moved to maintain their
+ * constraint.
+ *
+ * Models are only moved directly if no bodies are registered with the component.
+ * In this case, all models are moved together to keep their relative constraints.
+ * As soon as any bodies are registered in the model, this behavior ceases, and
+ * models will only move if they are tied to a registered body
+ *
+ * IMPORTANT!
+ *
+ * All top-level models should be constructed and regiestered during construction of
+ * the component. Models registered after construction are not guaranteed
+ * to be drawn; however, models may be added/removed as children of registered
+ * models at any time
+ */
 void WorldObjectComponent::registerModel(Model* mod)
 {
     _models.removeAll(mod);

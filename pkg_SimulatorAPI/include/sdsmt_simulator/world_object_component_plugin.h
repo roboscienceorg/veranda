@@ -1,17 +1,26 @@
-#ifndef WORLD_OBJECT_COMPONENT_PLUGIN_H
-#define WORLD_OBJECT_COMPONENT_PLUGIN_H
+//! \file
+#pragma once
 
 #include "world_object_component.h"
 #include "dllapi.h"
 
+/*!
+ * \brief Plugin interface for plugins that provide new components
+ * Almost all component types available in the application are provided
+ * through plugins loaded at runtime; this is the plugin interface that
+ * plugins should use to indicate that they provide a component
+ */
 class WorldObjectComponent_Plugin_If
 {
 public:
+    //! Virtual destructor
     virtual ~WorldObjectComponent_Plugin_If(){}
 
+    /*!
+     * \brief Creates a new instance of the component this plugin adds
+     * \return A new instance of the plugin's component
+     */
     virtual WorldObjectComponent* createComponent() = 0;
 };
 
 Q_DECLARE_INTERFACE(WorldObjectComponent_Plugin_If, "org.sdsmt.sim.2d.worldObjectComponent")
-
-#endif
