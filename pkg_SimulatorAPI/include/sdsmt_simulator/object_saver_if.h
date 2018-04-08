@@ -36,8 +36,8 @@ public:
 
     /*!
      * \brief Saves a worldObject into a file
-     * \param filePath The path to the file to save into
-     * \param object The WorldObject to save
+     * \param[in] filePath The path to the file to save into
+     * \param[in] object The WorldObject to save
      */
     virtual void saveFile(QString filePath, WorldObject* object) = 0;
 
@@ -68,8 +68,8 @@ public:
 
     /*!
      * \brief Saves a group of worldObjects into a file
-     * \param filePath The path to the file to save into
-     * \param objects The WorldObjects to save
+     * \param[in] filePath The path to the file to save into
+     * \param[in] objects The WorldObjects to save
      */
     virtual void saveFile(QString filePath, QVector<WorldObject*> objects) = 0;
 };

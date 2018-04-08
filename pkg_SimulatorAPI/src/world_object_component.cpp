@@ -1,3 +1,5 @@
+//! \file
+
 #include <QObject>
 #include <QString>
 #include <QMap>
@@ -10,6 +12,12 @@
 #include "sdsmt_simulator/property.h"
 #include "sdsmt_simulator/world_object_component.h"
 
+/*!
+ * \brief Creates a QTransform from a point and angle
+ * \param[in] pos Translation of the transform
+ * \param[in] rad Angle of the transform (radians)
+ * \return The translation and rotation combined into a transform matrix
+ */
 QTransform transform(const b2Vec2& pos, const double& rad)
 {
     double sina = sin(rad);
@@ -18,11 +26,21 @@ QTransform transform(const b2Vec2& pos, const double& rad)
     return QTransform(cosa, sina, -sina, cosa, pos.x, pos.y);
 }
 
+/*!
+ * \brief Retrieves the angle of rotation from a Transformation matrix
+ * \param[in] t The transform matrix
+ * \return The rotation represented in the transform in radians
+ */
 double radians(const QTransform& t)
 {
     return atan2(t.m12(), t.m22());
 }
 
+/*!
+ * \brief Creates a transformation matrix representing the location of b2Body
+ * \param[in] b The body to get a transformation from
+ * \return The body's location as a transformation matrix
+ */
 QTransform bodyTransform(const b2Body* b)
 {
     return transform(b->GetPosition(), b->GetAngle());

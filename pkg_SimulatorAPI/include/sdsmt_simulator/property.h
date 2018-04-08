@@ -60,8 +60,13 @@ class SDSMT_SIMULATOR_API Property : public QObject
 
     friend class PropertyView;
 
+    //! Metadata for the Property
     PropertyInfo _info;
+
+    //! Validation function
     std::function<QVariant(QVariant, QVariant)> _validate;
+
+    //! Current Property value
     QVariant _value;
 
 public:
@@ -70,8 +75,8 @@ public:
      * The validator rejects any non-numeric values. Values within EPSILON (see const.h)
      * of 0 are rounded to 0.
      *
-     * \param _old The old value stored
-     * \param _new The new value requested
+     * \param[in] _old The old value stored
+     * \param[in] _new The new value requested
      * \return The value that should be stored
      */
     static QVariant double_validator(QVariant _old, QVariant _new)
@@ -87,8 +92,8 @@ public:
      * \brief Validator to check that the stored value is an integer
      * The validator rejects any non-integer values.
      *
-     * \param _old The old value stored
-     * \param _new The new value requested
+     * \param[in] _old The old value stored
+     * \param[in] _new The new value requested
      * \return The value that should be stored
      */
     static QVariant int_validator(QVariant _old, QVariant _new)
@@ -106,8 +111,8 @@ public:
      * are treated as true. All empty strings, numeric 0's and the strings "0", "false", and "no"
      * are treated as false. String compares are case-insensitive.
      *
-     * \param _old The old value stored
-     * \param _new The new value requested
+     * \param[in] _old The old value stored
+     * \param[in] _new The new value requested
      * \return The value that should be stored
      */
     static QVariant bool_validator(const QVariant& _old, const QVariant& _new)
@@ -125,8 +130,8 @@ public:
      * The validator rejects any non-numeric values. Values within EPSILON (see const.h)
      * of 0 are rounded to 0. Any negative values are converted to their absolute valuess.
      *
-     * \param _old The old value stored
-     * \param _new The new value requested
+     * \param[in] _old The old value stored
+     * \param[in] _new The new value requested
      * \return The value that should be stored
      */
     static QVariant abs_double_validator(const QVariant& _old, const QVariant& _new)
@@ -137,8 +142,8 @@ public:
     /*!
      * \brief Validator to check that the stored value is an angle
      *  The validator requires that angle values be numeric between 0 and 360 inclusive.
-     * \param _old The old value stored
-     * \param _new The new value requested
+     * \param[in] _old The old value stored
+     * \param[in] _new The new value requested
      * \return The value that should be stored
      */
     static QVariant angle_validator(const QVariant& _old, const QVariant& _new)
@@ -153,10 +158,10 @@ public:
     /*! \brief Constructs a new property with metadata, a default value, and a validator
      *  See class description for details about validator behavior
      *
-     * \param info Metadata for the property
-     * \param defaultValue The value that the Property should contain at its creation
-     * \param validator The validator function to use
-     * \param parent QObject parent
+     * \param[in] info Metadata for the property
+     * \param[in] defaultValue The value that the Property should contain at its creation
+     * \param[in] validator The validator function to use
+     * \param[in] parent QObject parent
      */
     Property(PropertyInfo info = PropertyInfo(), QVariant defaultValue="",
             const std::function<QVariant(const QVariant&, const QVariant&)> validator = [](const QVariant&, const QVariant& _new){ return _new; },
@@ -165,7 +170,7 @@ public:
 
     /*!
      * \brief Copy constructor
-     * \param other Property to copy
+     * \param[in] other Property to copy
      */
     Property(const Property& other) : QObject(other.parent()), _info(other._info), _validate(other._validate), _value(other._value) {}
 
@@ -188,8 +193,8 @@ public:
 
     /*!
      * \brief Sets a new value using the validation function an signals listeners
-     * \param v The value to set
-     * \param notifyOwner If true, the valueRequested signal is emitted in addition to valueSet (Default false)
+     * \param[in] v The value to set
+     * \param[in] notifyOwner If true, the valueRequested signal is emitted in addition to valueSet (Default false)
      */
     void set(const QVariant& v, bool notifyOwner = false)
     {
@@ -203,20 +208,20 @@ public:
 signals:
     /*!
      * \brief Signal that the value was set for the Property; this does not guarantee that it changed
-     * \param value The currently stored value
+     * \param[in] value The currently stored value
      */
     void valueSet(QVariant value);
 
     /*!
      * \brief Signal that the value was set for the Property by a request from an object other than the owner
-     * \param value The currently stored value
+     * \param[in] value The currently stored value
      */
     void valueRequested(QVariant value);
 
 private slots:
     /*!
      * \brief Internal function used to change the value
-     * \param newValue The value to update to through the validator
+     * \param[in] newValue The value to update to through the validator
      */
     void _request(QVariant newValue)
     {
@@ -229,7 +234,7 @@ private slots:
 
     /*!
      * \brief Notifies watchers that the value may have changed
-     * \param isRequest If true, then valueRequested is emitted in addition to the regualar valueSet
+     * \param[in] isRequest If true, then valueRequested is emitted in addition to the regualar valueSet
      */
     void _update(bool isRequest)
     {
@@ -249,6 +254,7 @@ class SDSMT_SIMULATOR_API PropertyView : public QObject
 {
     Q_OBJECT
 
+    //! The property being observed
     Property* _origin = nullptr;
 
     /*!
@@ -276,7 +282,7 @@ private slots:
 public:
     /*!
      * \brief Constructs a propertyView to watch a specific property
-     * \param origin The property to observe
+     * \param[in] origin The property to observe
      */
     PropertyView(Property* origin=nullptr) : _origin(origin)
     {
@@ -285,7 +291,7 @@ public:
 
     /*!
      * \brief Copy constructor to watch the same property as another PropertyView
-     * \param other PropertyView to copy
+     * \param[in] other PropertyView to copy
      */
     PropertyView(const PropertyView& other) : _origin(other._origin)
     {
@@ -294,7 +300,7 @@ public:
 
     /*!
      * \brief Assignment operator to copy other PropertyView
-     * \param other PropertyView to copy
+     * \param[in] other PropertyView to copy
      * \return Reference to self
      */
     PropertyView& operator =(const PropertyView& other)
@@ -307,8 +313,8 @@ public:
 
     /*!
      * \brief Request a change to the original property, optionally ignoreing the ReadOnly metadata
-     * \param value Value to request be set
-     * \param force If true, then the readOnly metadata is ignored (Default false)
+     * \param[in] value Value to request be set
+     * \param[in] force If true, then the readOnly metadata is ignored (Default false)
      */
     void set(const QVariant& value, bool force = false)
     {
@@ -334,14 +340,14 @@ public:
 signals:
     /*!
      * \brief Signals that the property's value may have changed
-     * \param value The current value of the property
+     * \param[in] value The current value of the property
      */
     void valueSet(QVariant value);
 
     /*!
      * \brief Signal requesting a new value to be set
      * This should not be called directly; use the set() method instead
-     * \param value The value requested
+     * \param[in] value The value requested
      */
     void requestValue(QVariant value);
 };

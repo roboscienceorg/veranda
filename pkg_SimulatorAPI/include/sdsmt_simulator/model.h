@@ -39,10 +39,20 @@ class SDSMT_SIMULATOR_API Model : public QObject
 {
     Q_OBJECT
 
+    //! List of children models
     QVector<Model*> _children;
+
+    //! List of shapes in this model
     QVector<b2Shape*> _shapes;
 
-    double _x=0, _y=0, _theta=0;
+    //! Current x coordinate of model
+    double _x=0;
+
+    //! Current y coordinate of model
+    double _y=0;
+
+    //! Current rotation of model (Degrees)
+    double _theta=0;
 
 signals:
     /*!
@@ -50,16 +60,16 @@ signals:
      *  * One or more of its shapes was changed, added, or removed
      *  * One or more of its children were added or removed (NOT Changed!)
      *
-     * \param mdl[in] Pointer to the model that changed
+     * \param[in] mdl Pointer to the model that changed
      */
     void modelChanged(Model* mdl);
 
     /*!
      * \brief Indicates that the model's transform changed
-     * \param mdl[in] Pointer to the model that changed
-     * \param x[in] Delta x
-     * \param y[in] Delta y
-     * \param dt[in] Delta angle (degrees)
+     * \param[in] mdl Pointer to the model that changed
+     * \param[in] x Delta x
+     * \param[in] y Delta y
+     * \param[in] dt Delta angle (degrees)
      */
     void transformChanged(Model* mdl, double dx, double dy, double dt);
 
@@ -67,9 +77,9 @@ public:
 
     /*! Construct a new model and initialize its children models and shapes
      *
-     * \param children[in] Children models of this model
-     * \param shapes[in] Shapes represented in this model (Default empty list)
-     * \param parent[in] QObject parent of the object (Default nullptr)
+     * \param[in] children Children models of this model
+     * \param[in] shapes Shapes represented in this model (Default empty list)
+     * \param[in] parent QObject parent of the object (Default nullptr)
      */
     Model(QVector<Model*> children, QVector<b2Shape*> shapes = {}, QObject* parent = nullptr) : QObject(parent)
     {
@@ -79,8 +89,8 @@ public:
 
     /*! Construct a new model and initialize its shapes
      *
-     * \param shapes[in] Shapes represented in this model (Default empty list)
-     * \param parent[in] QObject parent of the object (Default nullptr)
+     * \param[in] shapes Shapes represented in this model (Default empty list)
+     * \param[in] parent QObject parent of the object (Default nullptr)
      */
     Model(QVector<b2Shape*> shapes = {}, QObject* parent = nullptr) : QObject(parent)
     {
@@ -116,9 +126,9 @@ public:
 
     /*!
      * \brief Set the location of the model relative to its parent (or the world, if no parent)
-     * \param x[in] The x coordinate of the model
-     * \param y[in] The y coordinate of the model
-     * \param theta[in] The rotation of the model in degrees
+     * \param[in] x The x coordinate of the model
+     * \param[in] y The y coordinate of the model
+     * \param[in] theta The rotation of the model in degrees
      */
     void setTransform(const double& x, const double& y, const double& theta)
     {
@@ -135,9 +145,9 @@ public:
 
     /*!
      * \brief Obtains the last transformation values set for the model
-     * \param x[out] x coordinate
-     * \param y[out] y coordinate
-     * \param theta[out] angle (degrees)
+     * \param[out] x x coordinate
+     * \param[out] y y coordinate
+     * \param[out] theta angle (degrees)
      */
     void getTransform(double& x, double& y, double& theta)
     {
@@ -150,7 +160,7 @@ public:
      * \brief Adds new children models to the model
      * If a child is added multiple times (either in 1 call, or across
      * multiple) it will only be added 1 time
-     * \param newChildren[in] A list of pointers to any number of models to add as children to this one
+     * \param[in] newChildren A list of pointers to any number of models to add as children to this one
      */
     void addChildren(QVector<Model*> newChildren)
     {
@@ -167,7 +177,7 @@ public:
      * \brief Removes a set of children of this model
      * If a child to be removed is not actually a child of this model, it is
      * ignored
-     * \param oldChildren[in] List of children to remove from this model
+     * \param[in] oldChildren List of children to remove from this model
      */
     void removeChildren(QVector<Model*> oldChildren)
     {
@@ -186,7 +196,7 @@ public:
      * \brief Adds new shapes to the model
      * If a shape is added multiple times (either in 1 call, or across
      * multiple) it will only be added 1 time
-     * \param newShapes[in] A list of pointers to any number of shapes to add
+     * \param[in] newShapes A list of pointers to any number of shapes to add
      */
     void addShapes(QVector<b2Shape*> newShapes)
     {
@@ -203,7 +213,7 @@ public:
      * \brief Removes a set of shapes from this model
      * If a shape to be removed is not actually a in this model, it is
      * ignored
-     * \param oldShapes[in] List of shapes to remove from this model
+     * \param[in] oldShapes List of shapes to remove from this model
      */
     void removeShapes(QVector<b2Shape*> oldShapes)
     {

@@ -32,8 +32,8 @@ public:
      * The loader should read enough of the file to determine if it is the correct type
      * for the loader to parse. The loader should do more than just check the file extension,
      * as multiple loaders may exist for any given extension
-     * \param filePath[in] Absolute path to the file to check
-     * \param plugins[in] Map of the available plugins in the system
+     * \param[in] filePath Absolute path to the file to check
+     * \param[in] plugins Map of the available plugins in the system
      * \return True if the file can be loaded by the loader
      */
     virtual bool canLoadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins) = 0;
@@ -44,8 +44,8 @@ public:
      * function, the loader is allowed to display a dialog box to the user to get information about
      * how to load a specific file. This call is immediately followed by loadFile() with the same file
      * path.
-     * \param filePath[in] Absolute path to the file to check
-     * \param plugins[in] Map of the available plugins in the system
+     * \param[in] filePath Absolute path to the file to check
+     * \param[in] plugins Map of the available plugins in the system
      */
     virtual void getUserOptions(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins){}
 
@@ -55,8 +55,8 @@ public:
      * within the file. If user settings are required, they should be gotten during getUserOptions().
      * This function may be run in a separate thread to prevent the UI from blocking; for this reason, the function
      * should not display any sort of UI or dialog box
-     * \param filePath[in] Absolute path to the file to check
-     * \param plugins[in] Map of the available plugins in the system
+     * \param[in] filePath Absolute path to the file to check
+     * \param[in] plugins Map of the available plugins in the system
      * \return A newly allocated WorldObject* built from the file
      */
     virtual WorldObject* loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins) = 0;
@@ -87,8 +87,8 @@ public:
      * The loader should read enough of the file to determine if it is the correct type
      * for the loader to parse. The loader should do more than just check the file extension,
      * as multiple loaders may exist for any given extension
-     * \param filePath[in] Absolute path to the file to check
-     * \param plugins[in] Map of the available plugins in the system
+     * \param[in] filePath Absolute path to the file to check
+     * \param[in] plugins Map of the available plugins in the system
      * \return True if the file can be loaded by the loader
      */
     virtual bool canLoadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins) = 0;
@@ -99,8 +99,8 @@ public:
      * function, the loader is allowed to display a dialog box to the user to get information about
      * how to load a specific file. This call is immediately followed by loadFile() with the same file
      * path.
-     * \param filePath[in] Absolute path to the file to check
-     * \param plugins[in] Map of the available plugins in the system
+     * \param[in] filePath Absolute path to the file to check
+     * \param[in] plugins Map of the available plugins in the system
      */
     virtual void getUserOptions(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins){}
 
@@ -110,8 +110,8 @@ public:
      * within the file. If user settings are required, they should be gotten during getUserOptions().
      * This function may be run in a separate thread to prevent the UI from blocking; for this reason, the function
      * should not display any sort of UI or dialog box
-     * \param filePath[in] Absolute path to the file to check
-     * \param plugins[in] Map of the available plugins in the system
+     * \param[in] filePath Absolute path to the file to check
+     * \param[in] plugins Map of the available plugins in the system
      * \return A vector of newly allocated WorldObject* built from the file
      */
     virtual QVector<WorldObject*> loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If*> plugins) = 0;

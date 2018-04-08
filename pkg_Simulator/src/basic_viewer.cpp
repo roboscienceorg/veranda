@@ -1,3 +1,5 @@
+//! \file
+
 #include "basic_viewer.h"
 
 #include <QPainter>
@@ -51,6 +53,14 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     setWorldBounds(-200, 200, -200, 200);
 }
 
+/*!
+ * The supported b2Shape types are
+ * * Circle
+ * * Edge
+ * * Polygon
+ *
+ * Drawing any of these results in a single QGrahicsItem with no children
+ */
 QGraphicsItem* BasicViewer::_drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
 {
     QGraphicsItem* newShape = nullptr;
@@ -107,10 +117,12 @@ QGraphicsItem* BasicViewer::_drawModel(Model* m)
     return baseItem;
 }
 
-//Something new was added to the world view
-//It needs to get added to the graphics scene and indexed
-//When the model updates, (transformChanged) the graphics shape
-//needs to be moved within the scene
+/*!
+ * Something new was added to the world view
+ * It needs to get added to the graphics scene and indexed
+ * When the model updates, (transformChanged) the graphics shape
+ * needs to be moved within the scene
+ */
 void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 {
     _models[id] = objects;
@@ -135,6 +147,16 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
     _topShapes[id] = group;
 }
 
+/*!
+ * When adding a new model, we create a number of ways to map to and from it
+ * * Map the model to the QGraphicItem
+ * * Map the QGraphicItem to the object id of the model
+ * * Map the model to its object id
+ * * Mapthe model to a list of its child models
+ *
+ * This method also connects the signals from the model which
+ * indicate that the model moved or its shapes or children were changed
+ */
 QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
 {
     //qDebug() << "Add model " << m << " with " << m->children().size() << " children";
@@ -161,9 +183,10 @@ QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
     return graphic;
 }
 
-
-//Updates a graphics scene object to have a new
-//location
+/*!
+ * When a model moves, we find the QGraphicsItem that represents it
+ * and move that the same amount
+ */
 void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
 {
     double x, y, t;
@@ -182,6 +205,10 @@ void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
         _placeTools();
 }
 
+/*!
+ * When a model changes, we destroy the QGraphicsItem that
+ * was representing it and rebuild it
+ */
 void BasicViewer::modelChanged(Model *m)
 {
     object_id oid = _modelToObject[m];
@@ -206,7 +233,14 @@ void BasicViewer::modelChanged(Model *m)
         _scene->addItem(replace);
 }
 
-//World View Clicked
+/*!
+ * When the left mouse button is pressed, start tracking
+ * the mouse if the user selected one of the click-drag tools.
+ *
+ * If the user did not click one of the click-drag tools, we check
+ * if they clicked on one of the drawn models, and if so signal that
+ * it should be the selected model
+ */
 void BasicViewer::viewMousePress(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
@@ -255,6 +289,11 @@ void BasicViewer::viewMousePress(QMouseEvent *event)
     }
 }
 
+/*!
+ * If the user is click-dragging one of the tools, then
+ * emit signals that the object which is currently selected
+ * is being moved or rotate.
+ */
 void BasicViewer::viewMouseMove(QMouseEvent* event)
 {
     if(_draggingTranslate)
@@ -317,13 +356,14 @@ void BasicViewer::resizeEvent(QResizeEvent *event)
     _rescale();
 }
 
+/*!
+ * It appears that QGraphicsView::fitInView is broken in
+ * Qt 5.5. This should be an acceptable alternative. We manually
+ * calculate how much of the view should be visible based on the
+ * canvas size and the scene size and rescale the viewport
+ */
 void BasicViewer::_rescale()
 {
-    //It appears that QGraphicsView::fitInView is broken in
-    //Qt 5.5. This should be an acceptable alternative
-    //If we allow the user to pan and zoom, then this will
-    //likely need to change to keep track of zoom and pan parameters
-    //so they can correctly be part of this transform
     double w_acutal = geometry().width()*0.9;
     double h_actual = geometry().height()*0.9;
 
@@ -498,7 +538,11 @@ void BasicViewer::nothingSelected()
     }
 }
 
-//Returns a color given drawlevel and state of selected
+/*!
+ * By default, all colors are black. If the object is selected,
+ * then we use a green color instead. The DrawLevel parameter determines
+ * the level of transparency of the color
+ */
 QColor BasicViewer::_color(DrawLevel level, bool selected)
 {
     QColor out(0, 0, 0);
@@ -522,7 +566,15 @@ QColor BasicViewer::_color(DrawLevel level, bool selected)
     return out;
 }
 
-//Sets a graphics item and all it's children to a specific color pen
+/*!
+ * The QObjectItems drawn by this widget are one of three types:
+ * * QAbstractGraphicsShapeItem
+ * * QGraphicsLineItem
+ * * QGraphicsItemGroup
+ *
+ * In the first two cases, the color can just be set. After possibly setting
+ * the color, the method recurses on the children GraphicsItems
+ */
 void BasicViewer::_setOutlineColor(QGraphicsItem* item, const QColor& color)
 {
     QAbstractGraphicsShapeItem* asShape = dynamic_cast<QAbstractGraphicsShapeItem*>(item);

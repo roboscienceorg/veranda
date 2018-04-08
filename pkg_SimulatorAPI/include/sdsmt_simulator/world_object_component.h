@@ -49,25 +49,34 @@ class SDSMT_SIMULATOR_API WorldObjectComponent : public QObject
 {
     Q_OBJECT
 
+    //! Property for component name
     Property _objName;
+
+    //! Property for local x location
     Property _locX = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X coord of the object relative to its parent"),
                                 QVariant(0.0), &Property::double_validator);
 
+    //! Property for local y location
     Property _locY = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y coord of the object relative to its parent"),
                                 QVariant(0.0), &Property::double_validator);
 
+    //! Property for local rotation
     Property _locTheta = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of the object (Degrees) relative to its parent"),
                                 QVariant(0.0), &Property::angle_validator);
 
+    //! Property for global x location
     Property _globX = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Global X coord of the object"),
                                 QVariant(0.0), &Property::double_validator);
 
+    //! Property for global y location
     Property _globY = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Global Y coord of the object"),
                                 QVariant(0.0), &Property::double_validator);
 
+    //! Property for global rotation
     Property _globTheta = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Global Angle of the object (Degrees)"),
                                 QVariant(0.0), &Property::angle_validator);
 
+    //! Mapping of all properties and their identifying keys
     QMap<QString, Property*> _properties
     {
         {"Name", &_objName},
@@ -79,53 +88,79 @@ class SDSMT_SIMULATOR_API WorldObjectComponent : public QObject
         {"GlobalPos/Theta", &_globTheta}
     };
 
+    //! The main body of the component
     b2Body* _mainBody = nullptr;
+
+    //! List of registered models
     QVector<Model*> _models;
+
+    //! List of registered bodies and the models tied to them
     QMap<b2Body*, QVector<Model*>> _bodies;
 
-    QTransform parentTransform, parentInverse;
+    //! Transform matrix of the parent to this component
+    QTransform parentTransform;
+
+    //! Inverse of parentTransform cached for quick access
+    QTransform parentInverse;
+
+    //! Local transformation matrix
     QTransform localTransform;
+
+    //! Global transformation matrix. = localTransform * parentTransform
     QTransform globalTransform;
+
+    //! Global angle in radians
     double globalRadians = 0;
+
+    //! Global location x, y
     b2Vec2 globalPos = b2Vec2(0, 0);
+
+    //! Whether or not any parent transform has been set
     bool hasParent = false;
-    QString _type = "", _defaultName = "";
+
+    //! Type identifier for the component
+    QString _type = "";
+
+    //! Default name for the component
+    QString _defaultName = "";
 
     /*!
      * \brief Moves the component to a new location and updates all models and bodies
      * Models and bodies moved are kept in the same location relative to the origin of the component
-     * \param tOldI Inverse of the old transform
-     * \param tNew The new transform
+     * \param[in] tOldI Inverse of the old transform
+     * \param[in] tNew The new transform
      */
     void shiftComponent(const QTransform& tOldI, const QTransform& tNew);
 
-    //?
-    //void updateProperties();
+    /*!
+     * \brief Updates the location property values of the component to match its transforms
+     */
+    void updateProperties();
 
 protected:
     /*!
      * \brief Constrains a body's location relative to the component origin
-     * \param bod The body to register and move
-     * \param representations 0 or more Models to tie to the location of the body
-     * \param isMainBody
+     * \param[in] bod The body to register and move
+     * \param[in] representations 0 or more Models to tie to the location of the body
+     * \param[in] isMainBody Whether or not the body should registered as the main one for the component
      */
     void registerBody(b2Body* bod, const QVector<Model*>& reprentations = {}, bool isMainBody = false);
 
     /*!
      * \brief Removes the constraint between a body and the component
-     * \param bod The body to unregister
+     * \param[in] bod The body to unregister
      */
     void unregisterBody(b2Body* bod);
 
     /*!
      * \brief Constrains a models's location relative to the component origin
-     * \param mod The model to register and move
+     * \param[in] mod The model to register and move
      */
     void registerModel(Model* mod);
 
     /*!
      * \brief Removes the constraint between a model and the component
-     * \param mod The model to unregister
+     * \param[in] mod The model to unregister
      */
     void unregisterModel(Model* mod);
 
@@ -144,7 +179,7 @@ protected:
      * from the physics engine and act on it, either by changing internal
      * properties, publishing messages, or applying forces to physics bodies.
      *
-     * \param dt The amount of time simulated by the physics engine
+     * \param[in] dt The amount of time simulated by the physics engine
      */
     virtual void _worldTicked(const double dt){}
 
@@ -163,9 +198,9 @@ public:
      * it is reassigned; the type identifies to the UI what group in the toolbox
      * should contain the component
      *
-     * \param defaultName Starting name of the component
-     * \param type Toolbox group of the component
-     * \param parent QObject parent
+     * \param[in] defaultName Starting name of the component
+     * \param[in] type Toolbox group of the component
+     * \param[in] parent QObject parent
      */
     WorldObjectComponent(QString defaultName = "", QString type = "", QObject* parent=nullptr);
 
@@ -177,7 +212,7 @@ public:
      * properties. Properties are copied by the WorldObjectComponent parent
      * class (see clone())
      *
-     * \param newParent QObject parent of the new object
+     * \param[in] newParent QObject parent of the new object
      * \return A newly constructed WorldObjectComponent* of the same type
      */
     virtual WorldObjectComponent* _clone(QObject* newParent=nullptr) = 0;
@@ -188,7 +223,7 @@ public:
      * assigns all of the currently set property values into that new
      * object
      *
-     * \param newParent QObject parent of the new object
+     * \param[in] newParent QObject parent of the new object
      * \return A WorldObjectComponent* copy of self
      */
     WorldObjectComponent* clone(QObject* newParent = nullptr);
@@ -243,8 +278,8 @@ public:
      * components and/or bodies as a group, preserving nesting
      * and relative location
      *
-     * \param x Distance to move in x direction
-     * \param y Distance to move in y direction
+     * \param[in] x Distance to move in x direction
+     * \param[in] y Distance to move in y direction
      */
     void translate(double x, double y);
 
@@ -254,7 +289,7 @@ public:
      * components and/or bodies as a group, preserving nesting
      * and relative location
      *
-     * \param degrees Number of degrees to rotate
+     * \param[in] degrees Number of degrees to rotate
      */
     void rotate(double degrees);
 
@@ -266,7 +301,7 @@ public:
      * nullptr may be passed here. Only components which want to publish or subscribe
      * ROS 2 messages need to override this method
      *
-     * \param node The ROS 2 Node to use (Or nullptr)
+     * \param[in] node The ROS 2 Node to use (Or nullptr)
      */
     virtual void setROSNode(std::shared_ptr<rclcpp::Node> node){}
 
@@ -303,9 +338,9 @@ public:
      * Box2D fixtures to the filter group -objectId (negative the object id) in order to prevent overlapping
      * parts of a world object from causing collisions.
      *
-     * \param world The Box2D world to create bodies in
-     * \param oId The object id this component is part of
-     * \param anchor The body that this component should joint itself to
+     * \param[in] world The Box2D world to create bodies in
+     * \param[in] oId The object id this component is part of
+     * \param[in] anchor The body that this component should joint itself to
      */
     virtual void generateBodies(b2World* world, object_id oId, b2Body* anchor){}
 
@@ -354,7 +389,7 @@ public slots:
      * read any physics properties needed, as well as forward the call to
      * its inheriting class through _worldTicked()
      *
-     * \param t The amount of time simulated in the tick
+     * \param[in] t The amount of time simulated in the tick
      */
     void worldTicked(const double t);
 
@@ -380,8 +415,8 @@ public slots:
      * to be unchanged relative to the parent transform; this happens when the user
      * manually moves or rotates components
      *
-     * \param t The transformation matrix
-     * \param cascade If true, the component will recompute its local transform and
+     * \param[in] t The transformation matrix
+     * \param[in] cascade If true, the component will recompute its local transform and
      * forward it to any children components as their new global transform
      */
     void setParentTransform(QTransform t, bool cascade);
@@ -396,8 +431,8 @@ signals:
      * user is moving the component, cascade will be true; as all children components
      * should recompute their transforms and move to stay in the same relative location.
      *
-     * \param t The new transform
-     * \param cascade Whether or not children components should move to stay in the same relative location
+     * \param[in] t The new transform
+     * \param[in] cascade Whether or not children components should move to stay in the same relative location
      */
     void transformChanged(QTransform t, bool cascade);
 };

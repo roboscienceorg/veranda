@@ -1,3 +1,4 @@
+//! \file
 #include "simulator_core.h"
 
 #include <iostream>
@@ -79,6 +80,11 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     });
 }
 
+/*!
+ * When it is destroyed, the simulator core will destroy all
+ * of the objects in the simulation, and then delete the physics
+ * and UI interfaces
+ */
 SimulatorCore::~SimulatorCore()
 {
     //Destroy all remaining objects
@@ -92,6 +98,9 @@ SimulatorCore::~SimulatorCore()
     _userInterface->deleteLater();
 }
 
+/*!
+ * On startup, the physics ticks are set to 1/30, 30 times a second
+ */
 void SimulatorCore::start()
 {
     //Set default physics tick rate

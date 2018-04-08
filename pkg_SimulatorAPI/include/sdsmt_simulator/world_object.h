@@ -36,14 +36,22 @@ class SDSMT_SIMULATOR_API WorldObject : public WorldObjectComponent
 {
     Q_OBJECT
 
+    //! Children components of the object
     QVector<WorldObjectComponent*> _components;
 
+    //! OR of usesChannels for all child components
     bool _useChannels = false;
 
+    //! Model that can be drawn to visualize the WorldObject's location
     Model* _debugModel = nullptr;
+
+    //! Central body that components can anchor to
     b2Body* _anchorBody = nullptr;
+
+    //! The b2World last set by generateBodies
     b2World* _world = nullptr;
 
+    //! Union of all properties provided by the object's components
     QMap<QString, QSharedPointer<PropertyView>> _properties;
 
 protected:
@@ -59,11 +67,11 @@ public:
      * \brief Constructs a WorldObject from a set of components.
      * The children components will becomed owned by the WorldObject; it will
      * delete them when it is destroyed.
-     * \param components Children components of the world object
-     * \param name The name of the object (Default "object")
-     * \param parent QObject parent
+     * \param[in] components Children components of the world object
+     * \param[in] name The name of the object (Default "object")
+     * \param[in] parent QObject parent
      */
-    WorldObject(QVector<WorldObjectComponent*> components, QString name = "object", QObject* parent = nullptr);
+    WorldObject(QVector<WorldObjectComponent*> components, QString name = "object", QString type = "Component Group", QObject* parent = nullptr);
 
     //Constructs copy of object
     WorldObject* _clone(QObject* newParent=nullptr);
