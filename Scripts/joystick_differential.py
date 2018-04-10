@@ -24,19 +24,24 @@ def publishWheelVelocity(publeft, pubright, phi1, phi2):
 def main():
     args = sys.argv
 
-    if len(args) != 2:
-        print("Usage: joystick_differential {robot}")
-        print("Joystick should be {robot}/joystick")
-        print("Wheels will be {robot}/left_wheel and {robot}/right_wheel")
+    if len(args) != 2 and len(args) != 3:
+        print("Usage: joystick_differential {channelin} [channelout]")
+        print("Joystick should be {channelin}/joystick")
+        print("Wheels will be {channelout}/left_wheel and {channelout}/right_wheel")
+        print("If no {channelout} given, {channelin} will be used for both")
         return
 
-    channel = args[1] + "/joystick"
+    channelin = channelout = args[1]
+    if len(args) == 3:
+        channelout = args[2]
+
+    channelin = channelin + "/joystick"
 
     rclpy.init(args=args)
 
     node = Node("joystick_differential")
-    publeft = node.create_publisher(Float32, args[1] + "/left_wheel")
-    pubright = node.create_publisher(Float32, args[1] + "/right_wheel")
+    publeft = node.create_publisher(Float32, channelout + "/left_wheel")
+    pubright = node.create_publisher(Float32, channelout + "/right_wheel")
 
     def joystick_callback(msg):
         if len(msg.axes) < 2:
@@ -52,7 +57,7 @@ def main():
 
         publishWheelVelocity(publeft, pubright, phi1, phi2)
 
-    node.create_subscription(Joy, channel, joystick_callback)
+    node.create_subscription(Joy, channelin, joystick_callback)
 
     rclpy.spin(node)
     node.destroy_node()

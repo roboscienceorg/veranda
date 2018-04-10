@@ -440,9 +440,123 @@ void MainWindow::newSimButtonClick()
     }
 }
 
-void MainWindow::quickSaveButtonClick(){}
-void MainWindow::quickLoadButtonClick(){}
+void MainWindow::quickSaveButtonClick()
+{
+    // Save was clicked
+    QString path = "quick.json";
 
+    QString ext = "json";
+
+    for(auto it = worldSavers.begin(); it != worldSavers.end(); it++)
+    {
+        if(it.key().toLower().contains(ext))
+        {
+            QVector<WorldObject*> worldObjs;
+            for(WorldObjectProperties* prop : objects)
+            {
+                WorldObject* cast = prop->getObject();
+                if(cast)
+                    worldObjs.push_back(cast);
+            }
+
+            try
+            {
+                it.value()[0]->saveFile(path, worldObjs);
+            }catch(std::exception& ex){
+                error("Unable to save file '" + path + "': " + QString::fromStdString(ex.what()));
+            }
+
+            return;
+        }
+    }
+    error("No plugin to save file '" + path + "'");
+}
+
+void MainWindow::quickLoadButtonClick()
+{
+    QMessageBox msgBox;
+    msgBox.setText("WARNING: Changing the map will delete all world objects from this simulation.");
+    msgBox.setInformativeText("Would you like to proceed?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::No);
+    int ret = msgBox.exec();
+
+    switch (ret) {
+      case QMessageBox::Yes:
+    {
+          QString path = "quick.json";
+
+          QString ext = "json";
+
+          bool done = false;
+          for(auto it = worldLoaders.begin(); it != worldLoaders.end() && !done; it++)
+          {
+              if(it.key().toLower().contains(ext))
+                  for(WorldLoader_If* wl : it.value())
+
+                      //Find the json world loader
+                      if(!done && wl->canLoadFile(path, componentPlugins))
+                      {
+                          //Get user options in main thread
+                          wl->getUserOptions(path, componentPlugins);
+
+                          //Spin up side thread to actually load it
+                          QtConcurrent::run([this, path, wl](){
+                              QVector<WorldObject*> loadedObjs;
+                              try
+                              {
+                                  //Load file in separate thread
+                                  qDebug() << "Load file";
+                                  loadedObjs=wl->loadFile(path, componentPlugins);
+                              }catch(std::exception& ex){}
+
+                              if(loadedObjs.size())
+                              {
+                                  qDebug() << "Clear world";
+                                  userRemoveWorldObjectsFromSimulation(simulator->worldObjects.keys().toVector());
+
+                                  qDebug() << "Build new world";
+                                  userAddWorldObjectsToSimulation(loadedObjs, false);
+
+
+                                  //Add default robots
+                                  if(defaultLoader && defaultLoader->canLoadFile(path, componentPlugins))
+                                  {
+                                      loadedObjs.clear();
+                                      try
+                                      {
+                                          loadedObjs=defaultLoader->loadFile(path, componentPlugins);
+                                      }catch(std::exception& ex){}
+
+                                      userAddWorldObjectsToSimulation(loadedObjs, false);
+                                  }
+                              }
+                              else
+                              {
+                                emit error("Unable to open \'" + path + "\' as a world file");
+                              }
+                          });
+
+                          //Stop looking for a file handler
+                          //for this file
+                          done = true;
+                      }
+          }
+
+          if(!done) emit error("Json plugin not found.");
+
+          break;
+    }
+        break;
+
+      case QMessageBox::No:
+          // Don't Save was clicked
+          break;
+      default:
+          // should never be reached
+          break;
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Designer mode button signals and slots                                                                                    //
