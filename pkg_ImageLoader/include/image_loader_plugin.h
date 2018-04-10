@@ -1,5 +1,5 @@
-#ifndef DEFAULT_ROBOT_LOADER_PLUGIN_H
-#define DEFAULT_ROBOT_LOADER_PLUGIN_H
+//! \file
+#pragma once
 
 #include <QObject>
 
@@ -10,6 +10,9 @@
 //do conditional compilation so this would be used only on windows
 #include "../../../install/include/sdsmt_simulator/file_handler_plugin.h"
 
+/*!
+ * \brief Qt Plugin interface for the image reader
+ */
 class Image_Loader_Plugin : public QObject, public WorldFileHandler_Plugin_If
 {
     Q_OBJECT
@@ -17,10 +20,15 @@ class Image_Loader_Plugin : public QObject, public WorldFileHandler_Plugin_If
     Q_INTERFACES(WorldFileHandler_Plugin_If)
 
 public:
-    Image_Loader_Plugin();
-
+    /*!
+     * \brief Returns an instance of the Image Loader
+     * \return A vector containing 1 instance of the Image Loader
+     */
     virtual QVector<WorldLoader_If*> getLoaders();
+
+    /*!
+     * \brief The plugin does not provide a way to save
+     * \return An empty vector
+     */
     virtual QVector<WorldSaver_If*> getSavers(){ return QVector<WorldSaver_If*>{}; }
 };
-
-#endif

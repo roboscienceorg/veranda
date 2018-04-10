@@ -1,3 +1,5 @@
+//! \file
+
 #include "image_loader.h"
 #include "imageparser.h"
 #include "optiondialog.h"
@@ -8,6 +10,12 @@
 #include <stdexcept>
 #include <limits>
 
+/*!
+ * \brief Converts a QPolygonF to a QVariantList
+ * Each element of the list is another QVariantList with 2 elements, x and y
+ * \param[in] poly The sequence of points to convert
+ * \return The polygon as a QVariantList
+ */
 QVariant toVariantList(const QPolygonF& poly)
 {
     QVariantList list;
@@ -17,6 +25,13 @@ QVariant toVariantList(const QPolygonF& poly)
     return list;
 }
 
+/*!
+ * After the sequence of Shape types is acquired, each one is normalized before
+ * being loaded into a WorldObject. This is done by finding the center of the bounding
+ * box of the polygon and subtracting it from all the points in the shape. After the
+ * points are all offset this way, the final WorldObject can be translated to that
+ * center point to retain the shape's location.
+ */
 QVector<WorldObject *> ImageLoader::loadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
     auto iter = plugins.find("org.sdsmt.sim.2d.worldObjectComponent.defaults.polygon");
@@ -97,6 +112,11 @@ QVector<WorldObject *> ImageLoader::loadFile(QString filePath, QMap<QString, Wor
     return {};
 }
 
+/*!
+ * There are two requirements to be able to load images
+ * * The file must be an image
+ * * The polygon plugin included with this project must be available
+ */
 bool ImageLoader::canLoadFile(QString filePath, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
     QImage img(filePath);
@@ -119,6 +139,11 @@ void ImageLoader::getUserOptions(QString filePath, QMap<QString, WorldObjectComp
     lastOptions->exec();
 }
 
+/*!
+ * Each shape consists of an outer loop and 0 or more inner loops
+ * representing holes. This information can be copied almost directly
+ * to the polygon shape plugin.
+ */
 QVector<ImageParser::Shape> ImageLoader::getShapesFromFile(QString filePath, uint64_t colorThreshold)
 {
     QImage img(filePath);
