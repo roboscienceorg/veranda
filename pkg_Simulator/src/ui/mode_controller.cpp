@@ -2,6 +2,7 @@
 
 Mode_Controller::Mode_Controller(visualizerFactory factory, QToolButton *pModeButton, QWidget* pMenu, QWidget* pToolsMenu, QListWidget* pActive, QTableView* pProperties, QTabWidget* pTabs, QWidget *parent)
 {
+    //set mode objects, these will be used to display menus and lists of a specific mode
     makeWidget = factory;
     visual = factory();
     active = pActive;
@@ -11,22 +12,29 @@ Mode_Controller::Mode_Controller(visualizerFactory factory, QToolButton *pModeBu
     properties = pProperties;
     tabs = pTabs;
     tabs->clear();
+
+    //designer world bounds will be redefined smaller in the main window because designer objects are small
     setWorldBounds(-100, 100, -100, 100);
 
+    //connect slots to alter which mode is active and user interaction with the world view
     connect(active, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(robotItemClicked(QListWidgetItem*)));
     connect(this, SIGNAL(objectIsSelected(object_id)), visual, SLOT(objectSelected(object_id)));
     connect(this, SIGNAL(nothingIsSelected()), visual, SLOT(nothingSelected()));
-
     connect(visual, SIGNAL(userDragMoveObject(object_id,double,double)), this, SLOT(simObjectMoveDragged(object_id,double,double)));
     connect(visual, SIGNAL(userDragRotateObject(object_id,double)), this, SLOT(simObjectRotateDragged(object_id,double)));
-
     connect(visual, SIGNAL(userSelectedObject(object_id)), this, SLOT(objectSelected(object_id)));
 
+    //keep tabs neutral and small enough to not enlarge the right side menu unnecessarily
     tabs->setAutoFillBackground( false );
     tabs->setMaximumWidth(200);
     setPropertiesTableView();
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Functions for mode, menu, and ui component setup                                                                          //
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//create columns for the properties display, properties are only displayed for the active object
 void Mode_Controller::setPropertiesTableView()
 {
     propertiesModel = new QStandardItemModel(0,2,this); //12 Rows and 2 Columns
@@ -52,7 +60,7 @@ void Mode_Controller::open()
     nothingSelected();
 }
 
-//make this mode visible
+//make this mode invisible
 void Mode_Controller::close()
 {
     visual->setVisible(false);
@@ -66,7 +74,7 @@ void Mode_Controller::close()
     nothingSelected();
 }
 
-//Add robot to the simulation world view
+//add robot to the simulation world view (will be auto-called from the backend in the simulator)
 void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties *, object_id>> objs)
 {
     for(auto& p : objs)
@@ -89,12 +97,11 @@ void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectPro
         objectSelected(objs.last().second);
 }
 
+//remove robot from the simulation world view (will be auto-called from the backend in the simulator)
 void Mode_Controller::worldObjectsRemovedFromSimulation(QVector<object_id> oIds)
 {
-    //qDebug() << "Objects destroyed" << oIds;
     for(object_id oId : oIds)
     {
-        //qDebug() << "Undraw" << oId;
         visual->objectRemovedFromScreen(oId);
         worldObjects[oId]->deleteLater();
         worldObjects.remove(oId);
@@ -108,6 +115,7 @@ void Mode_Controller::worldObjectsRemovedFromSimulation(QVector<object_id> oIds)
     }
 }
 
+//alter the reference size of the world view (zoom in/out)
 void Mode_Controller::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
 {
     if(xMin > xMax) std::swap(xMin, xMax);
@@ -120,6 +128,7 @@ void Mode_Controller::setWorldBounds(double xMin, double xMax, double yMin, doub
 //Interaction slots for button clicks in UI                                                                                 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//used to create a new instance of whatever tool is selected in the right side menu
 bool Mode_Controller::cloneSelectedTool()
 {
     if(toolTabs.size() < 1)
@@ -133,6 +142,7 @@ bool Mode_Controller::cloneSelectedTool()
     return false;
 }
 
+//used to name active objects
 int Mode_Controller::getNextId()
 {
     while(worldObjects.contains(idIncrementer))
@@ -140,6 +150,7 @@ int Mode_Controller::getNextId()
     return idIncrementer;
 }
 
+//adds an object to the world view for designer or sends request to backend for simulator
 void Mode_Controller::addObjectToView()
 {
     if(cloneSelectedTool())
@@ -164,6 +175,7 @@ void Mode_Controller::addObjectToView()
     }
 }
 
+//removes an object from the world view for designer or sends request to backend for simulator
 void Mode_Controller::deleteObjectFromView()
 {
     object_id oId = selected;
@@ -179,6 +191,7 @@ void Mode_Controller::deleteObjectFromView()
     }
 }
 
+//removes all obects from world view and active objects list
 void Mode_Controller::clear()
 {
     for(auto e : worldObjects.keys())
@@ -188,6 +201,7 @@ void Mode_Controller::clear()
     }
 }
 
+//used by mainwindow to export a designer object to the simulator by returning all active objects
 QVector<WorldObjectComponent*> Mode_Controller::getComponents()
 {
     QVector<WorldObjectComponent*> rVector;
@@ -201,6 +215,7 @@ QVector<WorldObjectComponent*> Mode_Controller::getComponents()
     return rVector;
 }
 
+//adds a world object to available tools and takes care of tab selection/new tab
 void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
 {
     WorldObjectProperties* properties = new WorldObjectProperties(component, this);
@@ -227,6 +242,7 @@ void Mode_Controller::addObjectToTools(WorldObjectComponent* component)
 //World view signals and slots                                                                                              //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//backend creates green arrows and rotations to move the selected object, here the properties get displayed
 void Mode_Controller::objectSelected(object_id id)
 {
     if(worldObjects.contains(id))
@@ -270,6 +286,7 @@ void Mode_Controller::objectSelected(object_id id)
     }
 }
 
+//backend "releases" selected object and properties are cleared
 void Mode_Controller::nothingSelected()
 {
     propertiesModel->setRowCount(0);
@@ -286,6 +303,7 @@ void Mode_Controller::nothingSelected()
     nothingIsSelected();
 }
 
+//selects item via user clicking on active object list item
 void Mode_Controller::robotItemClicked(QListWidgetItem* item)
 {
     QString strName = item->data(Qt::DisplayRole).toString().section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
@@ -293,6 +311,7 @@ void Mode_Controller::robotItemClicked(QListWidgetItem* item)
     objectSelected(strName.toInt());
 }
 
+//updates properties in backend and properties list when a property gets altered by user
 void Mode_Controller::updatePropertyInformation()
 {
     if(worldObjects.contains(selected))
@@ -312,6 +331,7 @@ void Mode_Controller::updatePropertyInformation()
     }
 }
 
+//moves selected object up/down & left/right
 void Mode_Controller::simObjectMoveDragged(object_id id, double dx, double dy)
 {
     auto obj = worldObjects.find(id);
@@ -321,9 +341,9 @@ void Mode_Controller::simObjectMoveDragged(object_id id, double dx, double dy)
     }
 }
 
+//rotates selected object about its' centerpoint
 void Mode_Controller::simObjectRotateDragged(object_id id, double dt)
 {
-    //qDebug() << "Yo yo " << dt;
     auto obj = worldObjects.find(id);
     if(obj != worldObjects.end())
     {
