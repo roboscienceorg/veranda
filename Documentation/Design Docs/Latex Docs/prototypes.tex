@@ -337,7 +337,10 @@ The entire Christmas break was designated to this sprint. The backlog for this s
 
 \subsection{Deliverable}
 
-Deliverables will be viewed and discussed after the break.
+\begin{itemize}
+	\item New Physics
+	\item Spring Semester Plan
+\end{itemize}
 
 \subsection{Results of testing}
 
@@ -353,7 +356,319 @@ Deliverables will be viewed and discussed after the break.
 
 \subsection{Sprint Retrospective}
 
- 
+\section{Sprint 7 Report}
+Jan. 11th - Jan. 25th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included 
+
+\begin{itemize}
+	\item Joystick Prototype
+	\item Run on Windows
+	\item Image Loading
+	\item Differential Drive
+	\item Circle Plugin
+	\item Test with ROS2
+\end{itemize}
+
+\subsection{Deliverable}
+
+\begin{itemize}
+	\item Bug Fixes	
+\begin{itemize}
+	\item Robot selection in active list matching green robot
+	\item Properties updating when changed
+	\item No NaN at start bug
+	\item No crash while coloring shapes
+	
+\end{itemize}
+	\item Project builds with ROS2
+	\item Project works on Windows 10
+	\item Moveable joystick window
+\end{itemize}
+
+
+\subsection{Results of testing}
+
+
+\subsection{Successes and Failures}
+
+
+\subsection{Modifications Required}
+Interaction between Box2D and world objects created some issues like wobbling wheels or "jello" robots, which will have to be dealt with by users in the future via altering object mass until the desired effect is achieved.
+
+\subsection{Sprint Review}
+
+
+\subsection{Sprint Retrospective}
+ \section{Sprint 8 Report}
+Jan. 25th - Feb. 8th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included 
+
+\begin{itemize}
+	\item Image Loading
+	\item Implement Ackermann steering
+	\item Control script for joystick
+	\item Integrate joystick
+	\item Rectangle plugin
+\end{itemize}
+
+\subsection{Deliverable}
+
+	\item Boilerplate start for image loader
+	\item Simple Shape plugin
+	\item UI bug to resize screen
+	\item DLL fixes
+	\item Clone function for world objects
+	\item Joystick integrated with signals to physics models
+	\item Lidar sensor
+	\item Update Box2D version
+	\item Rectangular robot
+	\item Ackermann steering
+	\item Consolidate packages for product
+
+\subsection{Results of testing}
+
+
+\subsection{Successes and Failures}
+
+
+\subsection{Modifications Required}
+
+Modularize by creating mode controller object
+
+\subsection{Sprint Review}
+
+
+\subsection{Sprint Retrospective}
+\section{Sprint 9 Report}
+Feb. 8th - Feb. 22nd
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included
+
+\begin{itemize}
+	\item Integrate image loading
+	\item Object Designer	
+	\item Fix Joystick bugs
+	\item Fix Ackermann Steer bugs
+\end{itemize}
+
+\subsection{Deliverable}
+
+\begin{itemize}
+	\item Bugs Fixed:	
+\begin{itemize}
+	\item Joystick key selection
+	\item Joystick sending correct numbers
+	\item Ackermann steering glitch
+\end{itemize}
+	\item Image loading with triangulation integrated into product
+\end{itemize}
+
+
+While a lot of backlog items were started in this sprint, many were not completed. Map import button worked, but the images did not scale correctly. The joystick bugs were resolved. The object designer was not completed.
+
+\subsection{Results of testing}
+
+
+\subsection{Successes and Failures}
+
+
+\subsection{Modifications Required}
+
+World Object Properties Wrapper updated to work for objects and components. This was necessary for modularity between the designer and the simulator.
+
+\subsection{Sprint Review}
+
+
+\subsection{Sprint Retrospective}
+
+\section{Sprint 10 Report}
+Feb. 22nd - Mar. 8th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included
+
+\begin{itemize}
+	\item Object Designer
+	\item File Load / Save	
+	\item Speed Button
+	\item Rotate and Move World Objects
+	\item Fix Image Loader bugs
+\end{itemize}
+
+\subsection{Deliverable}
+
+\begin{itemize}
+	\item Object Designer integrated
+	\item File Load / Save	
+	\item Speed Button
+	\item Rotate and Move World Objects
+	\item Fix Image Loader bugs
+\end{itemize}
+
+Globalize World Object Component to make objects moveable on the map
+
+Able to build shape plugins, sensor plugins, and image loader
+
+Fixed bugs like program crash while loading many world objects, obects being moveable during simulation play, lidar seeing invisible or non-colliding objects
+
+Added rotate tool
+
+\subsection{Results of testing}
+
+
+\subsection{Successes and Failures}
+
+Scrum master had to reimage computer
+
+\subsection{Modifications Required}
+Cleaned makefile and debug/release flags, added epsilon check for property values closer to 0
+
+\subsection{Sprint Review}
+
+
+\subsection{Sprint Retrospective}
+\section{Sprint 11 Report}
+Mar. 8th - Mar. 22th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included
+
+\begin{itemize}
+	\item Establish JSON file format
+	\item Load / Save JSON files	
+	\item Client Presentation showcasing:
+	\begin{itemize}
+		\item Custom positioning of wheels and sensors
+		\item Image Loading	
+		\item Multiple drive systems
+		\item Multiple sensors
+		\item Various robot shapes (rectangular)
+		\item New UI Icons
+		\item Built in joystick control
+	\end{itemize}
+	\item Integrate Object Designer
+	\item Documentation	
+	\begin{itemize}
+		\item Testing
+		\item UI
+		\item Sprints & Prototypes
+		\item User Manual
+	\end{itemize}
+\end{itemize}
+
+\subsection{Deliverable}
+
+World simulation loading
+
+Removed QSharedPointer requirement from file loader returns
+
+Designer fully integrated, added names to active objects list, altered plugin model sizes so they can be drawn in designer widgets, enabled modification of properties in the designer. 
+
+\subsection{Results of testing}
+
+
+\subsection{Successes and Failures}
+
+
+\subsection{Modifications Required}
+
+
+\subsection{Sprint Review}
+
+
+\subsection{Sprint Retrospective}
+\section{Sprint 12 Report}
+Mar. 22th - Apr. 5th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included 
+
+\begin{itemize}
+	\item Fix UI Bugs
+\begin{itemize}
+	\item Name and Type prompt for exported robots
+	\item Black borders around tool widgets
+	\item Icon Reselections
+\end{itemize}
+	\item Quick Save/ Quick Load
+	\item Load / Save World Object Buttons
+	\item Load / Save Simulation Buttons
+	\item Documentation
+	\item Design Fair Preparations
+\end{itemize}
+
+\subsection{Deliverable}
+
+example robot files, icon licensing
+
+remove default robots
+
+fixed MSVC compile errors
+
+Not a lot of documentation got done, so we pushed most of that onto backlog for the next sprint.
+
+\subsection{Results of testing}
+
+
+\subsection{Successes and Failures}
+
+
+\subsection{Modifications Required}
+
+
+\subsection{Sprint Review}
+
+
+\subsection{Sprint Retrospective}
+
+\section{Sprint 13 Report}
+Apr. 5th - Apr. 19th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included starting a bug backlog, documentation, and prepping for the design fair.
+
+\begin{itemize}
+	\item Bug Backlog
+	\item Documentation		
+\begin{itemize}
+    \item Sprints & Prototypes
+    \item Testing
+    \item UI
+    \item User Documentation
+\end{itemize}
+	\item Design Fair	
+\begin{itemize}
+    \item Poster board
+    \item Possible Q/A
+    \item Presentation at fair
+\end{itemize}
+	\item Product Finalization
+\end{itemize}
+
+\subsection{Deliverable}
+
+Deliverables will be viewed and discussed after the design fair.
+
+\subsection{Results of testing}
+
+
+\subsection{Successes and Failures}
+
+
+\subsection{Modifications Required}
+
+
+\subsection{Sprint Review}
+
+
+\subsection{Sprint Retrospective}
+
+
 \section{Prototypes}
 
 \subsection{STDR Simulator}
