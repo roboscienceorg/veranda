@@ -423,7 +423,7 @@ In retrospect, progress was slow during sprint seven as far as product developme
 Jan. 25th - Feb. 8th
 \subsection{Sprint Backlog}
 
-The backlog for this sprint included completeing the image loading, integrating the jostick control, and implementing rectangle and ackermann steer plugins.
+The backlog for this sprint included completeing the image loading, integrating the joystick control, and implementing rectangle and ackermann steer plugins.
 
 \begin{itemize}
 	\item Image Loading
@@ -434,6 +434,8 @@ The backlog for this sprint included completeing the image loading, integrating 
 \end{itemize}
 
 \subsection{Deliverable}
+
+In sprint eight, we finished the image loading functionality, ackermann steering, the rectangle plugin, and controls for the joystick, which got integrated into the software. We did some backend clean-up as well that was not necessarily visible at the product frontend but left nicer source code for future developers.
 
 \begin{itemize}
 	\item Boilerplate start for image loader
@@ -451,27 +453,32 @@ The backlog for this sprint included completeing the image loading, integrating 
 
 \subsection{Results of testing}
 
+The joystick did not integrate as smoothly as planned, and some alterations had to be made in order to prevent a memory leak in the program. Rectangular robots and Ackermann steering both worked as planned except for the appearance of the "jello" effect, whereby the way Box2D handles welded objects made a particular robot wobble uncontrollably while moving.
 
 \subsection{Successes and Failures}
 
+We successfully integrated the joystick and implemented both rectangle and Ackermann plugins for the software. There was some bug fixes and code clean-up that went smoothly, such as new functions for world objects needed by the designer and enabling a logical user resize of the window. A couple issues we ran into were a minor memory leak that was fixed and the robot "jello" effect which prompted us to build in a window where users can alter robot mass settings until it no longer wobbles. The client would have preferred if the software could handle this but we decided to give default mass settings and otherwise keep it open-ended in case different users have different requirements for the individual simulations.
 
 \subsection{Modifications Required}
 
-Interaction between Box2D and world objects created some issues like wobbling wheels or "jello" robots, which will have to be dealt with by users in the future via altering object mass until the desired effect is achieved.
-
-Modularize by creating mode controller object
+Interaction between Box2D and world objects created the issue of wobbling wheels or the "jello" effect, which will have to be dealt with by users in the future via altering object mass until the desired effect is achieved. The UI was modularized by creating the mode controller object, such that the designer and simulator were controlled as mode controller objects by the main UI. This cleaned up the UI code and minimized code repetition which was getting imense with the creation of the world object and simulation designers. Other backend cleanup was implemented as well, such as DLL alterations and updating the version of our Box2D library.
 
 \subsection{Sprint Review}
 
+The team felt that this sprint was successful because we integrated the joystick, implemented rectangular robots and Ackermann steering, and continued to make progress with the image loader. We were happy to see that progress didn't slow too much with the transition into spring semester and we were still making strong headway with the product.
 
 \subsection{Sprint Retrospective}
+
+In retrospect, sprint eight took some of the pieces the team had been working on in previous sprints and brought them together. We successfully completed implementation of the joystick and the rectangle and Ackermann plugins. We came upon the issue of the "jello" effect, which we discussed with the client in later sprints to determine that it will be an ongoing issue with the software that individual users will have to play around with to obtain desired effects.
+
 \section{Sprint 9 Report}
 Feb. 8th - Feb. 22nd
 \subsection{Sprint Backlog}
 
-The backlog for this sprint included
+The backlog for this sprint included integrating the image loader, implementing the robot designer, starting a user manual, and fixing bugs that popped up during development in the previous sprints.
 
 \begin{itemize}
+	\item User Manual Documentation
 	\item Integrate image loading
 	\item Object Designer	
 	\item Fix Joystick bugs
@@ -479,6 +486,8 @@ The backlog for this sprint included
 \end{itemize}
 
 \subsection{Deliverable}
+
+In sprint nine, we accomplished some bug fixes and integrated the image loader such that the user could choose any image, select a greyscale number, and import it into the simulation as a series of Box2D triangles. We also started discussing the user manual and things to include.
 
 \begin{itemize}
 	\item Bugs Fixed:	
@@ -488,31 +497,32 @@ The backlog for this sprint included
 		\item Ackermann steering glitch
 	\end{itemize}
 	\item Image loading with triangulation integrated into product
+	\item Picked environment for User Manual
 \end{itemize}
 
-
-While a lot of backlog items were started in this sprint, many were not completed. Map import button worked, but the images did not scale correctly. The joystick bugs were resolved. The object designer was not completed.
-
 \subsection{Results of testing}
-
+We found some bugs in the josytick and Ackermann steering because of our testing in this sprint, which were quickly resolved. The client decided he would like us to use Sphinx for the user manual with possible future implementation in the Senior Design class to replace LaTex.
 
 \subsection{Successes and Failures}
-
+Some of our implemented features required bug resolutions in this sprint, like the joystick and Ackermann steering. Map import button worked, but the images did not scale correctly. The object designer was not completed.
 
 \subsection{Modifications Required}
 
-World Object Properties Wrapper updated to work for objects and components. This was necessary for modularity between the designer and the simulator.
+In this sprint, we picked an environment for writing the user manual and integrated the image loader, which responded interestingly to some of the testing images. Because some of the images contained very curved lines and some contained very thin lines, we decided to allow the user to define a few settings that would determing how "precise" they needed the image to be once loaded into Box2D-compatible triangles. Other than that, the World Object Properties Wrapper was updated to work for both objects and components. This was necessary for modularity between the designer and the simulator when adding components to the tools lists.
 
 \subsection{Sprint Review}
 
+The team felt that this sprint was successful because we integrated the image loader, which the client was very pleased with, and made modifications necessary to implement the world object designer. We also started the user manual, which didn't really need to be completed until future sprints, so we felt we were still progressing with strong momentum.
 
 \subsection{Sprint Retrospective}
+
+In retrospect, sprint nine displayed our dwindling reservoir of new features to implement. At this point, it was basically the designer and some plugins that we had left before testing, documentation, and bug collecting would completely take over our time.
 
 \section{Sprint 10 Report}
 Feb. 22nd - Mar. 8th
 \subsection{Sprint Backlog}
 
-The backlog for this sprint included
+The backlog for this sprint included completing the world object designer, implementing file load/save, enabling the movement and rotation of objects in the world view, and fixing bugs.
 
 \begin{itemize}
 	\item Object Designer
@@ -565,6 +575,7 @@ The backlog for this sprint included
 	\item Load / Save JSON files	
 	\item Client Presentation showcasing:
 	\begin{itemize}
+		\item Named the product (finally) 
 		\item Custom positioning of wheels and sensors
 		\item Image Loading	
 		\item Multiple drive systems
@@ -583,11 +594,17 @@ The backlog for this sprint included
 \end{itemize}
 
 \subsection{Deliverable}
+Deliverables for this sprint included completion of the robot designer, image loading, and our third client presentation.
+
 
 \begin{itemize}
+	\item World Object Designer
 	\item UI Icons Licensing
 	\item World simulation loading
 	\item Removed QSharedPointer requirement from file loader returns
+	\item Client Presentation III
+	\item Divided remaining Documentation work
+	\item Established JSON file format and begun work on load / save
 \end{itemize} 
 
 
@@ -599,6 +616,7 @@ Designer fully integrated, added names to active objects list, altered plugin mo
 
 \subsection{Successes and Failures}
 
+In this sprint we successfully named our product, which until this point was being referred to as something akin to "2D Robot Simulator". We named it the "RoboScience Simulator" which was chosen to match the website and online course being crafted by the client. 
 It was during the presentation this sprint (third client presentation) that we showed the "jello" robot simulation with a rectangular robot. We also showed the joystick control and Ackermann steering, but did not sufficiently discuss our plans for testing.
 
 \subsection{Modifications Required}
