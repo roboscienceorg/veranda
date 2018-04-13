@@ -127,10 +127,10 @@ private:
 
     /*!
      * \brief Sets the bounds of what is viewable in the simulation
-     * \param xMin Minimum x coordinate to show
-     * \param xMax Maximum x coordinate to show
-     * \param yMin Minimum y coordinate to show
-     * \param yMax Maximum y coordinate to show
+     * \param[in] xMin Minimum x coordinate to show
+     * \param[in] xMax Maximum x coordinate to show
+     * \param[in] yMin Minimum y coordinate to show
+     * \param[in] yMax Maximum y coordinate to show
      */
     void setWorldBounds(double xMin, double xMax, double yMin, double yMax)
     {
@@ -169,7 +169,7 @@ public slots:
 
     /*!
      * \brief Captures event on window close to forward it in a signal
-     * \param[in] The close event
+     * \param[in] e The close event
      */
     void closeEvent(QCloseEvent *e)
     {

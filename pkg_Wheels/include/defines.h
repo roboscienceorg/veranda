@@ -1,7 +1,8 @@
-#ifndef DEFINES_H
-#define DEFINES_H
+//! \file
+#pragma once
 
+//! The plugin IID for the fixed wheel plugin
 #define FIXEDWHEEL_IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.fixedwheel"
-#define ACKERMANN_IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.ackermann"
 
-#endif // DEFINES_H
+//! The plugin IID for the ackermann steering plugin
+#define ACKERMANN_IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.ackermann"

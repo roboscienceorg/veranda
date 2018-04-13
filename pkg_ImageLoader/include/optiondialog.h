@@ -170,5 +170,3 @@ public:
         return _pxpmy->text().toDouble();
     }
 };
-
-#endif // OPTIONDIALOG_H

@@ -796,7 +796,8 @@ debug\json_object_plugin.obj: src\json_object_plugin.cpp include/json_object_plu
 		include/json_object.h \
 		include/json_common.h \
 		..\pkg_SimulatorAPI\include\sdsmt_simulator\object_loader_if.h \
-		..\pkg_SimulatorAPI\include\sdsmt_simulator\object_saver_if.h
+		..\pkg_SimulatorAPI\include\sdsmt_simulator\object_saver_if.h \
+		include/json_world.h
 
 debug\json_world.obj: src\json_world.cpp include/json_world.h \
 		include/json_common.h \

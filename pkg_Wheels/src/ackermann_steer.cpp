@@ -221,7 +221,7 @@ void Ackermann_Steer::setROSNode(std::shared_ptr<rclcpp::Node> node)
     _rosNode = node;
 }
 
-void Ackermann_Steer::_refreshChannel(QVariant)
+void Ackermann_Steer::_refreshChannel()
 {
     disconnectChannels();
     connectChannels();

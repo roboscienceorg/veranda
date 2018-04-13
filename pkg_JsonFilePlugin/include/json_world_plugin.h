@@ -1,5 +1,5 @@
-#ifndef JSON_WORLD_PLUGIN_H
-#define JSON_WORLD_PLUGIN_H
+//! \file
+#pragma once
 
 #include <QObject>
 
@@ -10,6 +10,9 @@
 //do conditional compilation so this would be used only on windows
 #include "../../../install/include/sdsmt_simulator/file_handler_plugin.h"
 
+/*!
+ * \brief Plugin interface for load/save objects to work with multiple objects in JSON files
+ */
 class Json_World_Plugin : public QObject, public WorldFileHandler_Plugin_If
 {
     Q_OBJECT
@@ -17,10 +20,15 @@ class Json_World_Plugin : public QObject, public WorldFileHandler_Plugin_If
     Q_INTERFACES(WorldFileHandler_Plugin_If)
 
 public:
-    Json_World_Plugin();
-
+    /*!
+     * \brief Gets the file loader types provided by the plugin
+     * \return A single loader type that can handle JSON files with multiple objects in them
+     */
     virtual QVector<WorldLoader_If*> getLoaders();
+
+    /*!
+     * \brief Gets the file saver types provided by the plugin
+     * \return A single saver type that can create JSON files with multiple objects in them
+     */
     virtual QVector<WorldSaver_If*> getSavers();
 };
-
-#endif

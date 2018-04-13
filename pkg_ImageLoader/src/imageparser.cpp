@@ -53,7 +53,7 @@ QVector<ImageParser::Shape> ImageParser::parseImage(const QImage& image, const u
  *
  * \throws std::exception - The pixel map has 0 size
  */
-QVector<Shape> ImageParser::parseImage(const QVector<QVector<QRgb>>& pixMap, const uint64_t& colorThreshold)
+QVector<Shape> ImageParser::parseImage(const QVector<QVector<QRgb> >& pixMap, const uint64_t& colorThreshold)
 {
     qDebug() << "Making black and white...";
     if(!pixMap.size() || !pixMap[0].size())

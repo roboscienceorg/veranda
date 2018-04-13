@@ -61,7 +61,7 @@ private:
 
     /*!
      * \brief Copies a connected white section of an image into its own small image and erases it from the origin image
-     * \param[in/out] bwImage The image to copy a connected section from
+     * \param[in,out] bwImage The image to copy a connected section from
      * \param[out] copy A 2D array containing only pixels of the connected section
      * \param[in] x x coordinate of a point in the shape
      * \param[in] y y coordinate of a point in the shape
@@ -98,7 +98,7 @@ private:
 
     /*!
      * \brief Centers a shape and scales it
-     * \param[in/out] s Shape to transform
+     * \param[in,out] s Shape to transform
      * \param[in] width Width to center based on
      * \param[in] height Height to center based on
      * \param[in] scale Scaling factor to apply
@@ -107,7 +107,7 @@ private:
 
     /*!
      * \brief Centers a point loop and scales it
-     * \param[in/out] s Points to transform
+     * \param[in,out] s Points to transform
      * \param[in] width Width to center based on
      * \param[in] height Height to center based on
      * \param[in] scale Scaling factor to apply

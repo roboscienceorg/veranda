@@ -58,7 +58,7 @@ void Touch_Sensor::setROSNode(std::shared_ptr<rclcpp::Node> node)
     _rosNode = node;
 }
 
-void Touch_Sensor::_channelChanged(QVariant)
+void Touch_Sensor::_channelChanged()
 {
     if(_connected)
     {

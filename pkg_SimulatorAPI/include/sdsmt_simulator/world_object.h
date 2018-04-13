@@ -69,6 +69,7 @@ public:
      * delete them when it is destroyed.
      * \param[in] components Children components of the world object
      * \param[in] name The name of the object (Default "object")
+     * \param[in] type The type of the object (Default "Component Group")
      * \param[in] parent QObject parent
      */
     WorldObject(QVector<WorldObjectComponent*> components, QString name = "object", QString type = "Component Group", QObject* parent = nullptr);

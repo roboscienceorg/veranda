@@ -1,7 +1,8 @@
-#ifndef DEFINES_H
-#define DEFINES_H
+//! \file
+#pragma once
 
+//! The plugin IID for the lidar sensor plugin
 #define LIDAR_IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar"
-#define TOUCH_IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.touchring"
 
-#endif // DEFINES_H
+//! The plugin IID for the button ring plugin
+#define TOUCH_IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.touchring"

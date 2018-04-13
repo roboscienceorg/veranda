@@ -196,7 +196,7 @@ public slots:
     /*!
      * \brief Handles a drag-rotate event on the drawing canvas
      * \param[in] id Id of the item being dragged
-     * \param[in] dx Distance rotated (degrees)
+     * \param[in] dt Distance rotated (degrees)
      */
     void simObjectRotateDragged(object_id id, double dt);
 

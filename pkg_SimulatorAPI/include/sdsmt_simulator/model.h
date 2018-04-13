@@ -67,8 +67,8 @@ signals:
     /*!
      * \brief Indicates that the model's transform changed
      * \param[in] mdl Pointer to the model that changed
-     * \param[in] x Delta x
-     * \param[in] y Delta y
+     * \param[in] dx Delta x
+     * \param[in] dy Delta y
      * \param[in] dt Delta angle (degrees)
      */
     void transformChanged(Model* mdl, double dx, double dy, double dt);

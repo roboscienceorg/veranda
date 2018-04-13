@@ -22,6 +22,7 @@ class WorldObjectProperties : public QObject
 {
     Q_OBJECT
 
+    //! The world object component observed by this wrapper
     WorldObjectComponent* _comp = nullptr;
 
 public:
@@ -32,23 +33,38 @@ public:
      */
     WorldObjectProperties(WorldObjectComponent* comp, QObject* parent=nullptr) : QObject(parent), _comp(comp){}
 
-    //! See WorldObjectComponent::getModels
+    /*!
+     * See WorldObjectComponent::getModels
+     * \return The models of the observed component
+     */
     QVector<Model*> getModels()
     { return _comp->getModels(); }
 
-    //! See WorldObjectComponent::getName()
+    /*!
+     * See WorldObjectComponent::getName()
+     * \return The name of the observed component
+     */
     QString getName()
     { return _comp->getName(); }
 
-    //! See WorldObjectComponent::getName()
+    /*!
+     * See WorldObjectComponent::getName()
+     * \return The type of the observed component
+     */
     QString getType()
     { return _comp->getType(); }
 
-    //! See WorldObjectComponent::getProperties()
+    /*!
+     * See WorldObjectComponent::getProperties()
+     * \return The properties of the observed component
+     */
     QMap<QString, QSharedPointer<PropertyView>> getProperties()
     { return _comp->getProperties(); }
 
-    //! See WorldObjectComponent::usesChannels()
+    /*!
+     * See WorldObjectComponent::usesChannels()
+     * \return Whether or not the observed component uses channels
+     */
     bool usesChannels()
     { return _comp->usesChannels(); }
 
@@ -71,10 +87,17 @@ public:
     WorldObjectComponent* getComponent()
     { return _comp; }
 
-    //! See WorldObjectComponent::translate()
+    /*!
+     * See WorldObjectComponent::translate()
+     * \param[in] x Amount of horizontal translation
+     * \param[in] y Amount of vertical translation
+     */
     void translate(double x, double y){ _comp->translate(x, y); }
 
-    //! See WorldObjectComponent::rotate()
+    /*!
+     * See WorldObjectComponent::rotate()
+     * \param[in] degrees Number of degrees of rotation
+     */
     void rotate(double degrees){ _comp->rotate(degrees); }
 
 public slots:
@@ -98,17 +121,22 @@ class WorldObjectPhysics : public QObject
 {
     Q_OBJECT
 
+    //! The wrapped world object
     WorldObject* _obj;
 
 public:
     /*!
      * \brief Constructs a WorldObjectPhysics to observe a specific WorldObject
-     * \param[in] comp The WorldObject to provide access to
+     * \param[in] obj The WorldObject to provide access to
      * \param[in] parent QObject parent of the wrapper
      */
     WorldObjectPhysics(WorldObject* obj, QObject* parent=nullptr) : QObject(parent), _obj(obj){}
 
-    //! See WorldObjectComponent::generateBodies
+    /*!
+     * See WorldObjectComponent::generateBodies
+     * \param[in] world b2World to add the world object to
+     * \param[in] oId Object id of the object added
+     */
     virtual void generateBodies(b2World* world, object_id oId){_obj->generateBodies(world, oId);}
 
     //! See WorldObjectComponent::clearBodies()
@@ -118,6 +146,9 @@ public slots:
     //! See WorldObjectComponent::syncModels()
     virtual void syncModels(){_obj->syncModels();}
 
-    //! See WorldObjectComponent::worldTicked()
+    /*!
+     * See WorldObjectComponent::worldTicked()
+     * \param[in] t Amount of time passed in this tick
+     */
     virtual void worldTicked(const double t){_obj->worldTicked(t);}
 };

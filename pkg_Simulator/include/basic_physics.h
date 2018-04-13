@@ -94,5 +94,6 @@ public slots:
      */
     virtual void removeWorldObjects(QVector<object_id> oIds) override;
 
+    //! Ticks the physics world forward the amount of time currently set
     void step();
 };

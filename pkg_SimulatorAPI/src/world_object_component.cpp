@@ -124,10 +124,11 @@ WorldObjectComponent* WorldObjectComponent::clone(QObject* newParent)
  * One body can be registered as the Main Body of the component. During the simulation,
  * the location of the main body will be used to update the position of the component.
  * If multiple main bodies are added, only the last one will be used as the main body
+ *
  */
-void WorldObjectComponent::registerBody(b2Body* bod, const QVector<Model*>& reprentations, bool isMainBody)
+void WorldObjectComponent::registerBody(b2Body* bod, const QVector<Model*>& representations, bool isMainBody)
 {
-    _bodies[bod] = reprentations;
+    _bodies[bod] = representations;
 
     b2Vec2 start = bod->GetPosition();
 

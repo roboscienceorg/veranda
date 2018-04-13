@@ -1,5 +1,5 @@
-#ifndef FIXED_WHEEL_PLUGIN_H
-#define FIXED_WHEEL_PLUGIN_H
+//! \file
+#pragma once
 
 #include <QObject>
 
@@ -12,6 +12,9 @@
 //do conditional compilation so this would be used only on windows
 #include "../../../install/include/sdsmt_simulator/world_object_component_plugin.h"
 
+/*!
+ * \brief Plugin interface for the fixed wheel WorldObjectComponent
+ */
 class Fixed_Wheel_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 {
     Q_OBJECT
@@ -19,9 +22,10 @@ class Fixed_Wheel_Plugin : public QObject, public WorldObjectComponent_Plugin_If
     Q_INTERFACES(WorldObjectComponent_Plugin_If)
 
 public:
-    Fixed_Wheel_Plugin();
+    /*!
+     * \brief Creates a new fixed wheel component
+     * \return A newly constructed Fixed Wheel component
+     */
     WorldObjectComponent *createComponent();
 
 };
-
-#endif

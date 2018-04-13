@@ -57,7 +57,7 @@ signals:
     void mouseRelease(QMouseEvent* event);
 
     /*!
-     * \brief Signals that one of the zoom in/out keys was pressed
+     * \brief Signals that one of the zoom in,out keys was pressed
      * \param[in] z Amount to zoom (-1 or 1)
      */
     void zoomTick(int z);
@@ -345,7 +345,7 @@ private slots:
     void resizeEvent(QResizeEvent* event);
 
     /*!
-     * \brief Handle zoom in/out commands
+     * \brief Handle zoom in,out commands
      * \param[in] z The direction to zoom
      */
     void viewZoom(int z);

@@ -1,10 +1,6 @@
 #include "json_object_plugin.h"
 #include "json_object.h"
-
-Json_Object_Plugin::Json_Object_Plugin()
-{
-
-}
+#include "json_world.h"
 
 QVector<WorldObjectLoader_If*> Json_Object_Plugin::getLoaders()
 {

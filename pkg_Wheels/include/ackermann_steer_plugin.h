@@ -1,5 +1,5 @@
-#ifndef ACKERMANN_STEER_PLUGIN_H
-#define ACKERMANN_STEER_PLUGIN_H
+//! \file
+#pragma once
 
 #include <QObject>
 
@@ -12,6 +12,9 @@
 //do conditional compilation so this would be used only on windows
 #include "../../../install/include/sdsmt_simulator/world_object_component_plugin.h"
 
+/*!
+ * \brief Plugin interface to provide the Ackermann Steering component
+ */
 class Ackermann_Steer_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 {
     Q_OBJECT
@@ -19,9 +22,10 @@ class Ackermann_Steer_Plugin : public QObject, public WorldObjectComponent_Plugi
     Q_INTERFACES(WorldObjectComponent_Plugin_If)
 
 public:
-    Ackermann_Steer_Plugin();
+    /*!
+     * \brief Creates a new Ackermann Steering component
+     * \return A newly allocated Ackermann Steering component
+     */
     WorldObjectComponent* createComponent();
 
 };
-
-#endif

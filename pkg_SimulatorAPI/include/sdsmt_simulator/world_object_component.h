@@ -144,7 +144,7 @@ protected:
      * \param[in] representations 0 or more Models to tie to the location of the body
      * \param[in] isMainBody Whether or not the body should registered as the main one for the component
      */
-    void registerBody(b2Body* bod, const QVector<Model*>& reprentations = {}, bool isMainBody = false);
+    void registerBody(b2Body* bod, const QVector<Model*>& representations = {}, bool isMainBody = false);
 
     /*!
      * \brief Removes the constraint between a body and the component

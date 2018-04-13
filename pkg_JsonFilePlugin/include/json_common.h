@@ -1,5 +1,5 @@
-#ifndef JSON_COMMON
-#define JSON_COMMON
+//! \file
+#pragma once
 
 #include <QVector>
 #include <QString>
@@ -10,6 +10,13 @@
 #include <sdsmt_simulator/object_loader_if.h>
 #include <sdsmt_simulator/object_saver_if.h>
 
+/*!
+ * \brief Reads a JSON description of a WorldObject and builds that WorldObject
+ * Any components that cannot be created because their plugin is not available will be skipped
+ * \param[in] json The JSON Object to convert
+ * \param[in] plugins The map of available component plugins
+ * \return A new WorldObject
+ */
 inline WorldObject* jsonObjectToWorldObject(const QJsonObject &json, QMap<QString, WorldObjectComponent_Plugin_If *> plugins)
 {
     QVector<WorldObjectComponent*> components;
@@ -60,6 +67,11 @@ inline WorldObject* jsonObjectToWorldObject(const QJsonObject &json, QMap<QStrin
     return robot;
 }
 
+/*!
+ * \brief Makes a JSON Object description of a WorldObject
+ * \param[in] obj The WorldObject to make a description of
+ * \return The resulting JsonObject description
+ */
 inline QJsonObject worldObjectToJsonObject(WorldObject* obj)
 {
     QJsonObject robotObject;
@@ -104,6 +116,3 @@ inline QJsonObject worldObjectToJsonObject(WorldObject* obj)
     robotObject["properties"] = propArray;
     return robotObject;
 }
-
-#endif // JSON_COMMON
-

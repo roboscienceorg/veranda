@@ -79,23 +79,23 @@ signals:
 
     /*!
      * \brief The user moved a virtual joystick
-     * \param[-1, 1] x[in] The current location of the joystick on the x axis 
-     * \param[-1, 1] y[in] The current location of the joystick on the y axis 
-     * \param[-1, 1] z[in] The current location of the joystick on the z axis 
+     * \param x[in] The current location of the joystick on the x axis [-1, 1]
+     * \param y[in] The current location of the joystick on the y axis [-1, 1]
+     * \param z[in] The current location of the joystick on the z axis [-1, 1]
      * \param[in] channel The ROS 2 channel name to publish this joystick on
      */
     void joystickMoved(double x, double y, double z, QString channel);
 
     /*!
      * \brief The user pressed a button on a virtual joystick
-     * \param[in] key The integer value of the button
+     * \param[in] button The integer value of the button
      * \param[in] channel The ROS 2 channel name to publish this joystick on
      */
     void joystickButtonPress(int button, QString channel);
 
     /*!
      * \brief The user released a button on a virtual joystick
-     * \param[in] key The integer value of the button
+     * \param[in] button The integer value of the button
      * \param[in] channel The ROS 2 channel name to publish this joystick on
      */
     void joystickButtonRelease(int button, QString channel);

@@ -1,5 +1,5 @@
-#ifndef RECTANGLE_PLUGIN_H
-#define RECTANGLE_PLUGIN_H
+//! \file
+#pragma once
 
 #include <QObject>
 
@@ -12,6 +12,9 @@
 //do conditional compilation so this would be used only on windows
 #include "../../../install/include/sdsmt_simulator/world_object_component_plugin.h"
 
+/*!
+ * \brief Plugin interface to the rectangle shape WorldObjectComponent
+ */
 class Rectangle_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 {
     Q_OBJECT
@@ -19,9 +22,10 @@ class Rectangle_Plugin : public QObject, public WorldObjectComponent_Plugin_If
     Q_INTERFACES(WorldObjectComponent_Plugin_If)
 
 public:
-    Rectangle_Plugin();
+    /*!
+     * \brief Creates a new rectangle WorldObjectComponent
+     * \return A newly allocated rectangle WorldObjectComponent
+     */
     WorldObjectComponent *createComponent();
 
 };
-
-#endif
