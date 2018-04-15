@@ -61,7 +61,7 @@ While the visualization of the simulated activity is, technically speaking, part
 The World Visualization is a widget in the UI which is responsible for portraying the simulated activity. Its communication is strictly with the general UI, as it is a child object of it. The UI is expected to tell this visual when objects are added and removed, as well as what models belong with those objects.
 
 \subsection{File Read/Write}
-The File Read/Write component is utilized by the general UI. When the user selects a file, the Read/Write component loads or saves a world object or collection of world objects in that file. If the file is malformed, it returns an error that the UI can display. In the future, this could be extended to support multiple different file formats.
+The File Read/Write component is utilized by the general UI. When the user selects a file, the Read/Write component loads or saves a world object or collection of world objects in that file. If the file is malformed, it returns an error that the UI can display. File handlers are loaded from plugins on startup; the base project includes a save/load handler which utilizes JSON format, and a loader which can convert images to sets of World Objects.
 
 \subsection{Plugin System}
 The Plugin System keeps the core application logic separate from the specific capabilities of the simulated objects. Plugins provide the components which make up the objects simulated. Using this design allows users to write their own components for the simulation if some desired feature is missing.
@@ -222,9 +222,9 @@ When working with a Box2D simulation, there are a number of types that are used.
 \end{itemize}
 
 \subsection{ROS}
-As mentioned a number of times previously, this simulation supports communication with external applications through ROS, the Robotics Operating System. Information on ROS can be found at \url{http://www.ros.org/}. The version of ROS targeted for this project is ROS Kinetic Kame.
+As mentioned a number of times previously, this simulation supports communication with external applications through ROS, the Robotics Operating System. Information on ROS can be found at \url{http://www.ros.org/}. The version of ROS targeted for this project is ROS 2 Ardent Abalone.
 
-The core application itself has minimum communication through ROS, it mainly starts a ROS listener thread so that messages can be received. The bulk of the message sending and receiving is done by the plugin components which make up the objects being simulated.
+The core application itself has minimum communication through ROS, it mainly starts a ROS listener thread so that messages can be received. The bulk of the message sending and receiving is done by the plugin components which make up the objects being simulated. There are two messages sent from the core application -- A timestamp message to indicate the time passed in the simulation and joystick control messages from the virtual joystick.
 
 \newpage
  \section{Architecture and System Design} 	
@@ -333,15 +333,15 @@ After construction, shapes and children models can be added and removed with the
  	\item removeShapes()
  \end{itemize} 
  
- Calling any of these functions will result in the modelChanged() signal being emitted. If a child model emits modelChanged(), then the parent will forward that call with the childModelChanged() signal. This design allows the UI to do the minimum amount of re-rendering necessary when part of a model updates.
+ Calling any of these functions will result in the modelChanged() signal being emitted. This design allows the UI to do the minimum amount of re-rendering necessary when part of a model updates. If the renderer needs to know when to update based on children of the model, it should use the children() method to get the list of children and listen for the modelChanged() signal from each of them.
  
- The transform of the model can be accessed through getTransform() and setTransform(). Setting the transform will result in the transformChanged() signal being emitted, and similarly to how the modelChanged() signals work, the parent of a model whose transform changes will forward that signal with childTransformChanged().
+ The transform of the model can be accessed through getTransform() and setTransform(). Setting the transform will result in the transformChanged() signal being emitted.
  
  Figure \ref{uml:dataflow_model} depicts the series of notifications which result from moving or modifying a Model and its child Models.
  \begin{figure}[h]
  	\begin{center}
- 	\includegraphics[width=\textwidth]{./images_design/uml/DataFlow_Model}
- 	\caption{Flow of data using Models. When the Model owner updates a model: If that model is a child, it notifies its parent; if it is the parent, it notifies the observer.\label{uml:dataflow_model}}
+ 	\includegraphics[width=0.75\textwidth]{./images_design/uml/DataFlow_Model}
+ 	\caption{Flow of data using Models. When the Model owner updates a model, any observers are notified. \label{uml:dataflow_model}}
  	\end{center}
  \end{figure}   
  
@@ -370,7 +370,7 @@ After construction, shapes and children models can be added and removed with the
  		\item int\_validator()
  	\end{itemize}
  	
- 	The value of a property is accessed and mutated though the methods set() and get(). get() returns the current value. set() validates a new value using the validation function and stores whatever value is returned. Whenever the set() function is called, the valueSet() signal is emitted with the value that was set. This happens even if the stored value does not change.
+ 	The value of a property is accessed and mutated though the methods set() and get(). get() returns the current value. set() validates a new value using the validation function and stores whatever value is returned. Whenever the set() function is called, the valueSet() signal is emitted with the value that was set. This happens even if the stored value does not change. The valueRequested() signal is emitted under similar conditions, but only when the value changed because of a request from a PropertyView. This can be used by the owner to only react to external changes, allowing internal changes to not trigger any slots listening for the value change.
  	
  	The PropertyView object contains all of the same public functions as a Property; however it is constructed with only a Property, which it observes. When the set() function is called on a PropertyView, the requestValue() signal is emitted, and the original Property handles that signal and validates the new value. The valueSet() signal in a PropertyView is tied to the same signal in its observed property so that any owner of a PropertyView will know when the value changes.
  	
@@ -385,29 +385,48 @@ After construction, shapes and children models can be added and removed with the
  	\end{center}
  \end{figure} 
  	
-  \subsubsection*{World Object} \label{sec:worldobjclass}
-	The main data type in this simulation is the World Object. World Objects can be added to and removed from the simulation, cloned, and saved to or loaded from files. World Objects consist of a set of Components (Which follow the WorldObjectComponent\_If interface and are created by plugins) and the constraints that keep them together. For the UML diagram of a World Object, see Figure \ref{uml:worldobj}.
+  \subsubsection*{World Object Component} \label{sec:worldobjclass}
+	The main data type in this simulation is the World Object Component. For the UML diagram of a World Object Component, see Figure \ref{uml:worldobj}.
 	
  \begin{figure}[h]
  	\begin{center}
  	\includegraphics[scale=0.5]{./images_design/uml/WorldObj}
- 	\caption{UML of World Object and associated classes\label{uml:worldobj}}
+ 	\caption{UML of World Objects, World Object Components, and associated classes\label{uml:worldobj}}
  	\end{center}
  \end{figure}
- \hrule	
-	TODO
-	\begin{enumerate}
-		\item Finalize new iteractions between World Object and Physics Engine
-	\end{enumerate}
-\hrule
-	World Objects, upon construction, consolidate all of the models and properties of their components. When getModels() or getProperties() is used to access the World Object, these consolidated lists are returned.
 	
-	It is possible that some of a World Object's components will use external communications, such as ROS. The usesChannels() accessor is used to determine if this is the case, and the connectChannels() and disconnectChannels() slots are used to start or stop communctions of any components which do this.
+	It is possible that a World Object Component will use external communications, such as ROS. The usesChannels() accessor is used to determine if this is the case, and the connectChannels() and disconnectChannels() slots are used to start or stop communications.
 	
-	Only the Simulator Core holds the reference to a World Object in the simulation. As can be seen in the UML diagram, a number of wrapper objects exist to provide specific interfaces. The WorldObjectProperties class provides an interface to a World Object which is used by the User Interface, and the WorldObjectPhysics provides the interface used by the Physics Engine. These interfaces are children (in the Qt sense) of the original World Object, so no owner of an interface needs to delete their interface when the WorldObject is removed from the simulation.
-	
-	When a World Object is added to the physics engine, it should be given access to the Box2D world. At this point, the World Object and its Components create any Box2D bodies needed and set up the shapes, masses, and joints required to simulate the World Object. During the simulation, Components can apply forces to this body to give motion to the World Object. When the World Object is removed from the physics engine it should be given access to the Box2D world again so that all bodies and joints can be removed from the simulation. These two events are the only points in time that the World Object will add or remove elements of the simulated world.
+	When a World Object Component is added to the physics engine, it is given access to the Box2D world. At this point, the World Object Component creates any Box2D bodies needed and set up the shapes, masses, and joints required to simulate the component. During the simulation, components can apply forces to their bodies to create movement in the world. When the World Object Component is removed from the physics engine it should destroy any joints and bodies that it has created in the current box2d world.
+
+	The World Object Component type contains a number of methods to help integrate with the rest of the application. The main concerns are keeping track of the Models and Bodies associated with the Component and moving them around as a group when the Component is translated
+	or rotated. To aid this, the methods \lstinline|registerBody()|, \lstinline|unregisterBody()|, \lstinline|registerModel()|, and \lstinline|unregisterModel()| exist as part of World Object Component. Any subclass can call these methods to add or remove handling for bodies and models. Registering either a Model or Box2D Body will move them into global space. The current transform of the Model or Body at the time of registration is assumed to be the location of that Model or Body relative to the Component (or their location in local space); upon registration, the Model or Body is moved to global space. When Bodies are registered, they can be tied to any number of Models; tying a Body to a Model means that the Model's global transform will be updated each step to match that of the Body. Bodies can also be set as the main body for the component, which means that it's location will be the location reported for the Component. If no main body is set, the Component will behave no differently, except that its location will not change due to the simulation.
+
+	When registering and unregistering Models and Bodies, there are a couple of things to keep in mind:
+	\begin{itemize}
+		\item All Models should be registered during the constructor; the set of registered models should not change except during destruction
+		\item Models tied to bodies are not required to be registered, and vice-versa; however, Models not tied to bodies will not move automatically, it will be up to the Component to move them during \lstinline|_syncModels()|
+		\item Models and Bodies should not be destroyed until they are unregistered
+		\item Models should not be destroyed while they are tied to a body
+	\end{itemize}
+
+	World Object Components also have a couple of default Properties: Name, Local X, Y, Theta, and Global X, Y, Theta. Local position is relative to any parent components; if no parent exists, then the Local position will be 0, 0, 0 at all times.
+
+	Finally, World Object Components have a type which is assigned during construction and accessed through \lstinline|getType()|. This value is used to sort components into groups of like components.
   
+	\begin{figure}
+		\begin{center}
+		\includegraphics[scale=0.5]{./images_design/uml/WorldComponent_If}
+		\caption{UML of World Component class interface\label{uml:worldcomponent_if}}
+		\end{center}
+	\end{figure} 
+
+\subsubsection*{World Object}
+	World Objects are a special kind of World Object Component. They are container types which hold any number of other components as children. These consolidations are the data type which is added to and removed from the simulation.
+
+	World Objects, upon construction, consolidate all of the models and properties of their components. When getModels() or getProperties() is used to access the World Object, these consolidated lists are returned.
+
+	Only the Simulator Core holds the reference to a World Object in the simulation. As can be seen in the UML diagram, a number of wrapper objects exist to provide specific interfaces. The WorldObjectProperties class provides an interface to a World Object which is used by the User Interface, and the WorldObjectPhysics provides the interface used by the Physics Engine. These interfaces are children (in the Qt sense) of the original World Object, so no owner of an interface needs to delete their interface when the WorldObject is removed from the simulation.
   
   \subsection{Interfaces}
   \subsubsection*{Physics Engine Interface}
@@ -427,7 +446,8 @@ After construction, shapes and children models can be added and removed with the
   	\item start()
   	\item stop()
   	\item clear()
-  	\item setTick()
+	\item setTick()
+	\item setTickMultiplier()
   \end{itemize}
   
   The methods for adding and removing simulated objects are
@@ -479,29 +499,52 @@ After construction, shapes and children models can be added and removed with the
  	\caption{UML of Visualization widget interface\label{uml:visual_if}}
  	\end{center}
  \end{figure}
-  \subsubsection*{File Handler Interface}
-  Like the View Widget Interface, this interface is a requirement of the UI implemented for this project. One of the goals of the application is to be able to load and save robots, maps, and simulations. Because all of these things are represented as a World Object or collection of World Objects, a single file interface is needed. The File I/O object should be able to load and save files with 1-n world objects contained in them.
+  \subsubsection*{File Handler Plugin Interface}
+  File Handlers are loaded at runtime from plugin libraries following this interface. The interface should provide a set of Loaders and a set of Savers, but one or both sets can be empty. File Handler Plugins are specific to the handling of single objects or entire simulations, covered by the \lstinline|WorldObjectFileHandler_Plugin_If| and \lstinline|WorldFileHandler_Plugin_If| respectively. The loaders and savers returned by the plugin also cover the same category of files.
    \begin{figure}
  	\begin{center}
  	\includegraphics[scale=0.5]{./images_design/uml/FileHandler_If}
  	\caption{UML of File Handler interface\label{uml:filehandle_if}}
  	\end{center}
  \end{figure}
-  \subsubsection*{World Object Component Interface}
-  World Object Components are, as described above, the pieces which make up World Objects. It is expected that all components will come from plugins which are loaded by the application at runtime. This provides flexibility for users, as it will allow them to define their own robot sensors and wheels as well as map obstacles.
- \begin{figure}
- 	\begin{center}
- 	\includegraphics[scale=0.5]{./images_design/uml/WorldComponent_If}
- 	\caption{UML of World Component class interface\label{uml:worldcomponent_if}}
- 	\end{center}
- \end{figure} 
- World Object Components are also the application's main points of contact to the outside world. Components may register as many publish and subscribe channels in ROS as they need. At any point, they need to be able to stop listening (disconnectChannels()) or start listening(connectChannels()) on these topics. If the component does not use any channels, it should return \textit{false} in the usesChannels() method so that the system knows that these calls are unnecessary for this component.
- \hrule
- TODO
+ File Loaders (Figure \ref{uml:fileload_if}) allow a three step process when loading files:
  \begin{enumerate}
- 	\item Determine how World Object Components access the physics engine (See World Object TODO)
+	\item Check that a file is the proper format
+	\item Prompt the user for settings
+	\item Load the file, using the settings from the most recent prompt
  \end{enumerate}
- \hrule
+ These steps are covered by the three methods of a file loader:
+ \begin{enumerate}
+	\item \lstinline|canLoadFile()|
+	\item \lstinline|getUserOptions()|
+	\item \lstinline|loadFile()|
+ \end{enumerate}
+ During the first step, the loader should verify that the file exists and read enough of it to determine that it is the correct format. Simply checking for the correct extension is not enough.
+
+ If the loader needs to get information from the user to load the file, this can be done with a dialog prompt in the second step. It should not be done in the third step, because that step may not be run in the main thread.
+
+ In the third step, the loader should open the file and load any WorldObject(s) found. The user settings chosen in the most recent prompt from \lstinline|getUserOptions()| should be used, if any are needed.
+
+ During any of these steps, it is acceptable for the loader to throw an exception if unexpected situations are encountered.
+
+ \begin{figure}[h]
+	\begin{center}
+	\includegraphics[scale=0.5]{./images_design/uml/Loader_If}
+	\caption{UML of Plugin interface\label{uml:fileload_if}}
+	\end{center}
+\end{figure} 
+
+ File Savers (Figure \ref{uml:filesave_if}) are much simpler, they have a single \lstinline|saveFile()| method which writes out the requested file.
+
+ \begin{figure}[h]
+	\begin{center}
+	\includegraphics[scale=0.5]{./images_design/uml/Saver_If}
+	\caption{UML of Plugin interface\label{uml:filesave_if}}
+	\end{center}
+\end{figure}
+
+ Both File Savers and Loaders have the \lstinline|fileExts()| method which returns a vector of strings. Each of these strings should be a single group of file types that go together, following the Qt File Dialog format. For example, a file loader that can load any image file might return \lstinline|"Images (*.jpg *.png *.bmp)"|, and one that can process JSON or XML files might return \lstinline|"JSON Files (*.json)"| and \lstinline|"XML Files (*.xml)"|.
+
   \subsubsection*{World Object Component Plugin Interface}
   This interface defines how plugins containing World Object Components should look. Plugins are loaded using the Qt Plugin Loader; information on the plugin system can be found at \href{http://doc.qt.io/qt-5/plugins-howto.html#the-low-level-api-extending-qt-applications}{http://doc.qt.io/qt-5/plugins-howto.html}. 
   The only purpose of these plugins is to create instances of the World Object Component they contain. These instances will be cloned or added into World Objects.
@@ -549,7 +592,7 @@ of the simulation to it so that the Object can add bodies and shapes to the phys
  When the UI receives this signal, it un-caches the Object's list of Properties and notifies the world view widget to stop drawing the Models associated with the object.
  
  \subsubsection*{World Ticked}
- World ticks are generated by the physics engine on a timer. The default tick rate is 100 per second, and each tick moves the simulation forward $\frac{1}{100}$ of a second.
+ World ticks are generated by the physics engine on a timer. The default tick rate is 30 per second, and each tick moves the simulation forward $\frac{1}{30}$ of a second.
  
  When a Component of an Object receives this signal, it may update its own Model, which would redraw the screen with the change. Additionally, Components can take this moment to modify the simulation by applying forces on their Box2D bodies or send messages to external applications through ROS.
  

@@ -191,19 +191,6 @@ protected:
      */
     virtual void _syncModels(){}
 
-public:
-    /*!
-     * \brief Constructs a component with a default name and a type
-     * The default name is used to fill the "name" property of the component until
-     * it is reassigned; the type identifies to the UI what group in the toolbox
-     * should contain the component
-     *
-     * \param[in] defaultName Starting name of the component
-     * \param[in] type Toolbox group of the component
-     * \param[in] parent QObject parent
-     */
-    WorldObjectComponent(QString defaultName = "", QString type = "", QObject* parent=nullptr);
-
     /*!
      * \brief Virtual clone/copy
      * The _clone function is used to create a duplicate of the component.
@@ -216,6 +203,19 @@ public:
      * \return A newly constructed WorldObjectComponent* of the same type
      */
     virtual WorldObjectComponent* _clone(QObject* newParent=nullptr) = 0;
+
+public:
+    /*!
+     * \brief Constructs a component with a default name and a type
+     * The default name is used to fill the "name" property of the component until
+     * it is reassigned; the type identifies to the UI what group in the toolbox
+     * should contain the component
+     *
+     * \param[in] defaultName Starting name of the component
+     * \param[in] type Toolbox group of the component
+     * \param[in] parent QObject parent
+     */
+    WorldObjectComponent(QString defaultName = "", QString type = "", QObject* parent=nullptr);
 
     /*!
      * \brief Creates a complete copy of the WorldObjectComponent
@@ -420,8 +420,6 @@ public slots:
      * forward it to any children components as their new global transform
      */
     void setParentTransform(QTransform t, bool cascade);
-
-protected slots:
 
 signals:
     /*!
