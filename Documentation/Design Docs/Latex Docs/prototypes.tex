@@ -526,49 +526,47 @@ The backlog for this sprint included completing the world object designer, imple
 
 \begin{itemize}
 	\item Object Designer
-	\item File Load / Save	
-	\item Speed Button
+	\item Time warping / speed button
+	\item File Load / Save
 	\item Rotate and Move World Objects
 	\item Fix Image Loader bugs
 \end{itemize}
 
 \subsection{Deliverable}
-
+In sprint ten, we confirmed functinoality of plugin loading, implemented rotating/moving world view objects, and worked on, but did not complete, the object designer. We also globalized World Object Component to make objects moveable on the map and fixed bugs like the program crashing while loading many world objects, objects being moveable during simulation play, lidar seeing invisible or non-colliding objects. We also got the speed button functioning just in time for the client presentation next sprint.
+ 
 \begin{itemize}
-	\item Object Designer integrated
-	\item File Load / Save	
+	\item Fixed LIDAR bugs	
 	\item Speed Button
-	\item Rotate and Move World Objects
+	\item Added Rotate and Move World Object Tools
 	\item Fix Image Loader bugs
+	\item Changed Property to have distinct incoming/outgoing signals
+	\item Able to build shape, sensor plugins
 \end{itemize}
-
-Globalize World Object Component to make objects moveable on the map
-
-Able to build shape plugins, sensor plugins, and image loader
-
-Fixed bugs like program crash while loading many world objects, obects being moveable during simulation play, lidar seeing invisible or non-colliding objects
-
-Added rotate tool
 
 \subsection{Results of testing}
 
+We were able to test the planned functionality for plugin components, which worked. The object designer worked after some modification, and we were able to export built robots to the simulator. Objects on the world view rotated and moved correctly for the most part, with some minor bugs in the designer using the rotate tool. We had to alter the signals for world object properties to the UI in order to get them updating in the backend models.
 
 \subsection{Successes and Failures}
-
-Scrum master had to reimage computer
+We successfully tested our component plugin compatibility. We also were able to fix some bugs with the lidar and image loader, and alter the properties signals to incorporate user changes in the models. During this sprint, our scrum master had to reimage his computer, which took a chunk of time out of his sprint schedule. The world object designer from the backlog did not get completed. However, we still completed most of the backlog items and made good progress in the product.
 
 \subsection{Modifications Required}
-Cleaned makefile and debug/release flags, added epsilon check for property values closer to 0
+We had to make world objects global in order to successfully get them to move on the world view. We also cleaned the makefile and debug/release flags, added epsilon checking for property values closer to 0. For the time warping, we modified the base speed of the simulation to be slower. This allowed us two levels of "faster" simulation without producing a glitchy output.
 
 \subsection{Sprint Review}
-
+The team felt that this sprint was successful despite the reimaging of a laptop. We were able to piece together some of the final user stories that we planned to get done before our final client presentation. Aside from the incompletion of the world object designer, which was pushed onto the next sprint.
 
 \subsection{Sprint Retrospective}
+
+In retrospect, sprint ten was a good preparatory sprint for the final client presentation. Much of what we got done was easy to show in a demo and thus created a more significant effect when we later showcased the progress we had made on the project.
+
+
 \section{Sprint 11 Report}
 Mar. 8th - Mar. 22th
 \subsection{Sprint Backlog}
 
-The backlog for this sprint included
+The backlog for this sprint included file load/save, JSON file formatting, client presentation three, integrating the world object designer, and some documentation.
 
 \begin{itemize}
 	\item Establish JSON file format
@@ -594,43 +592,41 @@ The backlog for this sprint included
 \end{itemize}
 
 \subsection{Deliverable}
-Deliverables for this sprint included completion of the robot designer, image loading, and our third client presentation.
-
+In sprint eleven, we completed the world object designer, completed simulation save/load, established our file format for world objects, divied out the remaining Documentation work, and gave our third client presentation.
 
 \begin{itemize}
 	\item World Object Designer
-	\item UI Icons Licensing
 	\item World simulation loading
 	\item Removed QSharedPointer requirement from file loader returns
 	\item Client Presentation III
 	\item Divided remaining Documentation work
-	\item Established JSON file format and begun work on load / save
+	\item Established JSON file format and began work on load / save
 \end{itemize} 
 
 
-
-Designer fully integrated, added names to active objects list, altered plugin model sizes so they can be drawn in designer widgets, enabled modification of properties in the designer. 
-
 \subsection{Results of testing}
-
+We got the designer fully integrated, added names to active objects list, altered plugin model sizes so they can be drawn in designer widgets, enabled modification of properties in the designer. To accomplish these, we had to remove the QSharedPointer requirement from file loader returns. We decided to go with a video demo for our presentation, rather than a live demo, and used the same presentation layout as with previous client presentations.
 
 \subsection{Successes and Failures}
 
-In this sprint we successfully named our product, which until this point was being referred to as something akin to "2D Robot Simulator". We named it the "RoboScience Simulator" which was chosen to match the website and online course being crafted by the client. 
-It was during the presentation this sprint (third client presentation) that we showed the "jello" robot simulation with a rectangular robot. We also showed the joystick control and Ackermann steering, but did not sufficiently discuss our plans for testing.
+Our presentation was successful. The client and class were pleased with our progress and we were finally able to show some variation in the robots we were simulating, like a rectanglular robot with Ackermann steering. We successfully integrated the world object designer, although not in time to include it in the presentation. Some of the save/load operations we were working on also did not get implemented in time for the presentation.
 
 \subsection{Modifications Required}
-
+We had no major modifications during this sprint, aside from removing QSharedPointers and deciding on a file format for world objects. The object designer was finally integrated so a few bugs popped up with that, which didn't get fixed until sprint twelve.
 
 \subsection{Sprint Review}
-
+The team felt that this sprint was successful. We gave a good presentation, other than the fact that our lack of testing reflected poorly, and continued to make progress with the final product features. The client was happy with our work and we were almost at a point of completely switching over from development to bugs and documentation.
 
 \subsection{Sprint Retrospective}
+
+In retrospect, sprint eleven was where our early design decisions for flexibility and expansion really started to show. We were able to create plugins for some demo robots and actually use them in the simulation. We also gave a good final presentation to showcase this and successfully finished the last major development feature: the world object designer.
+
+
 \section{Sprint 12 Report}
 Mar. 22th - Apr. 5th
 \subsection{Sprint Backlog}
 
-The backlog for this sprint included 
+The backlog for this sprint included fixing bugs, implementing quick save/quick load, documentation, design fair poster board, and finishing up the load/save file operations.
 
 \begin{itemize}
 	\item Fix UI Bugs
@@ -647,14 +643,17 @@ The backlog for this sprint included
 \end{itemize}
 
 \subsection{Deliverable}
+In sprint twelve, we fixed some glaring bugs, changed the icons to all fall under one license, created some example robot files, implemented quick save/quick load, designed our board for the fair, and completed the file load/save functionality. We also removed the default robots from the simulator. Not a lot of documentation got done, so we pushed most of that onto backlog for the next sprint.
 
-example robot files, icon licensing
-
-remove default robots
-
-fixed MSVC compile errors
-
-Not a lot of documentation got done, so we pushed most of that onto backlog for the next sprint.
+\begin{itemize}
+	\item Fixed UI Bugs
+	\item Solidified icon licensing
+	\item Example robot files
+	\item Fixed MSVC compile errors
+	\item Implemented Quick Save/ Quick Load
+	\item Finalized Load / Save World Objects and Simulations
+	\item Design Fair Board and Q/A list
+\end{itemize}
 
 \subsection{Results of testing}
 
@@ -696,7 +695,23 @@ The backlog for this sprint included starting a bug backlog, documentation, and 
 
 \subsection{Deliverable}
 
-Deliverables will be viewed and discussed after the design fair.
+Deliverables for this sprint included some documentation, a bug backlog, and the preparation and presentation of the design fair. 
+
+\begin{itemize}
+	\item Bug Backlog Started
+	\item Documentation	Progress	
+	\begin{itemize}
+		\item Sprints
+		\item Testing
+		\item User Documentation
+	\end{itemize}
+	\item Design Fair	
+	\begin{itemize}
+    	\item Poster board
+    	\item Q/A with guests
+    	\item Video of product
+	\end{itemize}
+\end{itemize}
 
 \subsection{Results of testing}
 
