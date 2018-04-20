@@ -70,7 +70,7 @@ QPolygonF simplify(const QPolygonF &p, const uint64_t& crossThreshold)
         indexB = (indexB+1) % p.size();
         indexC = (indexC+1) % p.size();
 
-        if(indexB == 0) lastCorner = true;
+        if(indexB == firstIndex) lastCorner = true;
 
         //If the entire thing is a line, or we can't otherwise simplify it
         //break out of infinite loop
