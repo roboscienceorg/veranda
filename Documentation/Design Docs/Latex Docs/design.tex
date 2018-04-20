@@ -306,8 +306,6 @@ We chose to go with the single-window application both because it looks 'cleaner
 		\item Sensor calculations will likely be fast enough that they won't impact the simulation significantly
 	\end{itemize}
 	After these realizations occurred, the decision was made to keep all processing in a single thread to simplify the application. The major risk to this design is that the system will lag behind real-time; however this should not affect simulations, just the observation of them. It is planned that the simulator will publish timestamp messages so that control code which relies on the passage of time can correctly account for any lag in the system.
-%\section{Notable Algorithms} 
- %\subsubsection{Importing Images}
 
  \newpage
 \subsection{Classes}
@@ -621,10 +619,12 @@ of the simulation to it so that the Object can add bodies and shapes to the phys
 \subsubsection*{Overview}
 The simulator core is, as the name suggests, the main piece of the simulation. It organizes the other parts of the system and ensures that data flows in the correct paths. The main purpose of the simulator core is to connect the UI to the Physics engine and keep them synchronized so that what's shown on screen reflects what's simulated in the physics engine. See UML Figure \ref{uml:simcore} for a list of data members and functions in the simulator core. The specific data connections set up by the core are shown in Figure \ref{uml:dataflow_simcore}.
 
+The simulator core is also responsible for publishing timestamp messages and joystick messages. The timestamp message is, by default, published on the channel \lstinline|"roboScience/simulator/timestamp"|. It consists of a \lstinline|Float64MultiArray| with 2 values in it; the first is the total amount of time simulated since the start of the application, and the second is the amount of time simulated during the most recent tick. This message is published each time the simulation ticks. The joystick messages are the standard \lstinline|sensor_msgs/msg/joy| message provided in ROS. The channels that these messages are published on are assigned by the user
+or the UI as part of the virtual joystick tool.
  
  \begin{figure}[h]
  	\begin{center}
- 	\includegraphics[scale=0.5]{./images_design/uml/SimCore}
+ 	\includegraphics[width=\textwidth]{./images_design/uml/SimCore}
  	\caption{UML of Simulator Core\label{uml:simcore}}
  	\end{center}
  \end{figure}
@@ -639,8 +639,11 @@ The simulator core is, as the name suggests, the main piece of the simulation. I
 \subsubsection*{Design Details}
 \begin{itemize}
 	\item World Objects are assigned an unsigned index when they are added. These indexes count up from 1. 0 can safely be used elsewhere as a placeholder for None.
-	\item Added World Objects are cloned, so the original copy must be deleted correctly wherever it exists.
+	\item Added World Objects can be either cloned or taken by the Simulator Core. Which happens is a function of the second parameter to the \lstinline|addWorldObject()| call.
 	\item The Simulator\_Ui\_If* and Simulator\_Physics\_If* that are used to construct the core will be deleted by the core's destructor.
+	\item During runtime, if a new channel is requested, it will be created. The existing cache of joystick channels will be cleared when the simulation is stopped to prevent the cache from
+	taking too much memory.
+	\item The Simulator Core will delete the Physics and UI interfaces upon destruction, along with all existing World Objects.
 \end{itemize}
 
 \subsection{Physics Engine}
@@ -670,7 +673,7 @@ The physics engine is responsible for updating the world state at regular interv
 
 \subsubsection*{Design Details}
 \begin{itemize}
-	\item Two things happen on every tick: The world updates (b2World::Step), then all world objects are notified of the tick
+	\item Two things happen on every tick: The world updates (b2World::Step), then all world objects are notified of the tick. World Objects are notified twice, once through \lstinline|worldTicked()| to update internal state, and once through \lstinline|syncModels()| to update their visual representations.
 	\item The QTimer is started and stopped with QTimer::start, QTimer::stop. This means that if processing a tick takes longer than the set interval, the timer events will start to stack up. It may be necessary to look at a different method of ticking to prevent this.
 \end{itemize}
 
@@ -687,19 +690,11 @@ The user interface implemented for this project has the following features
 	\item Time Warp simulation
 	\item Add/Remove simulated item
 	\item Load/Save simulation states
+	\item Load images as simulation worlds
+	\item Quick Save/Quick Load simulation state
 	\item Save a screenshot of the simulation
+	\item Designer to build World Objects
 \end{itemize}
-
-\hrule
-TODO
-\begin{itemize}
-	\item Design mode - design, build, document, and test
-	\item Time Warp
-	\item Resetting
-	\item Saving/Loading full simulations
-	\item Loading Image files
-\end{itemize}
-\hrule
 
  \begin{figure}
  	\begin{center}
@@ -707,10 +702,10 @@ TODO
  	\caption{UML of User Interface\label{uml:mainwin}}
  	\end{center}
  \end{figure}
- 
+
  \begin{figure}
  	\begin{center}
- 	\includegraphics[scale=0.5]{./images_design/uml/DataFlow_UI}
+ 	\includegraphics[width=\textwidth]{./images_design/uml/DataFlow_UI}
  	\caption{Data flow of User Interface\label{uml:dataflow_ui}}
  	\end{center}
  \end{figure} 
@@ -752,7 +747,8 @@ TODO
  	\item All events that affect the simulation backend (the physics or core) follow a circular data path. The UI generates an event and emits it $\rightarrow$ The affected object receives the event, acts on it, and sends a response $\rightarrow$ The UI receives that response and updates so the user knows what happened.
  	\item Object properties are shown through a Model-View controller. When an object is selected, its properties are loaded into the model and connected to the dataChanged signals it emits. When the user changes the data in the model, the property views read the new data and attempt to set it on the original Property object if the property is read-only.
  	\item The UI is constructed with a factory function for making the world view widget. This can be done because the widget follows a specific interface and allows for rewriting the world view without changing any of the rest of the application.
- 	\item BUG: Currently, the user can change a read-only property on screen (this does not change the original property value, but the screen shows incorrect data)
+	\item BUG: Currently, the user can change a read-only property on screen (this does not change the original property value, but the screen shows incorrect data); if they try to change a property name, the application terminates unexpectedly
+	\item Since much of the functionality between the Designer and Simulator modes is shared, a common \lstinline|Mode_Controller| type exists to handle properties lists, objects groups, and toolboxes.
  \end{itemize}
 \subsection{World View}
 \subsubsection*{Technologies Used}
@@ -792,8 +788,8 @@ The options for how a shape is drawn include 'selected' or 'not selected', and '
 The main() function serves a couple of important purposes.
 \begin{enumerate}
 	\item Create QApplication. This runs the event loop and represents the application as a whole.
-	\item Call ros::spin() in a separate thread
-	\item Connect the ros spin thread to the QApplication
+	\item Start a timer to call \lstinline|rclcpp::spin_some()| at 100 hz
+	\item Connect the ros spin timer to the QApplication
 	\item Load all valid plugins that can be found in \lstinline|../|
 	\item Instantiate a system object for each interface
 	\begin{itemize}
@@ -808,20 +804,204 @@ The main() function serves a couple of important purposes.
 
 \subsubsection*{Design Details}
 \begin{itemize}
-	\item The ROS spin thread is connected to the QApplication for mutually assured destruction. If the ROS connection dies, then the application will close. If the Application closes, then the ROS connection will end. This prevents either from continuing in an invalid state without the other.
-	\begin{lstlisting}
-QFutureWatcher<void> rosThread;
-rosThread.setFuture(QtConcurrent::run(&ros::spin));
-QObject::connect(&rosThread, &QFutureWatcher<void>::finished, &app,
-                 &QCoreApplication::quit);
-QObject::connect(&app, &QCoreApplication::aboutToQuit,
-                 [](){ros::shutdown();});
-	\end{lstlisting}
-	\item The directory above the executable is checked for plugins because that is, by default, where Catkin places shared libraries
+	\item Originally, the \lstinline|rclcpp::spin_some()| call was just \lstinline|rclcpp::spin()| running in a separate thread. This is the preferable setup, but ROS 2 does not handle thread-safety correctly as of the time of this project, so using a timer is a temporary solution. This results in odd behaviors when exiting the application sometimes.
+	\item The directory above the executable is checked for plugins because that is, by default, where Ament places shared libraries
 \end{itemize}
+
+\section{Using the Timestamp message}
+As mentioned previously, the simulator publishes a timestamp message containing both the delta time for the most recent tick and the total time passed in the simulation. This message can be used to make control code more accurate when it relies on dead reckoning. To make using this data easier, the python SimTimer class in included with the project. The SimTimer has two simple methods:
+\begin{enumerate}
+	\item \lstinline|double global_time()| - Returns total number of seconds
+	\item \lstinline|void create_timer(delta, callback)| - Starts calling [callback] every [delta] seconds.
+\end{enumerate}
+
+Depending on its initialization parameters, the SimTimer will either listen to the simulator messages for its timestamp, in which case the global time will be the total time reported in those messages, or use a ROS node to create a repeating timer, in which case the global time will be seconds since epoch.
+
+The SimTimer type can be included in python projects with \begin{lstlisting}
+from sdsmt_simulator.SimTimer import SimTimer
+\end{lstlisting}
+
+SimTimer is constructed with three parameters:
+\begin{itemize}
+	\item useSimulatedTime: bool - Whether or not the timer should use the timestamps from the simulation. If False, the os clock will be used through a ROS node
+	\item simulatedTimeChannel: string - ROS topic to listen on for timestamp messages
+	\item rosNode: rclpy.Node - The ROS node to use for listening to messages and registering a normal timer
+\end{itemize}
+
+When listening to the timestamp messages, the SimTimer keeps a priority queue of all callbacks. They are ordered by their next target activation times. Each time a timestamp is recieved, it is compared to the front of the queue, and until that first item has a higher activation time than the current time, items are dequeued, called, and queued again with a higher activation time. Activation time is calculated by adding the callback delta to the time that the callback should have been called in a perfect simulation, which may differ slightly from the time that it was actually called.
+
 \section{Plugins}
-One of the main advantages to the design of this project is that it can be extended through WorldObjectComponent Plugins. Unfortunately, because it is a ROS package, the project (and any such plugins) must be built with Catkin and CMake. A number of plugins have been included with the project to provide much basic functionality, and those plugins can be used as examples of how plugins should be set up; however, not all plugins will follow the same patterns, so this section will describe the existing plugins as well as some of the requirements to build and use a plugin.
-\subsection{Touch Sensor Ring}
+One of the main advantages to the design of this project is that it can be extended through WorldObjectComponent Plugins and FileHandler Plugins. Unfortunately, because it is a ROS package, the project (and any such plugins) must be built with Ament and CMake. A number of plugins have been included with the project to provide basic functionalities, and those plugins can be used as examples of how other plugins should be set up; however, not all plugins will follow the same patterns, so this section will describe the existing plugins as well as some of the requirements to build and use a plugin.
+
+\subsection{Shape Plugins}
+Shape plugins create a solid mass of a specific shape.
+
+\subsubsection*{Rectangle Plugin}
+The Rectangle Plugin creates a rectangular shape. The width and height
+can be specified. The corresponding Properties can be found in Table \ref{tab:rectangle_props}.
+
+\begin{table}[h!]
+	\centering
+	\caption{Properties exposed by the Rectangle plugin}
+	\label{tab:rectangle_props}
+	\begin{tabular}{c|c|c}
+	Property Name & Data Type & Description\\ \hline \hline
+	width & Double & Width of the rectangle (meters)\\ \hline
+	Height & Double & Height of the rectangle (meters)
+	\end{tabular}
+\end{table}
+
+\subsubsection*{Circle Plugin}
+The Circle Plugin creates a circle shape. The radius
+can be specified. The corresponding Properties can be found in Table \ref{tab:circle_props}.
+
+\begin{table}[h!]
+	\centering
+	\caption{Properties exposed by the Circle plugin}
+	\label{tab:circle_props}
+	\begin{tabular}{c|c|c}
+	Property Name & Data Type & Description\\ \hline \hline
+	radius & Double & Radius of the circle (meters)
+	\end{tabular}
+\end{table}
+
+\subsubsection*{Polygon Plugin\label{sec:polygon}}
+The Polygon Plugin can be used to create a solid mass in any arbitrary shape, which could have holes in it. It is not intended to be added to objects manually, but should be
+used by other plugins to create specifically shaped masses. In the future, it may be possible to add a polygon and modify its points, but at the time of this writing, it is not possible. Finally, the components created by this plugin are anchored and will not move in the physics engine. The properties available from a Polygon component are shown in Table \ref{tab:polygon_props}.
+
+\paragraph{Design Details}
+\begin{enumerate}
+\item The Box2D polygon type does not work properly with concave polygon and has a limitation on how many points can be in a polygon. To prevent either of these limitations from being a problem, the polygon is triangulated and all of the triangles are loaded as separate shapes. The triangulation algorithm is provided by the OpenGL GLU Tesselator.
+\item Polygons are simplified according to the straightness property setting. The simplification algorithm can be found in Algorithm \ref{algo:straighten}; this algorithm is called with the straightness value as its cross product threshold.
+\item Triangulation is performed each time the straightness property or one of the scaling properties changes.
+\end{enumerate}
+
+\begin{table}[h!]
+	\centering
+	\caption{Properties exposed by the Polygon plugin}
+	\label{tab:polygon_props}
+	\begin{tabular}{c|c|c}
+	Property Name & Data Type & Description\\ \hline \hline
+	polygon\_count & Integer & Read Only: The number of triangles produced in triangulation\\ \hline
+	outer\_shape & List of Points & The points that make up the outer loop of the shape.\\ \hline
+	inner\_shape & List of Lists of Points & The loops of points making up the holes in the outer shape.\\ \hline
+	straightness & Integer $ > 0 $ & Threshold for cross product in the simplification algorithm\\ \hline
+	scale/horiz & Double & Horizontal scaling factor\\ \hline
+	scale/vert & Double & Vertical scaling factor  
+	\end{tabular}
+\end{table}
+
+\begin{algorithm}
+\begin{algorithmic}
+	\STATE{Given loop of points p and double threshold}
+	\IF{Points in p <= 3} \STATE{Return p} \ENDIF
+	\STATE{Let out be the output polygon}
+	\STATE{Let indexA be 0}
+	\COMMENT{Indices for the edges being considered}
+	\STATE{Let indexB be 1}
+	\STATE{Let indexC be 2}
+	\STATE{Let lastCorner be false}
+	\COMMENT{Set some flags and create sentinel}
+	\STATE{Let firstPoint be true}
+	\STATE{Let firstIndex be 0}
+	\WHILE{true}
+		\STATE{Let cProd be the cross product between the edges with points in p at indexA, indexB and indexA, indexC}
+		\IF{cProd greather than threshold}
+			\STATE{Let indexA be indexB}
+			\IF{indexA is not the firstIndex}
+				\STATE{Add the point in p at indexA to out}
+			\ENDIF
+			\IF{lastCorner is true} \STATE{break} \ENDIF
+			\IF{firstPoint is true}
+				\STATE{Let firstPoint be false}
+				\STATE{Let firstIndex be indexA}
+				\COMMENT{Set sentinel to the first point used in the output}
+			\ENDIF
+		\ENDIF
+		\STATE{Increment indexB and mod size of p}
+		\STATE{Increment indexC and mod size of p}
+		\IF{indexB equals firstPoint} \STATE{Let lastCorner be true} \COMMENT{Set flag to end if we get back to the first point that was used in the output}\ENDIF
+		\IF{indexC equals indexA} \STATE{Return p} 		\COMMENT{If indexC reaches indexA, the polygon is some degenerate case that this will not simplify (such as a line)}
+		\ENDIF
+	\ENDWHILE
+	\STATE{Return out}
+\end{algorithmic}
+\caption{Algorithm for simplification of line loops}
+\label{algo:straighten}
+\end{algorithm}
+
+\subsection{Driving Plugins}
+Driving plugins produce force to propel a world object. Perhaps they would be better named 'propulsion plugins', but they usually emulate wheel-like hardware, so we're calling them driving plugins. Box2D does not actually simulate rolling of wheels in a top-down environment, so it is all done virtually. Given the size of a wheel and its angular velocity, we can calculate its linear velocity, and apply that velocity. Similarly, given its linear velocity, we can calculate the portions of that velocity in invalid directions and negate it (for example, to prevent a wheel from slipping or sliding).
+
+It's important to note that, at least in the built-in plugins, the forces produced are proportional to the mass of the wheels. This means that if the body of a vehicle-like object is much more massive than the wheels, the wheels will have little effect on the object. This can be compensated
+for by allowing the user to tune the density of wheels so that their mass
+can be tweaked and made closer to the mass of what they are moving.
+
+\subsubsection*{Fixed Wheel Plugin}
+The fixed wheel plugin emulates a single wheel which cannot rotate to face a different direction. The wheel may be driven, which means its target angular velocity can be set and it will produce force in an attempt to travel the correct linear velocity. The wheel will always produce forces to negate any movement parallel to its axle (or where the axle would be if one existed). A list of the properties exposed by the plugin can be see in in Table \ref{tab:fixedwheel_props} and the input channel specification can be found in Table \ref{tab:fixedwheel_msgs}.
+\paragraph{Design Details}
+\begin{itemize}
+\item The code for generating the wheel shape and calculating forces that the wheel should generate is shared by the Ackermann steering plugin.
+\item The width of the wheel is not used in the force calculations other than to determine the mass of the wheel. It is also used for collisions.
+\end{itemize}
+
+\begin{table}[h!]
+	\centering
+	\caption{Properties exposed by the Fixed Wheel plugin}
+	\label{tab:fixedwheel_props}
+	\begin{tabular}{c|c|c}
+	Property Name & Data Type & Description\\ \hline \hline
+	channels/input\_speed & String & The ROS topic to listen on for target angular velocity \\ \hline
+	wheel\_radius & Double & Radius of the wheel in meters\\ \hline
+	wheel\_width & Double & Width of the wheel in meters\\ \hline
+	is\_driven & Bool & \makecell{Whether or not the wheel should\\ produce driving force based on the input speed}\\ \hline
+	density & Double & \makecell{Density of the wheel. This can be tuned to give the\\ wheel more or less mass so it affects the object\\ it is attached to better.}
+	\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+	\centering
+	\caption{ROS Messages used by the Fixed Wheel Plugin}
+	\label{tab:fixedwheel_msgs}
+	\begin{tabular}{c|c|c|c}
+	ROS Topic & Message Type & In/Out & Description\\ \hline \hline
+	channels/[input\_channel] & std\_msgs::msg::Float32 & In & \makecell{Target angular velocity (rad/s) to simulate.\\ This information is ignored if [is\_driven] is false.}
+	\end{tabular}
+\end{table}
+
+\subsubsection*{Ackermann Steering Plugin}
+The Ackermann steering plugin produces two linked wheels which can be steered together and will follow the Ackermann constraint. The wheels cannot be driven, they only produce forces to negate horizontal sliding, which can be used to steer a vehicle-like object. The Properties exposed and ROS channels used can be seen in Tables \ref{tab:ackermann_props} and \ref{tab:ackermann_msgs}.
+
+\begin{table}[h!]
+	\centering
+	\caption{Properties exposed by the Ackermann Steering plugin}
+	\label{tab:ackermann_props}
+	\begin{tabular}{c|c|c}
+	Property Name & Data Type & Description\\ \hline \hline
+	channels/input\_angle & String & The ROS topic to listen on for target steering angle\\ \hline
+	wheel\_radius & Double & Radius of the wheels in meters\\ \hline
+	wheel\_width & Double & Width of the wheels in meters\\ \hline
+	axle\_length & Double & \makecell{Distance between the two wheels (meters)}\\ \hline
+	vehicle\_length & Double & \makecell{Distance from the 'front axle'\\ of the object to the 'back axle'\\ to be used in the Ackermann constraint (meters)}\\ \hline
+	density & Double & \makecell{Density of the wheels. This can be tuned to give the\\ wheel more or less mass so it affects the object\\ it is attached to better.}\\ \hline
+	steer\_angle & Bool & \makecell{Read only property: The\\ current angle being steered to}
+	\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+	\centering
+	\caption{ROS Messages used by the Ackermann Steering Plugin}
+	\label{tab:ackermann_msgs}
+	\begin{tabular}{c|c|c|c}
+	ROS Topic & Message Type & In/Out & Description\\ \hline \hline
+	channels/input\_angle & std\_msgs::msg::Float32 & In & \makecell{Angle to steer towards, radians.\\ Will be clamped to the range [$-\frac{\pi}{2},\frac{\pi}{2}$]}
+	\end{tabular}
+\end{table}
+
+\subsection{Sensor Plugins}
+Sensors travel with a world object and collect information about the environment. This information is usually published to the control code through ROS messages so that the control code can react to what is happening. Sensors plugins should produce the same messages as their hardware counterparts so that any control code listening to the messages does not behave differently when the messages are produced by hardware.
+
+\subsubsection*{Touch Sensor Ring}
 The touch sensor ring plugin mimics a ring of touch sensors with a specific radius. It is intended to be used on circular robots, so that its radius can be set to the same as the robot. 
 	The sensor ring can be set to sense a specific section of the circle, and the number of sensors used can be specified. Whenever the state of one of the buttons changes, a ROS message is published. Extra circles are drawn on the world visualization to show which touch sensors are triggered. An example of this can be seen in Figure \ref{fig:touchsensorexample}. Details of the properties exposed by the plugin and the ROS messages it utilizes can be found in tables \ref{tab:touch_ring_props} and \ref{tab:touch_ring_msgs}
 	
@@ -850,15 +1030,167 @@ The touch sensor ring plugin mimics a ring of touch sensors with a specific radi
 	\label{tab:touch_ring_msgs}
 	\begin{tabular}{c|c|c|c}
 	ROS Topic & Message Type & In/Out & Description\\ \hline \hline
-	channels/output\_channel & std\_msgs::ByteMultiArray & Out & \makecell{1-Dimensional vector with one\\ element for each touch sensor on\\ the ring. Untriggered buttons\\ are set to 0, triggered\\ ones are non-0.}
+	channels/output\_channel & std\_msgs::msg::ByteMultiArray & Out & \makecell{1-Dimensional vector with one\\ element for each touch sensor on\\ the ring. Untriggered buttons\\ are set to 0, triggered\\ ones are non-0.}
 	\end{tabular}
 \end{table}
-\subsubsection*{Design Details}
+\paragraph{Design Details}
 \begin{itemize}
 	\item All the required circle shapes for the touch sensors are generated at the start. They are added to and removed from the model when they become active or inactive.
 	\item The touch sensor circle is a solid physics shape which can collide. This generates collision points from Box2D that can be used to know what is sensed.
 	\item The body with the sensor ring fixture is held in place relative to the robot by a Box2D Weld Joint. The ring has a very low density (so as not to affect how the robot drives) so, due to the implementation of Weld Joints,  it is possible for the ring to behave in strange ways if it is larger than the robot it surrounds. Specifically, if there is a collsion and the robot continues to drive, the robot can be seen moving around within the touch sensor ring; it does not stay anchored in the center as one might expect.
 \end{itemize}
+\subsubsection*{Lidar Sensor}
+The lidar sensor behaves as a regular hardware lidar would. It scans an area in front of (or around) itself at a high rate and reports the distances to the objects scanned. The lidar provided by this plugin can be customized to scan any size range from 0 to 360 degrees, with the center of the range directly in front of the lidar. The number of scan rays and the radius (maximum range) can also be specified, along with the rate of scanning. Each time a scan is performed, the image representing the lidar and its scan will be updated, and a ROS message will be published. A list of An example of the lidar can be seen in Figure \ref{fig:lidarsensorexample} and the properties exposed by the sensor and its ROS messages can be found in Tables \ref{tab:lidar_props} and \ref{tab:lidar_msgs} respectively.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{./images_design/lidar_sensor}
+	\caption{Example of the ldar sensor sensing something. The lidar has 20 rays in a range of 200 degrees; the rays are shortened on the sensor's left and front sides because it is in a corner.}
+	\label{fig:lidarsensorexample}
+\end{figure}
+
+\paragraph{Design Details}
+\begin{itemize}
+\item The Box2D shapes used to represent the lidar beams are created any time a Property changes which affects them. During runtime, their lengths are modified to represent what is seen.
+\item Given a range of $x$ degrees, the lidar will report beams from the angle of $-\frac{x}{2}$ to $\frac{x}{2}$, relative to the lidar body.
+\item Any beams which do not detect an obstacle will report a distance of $\infty$, as defined by the implementation of \lstinline|std::numeric_limits<float32>::infinity()|.
+\end{itemize}
+
+\begin{table}[h!]
+	\centering
+	\caption{Properties exposed by the Lidar Sensor plugin}
+	\label{tab:lidar_props}
+	\begin{tabular}{c|c|c}
+	Property Name & Data Type & Description\\ \hline \hline
+	channels/output\_channel & String & The ROS topic to output sensor messages to\\ \hline
+	scan\_range & Double (0-360) & Total angle range to sense, in Degrees\\ \hline
+	scan\_radius & Double & Max distance away from the sensor to detect\\ \hline
+	scan\_points & Integer $\geq$ 2 & \makecell{Number of beams spaced evenly in the range,\\ including the first and last beam.}\\ \hline
+	scan\_rate & Double & Rate (hz) of scans and messages.
+	\end{tabular}
+\end{table}
+\begin{table}[h!]
+	\centering
+	\caption{ROS Messages used by the Lidar Sensor Plugin}
+	\label{tab:lidar_msgs}
+	\begin{tabular}{c|c|c|c}
+	ROS Topic & Message Type & In/Out & Description\\ \hline \hline
+	channels/output\_channel & sensor\_msgs::msg::LaserScan & Out & \makecell{The standard ROS LaserScan message \\with parameters filled according to the \\property settings of the sensor.}
+	\end{tabular}
+\end{table}
+
+\subsection{Image Loading Plugin}
+One of the functions of the original STDR was that it could load an image, and then the dark pixels of the image would be treated as obstacles. This was simple for the STDR to do because of the way it did collision detection - on a per-pixel basis. Collisions in this project are done in the Box2D engine, so in order to provide a similar functionality, a plugin is included which converts an image to a set of obstacles which can be loaded into the physics engine. The algorithm for converting an image to polygons consists of a couple of steps, and can be found in Algorithms \ref{algo:findshapes}, \ref{algo:blackwhite}, \ref{algo:findpoints}, and \ref{algo:followbound}. The plugin can handle the common image formats .png, .jpg, and .bmp. All images are converted to black and white before processing. A threshold is chosen by the user, and all pixels with an intensity above that are changed to 255 and all pixels with intensity at or below it are set to 0. The polygons are constructed using the polygon component defined in Section \ref{sec:polygon}. When a file is loaded, the user is presented with a prompt in which they can specify the following:
+\begin{enumerate}
+	\item Width and height of the image (meters)
+	\item Pixels per meter in both the horizontal and vertical directions
+	\item Straightness value for the shapes read
+	\item Greyscale threshold
+\end{enumerate}
+
+\paragraph{Design Details}
+\begin{enumerate}
+\item The triangulation and simplification necessary to load polygons into the physics engine is not done in the plugin, but in the polygon component type. Similarly, scaling is also done in the polygon component type.
+\end{enumerate}
+
+\begin{algorithm}
+	\caption{Convert a black and white image to a set of polygons and holes}
+	\label{algo:findshapes}
+	\begin{algorithmic}
+		\STATE{Given 2D rgb pixel array and intensity threshold}
+		\STATE{Let blackAndWhite be the output from Algorithm \ref{algo:blackwhite}}
+		\STATE{Let shapes be a vector of pairs of outer loops and inner loops}
+		\FORALL{Values v in blackAndWhite}
+			\IF{v is false (black)}
+				\STATE{Perform BFS starting at v to find region of connected black pixels}
+				\STATE{Create new 2D boolean array of true (white) large enough to hold the region + 1 on each side}
+				\STATE{Copy region into new array}
+				\STATE{Let shift be the x, y offset in img of the upper-left corner of the bounding box of the region}
+				\STATE{Set all pixels in the region to be true (white) in the original image}
+				\STATE{Let outer, inner be the result of running Algorithm \ref{algo:findpoints} on the copy of the region}
+				\STATE{Add shift to every point in the outer loop and every point of every one of the inner loops}
+				\STATE{Store outer, inner as an output shape in shapes}
+			\ENDIF
+		\ENDFOR
+		\STATE{Return shapes}
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+	\caption{Convert an image to black and white}
+	\label{algo:blackwhite}
+	\begin{algorithmic}
+		\STATE{Given 2D rgb pixels array img and intensity threshold}
+		\STATE{Let out be a 2D boolean array with same dimensions as img}
+		\FORALL{Pixels p in img}
+			\IF{intensity(p) > threshold} \STATE{Let corresponding location in out be true}
+			\ELSE \STATE{Let corresponding location in out be false}
+			\ENDIF
+		\ENDFOR
+		\STATE{Return out}
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+	\caption{Convert a black and white image of a single shape to an outer loop and inner hole loops}
+	\label{algo:findpoints}
+	\begin{algorithmic}
+		\STATE{Given 2D boolean array img}
+		\STATE{Let firstEdge be false}
+		\COMMENT{Used to determine if we want to move clockwise or counterclockwise when following boundaries}
+		\STATE{Let out be a pair containing an empty outer loop and an empty set of inner loops}
+		\FORALL{Pixels p in img}
+			\IF{p is True and at least one of the four adjacent pixels to p is False}
+				\STATE{Let bound be the pixels found by Algorithm \ref{algo:followbound} starting at p}
+				\IF{firstEdge is true}
+					\STATE{Let the outer loop of out be bound}
+				\ELSE
+					\STATE{Add the bound to the inner loops of out}
+				\ENDIF
+				\STATE{Let firstEdge be false}
+				\STATE{Perform a BFS on true pixels starting at p}
+				\STATE{Set every pixel found in the BFS to false}
+			\ENDIF
+		\ENDFOR
+		\STATE{Return out}
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+	\caption{Follow the boundary between a black region and a white region}
+	\label{algo:followbound}
+	\begin{algorithmic}
+		\STATE{Given 2D boolean array img, starting location x, y, and boolean flag clockwise}
+		\STATE{Let searchNext be 0}
+		\COMMENT{Indicates which point to start with when checking points around the current point. Index 0 is 1, -1 relative, 1 is 1, 0 relative, 2 is 1, 1 relative, and so on}
+		\STATE{Let points be an empty list of output points}
+		\STATE{Let currPoint be the start x, y}
+		\STATE{Let lastPoint be currPoint}
+		\REPEAT
+			\STATE{Add currPoint to points}
+			\STATE{Let good be false}
+			\FOR{Each of the 8 points surrounding currPoint, starting with searchNext and continuing in the fasion described above (If clockwise is false, go the opposite direction). Let each point be called next}
+				\IF{next is true}
+					\FOR{Each neigbor f to next which is false}
+						\STATE{Let cProd be the cross product between currPoint, next and currPoint, f}
+						\IF{cProd is greater than 0}
+							\STATE{Let good be true}
+							\STATE{Let lastPoint be currPoint}
+							\STATE{Let currPoint be next}
+							\STATE{Let searchNext be searchNext + 4 mod 8
+							\STATE{break}}
+						\ENDIF
+					\ENDFOR
+				\ENDIF
+			\ENDFOR
+		\UNTIL{currPoint equals start}
+		\STATE{Return points}
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{The JSON Plugin}
+One general-purpose file handler plugin is provided as part of the project. It is able format WorldObjects and WorldObjectComponents as JSON objects which can be stored in files. The JSON formatter can be used to save single World Objects and entire Simulations.
+
 \subsection{Custom Plugins}
 Custom plugins should be ROS packages in the same workspace as the simulator package. The plugin's package.xml file should specify at least the following in order to resolve build order:
 \begin{lstlisting}
@@ -866,12 +1198,12 @@ Custom plugins should be ROS packages in the same workspace as the simulator pac
 <depend>sdsmt_simulator_box2d</depend>
 \end{lstlisting}
 
-Once Catkin is aware of package dependencies, the CMakeLists file must be set up to find the required libraries and files and build the plugin correctly.
+Once Ament is aware of package dependencies, the CMakeLists file must be set up to find the required libraries and files and build the plugin correctly.
 
 First, there are a number of definitions and values that need to be set in order to compile and link the Qt-Specific portions of the plugin
 \begin{lstlisting}
 find_package(Qt5 REQUIRED COMPONENTS
-  Core
+  Core Gui
 )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -883,35 +1215,48 @@ add_definitions(-DQT_SHARED)
 include_directories( ${CMAKE_BINARY_DIR} )
 \end{lstlisting}
 
-In order to resolve dependencies for Box2D and the header files from the simulator, find\_package needs to be called for the associated packages.
+In order to resolve dependencies for Box2D and the header files from the simulator, find\_package needs to be called for the associated packages. Then \lstinline|include_directories| needs to be called so the Qt MOC can resolve headers
 \begin{lstlisting}
-find_package(catkin REQUIRED COMPONENTS
-    sdsmt_simulator
-    sdsmt_simulator_box2d)
+find_package(sdsmt_simulator REQUIRED)
+find_package(sdsmt_simulator_box2d REQUIRED)
     
-catkin_package(
-    CATKIN_DEPENDS
+ament_export_dependencies(
     sdsmt_simulator
     sdsmt_simulator_box2d
 )
+
+include_directories(${sdsmt_simulator_api_INCLUDE_DIRS})
+include_directories(${sdsmt_simulator_box2d_INCLUDE_DIRS})
 \end{lstlisting}
 
+Next, any headers in the plugin containing the \lstinline|Q_OBJECT| or other \lstinline|Q_*| macros need to be preprocessed by the MOC
+\begin{lstlisting}
+	set(plugin_moc_hdrs a.h b.h ... z.h)
+    qt5_wrap_cpp(MOC_SRCS ${plugin_moc_hdrs})
+\end{lstlisting}
 
 Finally, the plugin needs to be built as a shared library and linked against Qt Core libraries and the Box2D library.
 \begin{lstlisting}
 add_compile_options(-fPIC)
 
 add_library([plugin name] SHARED ${CPP_SRCS} ${MOC_SRCS})
-qt5_use_modules([plugin name] Core)
+qt5_use_modules([plugin name] Core Gui)
 
-target_link_libraries(touch_sensor_plugin
-  ${catkin_LIBRARIES}
-)
+ament_target_dependencies([plugin name]
+	"sdsmt_simulator_box2d"
+	"sdsmt_simulator_api"
+	)
 \end{lstlisting}
 
-The last detail is that the plugin must be deployed in the directory above the simulator executable. This happens by default when the simulator and plugin packages are in the same package and \lstinline|catkin_make| is used to build them. However, if they are in separate workspaces or one has been installed to a more permanent directory (either manually or with \lstinline|catkin_make install|) then extra care will need to be taken to ensure that this last requirement is met.
+The last detail is that the plugin must be deployed in the directory above the simulator executable. This can be achieved by installing the plugin to the \lstinline|lib| directory of the workspace install.
+\begin{lstlisting}
+    install(
+      TARGETS [plugin name]
+      DESTINATION lib
+    )
+\end{lstlisting}
 
 \subsubsection*{A Note About ROS Communications}
-It is believed by the project team that, because the ros::spin() method was called from a thread other than the main one, all ROS message callbacks will be run from that thread. Care should be taken when defining callbacks in components to prevent race conditions which would result from this design. This issue was resolved in the Touch Sensor Ring plugin with the use of a Qt Signal and Slot. When a Qt Signal triggers a Slot of an object which resides in a different thread, the slot is queued for the second thread to receive naturally during its event loop, preventing any race conditions. The Touch Sensor Ring component has an internal signal and slot specifically for this purpose; the signal is emitted by the ROS callback function, and that copies the data from the callback into the main thread where it can be processed safely.
+It is believed by the project team that, because the rclcpp::spin() method may be called from a thread other than the main one, all ROS message callbacks may be run from a non-main thread. Care should be taken when defining callbacks in components to prevent race conditions which would result from this design. This issue was resolved in the Touch Sensor Ring plugin with the use of a Qt Signal and Slot. When a Qt Signal triggers a Slot of an object which resides in a different thread, the slot is queued for the second thread to receive naturally during its event loop, preventing any race conditions. The Touch Sensor Ring component has an internal signal and slot specifically for this purpose; the signal is emitted by the ROS callback function, and that copies the data from the callback into the main thread where it can be processed safely.
 
 \end{itemize}

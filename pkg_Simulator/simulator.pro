@@ -56,4 +56,5 @@ RESOURCES += \
 
 DISTFILES += \
     CMakeLists.txt \
-    package.xml
+    package.xml \
+    sdsmt_simulator/SimTimer.py
