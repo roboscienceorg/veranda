@@ -95,8 +95,8 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(ui->saveObjectButton, SIGNAL (released()), this, SLOT (saveObjectButtonClick()));
 
     //Simulation mode tool button signals and slots
-    connect(simulator, SIGNAL (requestAddWorldObject(QVector<WorldObject*>, bool)), this, SIGNAL (userAddWorldObjectsToSimulation(QVector<WorldObject*>, bool)));
-    connect(simulator, SIGNAL (requestRemoveWorldObject(QVector<object_id>)), this, SIGNAL (userRemoveWorldObjectsFromSimulation(QVector<object_id>)));
+    connect(simulator, SIGNAL (requestAddWorldObjects(QVector<WorldObject*>,bool)), this, SIGNAL (userAddWorldObjectsToSimulation(QVector<WorldObject*>, bool)));
+    connect(simulator, SIGNAL (requestRemoveWorldObjects(QVector<object_id>)), this, SIGNAL (userRemoveWorldObjectsFromSimulation(QVector<object_id>)));
     connect(ui->addObjectButton, SIGNAL (released()), simulator, SLOT (addObjectToView()));
     connect(ui->deleteObjectButton, SIGNAL (released()), simulator, SLOT (deleteObjectFromView()));
     connect(ui->loadObjectsButton, SIGNAL (released()), this, SLOT (loadObjectsForSimButtonClick()));

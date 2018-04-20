@@ -244,5 +244,3 @@ public:
      */
     QString getPluginName(){ return POLYGON_IID; }
 };
-
-#endif // POLYGON_H

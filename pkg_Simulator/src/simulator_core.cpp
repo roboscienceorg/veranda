@@ -68,7 +68,7 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
     custom_qos_profile.depth = 7;
 
-    _timestampChannel = _node->create_publisher<std_msgs::msg::Float64MultiArray>("sdsmt_simulator/timestamp", custom_qos_profile);
+    _timestampChannel = _node->create_publisher<std_msgs::msg::Float64MultiArray>("roboScience/simulator/timestamp", custom_qos_profile);
 
     //Publish on every physics tick
     connect(_physicsEngine, &Simulator_Physics_If::physicsTicked,
