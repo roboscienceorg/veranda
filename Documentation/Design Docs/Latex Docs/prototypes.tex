@@ -337,7 +337,385 @@ The entire Christmas break was designated to this sprint. The backlog for this s
 
 \subsection{Deliverable}
 
-Deliverables will be viewed and discussed after the break.
+In sprint six, we started a lot of features that did not get fully implemented, such as the joystick, image loading, and loading and saving world objects. User stories completed were the LIDAR and determining a plan for the remaining spring semester sprints.
+
+\begin{itemize}
+	\item New Physics
+	\item Spring Semester Plan
+	\item LIDAR sensor
+\end{itemize}
+
+\subsection{Results of testing}
+
+At this point we determined our software was pretty functional in terms of the original goal. We compiled a list of new features left to implement before we started testing and collecting bugs. This list included more sensor plugins, more component plugins, the joystick control, world object designer, and saving/loading files.
+
+\subsection{Successes and Failures}
+
+This sprint, while slow, was successful as far as creating a plan for what remained of the project. We determined the software could not be tested by the spring semester robotics class but we would be able to write some tests for specific features. Image loading ended up being a more difficult task than anticipated due the need to break large image bodies into Box2D-compatible shapes.
+
+\subsection{Modifications Required}
+
+A couple decisions were made during this sprint, such as choosing not to try and test our software with the spring robotics class and also altering the physics. Some of the tasks were re-assigned and we decided on most important features to implement during the following semester.
+
+\subsection{Sprint Review}
+
+This sprint was successful as a planning sprint. We made a couple design decisions, worked with the client to compile a list of desired features moving forward, and assigned tasks to team members.
+
+\subsection{Sprint Retrospective}
+
+In retrospect, sprint six was a lax sprint that set the framework for the sprints to come. The team didn't communicate much over the break, though that was expected. Overall, it was a necessary sprint that solidified our plans for the future.
+
+\section{Sprint 7 Report}
+Jan. 11th - Jan. 25th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included finishing the joystick prototype, finishing the image loading, testing the software on Windows and ROS2, and implementing differential drive and the circle plugin.
+
+\begin{itemize}
+	\item Joystick Prototype
+	\item Run on Windows
+	\item Image Loading
+	\item Differential Drive
+	\item Circle Plugin
+	\item Test with ROS2
+	\item Load / Save files
+\end{itemize}
+
+\subsection{Deliverable}
+
+In sprint seven, we focused on finishing some of the user stories started in sprint six, as well as implementing some new plugins and testing our product with different environment variables. The joystick prototype was completed and good progress was made in the realm of image loading.
+
+\begin{itemize}
+	\item Bug Fixes:
+	\begin{itemize}
+		\item Robot selection in active list matching green robot
+		\item Properties updating when changed
+		\item No NaN at start bug
+		\item No crash while coloring shapes	
+	\end{itemize}
+	\item Project builds with ROS2
+	\item Project works on Windows 10
+	\item Moveable joystick window
+\end{itemize}
+
+\subsection{Results of testing}
+
+Our product worked with ROS2 and also on Windows 10, but only for specific team members. One team member could not get the product to run on his Windows 10 despite seemingly no difference from the environment used by other team members. We discussed trying the product out on Mac OS as well, but could not find a viable machine on which to test it. It was in this sprint that we really started collecting and fixing bugs, because we finally had enough of a product to determine what was and was not working. 
+
+\subsection{Successes and Failures}
+
+We successfully adapted our project to run on Windows 10 and with ROS2, expanding our deployable environment requirements from strictly Unix systems, though we were not able to test it on Mac OS. Loading images as well as loading and saving files were pushed to backlog for the next sprint. The joystick was completed but not yet integrated into the software. Some bugs that hindered development were fixed.
+
+\subsection{Modifications Required}
+
+While there were no changes to the product architecture in this sprint, we did add in support for ROS2 and Windows 10. We had a few iterations of algorithms before solidifying a method for image triangulation. A few bugs popped up that required fixing, but they were promptly taken care of.
+
+\subsection{Sprint Review}
+
+The team felt that this sprint was successful because we established product compatibility with Windows 10 and ROS2. We lacked a little on implementation of new features but made headway with the joystick control and image loader as well as a couple client-requested plugins.
+
+\subsection{Sprint Retrospective}
+
+In retrospect, progress was slow during sprint seven as far as product development but we made good progress in expanding our client options with testing on Windows 10 and using ROS2. This will ultimately make our product more desireable in the testing and usage phases to come after this semester ends.
+
+
+\section{Sprint 8 Report}
+Jan. 25th - Feb. 8th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included completeing the image loading, integrating the joystick control, and implementing rectangle and ackermann steer plugins.
+
+\begin{itemize}
+	\item Image Loading
+	\item Implement Ackermann steering
+	\item Rectangle plugin
+	\item Integrate joystick
+	\item Control script for joystick
+\end{itemize}
+
+\subsection{Deliverable}
+
+In sprint eight, we finished the image loading functionality, ackermann steering, the rectangle plugin, and controls for the joystick, which got integrated into the software. We did some backend clean-up as well that was not necessarily visible at the product frontend but left nicer source code for future developers.
+
+\begin{itemize}
+	\item Boilerplate start for image loader
+	\item Simple Shape plugin
+	\item UI bug to resize screen
+	\item DLL fixes
+	\item Clone function for world objects
+	\item Joystick integrated with signals to physics models
+	\item Lidar sensor
+	\item Update Box2D version
+	\item Rectangular robot
+	\item Ackermann steering
+	\item Consolidate packages for product
+\end{itemize}
+
+\subsection{Results of testing}
+
+The joystick did not integrate as smoothly as planned, and some alterations had to be made in order to prevent a memory leak in the program. Rectangular robots and Ackermann steering both worked as planned except for the appearance of the "jello" effect, whereby the way Box2D handles welded objects made a particular robot wobble uncontrollably while moving.
+
+\subsection{Successes and Failures}
+
+We successfully integrated the joystick and implemented both rectangle and Ackermann plugins for the software. There was some bug fixes and code clean-up that went smoothly, such as new functions for world objects needed by the designer and enabling a logical user resize of the window. A couple issues we ran into were a minor memory leak that was fixed and the robot "jello" effect which prompted us to build in a window where users can alter robot mass settings until it no longer wobbles. The client would have preferred if the software could handle this but we decided to give default mass settings and otherwise keep it open-ended in case different users have different requirements for the individual simulations.
+
+\subsection{Modifications Required}
+
+Interaction between Box2D and world objects created the issue of wobbling wheels or the "jello" effect, which will have to be dealt with by users in the future via altering object mass until the desired effect is achieved. The UI was modularized by creating the mode controller object, such that the designer and simulator were controlled as mode controller objects by the main UI. This cleaned up the UI code and minimized code repetition which was getting imense with the creation of the world object and simulation designers. Other backend cleanup was implemented as well, such as DLL alterations and updating the version of our Box2D library.
+
+\subsection{Sprint Review}
+
+The team felt that this sprint was successful because we integrated the joystick, implemented rectangular robots and Ackermann steering, and continued to make progress with the image loader. We were happy to see that progress didn't slow too much with the transition into spring semester and we were still making strong headway with the product.
+
+\subsection{Sprint Retrospective}
+
+In retrospect, sprint eight took some of the pieces the team had been working on in previous sprints and brought them together. We successfully completed implementation of the joystick and the rectangle and Ackermann plugins. We came upon the issue of the "jello" effect, which we discussed with the client in later sprints to determine that it will be an ongoing issue with the software that individual users will have to play around with to obtain desired effects.
+
+\section{Sprint 9 Report}
+Feb. 8th - Feb. 22nd
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included integrating the image loader, implementing the robot designer, starting a user manual, and fixing bugs that popped up during development in the previous sprints.
+
+\begin{itemize}
+	\item User Manual Documentation
+	\item Integrate image loading
+	\item Object Designer	
+	\item Fix Joystick bugs
+	\item Fix Ackermann Steer bugs
+\end{itemize}
+
+\subsection{Deliverable}
+
+In sprint nine, we accomplished some bug fixes and integrated the image loader such that the user could choose any image, select a greyscale number, and import it into the simulation as a series of Box2D triangles. We also started discussing the user manual and things to include.
+
+\begin{itemize}
+	\item Bugs Fixed:	
+	\begin{itemize}
+		\item Joystick key selection
+		\item Joystick sending correct numbers
+		\item Ackermann steering glitch
+	\end{itemize}
+	\item Image loading with triangulation integrated into product
+	\item Picked environment for User Manual
+\end{itemize}
+
+\subsection{Results of testing}
+We found some bugs in the josytick and Ackermann steering because of our testing in this sprint, which were quickly resolved. The client decided he would like us to use Sphinx for the user manual with possible future implementation in the Senior Design class to replace LaTex.
+
+\subsection{Successes and Failures}
+Some of our implemented features required bug resolutions in this sprint, like the joystick and Ackermann steering. Map import button worked, but the images did not scale correctly. The object designer was not completed.
+
+\subsection{Modifications Required}
+
+In this sprint, we picked an environment for writing the user manual and integrated the image loader, which responded interestingly to some of the testing images. Because some of the images contained very curved lines and some contained very thin lines, we decided to allow the user to define a few settings that would determing how "precise" they needed the image to be once loaded into Box2D-compatible triangles. Other than that, the World Object Properties Wrapper was updated to work for both objects and components. This was necessary for modularity between the designer and the simulator when adding components to the tools lists.
+
+\subsection{Sprint Review}
+
+The team felt that this sprint was successful because we integrated the image loader, which the client was very pleased with, and made modifications necessary to implement the world object designer. We also started the user manual, which didn't really need to be completed until future sprints, so we felt we were still progressing with strong momentum.
+
+\subsection{Sprint Retrospective}
+
+In retrospect, sprint nine displayed our dwindling reservoir of new features to implement. At this point, it was basically the designer and some plugins that we had left before testing, documentation, and bug collecting would completely take over our time.
+
+\section{Sprint 10 Report}
+Feb. 22nd - Mar. 8th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included completing the world object designer, implementing file load/save, enabling the movement and rotation of objects in the world view, and fixing bugs.
+
+\begin{itemize}
+	\item Object Designer
+	\item Time warping / speed button
+	\item File Load / Save
+	\item Rotate and Move World Objects
+	\item Fix Image Loader bugs
+\end{itemize}
+
+\subsection{Deliverable}
+In sprint ten, we confirmed functinoality of plugin loading, implemented rotating/moving world view objects, and worked on, but did not complete, the object designer. We also globalized World Object Component to make objects moveable on the map and fixed bugs like the program crashing while loading many world objects, objects being moveable during simulation play, lidar seeing invisible or non-colliding objects. We also got the speed button functioning just in time for the client presentation next sprint.
+ 
+\begin{itemize}
+	\item Fixed LIDAR bugs	
+	\item Speed Button
+	\item Added Rotate and Move World Object Tools
+	\item Fix Image Loader bugs
+	\item Changed Property to have distinct incoming/outgoing signals
+	\item Able to build shape, sensor plugins
+\end{itemize}
+
+\subsection{Results of testing}
+
+We were able to test the planned functionality for plugin components, which worked. The object designer worked after some modification, and we were able to export built robots to the simulator. Objects on the world view rotated and moved correctly for the most part, with some minor bugs in the designer using the rotate tool. We had to alter the signals for world object properties to the UI in order to get them updating in the backend models.
+
+\subsection{Successes and Failures}
+We successfully tested our component plugin compatibility. We also were able to fix some bugs with the lidar and image loader, and alter the properties signals to incorporate user changes in the models. During this sprint, our scrum master had to reimage his computer, which took a chunk of time out of his sprint schedule. The world object designer from the backlog did not get completed. However, we still completed most of the backlog items and made good progress in the product.
+
+\subsection{Modifications Required}
+We had to make world objects global in order to successfully get them to move on the world view. We also cleaned the makefile and debug/release flags, added epsilon checking for property values closer to 0. For the time warping, we modified the base speed of the simulation to be slower. This allowed us two levels of "faster" simulation without producing a glitchy output.
+
+\subsection{Sprint Review}
+The team felt that this sprint was successful despite the reimaging of a laptop. We were able to piece together some of the final user stories that we planned to get done before our final client presentation. Aside from the incompletion of the world object designer, which was pushed onto the next sprint.
+
+\subsection{Sprint Retrospective}
+
+In retrospect, sprint ten was a good preparatory sprint for the final client presentation. Much of what we got done was easy to show in a demo and thus created a more significant effect when we later showcased the progress we had made on the project.
+
+
+\section{Sprint 11 Report}
+Mar. 8th - Mar. 22th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included file load/save, JSON file formatting, client presentation three, integrating the world object designer, and some documentation.
+
+\begin{itemize}
+	\item Establish JSON file format
+	\item Load / Save JSON files	
+	\item Client Presentation showcasing:
+	\begin{itemize}
+		\item Named the product (finally) 
+		\item Custom positioning of wheels and sensors
+		\item Image Loading	
+		\item Multiple drive systems
+		\item Multiple sensors
+		\item Various robot shapes (rectangular)
+		\item Built in joystick control
+	\end{itemize}
+	\item Integrate Object Designer
+	\item Remaining Documentation	
+	\begin{itemize}
+		\item Testing
+		\item UI
+		\item Sprints and Prototypes
+		\item User Manual
+	\end{itemize}
+\end{itemize}
+
+\subsection{Deliverable}
+In sprint eleven, we completed the world object designer, completed simulation save/load, established our file format for world objects, divied out the remaining Documentation work, and gave our third client presentation.
+
+\begin{itemize}
+	\item World Object Designer
+	\item World simulation loading
+	\item Removed QSharedPointer requirement from file loader returns
+	\item Client Presentation III
+	\item Divided remaining Documentation work
+	\item Established JSON file format and began work on load / save
+\end{itemize} 
+
+
+\subsection{Results of testing}
+We got the designer fully integrated, added names to active objects list, altered plugin model sizes so they can be drawn in designer widgets, enabled modification of properties in the designer. To accomplish these, we had to remove the QSharedPointer requirement from file loader returns. We decided to go with a video demo for our presentation, rather than a live demo, and used the same presentation layout as with previous client presentations.
+
+\subsection{Successes and Failures}
+
+Our presentation was successful. The client and class were pleased with our progress and we were finally able to show some variation in the robots we were simulating, like a rectanglular robot with Ackermann steering. We successfully integrated the world object designer, although not in time to include it in the presentation. Some of the save/load operations we were working on also did not get implemented in time for the presentation.
+
+\subsection{Modifications Required}
+We had no major modifications during this sprint, aside from removing QSharedPointers and deciding on a file format for world objects. The object designer was finally integrated so a few bugs popped up with that, which didn't get fixed until sprint twelve.
+
+\subsection{Sprint Review}
+The team felt that this sprint was successful. We gave a good presentation, other than the fact that our lack of testing reflected poorly, and continued to make progress with the final product features. The client was happy with our work and we were almost at a point of completely switching over from development to bugs and documentation.
+
+\subsection{Sprint Retrospective}
+
+In retrospect, sprint eleven was where our early design decisions for flexibility and expansion really started to show. We were able to create plugins for some demo robots and actually use them in the simulation. We also gave a good final presentation to showcase this and successfully finished the last major development feature: the world object designer.
+
+
+\section{Sprint 12 Report}
+Mar. 22th - Apr. 5th
+\subsection{Sprint Backlog}
+The backlog for this sprint included fixing bugs, implementing quick save/quick load, documentation, design fair poster board, and finishing up the load/save file operations.
+
+\begin{itemize}
+	\item Fix UI Bugs
+	\begin{itemize}
+		\item Name and Type prompt for exported robots
+		\item Black borders around tool widgets
+		\item Icon Reselections
+	\end{itemize}
+	\item Quick Save/ Quick Load
+	\item Load / Save World Object Buttons
+	\item Load / Save Simulation Buttons
+	\item Documentation
+	\item Design Fair Preparations
+	\item Write unit tests
+	\item Add to bugs backlog
+\end{itemize}
+
+\subsection{Deliverable}
+In sprint twelve, we fixed some glaring bugs, changed the icons to all fall under one license, created some example robot files, implemented quick save/quick load, designed our board for the fair, and completed the file load/save functionality. We also removed the default robots from the simulator. Not a lot of documentation got done, so we pushed most of that onto backlog for the next sprint.
+
+\begin{itemize}
+	\item Fixed UI Bugs
+	\item Solidified icon licensing
+	\item Example robot files
+	\item Fixed MSVC compile errors
+	\item Implemented Quick Save/ Quick Load
+	\item Finalized Load /Save World Objects and Simulations
+	\item Design Fair Board and Q/A list
+\end{itemize}
+
+\subsection{Results of testing}
+We completed our design fair board, deciding to go with a 3x3 partition of information with an entire row of images showcasing our product. In terms of the product itself, we fixed some bugs with the UI, which were mostly inconsistent dialogue boxes. We changed some icons such that icons used in the software are taken from Everaldo Coelho's "Crystal Project Icons" (http://www.everaldo.com CONTACT: everaldo@everaldo.com) under the LGPL license (https://www.gnu.org/licenses/lgpl.html). Example robot files were created to test some features like file loading and also for user convenience. There was a compile error fix and all file loading/saving was completed during this sprint.
+
+\subsection{Successes and Failures}
+In sprint twelve, we successfully created a design fair board, implemented quick save/quick load, fixed bugs/compile errors, and finalized file save/load. With our scrum master out of the country for much of this sprint, we didn't grow our bug backlog or unit tests as much as we would have liked.
+
+\subsection{Modifications Required}
+We had a couple feature modifications during this sprint, including fixes for some bugs and a compilation error. It was during this sprint that the client requested quick save/quick load as a feature to complement a simulation restart. This was in the case of a user wanting to start the simulation from a specified state, rather than using the restart button, which would reload the simulation from file. Quick save/load was implemented using a temporary file.
+
+\subsection{Sprint Review}
+The team felt that this sprint was successful despite being a little slow, which we attribute to design fair preparations and being down one teammate. We finished up the requested features and started to shift to completing the documentation.
+
+\subsection{Sprint Retrospective}
+
+In retrospect, sprint twelve was the last development sprint. We decided to declare a thirteenth sprint, but not for the product development so much as the documentation, testing, and bug backlog. 
+
+\section{Sprint 13 Report}
+Apr. 5th - Apr. 19th
+\subsection{Sprint Backlog}
+
+The backlog for this sprint included starting a bug backlog, documentation, and attending the design fair.
+
+\begin{itemize}
+	\item Bug Backlog
+	\item Documentation		
+	\begin{itemize}
+		\item Sprints and Prototypes
+		\item Testing
+		\item UI
+		\item User Documentation
+	\end{itemize}
+	\item Design Fair	
+	\begin{itemize}
+    	\item Poster board
+    	\item Possible Q/A
+    	\item Presentation at fair
+	\end{itemize}
+	\item Product Finalization
+\end{itemize}
+
+\subsection{Deliverable}
+
+Deliverables for this sprint included some documentation, a bug backlog, and the preparation and presentation of the design fair. 
+
+\begin{itemize}
+	\item Bug Backlog Started
+	\item Documentation	Progress	
+	\begin{itemize}
+		\item Sprints
+		\item Testing
+		\item User Documentation
+		\item Doxygen
+	\end{itemize}
+	\item Design Fair	
+	\begin{itemize}
+    	\item Poster board
+    	\item Q/A with guests
+    	\item Video of product
+	\end{itemize}
+\end{itemize}
 
 \subsection{Results of testing}
 
@@ -353,7 +731,7 @@ Deliverables will be viewed and discussed after the break.
 
 \subsection{Sprint Retrospective}
 
- 
+
 \section{Prototypes}
 
 \subsection{STDR Simulator}
@@ -361,10 +739,10 @@ Deliverables will be viewed and discussed after the break.
 The STDR was the original 2D robot simulator the client was using in robotics classes. The team was asked to modify it as our senior design project, but after careful deliberation we decided it would be more effective to start a new project. Visible in the figure below is a simulation of two robots implementing many sensors to navigate a maze.
 
 \begin{figure}[!htb]
-\begin{center}
-\includegraphics[width=0.75\textwidth]{./Images/Sprint0_STDR}
-\end{center}
-\caption{The original STDR 2D robot simulator, which the client initially wanted the team to modify.  \label{stdr}}
+	\begin{center}
+		\includegraphics[width=0.75\textwidth]{./Images/Sprint0_STDR}
+	\end{center}
+	\caption{The original STDR 2D robot simulator, which the client initially wanted the team to modify.  \label{stdr}}
 \end{figure}
 
 \subsection{Clickable UI}
@@ -374,24 +752,24 @@ The clickable UI prototype consisted of buttons and slots partitioned into three
 \newline\newline\newline
 
 \begin{figure}[H]
-\begin{center}
-\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_SimulationMode}
-\end{center}
-\caption{The clickable UI with Simulation Mode, currently set in Simulation Mode.  \label{clickableuisimulation}}
+	\begin{center}
+		\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_SimulationMode}
+	\end{center}
+	\caption{The clickable UI with Simulation Mode, currently set in Simulation Mode.  \label{clickableuisimulation}}
 \end{figure}
 
 \begin{figure}[H]
-\begin{center}
-\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_MapMode}
-\end{center}
-\caption{The clickable UI, currently set in Map Mode. \label{clickableuimap}}
+	\begin{center}
+		\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_MapMode}
+	\end{center}
+	\caption{The clickable UI, currently set in Map Mode. \label{clickableuimap}}
 \end{figure}
 
 \begin{figure}[H]
-\begin{center}
-\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_NoMenus}
-\end{center}
-\caption{The clickable UI with side menus "minimized", a design decision based on the possible need to view robots moving on a larger map more easily. \label{clickableuinomenus}}
+	\begin{center}
+		\includegraphics[width=0.60\textwidth]{./Images/Sprint1_clickableUI_NoMenus}
+	\end{center}
+	\caption{The clickable UI with side menus "minimized", a design decision based on the possible need to view robots moving on a larger map more easily. \label{clickableuinomenus}}
 \end{figure}
 
 \subsection{Modified MVP}
@@ -399,8 +777,27 @@ The clickable UI prototype consisted of buttons and slots partitioned into three
 The original MVP consisted of a single robot spawning in the center of the world view and moving in a figure-8 with no obstacles to collide with. Here is the modified MVP from sprint four, in which three robots get spawned randomly throughout the world view. Also pictured is the "room" made up of four map objects which are static squares loaded from an obstacle file. Properties for one of the robots are listed on the menu to the left.
 
 \begin{figure}[!htb]
-\begin{center}
-\includegraphics[width=0.75\textwidth]{./Images/Sprint3_hasBox_originalUI}
-\end{center}
-\caption{The MVP of our product, with a loaded map of four squares and three differential drive robots spawned at random locations in various orientations in the world view. \label{mvp}}
+	\begin{center}
+		\includegraphics[width=0.75\textwidth]{./Images/Sprint3_hasBox_originalUI}
+	\end{center}
+	\caption{The MVP of our product, with a loaded map of four squares and three differential drive robots spawned at random locations in various orientations in the world view. \label{mvp}}
+\end{figure}
+
+
+\subsection{RoboScience Simulator}
+
+The final product, the RoboScience Simulator, improved upon the MVP with many features requested by the client. These included the world object designer, the simulation designer, file loading/saving, image to map loading, improved physics, joystick control, lidar sensor, Ackermann steering, quick save/quick load, time warping, and multiple shapes of robots among other things. We also updated our Box2D version and implemented our software for compatibility with ROS2 and Windows 10 OS. The final product, as pictured below, has a different UI look than the MVP as well. This is due to all new icons and the addition of the menus and components lists on the right hand side dissapearing menu. 
+
+\begin{figure}[!htb]
+	\begin{center}
+		\includegraphics[width=0.75\textwidth]{./Images/simulator_with_my_robots}
+	\end{center}
+	\caption{The RoboScience Simulator, showing two robots which were constructed in the designer available to be added to the simulation. As shown, there are about twice the number of tool buttons available on the left hand menu. This is due to the added features from the MVP, such as quick save/quick load and joystick controls. \label{mvp}}
+\end{figure}
+
+\begin{figure}[!htb]
+	\begin{center}
+		\includegraphics[width=0.75\textwidth]{./Images/designer_weird_robot}
+	\end{center}
+	\caption{The RoboScience Simulator, showing the construction of a humanoid 2D robot in the designer. Here we see tabs for different "types" of components a user can add. Each component is a plugin and new plugins can be written and included by users if the product doesn't already have what they're looking for. \label{mvp}}
 \end{figure}
