@@ -15,7 +15,7 @@ SOURCES += \
     src/world_object_component.cpp \
     src/world_object.cpp \
     src/world_object_component.cpp \
-    tests/exampletest.cpp
+    tests/test_model.cpp
 
 HEADERS += \
     include/sdsmt_simulator/world_object.h \
@@ -37,8 +37,7 @@ HEADERS += \
     include/sdsmt_simulator/property.h \
     include/sdsmt_simulator/world_object.h \
     include/sdsmt_simulator/world_object_component.h \
-    include/sdsmt_simulator/world_object_component_plugin.h \
-    tests/exampleheader.h
+    include/sdsmt_simulator/world_object_component_plugin.h
 
 DISTFILES += \
     CMakeLists.txt \

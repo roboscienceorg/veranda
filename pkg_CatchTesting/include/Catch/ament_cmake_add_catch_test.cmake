@@ -12,11 +12,13 @@ function(ament_add_catch_test target)
     message("Qt Sources: ${ARG_QT_SOURCES}")
     message("Qt Libs: ${ARG_QT_LIBS}")
     message("ROS Libs: ${ARG_ROS_LIBS}")
-
     set(cpp_sources ${ARG_CPP_SOURCES} ${ARG_UNPARSED_ARGUMENTS})
 
     if(ARG_QT_SOURCES)
         qt5_wrap_cpp(moc_srcs ${ARG_QT_SOURCES})
+
+        list(APPEND cpp_sources ${moc_srcs})
+        list(APPEND cpp_sources ${ARG_QT_SOURCES})
     endif()
 
     if(ARG_QT_HEADERS)
@@ -25,8 +27,10 @@ function(ament_add_catch_test target)
         list(APPEND cpp_sources ${moc_hdrs})
     endif()
 
+    message(${cpp_sources})
     list(LENGTH cpp_sources source_count)
 
+    message("Build test with source files ${cpp_sources}")
     if("${source_count}" EQUAL "0")
         message(FATAL_ERROR
         "ament_add_catch_test() must be invoked with at least one source file")
