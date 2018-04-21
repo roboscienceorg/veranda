@@ -273,3 +273,4 @@ TSWLatexianTemp*
 
 # expex forward references with \gathertags
 *-tags.tex
+pkg_SimulatorAPI/debug/
