@@ -15,6 +15,9 @@ msg/_*.py
 *.autosave
 *.vscode*
 
+# Auto-Generated Makefiles from Qt Creator
+*.Makefile.*
+
 # Qt build folders
 build-*/
 
@@ -273,4 +276,31 @@ TSWLatexianTemp*
 
 # expex forward references with \gathertags
 *-tags.tex
-pkg_SimulatorAPI/debug/
+
+# Files built by visual studio
+*_i.c
+*_p.c
+*_i.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
