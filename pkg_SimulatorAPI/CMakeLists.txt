@@ -115,11 +115,9 @@ install(
 
 if(BUILD_TESTING)
     find_package(sdsmt_simulator_catch_tests REQUIRED)
-    find_package(sdsmt_simulator_api REQUIRED)
 
     ament_export_dependencies(
         sdsmt_simulator_catch_tests
-        sdsmt_simulator_api
     )
 
     set(CATCH_CMAKE "${sdsmt_simulator_catch_tests_INCLUDE_DIRS}/Catch/ament_cmake_add_catch_test.cmake")
@@ -127,9 +125,10 @@ if(BUILD_TESTING)
 
     ament_add_catch_test(
         "model_datatype_tests"
-        QT_SOURCES tests/test_model.cpp
+        CPP_SOURCES tests/test_model.cpp
+        QT_HEADERS include/sdsmt_simulator/model.h
         QT_LIBS Core
-        ROS_LIBS "sdsmt_simulator_box2d" "sdsmt_simulator_api"
+        ROS_LIBS "sdsmt_simulator_box2d"
         )
 endif()
 

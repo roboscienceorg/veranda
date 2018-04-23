@@ -4,7 +4,7 @@ function(ament_add_catch_test target)
     cmake_parse_arguments(ARG
         ""
         ""
-        "QT_HEADERS;QT_SOURCES;QT_LIBS;ROS_LIBS;CPP_SOURCES"
+        "QT_HEADERS;QT_SOURCES;QT_LIBS;ROS_LIBS;LIBS;CPP_SOURCES"
         ${ARGN})
 
     message("=================Building Catch Test================")
@@ -12,6 +12,7 @@ function(ament_add_catch_test target)
     message("Qt Sources: ${ARG_QT_SOURCES}")
     message("Qt Libs: ${ARG_QT_LIBS}")
     message("ROS Libs: ${ARG_ROS_LIBS}")
+    message("Other Libs: ${ARG_LIBS}")
     set(cpp_sources ${ARG_CPP_SOURCES} ${ARG_UNPARSED_ARGUMENTS})
 
     if(ARG_QT_SOURCES)
@@ -46,9 +47,13 @@ function(ament_add_catch_test target)
         ament_target_dependencies("${target}" "${ARG_ROS_LIBS}" "sdsmt_simulator_catch_tests")
     endif()
 
+    if(ARG_LIBS)
+        target_link_libraries("${target}" "${ARG_LIBS}")
+    endif()
+
     set(executable "$<TARGET_FILE:${target}>")
     set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${target}.catchtest.xml")
-    set(cmd "${executable}" "-r junit" "-o ${result_file}")
+    set(cmd "${executable}" "-r junit" "-o ${result_file}" "-s" "-t")
 
     ament_add_test(
         "${target}"
