@@ -1,7 +1,5 @@
 % !TEX root = DesignDocument.tex
 
-
-
 \usepackage[width=6.5in, height=9.2in, top=1.0in, papersize={8.5in,11in}]{geometry}
 \usepackage[pdftex]{graphicx}
 \usepackage{amsmath}
@@ -24,7 +22,6 @@
 \usepackage{calc}
 \usepackage{subcaption}
 \usepackage{wrapfig}
-\usepackage{doxygen}
 \usepackage[utf8]{inputenc}
 \usepackage{makeidx}
 \usepackage{multicol}
@@ -96,7 +93,9 @@
 identifierstyle=\ttfamily\color{DarkBlue}\bfseries,
 commentstyle=\color{OliveGreen},
 stringstyle=\ttfamily,
-showstringspaces=false,tabsize = 3}
+showstringspaces=false,tabsize = 3,
+breaklines=true,
+postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}}
 
 
 \setlength{\oddsidemargin}{0mm} 

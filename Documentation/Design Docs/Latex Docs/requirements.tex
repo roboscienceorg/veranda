@@ -12,51 +12,64 @@ Client wants to have a 2D simulator for robots designed using ROS.
 This user story encapsulates the entire project. The end goal is to provide software which simulates mobile robots on a plane. Additionally, it should be possible for a separate application to control the simulated robots via messages sent by ROS.
 
 \subsection{User Story \#2\label{us:2}} 
+\subsubsection*{Status: Fulfilled}
 Client wants to be able to easily swap control channels between the simulator and an actual robot
 
 \subsubsection*{Details}
 After the client has simulated a robot and written control code to drive it, they want to be able to unhook the simulator and hook up a real robot. This process should involve minimal changes in the actual control code; the main change should be the ROS channels used for communication of data to and from the control code.
 
 \subsection{User Story \#3\label{us:3}} 
+\subsubsection*{Status: Fulfilled}
 Client wants to be able to design a robot with some shape for it's body, a drive system, and any number of sensors
 
 \subsubsection*{Details}
 There are many different kinds of mobile robots; the client would like to be able model most of them using this software.
 
 \subsection{User Story \#4\label{us:4}} 
+\subsubsection*{Status: Fulfilled}
 Client wants to be able to send joystick messages to the control code from the simulator UI
 
 \subsubsection*{Details}
 It is possible to have a separate application which accepts keyboard or mouse input and conveys it to control code as joystick input, but the client would like that functionality as part of the simulator software.
 
 \subsection{User Story \#5\label{us:5}}
+\subsubsection*{Status: Fulfilled
 Client wants to be able to choose what drive system is used (ackermann, differential, mecanum...) and where it is positioned under the robot
 
 \subsubsection*{Details}
 See user story \#3. In addition to choosing between drive systems, the client wants to be able to mount them somewhere on the robot other than directly in the center.
 
 \subsection{User Story \#6\label{us:6}} 
+\subsubsection*{Status: Fulfilled}
 Client wants to be able to choose what sensors are used (lidar, sonar, touch...) and where they are positioned on top of the robot
 
 \subsubsection*{Details}
 See user story \#3. In addition to choosing sensor equipment on the robot, the client would like to be able to position the equipment.
 
 \subsection{User Story \#7\label{us:7}} 
+\subsubsection*{Status: Fulfilled}
 Client wants to be able to see a visualization of what sensors detect (when applicable)
 
+This is conditional upon the sensor plugins built for the project. The application provides methods by which plugin writers can create visuals on the screen, but this is not a requirement in new plugins. The plugins provided with the project do create visuals of the sensory information.
+
 \subsection{User Story \#8\label{us:8}} 
+\subsubsection*{Status: Fulfilled}
 Client wants the system unit tested
 
 \subsubsection*{Details}
 The original software (STDR) was not tested other than through use. The client would like this software to be at least partially tested by a set of functions.
 
+Due to time and framework constraints, unit tests were not written until very late in the project. The core data structures (Property, Model, and WorldObjectComponent) have unit tests associated with them.
+
 \subsection{User Story \#9\label{us:9}} 
+\subsubsection*{Status: Fulfilled}
 Client wants to be able to import an image as the map to drive on
 
 \subsubsection*{Details}
 Images should be black and white pixel-maps. The user will select an image and specify it's dimensions in meters as well as an origin location. This data will be used to scale objects in the image to a world-space plane.
 
 \subsection{User Story \#10\label{us:10}} 
+\subsubsection*{Status: Fulfilled}
 Client wants to be able to simulate multiple robots at the same time
 
 \subsection{User Story \#11\label{us:11}} 
@@ -66,14 +79,20 @@ Client wants the robot file format to be compatible with Gazebo 3D simulator
 If possible, it would be useful to be able to import and export robot files compatible with the Gazebo 3D simulator; however, it is recognized that this may not be possible due to the complexity of Gazebo simulations.
 
 \subsection{User Story \#12\label{us:12}} 
+\subsubsection*{Status: Unfulfilled}
 Client wants the software to be easy to modify for use outside of ROS - This is no longer a requirement
+
+Due to time constraints, this goal was not met. However, the structure of the project is such that it should be fairly simple to add this functionality in the future.
 
 \subsubsection*{Details}
 In the future, the client may want to simulate robots in a setting which cannot make use of the ROS software. In this case, the client would like the simulation to be designed in such a way that the ROS-specific portions can be easily removed and/or replaced.
 
+\subsubsection*{Status: Removed}
+Halfway through the project, the communication framework was switched from ROS 1 Kinetic to ROS 2 Ardent. Switching to ROS 2 allowed the project to be fully cross-platform compatible, instead of being bound to Ubuntu 16.04. The main concern of this user story was that the simulation would not be usable on Windows, but now that the project uses ROS 2, that is no longer a concern, so this user story is no longer relevant.
+
 \section{Requirements and Design Constraints}
 \subsection{System  Requirements}
-Software will run as a collection of nodes in ROS Kinetic. This means that it must follow ROS package conventions and be compiled through catkin build system on Ubuntu 16.04.
+Software will run as a collection of nodes in ROS 2. This means that it must follow ROS 2 package conventions and be compiled through the Ament build system on supported operating systems.
 
 \subsection{Project  Management Methodology}
 The project will be managed using an Agile methodology very close to the Scrum Framework. Due to the fact that all members of the team are full-time college students, there will only be group meetings twice a week, and at least one of them will be at a time that the Client can attend. Sprints will be two weeks long, beginning and ending on Thursday.
