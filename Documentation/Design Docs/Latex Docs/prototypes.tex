@@ -734,6 +734,16 @@ Deliverables for this sprint included some documentation, a bug backlog, and the
 
 \section{Prototypes}
 
+\subsection{Early Architecture Design}
+Early implementations of the project did not have as clearly defined data types and separation between the different sections of the project. Figure \ref{fig:prototypediagram} shows an early block diagram of the architecture. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.75\textwidth]{./images_design/sysarch}
+	\caption{Early block diagram of the project architecture. Compare to the current version in Figure \ref{fig:systemdiagram}}
+	\label{fig:prototypediagram}
+\end{figure}
+
 \subsection{STDR Simulator}
 
 The STDR was the original 2D robot simulator the client was using in robotics classes. The team was asked to modify it as our senior design project, but after careful deliberation we decided it would be more effective to start a new project. Visible in the figure below is a simulation of two robots implementing many sensors to navigate a maze.
@@ -780,24 +790,24 @@ The original MVP consisted of a single robot spawning in the center of the world
 	\begin{center}
 		\includegraphics[width=0.75\textwidth]{./Images/Sprint3_hasBox_originalUI}
 	\end{center}
-	\caption{The MVP of our product, with a loaded map of four squares and three differential drive robots spawned at random locations in various orientations in the world view. \label{mvp}}
+	\caption{The MVP of our product, with a loaded map of four squares and three differential drive robots spawned at random locations in various orientations in the world view. \label{mvp1}}
 \end{figure}
 
 
 \subsection{RoboScience Simulator}
 
-The final product, the RoboScience Simulator, improved upon the MVP with many features requested by the client. These included the world object designer, the simulation designer, file loading/saving, image to map loading, improved physics, joystick control, lidar sensor, Ackermann steering, quick save/quick load, time warping, and multiple shapes of robots among other things. We also updated our Box2D version and implemented our software for compatibility with ROS2 and Windows 10 OS. The final product, as pictured below, has a different UI look than the MVP as well. This is due to all new icons and the addition of the menus and components lists on the right hand side dissapearing menu. 
+The final product, the RoboScience Simulator, improved upon the MVP with many features requested by the client. These included the world object designer, the simulation designer, file loading/saving, image to map loading, improved physics, joystick control, lidar sensor, Ackermann steering, quick save/quick load, time warping, and multiple shapes of robots among other things. We also updated our Box2D version and implemented our software for compatibility with ROS2 and Windows 10 OS. The final product, as pictured below, has a different UI look than the MVP as well. This is due to all new icons and the addition of the menus and components lists on the right hand side disappearing menu. 
 
 \begin{figure}[!htb]
 	\begin{center}
 		\includegraphics[width=0.75\textwidth]{./Images/simulator_with_my_robots}
 	\end{center}
-	\caption{The RoboScience Simulator, showing two robots which were constructed in the designer available to be added to the simulation. As shown, there are about twice the number of tool buttons available on the left hand menu. This is due to the added features from the MVP, such as quick save/quick load and joystick controls. \label{mvp}}
+	\caption{The RoboScience Simulator, showing two robots which were constructed in the designer available to be added to the simulation. As shown, there are about twice the number of tool buttons available on the left hand menu. This is due to the added features from the MVP, such as quick save/quick load and joystick controls. \label{mvp2}}
 \end{figure}
 
 \begin{figure}[!htb]
 	\begin{center}
 		\includegraphics[width=0.75\textwidth]{./Images/designer_weird_robot}
 	\end{center}
-	\caption{The RoboScience Simulator, showing the construction of a humanoid 2D robot in the designer. Here we see tabs for different "types" of components a user can add. Each component is a plugin and new plugins can be written and included by users if the product doesn't already have what they're looking for. \label{mvp}}
+	\caption{The RoboScience Simulator, showing the construction of a humanoid 2D robot in the designer. Here we see tabs for different "types" of components a user can add. Each component is a plugin and new plugins can be written and included by users if the product doesn't already have what they're looking for. \label{mvp3}}
 \end{figure}

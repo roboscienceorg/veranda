@@ -26,9 +26,10 @@ See figure \ref{fig:systemdiagram} for an overview representation of where the c
 
 \begin{figure}[tbh]
 \begin{center}
-\includegraphics[width=0.75\textwidth]{./images_design/sysarch}
+\includegraphics[width=0.9\textwidth]{./images_design/sysarch2_flow}
+\includegraphics[width=0.9\textwidth]{./images_design/sysarch2_datatypes}
 \end{center}
-\caption{A visual representation of the system architecture, including basic data paths\label{fig:systemdiagram}}
+\caption{A visual representation of the system architecture; both the basic data types and data flow\label{fig:systemdiagram}}
 \end{figure}
 
 \subsection{Application Core}
@@ -222,7 +223,7 @@ When working with a Box2D simulation, there are a number of types that are used.
 \end{itemize}
 
 \subsection{ROS}
-As mentioned a number of times previously, this simulation supports communication with external applications through ROS, the Robotics Operating System. Information on ROS can be found at \url{http://www.ros.org/}. The version of ROS targeted for this project is ROS 2 Ardent Abalone.
+As mentioned a number of times previously, this simulation supports communication with external applications through ROS, the Robotics Operating System. Information on ROS can be found at \url{http://www.ros.org/}. The version of ROS targeted for this project is ROS 2 Ardent Apalone.
 
 The core application itself has minimum communication through ROS, it mainly starts a ROS listener thread so that messages can be received. The bulk of the message sending and receiving is done by the plugin components which make up the objects being simulated. There are two messages sent from the core application -- A timestamp message to indicate the time passed in the simulation and joystick control messages from the virtual joystick.
 
@@ -286,7 +287,7 @@ We chose to go with the single-window application both because it looks 'cleaner
  	Again, it was decided that the pure OpenGL solution would add unnecessary development time, and an alternative should be used. Not only does the graphics framework provide easy methods for drawing primitive shapes on a canvas, but it also allows for parent-child relationships between the models, which in turn allows shapes to be defined with relative transforms to each other instead of everything needing to be in world coordinates.
  	
  	\subsubsection*{Physics}
- 	One of the main failings of STDR was its lack of a physics engine. It was decided early on that a known physics engine should be used, or one should be written for this project so that at least basic collision detection could be simulated.
+ 	One of the main failings of STDR was its lack of a physics engine. It was decided early on that either a well-known and fully developed physics engine should be used, or one should be written for this project so that at least basic collision detection could be simulated.
  	
  	A number of different engines were investigated, including Box2D and Chipmunk2D. In the end, Box2D was chosen because it is simple and lightweight while also providing all of the functionality necessary for this simulator. Other physics engines would have been too bulky or difficult to use, and writing a custom physics engine would have extended the development considerably and likely would have resulted in worse performance.
 
@@ -305,7 +306,7 @@ We chose to go with the single-window application both because it looks 'cleaner
 		\item It would be more trouble than it's worth to use Box2D safely in a multithreaded application
 		\item Sensor calculations will likely be fast enough that they won't impact the simulation significantly
 	\end{itemize}
-	After these realizations occurred, the decision was made to keep all processing in a single thread to simplify the application. The major risk to this design is that the system will lag behind real-time; however this should not affect simulations, just the observation of them. It is planned that the simulator will publish timestamp messages so that control code which relies on the passage of time can correctly account for any lag in the system.
+	After these realizations occurred, the decision was made to keep all processing (outside of publishing and receiving ROS communications) in a single thread to simplify the application. The major risk to this design is that the system will lag behind real-time; however this should not affect simulations, just the observation of them. The simulator publishes timestamp messages so that control code which relies on the passage of time can correctly account for any lag in the system.
 
  \newpage
 \subsection{Classes}
@@ -384,7 +385,7 @@ After construction, shapes and children models can be added and removed with the
  \end{figure} 
  	
   \subsubsection*{World Object Component} \label{sec:worldobjclass}
-	The main data type in this simulation is the World Object Component. For the UML diagram of a World Object Component, see Figure \ref{uml:worldobj}.
+	The main data type in this simulation is the World Object Component. For the UML diagram of a World Object Component, see Figure \ref{uml:uml:worldcomponent_if}.
 	
  \begin{figure}[h]
  	\begin{center}
@@ -748,7 +749,7 @@ The user interface implemented for this project has the following features
  	\item Object properties are shown through a Model-View controller. When an object is selected, its properties are loaded into the model and connected to the dataChanged signals it emits. When the user changes the data in the model, the property views read the new data and attempt to set it on the original Property object if the property is read-only.
  	\item The UI is constructed with a factory function for making the world view widget. This can be done because the widget follows a specific interface and allows for rewriting the world view without changing any of the rest of the application.
 	\item BUG: Currently, the user can change a read-only property on screen (this does not change the original property value, but the screen shows incorrect data); if they try to change a property name, the application terminates unexpectedly
-	\item Since much of the functionality between the Designer and Simulator modes is shared, a common \lstinline|Mode_Controller| type exists to handle properties lists, objects groups, and toolboxes.
+	\item Since much of the functionality between the Designer and Simulator modes is shared, a common \\ \lstinline|Mode_Controller| type exists to handle properties lists, objects groups, and toolboxes.
  \end{itemize}
 \subsection{World View}
 \subsubsection*{Technologies Used}
@@ -1194,7 +1195,7 @@ One general-purpose file handler plugin is provided as part of the project. It i
 \subsection{Custom Plugins}
 Custom plugins should be ROS packages in the same workspace as the simulator package. The plugin's package.xml file should specify at least the following in order to resolve build order:
 \begin{lstlisting}
-<depend>sdsmt_simulator</depend>
+<depend>sdsmt_simulator_api</depend>
 <depend>sdsmt_simulator_box2d</depend>
 \end{lstlisting}
 
@@ -1217,7 +1218,7 @@ include_directories( ${CMAKE_BINARY_DIR} )
 
 In order to resolve dependencies for Box2D and the header files from the simulator, find\_package needs to be called for the associated packages. Then \lstinline|include_directories| needs to be called so the Qt MOC can resolve headers
 \begin{lstlisting}
-find_package(sdsmt_simulator REQUIRED)
+find_package(sdsmt_simulator_api REQUIRED)
 find_package(sdsmt_simulator_box2d REQUIRED)
     
 ament_export_dependencies(
@@ -1256,7 +1257,10 @@ The last detail is that the plugin must be deployed in the directory above the s
     )
 \end{lstlisting}
 
+\subsubsection*{Other Notes}
+The class types which extend the plugin interfaces will need to include either \lstinline|world_object_component_plugin.h| or \lstinline|file_handler_plugin.h|. According to ROS/Ament convention, this should be done with \lstinline|#include <sdsmt_simulator/[type]_plugin.h>|; however, due to a bug in the Microsoft Visual Studio Compiler, this is not a cross-platform compatible solution (It is unknown if this works using Clang on OSX). In order for the MOC to properly resolve headers and search upward in the dependency tree on Windows, the inclusion must be done using the full path, either absolute or relative: \lstinline|#include "../../../install/include/sdsmt_simulator/[type]_plugin.h"|. While this breaks convention and is inconvenient, it should still be a fairly modular solution which just depends on your workspace directory structure up to the plugin's folder matching that of the plugin writer's. Worst case, if you import a plugin and it does not match your directory structure, it should be simple to modify the include so the paths match.
+
 \subsubsection*{A Note About ROS Communications}
-It is believed by the project team that, because the rclcpp::spin() method may be called from a thread other than the main one, all ROS message callbacks may be run from a non-main thread. Care should be taken when defining callbacks in components to prevent race conditions which would result from this design. This issue was resolved in the Touch Sensor Ring plugin with the use of a Qt Signal and Slot. When a Qt Signal triggers a Slot of an object which resides in a different thread, the slot is queued for the second thread to receive naturally during its event loop, preventing any race conditions. The Touch Sensor Ring component has an internal signal and slot specifically for this purpose; the signal is emitted by the ROS callback function, and that copies the data from the callback into the main thread where it can be processed safely.
+It is believed by the project team that, because the rclcpp::spin() method may be called from a thread other than the main one, all ROS message callbacks may be run from a non-main thread. (Whether this is true or not is not known for sure, but the ROS documentation seems to indicate that it is the case.) Care should be taken when defining callbacks in components to prevent race conditions which would result from this design. This issue was resolved in the included plugins with the use of a Qt Signal and Slot. When a Qt Signal triggers a Slot of an object which resides in a different thread, the slot is queued for the second thread to receive naturally during its event loop, preventing any race conditions. The various components have an internal signal and slot specifically for this purpose; the signal is emitted by the ROS callback function, and that copies the data from the callback into the main thread where it can be processed safely.
 
 \end{itemize}
