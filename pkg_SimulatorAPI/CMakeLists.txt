@@ -130,6 +130,13 @@ if(BUILD_TESTING)
         QT_LIBS Core
         ROS_LIBS "sdsmt_simulator_box2d"
         )
+
+    ament_add_catch_test(
+        "property_datatype_tests"
+        CPP_SOURCES tests/test_property.cpp
+        QT_HEADERS include/sdsmt_simulator/property.h
+        QT_LIBS Core
+        )
 endif()
 
 ament_package()
