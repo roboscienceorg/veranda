@@ -15,7 +15,8 @@ SOURCES += \
     src/world_object_component.cpp \
     src/world_object.cpp \
     src/world_object_component.cpp \
-    tests/test_model.cpp
+    tests/test_model.cpp \
+    tests/test_property.cpp
 
 HEADERS += \
     include/sdsmt_simulator/world_object.h \

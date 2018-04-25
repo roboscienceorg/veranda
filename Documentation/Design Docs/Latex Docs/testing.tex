@@ -52,11 +52,15 @@ In order to confirm that this would also work with other robots, three were all 
 \subsection{Multiple Robots Can Exists at Once}
 Many robots should be able to exist at once, in different locations. To test this, three robots were loaded at different locations in the physics simulation, within the bounds of the world view, then it was confirmed that three circles appeared within the world view.
 
+This fulfills the User Story contained in \ref{us:10}
+
 \subsection{Changing Robot Properties in GUI Effects Simulation}
 Changing the properties of a robot should have an immediate effect on the simulation. To test this, a property with a visually obvious result, specifically, the radius of the robot's touch sensor, was changed and it was observed that the size of touch sensor's indicator circle also changed.
 
 \subsection{Touch Sensors Function Correctly}
 Touch sensors should indicate when the robot they're attached to gets within a certain distance of another object in the world. To test this, a circle is being drawn to indicate a touch sensor. As the radius of the touch sensor is changed, the size of the circle can also be observed changing. Wherever an obstacle is detected by the touch sensor, it draws another much smaller circle along its radius. The robot was set to drive in a figure-8, and these circles were observed appearing and dissappearing as they should.
+
+This contributes to the fulfillment of the User Story contained in \ref{us:7}
 
 \subsection{Touch Sensors Publish ROS Messages}
 Touch sensors should publish ROS messages to ROS tools whenever they're activated by a collision. This was tested by setting a robot with a touch sensor to drive in a figure-8 which was larger than the box of obstacles it was contained in. This caused many collisions, and therefore many touch sensor activations to occur. ROS messages were observed being generated properly by ROS tools.
@@ -73,7 +77,75 @@ In map mode, the widget on the far right side of the screen should display map b
 \subsection{When Switching Between Map and Designer Mode, Available Buttons Should Change}
 In map mode, there should be seven map design buttons below the mode of operation buttons, and in designer mode, there should be five designer buttons. To test this, the mode of operation was changed many times, and the buttons were observed changing as intended.
 
-The unit test framework is described here.   
+\subsection{Robot Designer Supports Multiple Body Shapes}
+The user should be able to use the integrated robot designer to build robots with a number of body shapes, and to load them into the simulation. To test this, a robot was designed with a circular body, another with a rectangular body, and a third with an irregularly shaped body made up of connected polygons. Each was observed behaving as intended in the simulation while driving uninterrupted, and while colliding with other world objects.
+
+This contributes to fulfillment of the User Story contained in \ref{us:3}
+
+\subsection{Robot Designer Supports Multiple Drive Systems}
+The user should be able to use the integrated robot designer to build robots with a number of drive systems, and to load them into the simulation. To test this, a robot was designed with differential drive and another with ackermann drive. Each was observed behaving as intended in the simulation while driving uninterrupted, and while colliding with other world objects.
+
+This contributes to fulfillment of the User Story contained in \ref{us:3}
+
+\subsection{Robot Designer Supports Multiple Sensors}
+The user should be able to use the integrated robot designer to build robots with a number of sensors, and to load them into the simulation. To test this, a robot was designed with a lidar sensor and another with a touch sensor. Each was observed behaving as intended in the simulation while driving uninterrupted, and while colliding with other world objects.
+
+This contributes to fulfillment of the User Story contained in \ref{us:3}
+
+\subsection{Robot Designer Supports Any Number of Sensors on a Single Robot}
+The user should be able to use the integrated robot designer to build robots with zero, one, or many sensors. Should they choose to put many sensors on a single robot, these sensors should be allowed to be of the same type, or differnet types. To test this, a robot was designed with no sensors, another with a single touch sensor, another with two lidar sensors, and another with one lidar and one touch sensor. Each was observed behaving as intended in the simulation while driving uninterrupted, and while colliding with other world objects. Each was also observed publishing messages as intended.
+
+This contributes to fulfillment of the User Story contained in \ref{us:3}
+
+\subsection{Integrated Joystick Tool Controls Robot}
+The user should be able to use the integrated joystick tool to control a robot. To test this, the joystick tool was loaded up and connected to a robot, which was then controlled in the simulation by moving the joystick within the widget. Pushing the joystick towards the top of the widget was confirmed to cause the robot to move forwards, pushing the joystick towards the bottom was confirmed to make the robot move backwards, and pushing it towards either side was confirmed to make the robot turn left or right accordingly.
+
+This fulfills the User Story contained in \ref{us:4}
+
+\subsection{Drive System can be in Different Positions on Robot}
+The user should be able to position a drive system wherever they want to on a robot. To test this, the robot designer was used to place a drive system in the middle of a robot, near the front of a different robot, and in the back left corner of another robot. Each was observed behaving as intended in the simulation while driving uninterrupted, and while colliding with other world objects.
+
+This fulfills the User Story contained in \ref{us:5}
+
+\subsection{Sensors can be in Different Positions on Robot}
+The user should be able to position a sensor wherever they want to on a robot. To test this, the robot designer was used to place a sensor in the middle of a robot, near the front of a different robot, and to place one in the back left corner and back right corner of another robot. Each was observed behaving as intended in the simulation while driving uninterrupted, and while colliding with other world objects.
+
+This fulfills the User Story contained in \ref{us:6}
+
+\subsection{Lidar Sensors Visibly Detect Objects}
+When an object is in range of a Lidar sensor, there should be a visual indication. This visual indication should be in the form of the lines representing the lidar sensor stopping short when they hit an object within their range. To test this, a robot with a lidar sensor was observed driving around many objects, and its sensor lines were observed shortening as intended while close enough to other objects.
+
+This contributes to the fulfillment of the User Story contained in \ref{us:7}
+
+\subsection{Images can be Imported as Maps}
+The user should be able to load an image file as a map. This was tested by clicking the load map button and selecting an image file of a maze where all of the walls are completely black and everything else is completely white. The resulting map in the simulator was compared to the image, and confirmed to be very similar.
+
+This contributes to the fulfillment of the User Story contained in \ref{us:9}
+
+\subsection{User can Select Darkness Threshold for Image Map Importing}
+The user should be able to select the darkness threshold for a map during the loading process. This should affect the objects created within the simulation. To test this, an image containing a rectangle that faded from completely white to completely black, surrounded by a white border on all sides was loaded at a threshold of 50, 100, 200, and 250. The size of the rectangle created in the simulation was observed to change accordingly.
+
+This contributes to the fulfillment of the User Story contained in \ref{us:9}
+
+\subsection{User can Select Size of Image Map in Simulator}
+The user should be able to select the size of a map during the loading process. This was tested by loading the same image at different sizes and observing the objects loaded in the simulator to change sizes accordingly.
+
+This contributes to the fulfillment of the User Story contained in \ref{us:9}
+
+\subsection{Many Map Types can Be Loaded by Image Loader}
+The map image loader should be able to load a wide variety of images as maps. This was tested by loading an image with rounded edges, an image with many colors in different shades, an image with concave shapes, and image with many seperate shapes, an image comprised of random noise, an entirely white image, and an entirely black image. Each was observed being loaded as expected.
+
+This contributes to the fulfillment of the User Story contained in \ref{us:9}
+
+\subsection{Maps can be Save and Loaded}
+The user should be able to save and load maps as json files. These save states should include world objects, including robots and their properties. To test this, an image was loaded as a map, and two distinct robots were designed in the robot designer and placed into the simulation. The 'save map' button was clicked, and the json file format was selected. Then, a different image file was loaded as a map, two entirely different robots were designed and placed, and this too was saved. 
+
+At this point, the first map was loaded by clicking the 'load map' button, selecting the json file format, and selecting the desired map. The simulation was observed getting set back to the state it had been in when the first map was saved. Robot objects and non-robot objects and all of their properties were maintained. Then the second map was loaded in the same way with the same results.
+
+\subsection{Quicksave and Quickload Function Properly}
+The user should be able to quicksave a simulator state, then, after making changes, return to that state with use of quickload. To test this, an image was loaded as a map, and two distinct robots were designed in the robot designer and placed into the simulation, then the quicksave button was clicked. Then, a different image file was loaded as a map, two entirely different robots were designed and placed.
+
+Next, the quickload button was clicked and the simulation was observed getting set back to the state it had been in when the first map was saved. Robot objects and non-robot objects and all of their properties were maintained.
 
 \section{System Testing}
 

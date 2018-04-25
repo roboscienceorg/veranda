@@ -22,7 +22,7 @@ Communications between group members happened almost exclusively over text and e
 Backlog items were assigned to specific group members during group meetings after being assigned an adequately high priority.
 
 
-\section{ Stakeholder Information}
+\section{Stakeholder Information}
 This project's successful completion would not only be a positive occurence for our clients, it could also come to benefit future robotics classes, not only at the South Dakota School of Mines and Technology, but the nation or maybe even the world over.
 
 Anybody currently using a worse alternative for 2D robotics simulation would likely be happy to hear of the successful completion of this project.
@@ -54,16 +54,16 @@ A flexible framework for writing robot software. It is a collection of tools, li
 
 One of the main features ROS provides is a messaging system for inter-process communication.
 
-Towards the end of 2017, the first version of ROS 2, Ardent Abalone, was released. The project was transitioned to the ROS 2 framework at that time, and no longer supports ROS. Throughout the rest of the documentation, ROS 2 may be referred to as ROS and ROS 2 interchangeably.
+Towards the end of 2017, the first version of ROS 2, Ardent Apalone, was released. The project was transitioned to the ROS 2 framework at that time, and no longer supports any version of ROS 1. Throughout this documentation, ROS 2 may be referred to as ROS and ROS 2 interchangeably.
 
 \subsection{STDR - Simple Two Dimensional Robot Simulator}
-A simple robot simulator, and a predecessor to this project. The goal of this project from the start was to improve on the STDR, and although we decided to write our own program from scratch, the STDR has often been used for reference and comparison.
+A simple robot simulator, and a predecessor to this project. The goal of this project from the start was to improve on the STDR, and although we decided to write our own program from scratch, the STDR was used for reference and comparison.
 
 \subsection{SDSMT - South Dakota School of Mines and Technology}
 The university at which this project was developed. All authors are students of SDSMT.
 
 \section{Sprint Schedule}
-\begin{table}
+\begin{table}[h]
 \begin{center}
 	\begin{tabular}{r | l l}
 		Sprint & Start Date & End Date \\ \hline
@@ -88,7 +88,6 @@ The university at which this project was developed. All authors are students of 
 \end{table}
 
 \section{Timeline}
-All timeline data beyond Sprint 6 is subject to change based on scheduling of events in CSC 465.
 \subsection{Sprint 0}
 \begin{itemize}
 	\item Set up team members in Ubuntu environment
@@ -200,14 +199,14 @@ All timeline data beyond Sprint 6 is subject to change based on scheduling of ev
 \end{itemize}
 
 \section{Development Environment\label{sec:devenv}}
-As mentioned before, the target environments for this project are Ubuntu 16.04, Windows 10 (These are the supported environments for ROS 2). The target version of ROS 2 is Ardent Abalone; though it is expected that the project will work with later versions of ROS 2.
+As mentioned before, the target environments for this project are Ubuntu 16.04 and Windows 10 (These are the supported environments for ROS 2). Mac OSX Sierra and Capitan are likely also supported, but were not been tested during development. The target version of ROS 2 is Ardent Apalone; though it is likely that the project will work with later versions of ROS 2.
 
 \begin{table}
 \centering
 \begin{tabular}{c | c}
 	Ubuntu 16.04 & Windows 10\\ \hline
 	g++ 4.8+ & Microsoft Visual Studio 2015\\
-	ROS2 Ardent Abalone & ROS2 Ardent Abalone\\
+	ROS2 Ardent Apalone & ROS2 Ardent Apalone\\
 	Qt 5.10 & Qt 5.10\\
 	& PyParsing\\
 \end{tabular}
@@ -219,13 +218,13 @@ As mentioned before, the target environments for this project are Ubuntu 16.04, 
 An image for Ubuntu may be downloaded at \url{https://www.ubuntu.com/download/desktop}. It is not required that this image be run a specific way; this project should work whether Ubuntu is the main OS or a run in a Virtual Machine.
 
 \subsection{Visual Studio 2015}
-Any version of the Visual Studio 2015 compiler should build this project. It can be installed from \url{insert link here}. According to the ROS 2 documentation, Visual Studio 2017 should also work; however, we encountered difficulty with it and recommend using a 2015 edition.
+Any version of the Visual Studio 2015 compiler can be used to build this project on Windows. It can be installed from \url{https://msdn.microsoft.com/en-us/library/e2h7fzkw.aspx}. According to the ROS 2 documentation, Visual Studio 2017 should also work; however, project developers encountered difficulty with it and recommend using a 2015 edition.
 
 \subsection{Qt}
-The full Open-Source Qt environment can be downloaded at \\ \url{https://www.qt.io/download-qt-for-application-development}
+The full Open-Source Qt environment can be downloaded at \\ \url{https://www.qt.io/download-qt-for-application-development}. This project was built using Qt 5.10; other versions of Qt 5 may work, 5.10 or 5.x greater than 5.10 is recommended.
 
 \subsection{ROS Ardent}
-All development is done in a ROS 2 Ament build environment. Details about setting up Ament and CMake can be found in section \ref{sec:buildenv}. Information about installing ROS Ardent can be found at \url{insert link here}.
+All development is done in a ROS 2 Ament build environment. Details about setting up Ament and CMake can be found in section \ref{sec:buildenv}. Information about installing ROS Ardent can be found at \url{https://github.com/ros2/ros2/wiki/Installation}.
 
 At minimum, developers should follow the steps to install the ROS 2 binaries on their system along with the requirements listed in table \ref{tab:min_reqs}.
 
@@ -238,12 +237,12 @@ This documentation was written using \LaTeX and compiles under the TexLive distr
 The TexLive page, which contains installation details for various OS's, can be found at \url{https://www.tug.org/texlive/}. TexMaker can be installed from \url{http://www.xm1math.net/texmaker/}. This document requires more than a minimum TexLive install; we recommend installing all available packages.
 
 \subsection{Git Tools}
-This project is managed by a Git repository. Details about the repository itself are below. Various tools exist for working with Git repositories on different OS's. At a bare minimum, the Git client is required. Information on how to install Git can be found at \url{https://git-scm.com/}. A couple of tools which were used to interface with Git during this project are Git Gui, the built-in UI(\url{https://git-scm.com/docs/git-gui}) and SourceTree, and Windows/Mac UI by Atlassian (\url{https://www.sourcetreeapp.com/}).
+This project is managed by a Git repository. Details about the repository itself are below. Various tools exist for working with Git repositories on different OS's. At a bare minimum, the Git client is required. Information on how to install Git can be found at \url{https://git-scm.com/}. A couple of tools which were used to interface with Git during this project are Git Gui, the built-in UI(\url{https://git-scm.com/docs/git-gui}) and SourceTree, a Windows/Mac UI by Atlassian (\url{https://www.sourcetreeapp.com/}).
 
 \section{Source  Control}
 A private GitHub repository is currently being used for the source control for this project. The repository will eventually be made public, but is currently only accessible by our development team and our clients. Anyone who has access to the project can find it at \url{https://github.com/CsmithSD/sdsmt_simulator}.
 
-There are two main branches: \lstinline|Documentation| and \lstinline|master|. The Documentation branch is used strictly for the development of this document. The master branch will contain the most recent working version of the product. All features will be added on branches off of master and merged back into master only when they are complete. This is similar to how Git Flow works.
+There are two main branches: \lstinline|Documentation| and \lstinline|master|. The Documentation branch is used strictly for the development of this document. The master branch will contain the most recent working version of the product. All features will be added on branches off of master and merged back into master only when they are complete. This is similar to how Git Flow works. Release candidate versions of the project will be merged into the \lstinline|Release| branch and tagged. After the first release, the \lstinline|Documentation| branch will be merged into the master branch; it existed separately during development to avoid excessive merge commits.
 
 \begin{figure}
 \centering
@@ -310,10 +309,10 @@ There are two main branches: \lstinline|Documentation| and \lstinline|master|. T
 
 As you can see in Figure \ref{fig:dirtree}, each package within the project is contained in its own directory, which is named beginning with \lstinline|pkg_|. There are directories for example control scripts and maps, and there is a directory containing all project documentation files. The Documentation files consist of the client contract, all \LaTeX files and images needed to build this document, and early design diagrams of the system.
 
-The core simulation is split into four packages: pkg\_Box2D, pkg\_CatchTesting, pkg\_SimulatorAPI, and pkg\_Simulator. pkg\_Box2D contains a copy of the Box2D physics engine with some minor modifications. pkg\_CatchTesting contains a copy of the Catch C++ Unit Testing header, a standard Catch main.cpp and a cmake file which can be included in ament build scripts to add the macro \lstinline|ament_add_catch_test|. pkg\_SimulatorAPI contains all of the C++ types which may be required in a plugin for loading files or for creating components; this means that package contains most of the custom data structures for the project. Finally, pkg\_Simulator contains the code for the simulator application. Both pkg\_Box2D and pkg\_SimulatorAPI are compiled as shared objects or dlls, depending upon the operating system.
+The core simulation is split into four packages: pkg\_Box2D, pkg\_CatchTesting, pkg\_SimulatorAPI, and pkg\_Simulator. pkg\_Box2D contains a copy of the Box2D physics engine with some minor modifications. pkg\_CatchTesting contains a copy of the Catch C++ Unit Testing header, a standard Catch main.cpp and a cmake file which can be included in ament build scripts to add the macro \lstinline|ament_add_catch_test|. pkg\_SimulatorAPI contains all of the C++ types which may be required in a plugin for loading files or for creating components; this means that package contains most of the custom data structures for the project. Finally, pkg\_Simulator contains the code for the simulator application. Both pkg\_Box2D and pkg\_SimulatorAPI are compiled as shared objects or dlls, depending upon the operating system. pkg\_TouchSensor is shown as an example of how plugin projects are structured; however, it is not the only plugin package included in this project.
 
 \section{Dependencies}
-While it is not a dependency for building and running the simulation, the Python Interpreter is highly recommended as development tool. One of the main avenues of testing the simulation is through ROS control nodes which publish control commands for robots. These nodes can be written in C++, but writing simple nodes for specific tests is generally faster in Python. A number of Python scripts are included in this project specifically for this purpose. To run them all, you will need to have installed the following in addition to ROS
+While it is not a dependency for building and running the simulation, the Python 3 Interpreter is highly recommended as development tool. One of the main avenues of testing the simulation is through ROS control nodes which publish control commands for robots. These nodes can be written in C++, but writing simple nodes for specific tests is generally faster in Python. A number of Python scripts are included in this project specifically for this purpose. To run them all, you will need to have installed the following in addition to ROS
 \begin{itemize}
 	\item Python
 	\item Numpy
