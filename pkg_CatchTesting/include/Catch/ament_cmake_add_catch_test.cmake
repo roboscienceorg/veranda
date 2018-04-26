@@ -53,7 +53,7 @@ function(ament_add_catch_test target)
 
     set(executable "$<TARGET_FILE:${target}>")
     set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${target}.catchtest.xml")
-    set(cmd "${executable}" "-r junit" "-o ${result_file}" "-s" "-t")
+    set(cmd "${executable}" "-r junit" "-o ${result_file}" "-s")
 
     ament_add_test(
         "${target}"

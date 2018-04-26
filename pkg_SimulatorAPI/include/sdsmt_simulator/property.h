@@ -8,7 +8,6 @@
 #include <QDebug>
 #include <functional>
 
-#include "model.h"
 #include "dllapi.h"
 #include "const.h"
 
@@ -117,12 +116,25 @@ public:
      */
     static QVariant bool_validator(const QVariant& _old, const QVariant& _new)
     {
-        const static QStringList isTrue{"1", "true", "yes"};
-        const static QStringList isFalse{"0", "false", "no"};
+        const static QStringList isTrue{"1", "true", "yes", "y"};
+        const static QStringList isFalse{"0", "false", "no", "n"};
 
+        bool k;
+
+        //If expected indicator of true or false
         if(isTrue.contains(_new.toString().toLower())) return true;
         if(isFalse.contains(_new.toString().toLower())) return false;
-        return _old;
+
+        //If numeric value not 0, return true
+        if(std::abs(_new.toDouble(&k)) > EPSILON && k) return true;
+        //If numerick ~= 0, return false
+        else if(k) return false;
+
+        //If non-empty string, return true
+        if(_new.toString().size()) return true;
+
+        //All other cases false
+        return false;
     }
 
     /*!
