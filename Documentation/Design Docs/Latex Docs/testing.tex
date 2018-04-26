@@ -11,10 +11,6 @@ There are also some unit tests for aspects of the project that can be tested alg
 
 Much of our exploratory testing will be performed by beta users in the future.
 
-\section{Dependencies}
-We plan to use Catch unit testing framework for our unit testing. This only requires the inclusion of a single header.
-
-
 \section{Test design and setup}
 This section will describe how test cases were developed/designed, setup, and how they connect to the requirements.
 
@@ -147,22 +143,83 @@ The user should be able to quicksave a simulator state, then, after making chang
 
 Next, the quickload button was clicked and the simulation was observed getting set back to the state it had been in when the first map was saved. Robot objects and non-robot objects and all of their properties were maintained.
 
-\section{System Testing}
+\section{Unit Testing}
 
-\subsection{Model Get and Set Transform}
-This test returns true if, after using a model object's setTransform function with certain unique values as input, that same model object's getTransform function returns those same values as outputs. This is tested with a number of values.
+\subsection{Dependencies}
+We plan to use Catch unit testing framework for our unit testing. This only requires the inclusion of a single header and will be in the project; thus there are no outside dependencies.
 
-\subsection{Model Add and Remove Shapes}
-This test returns true if calling a model object's addShapes function successfully increases the size of its \_shapes vector, and calling its removeShapes function successfully decreases the size of the same vector.
+\subsection{Writing and Running Tests}
+Unit tests are included inside of the packages with the code that they test. The package \lstinline|pkg_CatchTesting| includes the Catch header file, a default Catch main source file, and a cmake file providing a macro to create Catch tests which can be run as part of the Ament build process.
 
-\subsection{Property Double Validator}
-This test returns true if for a valid new argument, the double\_validator function returns that new argument, and for an invalid new argument it instead returns its old argument.
+\subsubsection*{Adding Tests}
+Tests should be in their own C++ source file, which includes \lstinline|"Catch/catch.hpp"| which is available from the Catch Testing package. The source file should not define a \lstinline|main()| or invoke the Catch macro to create one; the file should contain only Catch tests.
 
-\subsection{Property Int Validator}
-This test returns true if for a valid new argument, the int\_validator function returns that new argument, and for an invalid new argument it instead returns its old argument.
+Adding test files to the build is fairly simple, just copy the block in Listing \ref{lst:catchcmake} into the CMakeLists file for the package which the tests are for and modify it for the project. This block should be \textit{before} the \lstinline|ament_package()| function. Once tests are added to the build, they can be built and run using the command \lstinline|ament test|. This will run all unit tests and report whether they pass or fail. Unfortunately, the JUnit files exported by Catch are not compliant with GTest's modifications to the JUnit standard, so Ament will be unable to report which specific tests failed. Fortunately, the JUnit XML files can be found in \lstinline|[workspace root]\build\[package]\test_results\|; these files can be opened and read to determine which specific tests failed.
 
-\subsection{File Read and Write}
-This test returns true if, for a specific string, it can be written to a file and then read from that file, and if the string read back is the same as the one that was written in.
+\begin{lstlisting}
+if(BUILD_TESTING)
+    find_package(sdsmt_simulator_catch_tests REQUIRED)
 
-\section{Risk Analysis}
-The only real risk involved with the use of this program, is that it may not accurately reflect the way control code will work on a robot in the real world. Although this accurate reflection is our goal, we make no claims about the accuracy of simulations generated with this application.
+    ament_export_dependencies(
+        sdsmt_simulator_catch_tests
+    )
+
+    # Hacky way to include the cmake file since (as far as I know) Ament does not provide a way to export
+    # Other random files.
+    set(CATCH_CMAKE "${sdsmt_simulator_catch_tests_INCLUDE_DIRS}/Catch/ament_cmake_add_catch_test.cmake")
+    include(${CATCH_CMAKE})
+
+    ament_add_catch_test(
+        "[test name]"
+        CPP_SOURCES [list of plain C++ sources]
+        QT_SOURCES [list of C++ sources which need to be MOC'ed]
+        QT_HEADERS [list of C++ headers which need to be MOC'ed]
+        QT_LIBS [list of Qt Libraries to link against \{Core, Widgets, GUI, etc.\}]
+        ROS_LIBS [list of other ROS package dependencies]
+        LIBS [list of other libraries to link against]
+        )
+
+    # Example for building Model unit tests in the API package 
+    # ament_add_catch_test(
+    #     "model_datatype_tests"
+    #     CPP_SOURCES tests/test_model.cpp
+    #     QT_HEADERS include/sdsmt_simulator/model.h
+    #     QT_LIBS Core
+    #     ROS_LIBS "sdsmt_simulator_box2d"
+    #     )
+endif()
+\end{lstlisting}
+
+\subsection{List of Tests}
+\subsubsection*{Tests for the Model class}
+\begin{itemize}
+    \item The Model transform is 0, 0, 0 on construction
+    \item Using Model::setTransform changes the result of Model::getTransform correspondingly
+    \item Setting Model transform results in Model::transformChanged being emitted
+    \item Model shapes list is empty on construction
+    \item Added shapes are reflected in calls to Model::shapes()
+    \item Adding a shape multiple times does not create duplicates in Model::shapes()
+    \item Removed shapes are reflected in calls to Model::shapes()
+    \item Adding or removing one or more shapes results in Model::modelChanged being emitted (even if the shapes were added as duplicates or removed when they didn't exist)
+    \item Model children list is empty on construction
+    \item Added children are reflected in calls to Model::children()
+    \item Adding a child multiple times does not create duplicates in Model::children()
+    \item Removed children are reflected in calls to Model::children()
+    \item Adding or removing one or more children results in Model::modelChanged being emitted (even if the models were added as duplicates or removed when they didn't exist)
+    \item Calling Model::forceDraw results in Model::modelChanged being emitted
+\end{itemize}
+\subsubsection*{Tests for the Property class}
+\begin{itemize}
+    \item Testing of the static double\_validator function
+    \item Testing of the static int\_validator function
+    \item Testing of the static abs\_double\_validator function
+    \item Testing of the static bool\_validator function
+    \item Testing of the static angle\_validator function
+    \item Property value can be set and retrieved with Property::set() and Property::get()
+    \item Setting Property value results in emission of valueSet() in the Property and any PropertyValues observing it
+    \item Requesting Property value from a PropertyView sets the value and results in emission of valueSet() in the Property and any PropertyValues observing it
+    \item Requesting Property value from a PropertyView sets the value and results in emission of valueRequested() in the property
+    \item Setting Property value can optionally emit valueRequested() in the Property
+    \item PropertyValues can be copy-constructed to observe the same Property
+    \item Deleting the Property observed by a PropertyView invalidates the PropertyView and does not cause nullptr dereferences
+\end{itemize}

@@ -49,7 +49,11 @@
 \input{testing.tex}  %% All tracks
 \input{prototypes.tex}  %% All tracks
 \input{deploy.tex}  %% Normally not research track
-\input{userdocs.tex} %% All tracks
+
+\IfFileExists{UserMan/userManual.pdf}{
+    \chapter{User Manual}
+    \includepdf[pages=-]{UserMan/userManual.pdf}  %% All tracks
+}{}
 
 \bibliographystyle{plain}
 \bibliography{designrefs.bib}

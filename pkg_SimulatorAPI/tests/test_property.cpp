@@ -334,12 +334,15 @@ TEST_CASE("Value sets")
         {
             v1.requestValue(text = "request1");
             REQUIRE(externalCount == 3);
+            REQUIRE(p.get().toString() == text);
 
             v2.requestValue(text = "request2");
             REQUIRE(externalCount == 6);
+            REQUIRE(p.get().toString() == text);
 
             v3.requestValue(text = "request3");
             REQUIRE(externalCount == 9);
+            REQUIRE(p.get().toString() == text);
         }
     }
 }
@@ -370,12 +373,15 @@ TEST_CASE("Value requests")
     {
         v1.requestValue(text = "request1");
         REQUIRE(internalCount == 1);
+        REQUIRE(p.get().toString() == text);
 
         v2.requestValue(text = "request2");
         REQUIRE(internalCount == 2);
+        REQUIRE(p.get().toString() == text);
 
         v3.requestValue(text = "request3");
         REQUIRE(internalCount == 3);
+        REQUIRE(p.get().toString() == text);
     }
 }
 
