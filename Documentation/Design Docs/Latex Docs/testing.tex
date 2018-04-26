@@ -156,7 +156,7 @@ Tests should be in their own C++ source file, which includes \lstinline|"Catch/c
 
 Adding test files to the build is fairly simple, just copy the block in Listing \ref{lst:catchcmake} into the CMakeLists file for the package which the tests are for and modify it for the project. This block should be \textit{before} the \lstinline|ament_package()| function. Once tests are added to the build, they can be built and run using the command \lstinline|ament test|. This will run all unit tests and report whether they pass or fail. Unfortunately, the JUnit files exported by Catch are not compliant with GTest's modifications to the JUnit standard, so Ament will be unable to report which specific tests failed. Fortunately, the JUnit XML files can be found in \lstinline|[workspace root]\build\[package]\test_results\|; these files can be opened and read to determine which specific tests failed.
 
-\begin{lstlisting}
+\begin{lstlisting}[caption={Example CMake code for adding a Catch test}, label={lst:catchcmake}]
 if(BUILD_TESTING)
     find_package(sdsmt_simulator_catch_tests REQUIRED)
 
