@@ -1,10 +1,6 @@
 #include "json_world_plugin.h"
 #include "json_world.h"
 
-Json_World_Plugin::Json_World_Plugin()
-{
-
-}
 
 QVector<WorldLoader_If*> Json_World_Plugin::getLoaders()
 {

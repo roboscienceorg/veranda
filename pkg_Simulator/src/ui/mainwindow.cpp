@@ -95,8 +95,8 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     connect(ui->saveObjectButton, SIGNAL (released()), this, SLOT (saveObjectButtonClick()));
 
     //Simulation mode tool button signals and slots
-    connect(simulator, SIGNAL (requestAddWorldObject(QVector<WorldObject*>, bool)), this, SIGNAL (userAddWorldObjectsToSimulation(QVector<WorldObject*>, bool)));
-    connect(simulator, SIGNAL (requestRemoveWorldObject(QVector<object_id>)), this, SIGNAL (userRemoveWorldObjectsFromSimulation(QVector<object_id>)));
+    connect(simulator, SIGNAL (requestAddWorldObjects(QVector<WorldObject*>,bool)), this, SIGNAL (userAddWorldObjectsToSimulation(QVector<WorldObject*>, bool)));
+    connect(simulator, SIGNAL (requestRemoveWorldObjects(QVector<object_id>)), this, SIGNAL (userRemoveWorldObjectsFromSimulation(QVector<object_id>)));
     connect(ui->addObjectButton, SIGNAL (released()), simulator, SLOT (addObjectToView()));
     connect(ui->deleteObjectButton, SIGNAL (released()), simulator, SLOT (deleteObjectFromView()));
     connect(ui->loadObjectsButton, SIGNAL (released()), this, SLOT (loadObjectsForSimButtonClick()));
@@ -300,7 +300,7 @@ void MainWindow::loadSimButtonClick()
                                       //Load file in separate thread
                                       qDebug() << "Load file";
                                       loadedObjs=wl->loadFile(path, componentPlugins);
-                                  }catch(std::exception& ex){}
+                                  }catch(std::exception&){}
 
                                   if(loadedObjs.size())
                                   {
@@ -318,7 +318,7 @@ void MainWindow::loadSimButtonClick()
                                           try
                                           {
                                               loadedObjs=defaultLoader->loadFile(path, componentPlugins);
-                                          }catch(std::exception& ex){}
+                                          }catch(std::exception&){}
 
                                           userAddWorldObjectsToSimulation(loadedObjs, false);
                                       }
@@ -508,7 +508,7 @@ void MainWindow::quickLoadButtonClick()
                                   //Load file in separate thread
                                   qDebug() << "Load file";
                                   loadedObjs=wl->loadFile(path, componentPlugins);
-                              }catch(std::exception& ex){}
+                              }catch(std::exception&){}
 
                               if(loadedObjs.size())
                               {
@@ -526,7 +526,7 @@ void MainWindow::quickLoadButtonClick()
                                       try
                                       {
                                           loadedObjs=defaultLoader->loadFile(path, componentPlugins);
-                                      }catch(std::exception& ex){}
+                                      }catch(std::exception&){}
 
                                       userAddWorldObjectsToSimulation(loadedObjs, false);
                                   }
@@ -621,7 +621,7 @@ void MainWindow::loadObjectButtonClick()
                             designer->worldObjectsAddedToSimulation({{new WorldObjectProperties(c), i++}});
 
                         return;
-                    }catch(std::exception& ex)
+                    }catch(std::exception&)
                     {
                         error("Unable to load world object file '" + objFile + "'");
                     }
@@ -663,7 +663,7 @@ void MainWindow::saveObjectButtonClick()
                     s->saveFile(objFile, &wo);
 
                     return;
-                }catch(std::exception& ex)
+                }catch(std::exception&)
                 {
                     error("Unable to save world object file '" + objFile + "'");
                 }
@@ -710,7 +710,7 @@ void MainWindow::loadObjectsForSimButtonClick()
                         WorldObject* wobj = l->loadFile(objFile, componentPlugins);
                         simulator->addObjectToTools(wobj);
                         return;
-                    }catch(std::exception& ex)
+                    }catch(std::exception&)
                     {
                         error("Unable to load world object file '" + objFile + "'");
                     }
@@ -746,10 +746,7 @@ void MainWindow::exportObjectButtonClick()
             for(WorldObjectComponent* c : designer->getComponents())
                 newComponents.push_back(c->clone());
 
-            WorldObject *object = new WorldObject(newComponents, "test", this);
-
-            object->setName(name);
-            object->setType(type);
+            WorldObject *object = new WorldObject(newComponents, name, type, this);
             simulator->addObjectToTools(object);
         }
     }

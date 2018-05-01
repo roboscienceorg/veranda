@@ -16,6 +16,8 @@
   <depend>sdsmt_simulator_box2d</depend>
   <depend>rclcpp</depend>
 
+  <test_depend>sdsmt_simulator_catch_tests</test_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>

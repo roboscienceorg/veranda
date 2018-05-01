@@ -29,6 +29,7 @@ include_directories( include ${CMAKE_BINARY_DIR} )
 ## TODO If possible: Figure out how to mark Qt as a dependency
 ament_export_dependencies(
     sdsmt_simulator_box2d
+    sdsmt_simulator_api
     rclcpp
 )
 
@@ -111,6 +112,32 @@ install(
   TARGETS sdsmt_simulator_api
   DESTINATION ${INSTALLDIR}
 )
+
+if(BUILD_TESTING)
+    find_package(sdsmt_simulator_catch_tests REQUIRED)
+
+    ament_export_dependencies(
+        sdsmt_simulator_catch_tests
+    )
+
+    set(CATCH_CMAKE "${sdsmt_simulator_catch_tests_INCLUDE_DIRS}/Catch/ament_cmake_add_catch_test.cmake")
+    include(${CATCH_CMAKE})
+
+    ament_add_catch_test(
+        "model_datatype_tests"
+        CPP_SOURCES tests/test_model.cpp
+        QT_HEADERS include/sdsmt_simulator/model.h
+        QT_LIBS Core
+        ROS_LIBS "sdsmt_simulator_box2d"
+        )
+
+    ament_add_catch_test(
+        "property_datatype_tests"
+        CPP_SOURCES tests/test_property.cpp
+        QT_HEADERS include/sdsmt_simulator/property.h
+        QT_LIBS Core
+        )
+endif()
 
 ament_package()
 

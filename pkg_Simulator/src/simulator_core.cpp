@@ -1,3 +1,4 @@
+//! \file
 #include "simulator_core.h"
 
 #include <iostream>
@@ -67,7 +68,7 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
     custom_qos_profile.depth = 7;
 
-    _timestampChannel = _node->create_publisher<std_msgs::msg::Float64MultiArray>("sdsmt_simulator/timestamp", custom_qos_profile);
+    _timestampChannel = _node->create_publisher<std_msgs::msg::Float64MultiArray>("roboScience/simulator/timestamp", custom_qos_profile);
 
     //Publish on every physics tick
     connect(_physicsEngine, &Simulator_Physics_If::physicsTicked,
@@ -79,6 +80,11 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     });
 }
 
+/*!
+ * When it is destroyed, the simulator core will destroy all
+ * of the objects in the simulation, and then delete the physics
+ * and UI interfaces
+ */
 SimulatorCore::~SimulatorCore()
 {
     //Destroy all remaining objects
@@ -92,6 +98,9 @@ SimulatorCore::~SimulatorCore()
     _userInterface->deleteLater();
 }
 
+/*!
+ * On startup, the physics ticks are set to 1/30, 30 times a second
+ */
 void SimulatorCore::start()
 {
     //Set default physics tick rate

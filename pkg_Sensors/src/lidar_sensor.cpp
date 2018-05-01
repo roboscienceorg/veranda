@@ -66,7 +66,7 @@ void Lidar_Sensor::setROSNode(std::shared_ptr<rclcpp::Node> node)
     _rosNode = node;
 }
 
-void Lidar_Sensor::_channelChanged(QVariant)
+void Lidar_Sensor::_channelChanged()
 {
     if(_connected)
     {

@@ -1,3 +1,4 @@
+//! \file
 #include "triangulator.h"
 
 #include <functional>
@@ -69,7 +70,7 @@ QPolygonF simplify(const QPolygonF &p, const uint64_t& crossThreshold)
         indexB = (indexB+1) % p.size();
         indexC = (indexC+1) % p.size();
 
-        if(indexB == 0) lastCorner = true;
+        if(indexB == firstIndex) lastCorner = true;
 
         //If the entire thing is a line, or we can't otherwise simplify it
         //break out of infinite loop
@@ -82,32 +83,70 @@ QPolygonF simplify(const QPolygonF &p, const uint64_t& crossThreshold)
     return out;
 }
 
-QVector<QPolygonF> triangulate(const Shape& s)
-{
-    /* Ignore triangulation; use only for debugging pre-triangle steps
-    QVector<QPolygonF> out_ = s.inner;
-    out_ += s.outer;
-    return out_;
-    */
-
-    return triangulateGLU(s);
-}
-
+//! Custom datatype for GLU Tesselator callbacks
 struct GLTessData
 {
+    //! Current collection of vertices
     QVector<double*> vertices;
+
+    //! Collection of all triangles thus far
     QVector<QPolygonF> triangles;
+
+    //! Flag for if an error occurred
     bool error = false;
 };
 
+/*!
+ * \brief Callback when tesselation begins
+ * Pushes an empty triangle into the tesselation data so that GLTess_vert does access invalid memory
+ * \param[in] type Type of object being tesselated; should always be GL_TRIANGLES
+ * \param[in,out] data Custom data pointer - Points to GLTessData
+ */
 void GLTess_begin( GLenum type, void* data );
+
+/*!
+ * \brief Callback to add a vertex
+ * Vertices are added to triangles.last() of the GLTessData passed. Therefore, the triangles
+ * field of the struct should not be empty.
+ * \param[in] vert The vertex added - Points to a double[3]
+ * \param[in,out] data Custom data pointer - Points to GLTessData
+ */
 void GLTess_vert( void* vert, void* data );
+
+/*!
+ * \brief Collision resolution callback
+ * This callback is required so GLTess can combine vertices of the original
+ * polygon that are very close to each other; no extra processing
+ * is done here for triangulation
+ * \param[in] coords Coordinates of the new point
+ * \param[in] verts The vertices that are resolved together
+ * \param[in] weight Weights of the vertices being resolved
+ * \param[out] out Pointer to be filled with the result point object
+ * \param[in,out] data Custom data pointer - Points to GLTessData
+ */
 void GLTess_combine( GLdouble coords[3], void* verts[4],
                      GLfloat weight[4], void** out, void* data );
+
+/*!
+ * \brief Callback when triangulation encounters an error
+ * \param[in] error The type of error that occurred
+ * \param[in,out] data Custom data pointer - Points to GLTessData
+ */
 void GLTess_err( GLenum error, void* data );
+
+/*!
+ * \brief Dummy callback required to force triangulator to create GL_TRIANGLES only
+ * \param[in] flag Unused
+ * \param[in,out] data Custom data pointer - Points to GLTessData
+ */
 void GLTess_edge( GLboolean flag, void* data ){}
 
-QVector<QPolygonF> triangulateGLU(const Shape& s)
+/*!
+ * \brief
+ * \param s
+ * \return
+ */
+QVector<QPolygonF> triangulate(const Shape& s)
 {
     //Storage for results and pointers
     GLTessData tData;
@@ -119,8 +158,10 @@ QVector<QPolygonF> triangulateGLU(const Shape& s)
     //Set up callbacks
 
 #ifdef WINDOWS
+//! Typedef for GLU callback functions
 #define CB (void (CALLBACK *)())
 #else
+//! Typedef for GLU callback functions
 #define CB (_GLUfuncptr)
 #endif
     gluTessCallback(tess, GLU_TESS_BEGIN_DATA, CB GLTess_begin);

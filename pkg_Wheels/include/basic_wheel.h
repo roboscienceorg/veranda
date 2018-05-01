@@ -1,11 +1,17 @@
-#ifndef BASIC_WHEEL_H
-#define BASIC_WHEEL_H
+//! \file
+#pragma once
 
 #include <sdsmt_simulator/model.h>
 #include <Box2D/Box2D.h>
 
 #include <QVector>
 
+/*!
+ * \brief Collection of functions used in plugins that provide wheels
+ * The Basic_Wheel can be used to create shapes and models that look like
+ * wheels, as well as manage the no-slip and no-slide constraints on wheels
+ * in the physics engine
+ */
 class Basic_Wheel
 {
     constexpr static double PI = 3.14159265359;
@@ -13,6 +19,16 @@ class Basic_Wheel
     constexpr static double DEG2RAD = 1.0/RAD2DEG;
 
 public:
+    /*!
+     * \brief Creates a new Model that looks like a wheel
+     * The wheel consists of a rectangle with the width and twice
+     * the radius of the wheel and a line from the center of the wheel
+     * to the front-middle
+     *
+     * \param[in] radius Radius of the wheel (meters)
+     * \param[in] width Width of the wheel (meters)
+     * \return A newly allocated Model populated with some shapes
+     */
     static Model* makeWheelModel(double radius, double width)
     {
         b2Shape* sh = makeWheelShape(radius, width);
@@ -24,6 +40,13 @@ public:
         return new Model({}, {sh, line});
     }
 
+    /*!
+     * \brief Makes a b2Shape for the outline of a wheel
+     *
+     * \param[in] radius Radius of the wheel (meters)
+     * \param[in] width Width of the wheel (meters)
+     * \return A newly allocated b2Shape the size of the wheel
+     */
     static b2Shape* makeWheelShape(double radius, double width)
     {
         b2PolygonShape* sh = new b2PolygonShape;
@@ -32,6 +55,19 @@ public:
         return sh;
     }
 
+    /*!
+     * \brief Applies the no-slide constraint
+     * One of the properties of a wheel is that it generally doesn't
+     * slide along the ground perpendicular to the direction of rolling.
+     * This function takes a b2body and applies forces to prevent this
+     * non-physical movement.
+     *
+     * It's difficult to achieve this effect perfectly, so the function
+     * applies force to the body which is proportional to the mass attached
+     *
+     * \param[in,out] wheel The b2Body wheel to apply the constraint to
+     * \param[in] radius Radius of the wheel (meters)
+     */
     static void applyNoSlideConstraint(b2Body* wheel, double radius)
     {
         static b2Vec2 _localWheelRightUnit = b2Vec2(0, 1);
@@ -46,6 +82,20 @@ public:
         wheel->ApplyLinearImpulse( impulse, wheel->GetWorldCenter(), true );
     }
 
+    /*!
+     * \brief Applies the no-slip constraint
+     * One of the properties of a wheel is that it generally doesn't
+     * slip; the amount that it spins translates directly to a distance traveled.
+     * This function takes a b2body and applies forces to prevent this
+     * non-physical movement, given a specific target rotational velocity.
+     *
+     * It's difficult to achieve this effect perfectly, so the function
+     * applies force to the body which is proportional to the mass attached
+     *
+     * \param[in,out] wheel The b2Body wheel to apply the constraint to
+     * \param[in] radius Radius of the wheel (meters)
+     * \param[in] dtheta_rad Target rotational velocity of the wheel (rad/s)
+     */
     static void applyNoSlipConstraint(b2Body* wheel, double radius, double dtheta_rad)
     {
         static b2Vec2 _localWheelFrontUnit = b2Vec2(1, 0);
@@ -66,5 +116,3 @@ public:
         wheel->ApplyLinearImpulse( impulse, wheel->GetWorldCenter(), true );
     }
 };
-
-#endif // BASIC_WHEEL_H

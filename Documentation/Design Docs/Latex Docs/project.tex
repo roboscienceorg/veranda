@@ -2,98 +2,494 @@
 
 
 \chapter{Project Management}
-This section provides some housekeeping type of information with regard to the 
-team, project, environment, etc. 
-
-
 
 \section{Team Member's Roles}
-Describe who was involved and what role(s) were played. 
+Kendra Deziel was in charge of GUI design, implementation, and debugging. All members of the team created wireframe ideas which she concatenated with the intention of keeping to the generic video game interface standards most users will know and understand.
+Andrew Stelter was in charge of backend design, implementation, and debugging. This included things like file loading, unit tests, and the design of interfaces between all modules of the project. He was also the scrum master and architect of the project layers.
+Ryley Sutton was in charge of the world view design, implementation, and debugging. This is the section in the center of the project where the simulation, map, and robot can be viewed. She selected Qt graphics framework which supports interaction between 2D objects as well as allows for easy rotating. This was chosen over OpenGL because it was readily available, developed to be used in Qt by Qt easily and most importantly was better documented for use with Qt for easier learning.  
+Samuel Williams was in charge of the physics design, implementation, and debugging. He selected Box 2D as the physics engine for the project to handle movements and collisions of all world view objects: robot or map object.
+
+Specific details on why eah of these design decisions were made are available at the beginning of the Design and Implementation section of this document (Section 4).
 
 
 \section{Project  Management Approach}
-This section will provide an explanation of the basic approach to managing the 
-project.  Typically, this would detail how the project will be managed through 
-a given Agile methodology.  The sprint length (i.e. 2 weeks) and product backlog 
-ownership and location (ex. Trello) are examples of what will be discussed.  An 
-overview of the system used to track sprint tasks, bug or trouble tickets, and 
-user stories would be warranted. 
+For this project, an adapted agile approach was taken. Our sprints were two weeks long, which we judged to be the best length based on our schedules as students and on the complexity of the project overall. Team meetings were scheduled once weekly, sometimes with bonus 'coding sessions', and client meetings were also scheduled once weekly. 
+
+Trello was used to keep track of backlog items, which were derived from user stories during group meetings. Git was used for our repository.
+
+Communications between group members happened almost exclusively over text and email, or in person.
+
+Backlog items were assigned to specific group members during group meetings after being assigned an adequately high priority.
 
 
-\section{ Stakeholder Information}
+\section{Stakeholder Information}
+This project's successful completion would not only be a positive occurence for our clients, it could also come to benefit future robotics classes, not only at the South Dakota School of Mines and Technology, but the nation or maybe even the world over.
 
-
-This section would provide the basic description of all of the stakeholders for 
-the project.  Who has an interest in the successful and/or unsuccessful completion 
-of this project? 
-
+Anybody currently using a worse alternative for 2D robotics simulation would likely be happy to hear of the successful completion of this project.
 
 \subsection{Customer or End User (Product Owner)}
-Who?  What role will they play in the project?  Will this person or group manage 
-and prioritize the product backlog?  Who will they interact with on the team to 
-drive product backlog priorities if not done directly? 
-
-\subsection{Management or Instructor (Scrum Master)}
-Who?  What role will they play in the project?  Will the Scrum Master drive the 
-Sprint Meetings? 
-
-
-\subsection{Investors}
-Are there any?  Who?  What role will they play? 
-
+Dr. Jeff McGough and Christopher Smith are our clients or 'customers'. Their input generates user stories and helps to determine the priority of backlog items at weekly meetings, where they deliver this input to the entire development team in a progress report style dialogue.
 
 \subsection{Developers --Testers}
-Who?  Is there a defined project manager, developer, tester, designer, architect, 
-etc.? 
-
-\section{Budget}
-Describe the budget for the project including gifted equipment and salaries for 
-people on the project.
+Andrew Stelter is acting as our lead developer and project manager. Samuel Williams is a developer primarily focused on the physics engine and backend. Kendra Deziel is a developer primarily focused on our GUI. Ryley Sutton is a devloper primarily focused on graphics.
 
 \section{Intellectual Property and Licensing}
-Describe the IP ownership and issues surrounding IP.
+This project is going to open source on GitHub. We have yet to select a license. 
 
 \section{Sprint  Overview}
-If the system will be implemented in phases, describe those phases/sub-phases (design, 
-implementation, testing, delivery) and the various milestones in this section. 
- This section should also contain a correlation between the phases of development 
-and the associated versioning of the system, i.e. major version, minor version, 
-revision. 
+At the beginning of each sprint, a group meeting is used to reevaluate our backlog. This consists of moving items that have been completed to a board specifically for completed items, adding new backlog items generated from user stories, reevaluating the priority of items that are not in progress, and assigning those items of highest priority to specific team members, or in some cases, groups of team members to be completed in a timely manner.
 
-All of the Agile decisions are listed here.  For example, how do you order your backlog?   
-Did you use planning poker?   
+Over the course of the next week, individual work is done by each group member on the items assigned to them with collaboration in the case that one team member needs help from another.
+
+A client meeting occurs, a progress report is given, new user stories are collected, and another group meeting happens to discuss progress amongst ourselves, and to assign additional work in the case that someone has already finished their work for the sprint.
+
+Over the next week, more individual work and testing takes place, there is another client meeting, and completed items are pushed to the repository. Any unfinished items are carried over into the next sprint.
 
 \section{Terminology and Acronyms}
 Provide a list of terms used in the document that warrant definition.  Consider 
 industry or domain specific terms and acronyms as well as system specific. 
 
+\subsection{ROS - Robot Operating System}
+A flexible framework for writing robot software. It is a collection of tools, libraries, and conventions that aim to simplify the task of creating complex and robust robot behavior across a wide variety of robotic platforms.
+
+One of the main features ROS provides is a messaging system for inter-process communication.
+
+Towards the end of 2017, the first version of ROS 2, Ardent Apalone, was released. The project was transitioned to the ROS 2 framework at that time, and no longer supports any version of ROS 1. Throughout this documentation, ROS 2 may be referred to as ROS and ROS 2 interchangeably.
+
+\subsection{STDR - Simple Two Dimensional Robot Simulator}
+A simple robot simulator, and a predecessor to this project. The goal of this project from the start was to improve on the STDR, and although we decided to write our own program from scratch, the STDR was used for reference and comparison.
+
+\subsection{SDSMT - South Dakota School of Mines and Technology}
+The university at which this project was developed. All authors are students of SDSMT.
+
 \section{Sprint Schedule}
-The sprint schedule.  Can be tables or graphs.   This can be a list of dates with the visual 
-representation given below.
+\begin{table}[h]
+\begin{center}
+	\begin{tabular}{r | l l}
+		Sprint & Start Date & End Date \\ \hline
+		Sprint 0 & Sep 7 & Sep 21 \\
+		Sprint 1 & Sep 21 & Oct 5 \\
+		Sprint 2 & Oct 5 & Oct 19 \\
+		Sprint 3 & Oct 19 & Nov 2 \\
+		Sprint 4 & Nov 2 & Nov 16 \\
+		Sprint 5 & Nov 16 & Nov 30 \\
+		Sprint 6 & Nov 30 & Jan 11 \\
+		Sprint 7 & Jan 11 & Jan 25 \\
+		Sprint 8 & Jan 25 & Feb 8 \\
+		Sprint 9 & Feb 8 & Feb 22 \\
+		Sprint 10 & Feb 22 & Mar 8 \\
+		Sprint 11 & Mar 8 & Mar 22 \\
+		Sprint 12 & Mar 22 & Apr 5 \\
+		Sprint 13 & Apr 5 & Apr 19 \\
+		Sprint 14 & Apr 19 & May 3 \\
+	\end{tabular}
+\end{center}
+\caption{Anticipated start and end dates of all planned sprints}
+\end{table}
 
 \section{Timeline}
-Gantt chart or other type of visual representation of the project timeline.
+\subsection{Sprint 0}
+\begin{itemize}
+	\item Set up team members in Ubuntu environment
+	\item Decide whether or not to use STDR simulator 
+ 	\item Determine development tools
+\end{itemize}
 
-\section{Development Environment}
-The basic purpose for this section is to give a developer all of the necessary 
-information to setup their development environment to run, test, and/or develop. 
+\subsection{Sprint 1}
+\begin{itemize}
+	\item Create backlog of user stories
+	\item Create UI wireframes
+ 	\item Begin structuring architectural layers
+\end{itemize}
 
+\subsection{Sprint 2}
+\begin{itemize}
+	\item Create MVP
+	\item Create interfaces for partition communication 
+\end{itemize}
+
+\subsection{Sprint 3}
+\begin{itemize}
+	\item Allow for robots spawning at non-center of map
+	\item Allow for robots to rotate while moving
+ 	\item Be able to display and change robot properties
+ 	\item Find a way to pass shapes around threads
+\end{itemize}
+
+\subsection{Sprint 4}
+\begin{itemize}
+	\item Decide between kinematics and full-simulation physics
+	\item Allow selection of robot from main view and UI menu
+	\item Touch sensor plugin
+ 	\item Load obstacle files
+\end{itemize}
+
+\subsection{Sprint 5}
+\begin{itemize}
+	\item Documentation
+	\item Presentation
+ 	\item Ethics quiz
+ 	\item Team evaluation
+\end{itemize}
+
+\subsection{Sprint 6 - Winter Break}
+\begin{itemize}
+	\item Image loading
+	\item Replace kinematics with forces for determining robot motion
+ 	\item Object loading and saving
+ 	\item Addition of joystick module
+ 	\item Full draft of plans for Spring semester
+\end{itemize}
+
+\subsection{Sprint 7}
+\begin{itemize}
+	\item Image loading
+	\item Finish replacing kinematics with forces for determining robot motion
+	\item Re-implement DD with new physics
+ 	\item Object loading and saving
+ 	\item Addition of joystick module
+ 	\item Look into switching to ROS 2
+\end{itemize}
+
+\subsection{Sprint 8}
+\begin{itemize}
+	\item Time Warp feature
+	\item LIDAR sensor
+	\item Mechanum Wheels
+	\item First iteration of World Object Designer
+\end{itemize}
+
+\subsection{Sprint 9}
+\begin{itemize}
+	\item Other requested sensors and wheels/bases
+	\item Second iteration of World Object Designer
+	\item Finalize test plans for newer features
+\end{itemize}
+
+\subsection{Sprint 10}
+\begin{itemize}
+	\item Third iteration of World Object Designer
+	\item Finish remaining documentation sections
+	\item Start testing
+	\item Client Presentation
+\end{itemize}
+
+\subsection{Sprint 11}
+\begin{itemize}
+	\item Testing and Validation
+	\item Cleaning documentation
+	\item Design Fair
+\end{itemize}
+
+\subsection{Sprint 12}
+\begin{itemize}
+	\item Testing and Validation
+	\item Cleaning documentation
+\end{itemize}
+
+\subsection{Sprint 13}
+\begin{itemize}
+	\item Testing and Validation
+	\item Cleaning documentation
+\end{itemize}
+
+\subsection{Sprint 14}
+\begin{itemize}
+	\item Final Client Evaluation
+\end{itemize}
+
+\section{Development Environment\label{sec:devenv}}
+As mentioned before, the target environments for this project are Ubuntu 16.04 and Windows 10 (These are the supported environments for ROS 2). Mac OSX Sierra and Capitan are likely also supported, but were not been tested during development. The target version of ROS 2 is Ardent Apalone; though it is likely that the project will work with later versions of ROS 2.
+
+\begin{table}
+\centering
+\begin{tabular}{c | c}
+	Ubuntu 16.04 & Windows 10\\ \hline
+	g++ 4.8+ & Microsoft Visual Studio 2015\\
+	ROS2 Ardent Apalone & ROS2 Ardent Apalone\\
+	Qt 5.10 & Qt 5.10\\
+	& PyParsing\\
+\end{tabular}
+\caption{Minimum requirements of development environment}
+\label{tab:min_reqs}
+\end{table}
+
+\subsection{Ubuntu}
+An image for Ubuntu may be downloaded at \url{https://www.ubuntu.com/download/desktop}. It is not required that this image be run a specific way; this project should work whether Ubuntu is the main OS or a run in a Virtual Machine.
+
+\subsection{Visual Studio 2015}
+Any version of the Visual Studio 2015 compiler can be used to build this project on Windows. It can be installed from \url{https://msdn.microsoft.com/en-us/library/e2h7fzkw.aspx}. According to the ROS 2 documentation, Visual Studio 2017 should also work; however, project developers encountered difficulty with it and recommend using a 2015 edition.
+
+\subsection{Qt}
+The full Open-Source Qt environment can be downloaded at \\ \url{https://www.qt.io/download-qt-for-application-development}. This project was built using Qt 5.10; other versions of Qt 5 may work, 5.10 or 5.x greater than 5.10 is recommended.
+
+\subsection{ROS Ardent}
+All development is done in a ROS 2 Ament build environment. Details about setting up Ament and CMake can be found in section \ref{sec:buildenv}. Information about installing ROS Ardent can be found at \url{https://github.com/ros2/ros2/wiki/Installation}.
+
+At minimum, developers should follow the steps to install the ROS 2 binaries on their system along with the requirements listed in table \ref{tab:min_reqs}.
 
 \section{Development IDE and Tools}
-Describe which IDE and provide links to installs and/or reference material. 
+\subsection{Qt Creator}
+No specific development IDE is required for this project; however, we chose to use Qt Creator. It should be noted that Qt Creator was not used to build and run the project, just to develop it. It is useful to use Qt Creator in this fashion because it is able to do syntax highlighting and auto-correction for some Qt-Specific code elements. The Qt Creator IDE can be installed through the open-source installer found at \url{https://www.qt.io/download-qt-for-application-development}. A number of Qt \lstinline|.pro| files exist in the project which can be used to open the project in Qt Creator. IMPORTANT: These files can not be used to build the project. See section \ref{sec:buildenv} for details on the build environment.
+
+\subsection{\LaTeX Documentation}
+This documentation was written using \LaTeX and compiles under the TexLive distribution. The tools TexMaker and Visual Studio Code were used as and IDEs for developing the document.
+The TexLive page, which contains installation details for various OS's, can be found at \url{https://www.tug.org/texlive/}. TexMaker can be installed from \url{http://www.xm1math.net/texmaker/}. This document requires more than a minimum TexLive install; we recommend installing all available packages.
+
+\subsection{Git Tools}
+This project is managed by a Git repository. Details about the repository itself are below. Various tools exist for working with Git repositories on different OS's. At a bare minimum, the Git client is required. Information on how to install Git can be found at \url{https://git-scm.com/}. A couple of tools which were used to interface with Git during this project are Git Gui, the built-in UI(\url{https://git-scm.com/docs/git-gui}) and SourceTree, a Windows/Mac UI by Atlassian (\url{https://www.sourcetreeapp.com/}).
 
 \section{Source  Control}
-Which source control system is/was used?  How was it setup?  How does a developer 
-connect to it? 
+A private GitHub repository is currently being used for the source control for this project. The repository will eventually be made public, but is currently only accessible by our development team and our clients. Anyone who has access to the project can find it at \url{https://github.com/CsmithSD/sdsmt_simulator}.
+
+There are two main branches: \lstinline|Documentation| and \lstinline|master|. The Documentation branch is used strictly for the development of this document. The master branch will contain the most recent working version of the product. All features will be added on branches off of master and merged back into master only when they are complete. This is similar to how Git Flow works. Release candidate versions of the project will be merged into the \lstinline|Release| branch and tagged. After the first release, the \lstinline|Documentation| branch will be merged into the master branch; it existed separately during development to avoid excessive merge commits.
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.3\textwidth}
+\dirtree{%
+.1 sdsmt\_simulator/.
+.2 Documentation/.
+.3 Design Docs/.
+.4 Latex Docs/.
+.5 DesignDocument.tex.
+.5 Contract/.
+.6 contract.tex.
+.3 Architecture V1.docx.
+.2 Maps/.
+.2 Scripts/.
+.2 Robots/.
+.2 pkg\_Box2D/.
+.3 CMakeLists.txt.
+.3 package.xml.
+.3 include/.
+.4 Box2D/.
+.5 Box2D.h.
+.5 Collision/.
+.5 Common/.
+.5 Dynamics/.
+.5 Rope/.
+.2 pkg\_CatchTesting/.
+.3 CMakeLists.txt.
+.3 package.xml.
+.3 include/.
+.4 Catch/.
+.5 catch.hpp.
+.5 catch\_main.cpp.
+.5 ament\_cmake\_add\_catch\_test.cmake.
+.2 pkg\_SimulatorAPI/.
+.3 CMakeLists.txt.
+.3 package.xml.
+.3 simulatorAPI.pro.
+.3 src/.
+.3 include/.
+.4 sdsmt\_simulator/.
+.2 pkg\_Simulator/.
+.3 CMakeLists.txt.
+.3 package.xml.
+.3 simulator.pro.
+.3 sdsmt\_simulator/.
+.4 SimTimer.py.
+.3 src/.
+.3 ui/.
+.3 include/.
+.4 ui/.
+.4 interfaces/.
+.2 pkg\_TouchSensor/.
+.3 CMakeLists.txt.
+.3 package.xml.
+.3 touch\_sensor.pro.
+.3 include/.
+.3 src/.
+}
+\end{subfigure}
+\caption{Directory Tree of the project with notable files included}
+\label{fig:dirtree}
+\end{figure}
+
+As you can see in Figure \ref{fig:dirtree}, each package within the project is contained in its own directory, which is named beginning with \lstinline|pkg_|. There are directories for example control scripts and maps, and there is a directory containing all project documentation files. The Documentation files consist of the client contract, all \LaTeX files and images needed to build this document, and early design diagrams of the system.
+
+The core simulation is split into four packages: pkg\_Box2D, pkg\_CatchTesting, pkg\_SimulatorAPI, and pkg\_Simulator. pkg\_Box2D contains a copy of the Box2D physics engine with some minor modifications. pkg\_CatchTesting contains a copy of the Catch C++ Unit Testing header, a standard Catch main.cpp and a cmake file which can be included in ament build scripts to add the macro \lstinline|ament_add_catch_test|. pkg\_SimulatorAPI contains all of the C++ types which may be required in a plugin for loading files or for creating components; this means that package contains most of the custom data structures for the project. Finally, pkg\_Simulator contains the code for the simulator application. Both pkg\_Box2D and pkg\_SimulatorAPI are compiled as shared objects or dlls, depending upon the operating system. pkg\_TouchSensor is shown as an example of how plugin projects are structured; however, it is not the only plugin package included in this project.
 
 \section{Dependencies}
-Describe all dependencies associated with developing the system. 
+While it is not a dependency for building and running the simulation, the Python 3 Interpreter is highly recommended as development tool. One of the main avenues of testing the simulation is through ROS control nodes which publish control commands for robots. These nodes can be written in C++, but writing simple nodes for specific tests is generally faster in Python. A number of Python scripts are included in this project specifically for this purpose. To run them all, you will need to have installed the following in addition to ROS
+\begin{itemize}
+	\item Python
+	\item Numpy
+	\item Scipy
+\end{itemize}
+The included scripts were developed using Python 3, the standard Python version for ROS 2 projects.
+Before running one of these scripts, you must source the simulator project.
+\begin{lstlisting}
+> source [ament workspace]/install/setup.*
+> python3 [script]
+\end{lstlisting}
 
-\section{Build  Environment}
-How are the packages built?  Are there build scripts? 
+Information on installing Python, Numpy, and Scipy, can be found at \url{https://www.python.org/} and \url{https://www.scipy.org/install.html}.
+
+\section{Build  Environment} \label{sec:buildenv}
+ROS 2 includes a package management and build system called Ament. Ament is built on top of CMake and provides some facilities for automatically linking ROS projects together.
+All development for this project should be done within an Ament Workspace. Creating a new workspace is simple:
+\begin{enumerate}
+	\item Create an empty directory, this is the workspace
+	\item Create a subdirectory of the workspace named \lstinline|src|
+	\item Source the ROS setup file
+	\item Run the \lstinline|ament build| command
+\end{enumerate}
+Any packages to be built in the workspace should be subdirectories of the \lstinline|src| folder.
+
+\subsection{The Ament Workspace}
+Once a workspace is set up, the project should be cloned into \lstinline|[workspace]/src|.
+Ament and ROS provide a number of scripts which can be sourced to properly set up the build environment. See the ROS 2 installation guide for information about where these files are on your system.
+
+\subsection{ROS Packages}
+Every package in the ROS ecosystem contains a package.xml file which provides some metadata for the package and a list of package dependencies. This allows Ament to ensure that all package dependencies are resolved when a workspace is built. Since this project separates Box2D and the Simulator into separate packages, the line \lstinline|<depend>sdsmt_simulator_box2d</depend>| can be found in the package.xml file for the Simulator, indicating the dependency.  More information on the package.xml file can be found at \url{http://wiki.ros.org/catkin/package.xml} (This link is for the ROS 1 package manager, Catkin; Ament uses the same xml format for dependencies)
+
+\subsection{CMakeLists.txt}
+Every package in the ROS ecosystem also contains a CMakeLists.txt file. This is used by CMake to correctly build, link, and deploy packages. General information about CMake can be found at \url{https://cmake.org/}.
+
+\subsubsection*{Building Qt Projects with CMake}
+CMake provides a number of special functions specifically for building Qt projects. In a purely Qt project, the \lstinline|qmake| utility would be used to build instead of CMake or just Make. These special functions properly link Qt and include headers, process Qt-Specific macros, and convert non-C++ data files to a compile-able format. Details on these special functions can be found in the Qt Documentation at \url{http://doc.qt.io/qt-5/cmake-manual.html}
+
+\subsubsection*{Building ROS Projects with CMake}
+Ament adds a special function \lstinline|ament_package| which can be used in the CMakeLists.txt file. This function is used to correctly identify what portions of the package should be accessible for inclusion and linkage in other ROS packages.
+
+\subsubsection*{Box2D CMakeLists.txt Notes}
+Box2D is built as a separate package from the Simulator application for a few reasons
+\begin{itemize}
+	\item Makes it easier to include and use in other packages (like plugins)
+	\item Reduces clutter in the file tree of the simulator package
+	\item Helps optimize Ament Build process
+\end{itemize}
+
+Important things to note from the CMakeLists.txt file
+\begin{itemize}
+	\item It is built as a shared library with C++11 and -fPIC
+	\begin{lstlisting}
+add_compile_options(-std=c++11 -fPIC)
+	\end{lstlisting}
+	\item The file tree had to be restructured slightly so that exporting the headers to other ROS packages would work correctly. The entire \lstinline|include| directory of that package is exported.
+
+	\begin{lstlisting}
+ament_export_include_directories(include)
+ament_export_libraries(sdsmt_simulator_box2d)
+	\end{lstlisting}
+	As a result, it can be included in other packages as if it were part of that project's file tree.
+	\begin{lstlisting}
+#include <Box2D/Box2D.h>
+	\end{lstlisting}
+\end{itemize}
+\subsubsection*{Simulator CMakeLists.txt Notes}
+\begin{itemize}
+	\item It is dependent upon the Box2D package included in this project
+	\begin{lstlisting}
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(sdsmt_simulator_box2d REQUIRED)
+find_package(sdsmt_simulator_api REQUIRED)
+
+...
+
+ament_export_dependencies(    
+rclcpp
+std_msgs
+sensor_msgs
+sdsmt_simulator_box2d
+sdsmt_simulator_api
+)
+	\end{lstlisting}
+	\item It is built with C++11
+	\begin{lstlisting}
+add_compile_options(-std=c++11)
+	\end{lstlisting}
+	\item Source files are split into four categories
+	\begin{enumerate}
+		\item MOC\_HDRS are header files which the Qt MOC must be run on to generate C++ source
+		\item UI\_FILES are Qt .ui forms files which need to be wrapped in C++
+		\item CPP\_SRCS are all the .cpp files in the project
+		\item RCC\_FILES are Qt resource .qrc files that also need to be wrapped in C++
+	\end{enumerate}
+	\begin{lstlisting}
+## Files that have any Qt macros or keywords in them
+## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
+set(MOC_HDRS
+    include/sdsmt_simulator/drivetrain_if.h
+    ...
+    include/interfaces/simulator_physics_if.h
+    ...
+    include/basic_physics.h
+    ...
+    )
+
+## .ui qt widgets form files
+set(UI_FILES
+    ui/mainwindow.ui
+    ...
+    )
+
+## Any other source files
+set(CPP_SRCS
+    src/basic_maploader.cpp
+    ...
+    )
+
+set(RCC_FILES ui/resources.qrc)
+
+...
+
+## Run MOC on files with Qt Keywords and Macros
+qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
+
+## Wrap .ui files as cpp files
+qt5_wrap_ui(UI_SRCS ${UI_FILES})
+
+## Wrap .qrc files as cpp files
+qt5_add_resources(RCC_SRCS ${RCC_FILES})
+	\end{lstlisting}
+	\item It is dependent on a number of Qt Modules
+	\begin{lstlisting}
+find_package(Qt5 REQUIRED COMPONENTS
+  Core
+  Widgets
+  Gui
+)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+
+include_directories( ${CMAKE_BINARY_DIR} )
+
+...
+
+add_executable(sdsmt_simulator ${UI_SRCS} ${CPP_SRCS} ${MOC_SRCS} ${RCC_SRCS})
+qt5_use_modules(sdsmt_simulator Core Gui Widgets)
+	\end{lstlisting}
+\end{itemize}
 
 \section{Development Machine Setup}
-If warranted, provide a list of steps and details associated with setting up a 
-machine for use by a developer. 
+The recommended machine setup steps are as follows:
+\begin{enumerate}
+	\item Download Ubuntu 16.04
+	\item Install Ubuntu 16.04 as a native OS or Virtual Machine
+	\item Start Ubuntu 16.04
+	\item Ensure g++ 4.8 or later is installed
+	\item Install ROS Ardent
+	\item Install the Qt 5.10 Dev kit and Qt Creator
+	\item Install Git
+	\item Create an Ament Workspace
+	\item Clone the project repository into \lstinline|[workspace]/src|
+	\item Source the ROS setup with \lstinline|source /opt/ros/ardent/local_setup.bash|
+	\item Run \lstinline|ament build| from the top workspace directory
+\end{enumerate}
+At this point, if the project builds, your system is set up for development.
 
-
+Optional Steps
+\begin{enumerate}
+	\item Verify Python 3 is installed
+	\item Install Numpy for Python 3
+	\item Install the full TexLive distribution
+	\item Install TexMaker
+	\item Install a Git client UI
+\end{enumerate}

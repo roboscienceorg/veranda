@@ -1,5 +1,5 @@
-#ifndef SCREEN_MODEL_H
-#define SCREEN_MODEL_H
+//! \file
+#pragma once
 
 #include <QObject>
 #include <QVector>
@@ -9,66 +9,127 @@
 
 #include "dllapi.h"
 
+/*!
+ * \brief Contains shapes to be drawn together
+ *
+ * The model is a method for grouping a set of
+ * shapes together. They can contain shapes and children
+ * models, all of which will be drawn together. Signals
+ * from the model are emitted whenever it or one of its
+ * chilren changes; this can be used to trigger redrawing
+ * an image based on the model.
+ *
+ * Children and shapes added to the model are only references;
+ * they DO NOT become 'owned' by the model, and the model
+ * will not delete them at any time.
+ *
+ * This model does not directly access its children and shapes
+ * after they are added; but observers of the model may, so the
+ * Model owner should remove shapes and children model before
+ * deleting them using removeChildren() and removeShapes()
+ *
+ * It is intended that the transform of a child model indicates
+ * its location relative to its parent's location
+ *
+ * Similarly, the points and angles used used to locate the b2Shape*
+ * objects held by the model are intended to be relative to the 'position'
+ * of the model itself
+ */
 class SDSMT_SIMULATOR_API Model : public QObject
 {
     Q_OBJECT
 
+    //! List of children models
     QVector<Model*> _children;
+
+    //! List of shapes in this model
     QVector<b2Shape*> _shapes;
 
-    double _x=0, _y=0, _theta=0;
+    //! Current x coordinate of model
+    double _x=0;
+
+    //! Current y coordinate of model
+    double _y=0;
+
+    //! Current rotation of model (Degrees)
+    double _theta=0;
 
 signals:
-    void modelChanged(Model*);
-    void transformChanged(Model*, double, double, double);
-    void childModelChanged(Model*, Model*);
-    void childTransformChanged(Model*, Model*);
+    /*!
+     * \brief Indicates one of two things about the model
+     *  * One or more of its shapes was changed, added, or removed
+     *  * One or more of its children were added or removed (NOT Changed!)
+     *
+     * \param[in] mdl Pointer to the model that changed
+     */
+    void modelChanged(Model* mdl);
 
-private slots:
-    void _childChildModelChanged(Model*, Model* childChild)
-    {
-        emit childModelChanged(this, childChild);
-    }
-
-    void _childChildTransformChanged(Model*, Model* childChild)
-    {
-        emit childTransformChanged(this, childChild);
-    }
-
-    void _childModelChanged(Model* child)
-    {
-        emit childModelChanged(this, child);
-    }
-
-    void _childTransformChanged(Model* child)
-    {
-        emit childTransformChanged(this, child);
-    }
+    /*!
+     * \brief Indicates that the model's transform changed
+     * \param[in] mdl Pointer to the model that changed
+     * \param[in] dx Delta x
+     * \param[in] dy Delta y
+     * \param[in] dt Delta angle (degrees)
+     */
+    void transformChanged(Model* mdl, double dx, double dy, double dt);
 
 public:
+
+    /*! Construct a new model and initialize its children models and shapes
+     *
+     * \param[in] children Children models of this model
+     * \param[in] shapes Shapes represented in this model (Default empty list)
+     * \param[in] parent QObject parent of the object (Default nullptr)
+     */
     Model(QVector<Model*> children, QVector<b2Shape*> shapes = {}, QObject* parent = nullptr) : QObject(parent)
     {
         addChildren(children);
         addShapes(shapes);
     }
 
+    /*! Construct a new model and initialize its shapes
+     *
+     * \param[in] shapes Shapes represented in this model (Default empty list)
+     * \param[in] parent QObject parent of the object (Default nullptr)
+     */
     Model(QVector<b2Shape*> shapes = {}, QObject* parent = nullptr) : QObject(parent)
     {
         addShapes(shapes);
     }
 
-    ~Model()
-    {
-    }
+    //! Empty destructor
+    ~Model(){}
 
-    const QVector<b2Shape*>& shapes(){ return _shapes; }
-    const QVector<Model*>& children(){ return _children; }
+    /*!
+     * \brief Get the list of shapes held by the model
+     * \return const QVector<b2Shape*>& - Shapes represented by the model
+     */
+    const QVector<b2Shape*>& shapes() const { return _shapes; }
 
+    /*!
+     * \brief Get the list of children models of this model
+     * \return const QVector<Model*>& - Children of this model
+     */
+    const QVector<Model*>& children() const { return _children; }
+
+    /*!
+     * \brief Forces the modelChanged() signal to be emitted
+     * Use this if you change the parameters of the b2Shape*'s
+     * represented in the model, but don't add or remove any. (Like if
+     * you change the center point of a b2CircleShape, or add more edges
+     * on a b2PolygonShape)
+     */
     void forceDraw()
     {
         modelChanged(this);
     }
 
+    /*!
+     * \brief Set the location of the model relative to its parent (or the world, if no parent)
+     * \param[in] x The x coordinate of the model
+     * \param[in] y The y coordinate of the model
+     * \param[in] theta The rotation of the model in degrees
+     */
     void setTransform(const double& x, const double& y, const double& theta)
     {
         double dx = x-_x, dy = y-_y, dt = theta-_theta;
@@ -82,6 +143,12 @@ public:
             transformChanged(this, dx, dy, dt);
     }
 
+    /*!
+     * \brief Obtains the last transformation values set for the model
+     * \param[out] x x coordinate
+     * \param[out] y y coordinate
+     * \param[out] theta angle (degrees)
+     */
     void getTransform(double& x, double& y, double& theta)
     {
         x = _x;
@@ -89,23 +156,29 @@ public:
         theta = _theta;
     }
 
+    /*!
+     * \brief Adds new children models to the model
+     * If a child is added multiple times (either in 1 call, or across
+     * multiple) it will only be added 1 time
+     * \param[in] newChildren A list of pointers to any number of models to add as children to this one
+     */
     void addChildren(QVector<Model*> newChildren)
     {
         if(newChildren.size())
         {
             for(Model* s : newChildren)
-            {
-                connect(s, &Model::modelChanged, this, &Model::_childModelChanged);
-                connect(s, &Model::childModelChanged, this, &Model::_childChildModelChanged);
-
-                connect(s, &Model::transformChanged, this, &Model::_childTransformChanged);
-                connect(s, &Model::childTransformChanged, this, &Model::_childChildTransformChanged);
-                _children.push_back(s);
-            }
+                if(!_children.contains(s))
+                    _children.push_back(s);
             modelChanged(this);
         }
     }
 
+    /*!
+     * \brief Removes a set of children of this model
+     * If a child to be removed is not actually a child of this model, it is
+     * ignored
+     * \param[in] oldChildren List of children to remove from this model
+     */
     void removeChildren(QVector<Model*> oldChildren)
     {
         if(oldChildren.size())
@@ -119,16 +192,29 @@ public:
         }
     }
 
+    /*!
+     * \brief Adds new shapes to the model
+     * If a shape is added multiple times (either in 1 call, or across
+     * multiple) it will only be added 1 time
+     * \param[in] newShapes A list of pointers to any number of shapes to add
+     */
     void addShapes(QVector<b2Shape*> newShapes)
     {
         if(newShapes.size())
         {
             for(b2Shape* s : newShapes)
-                _shapes.push_back(s);
+                if(!_shapes.contains(s))
+                    _shapes.push_back(s);
             modelChanged(this);
         }
     }
 
+    /*!
+     * \brief Removes a set of shapes from this model
+     * If a shape to be removed is not actually a in this model, it is
+     * ignored
+     * \param[in] oldShapes List of shapes to remove from this model
+     */
     void removeShapes(QVector<b2Shape*> oldShapes)
     {
         if(oldShapes.size())
@@ -140,5 +226,3 @@ public:
         }
     }
 };
-
-#endif // SCREEN_MODEL_H

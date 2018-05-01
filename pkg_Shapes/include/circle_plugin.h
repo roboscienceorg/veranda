@@ -1,5 +1,5 @@
-#ifndef CIRCLE_PLUGIN_H
-#define CIRCLE_PLUGIN_H
+//! \file
+#pragma once
 
 #include <QObject>
 
@@ -12,6 +12,9 @@
 //do conditional compilation so this would be used only on windows
 #include "../../../install/include/sdsmt_simulator/world_object_component_plugin.h"
 
+/*!
+ * \brief Plugin interface to the circle shape WorldObjectComponent
+ */
 class Circle_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 {
     Q_OBJECT
@@ -19,9 +22,10 @@ class Circle_Plugin : public QObject, public WorldObjectComponent_Plugin_If
     Q_INTERFACES(WorldObjectComponent_Plugin_If)
 
 public:
-    Circle_Plugin();
+    /*!
+     * \brief Creates a new circle WorldObjectComponent
+     * \return A newly allocated circle WorldObjectComponent
+     */
     WorldObjectComponent *createComponent();
 
 };
-
-#endif

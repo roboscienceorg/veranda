@@ -1,4 +1,5 @@
 build/
+Documentation/Design\ Docs/Latex\ Docs/Doxygen/
 bin/
 lib/
 msg_gen/
@@ -13,6 +14,9 @@ msg/*Result.msg
 msg/_*.py
 *.autosave
 *.vscode*
+
+# Auto-Generated Makefiles from Qt Creator
+*.Makefile.*
 
 # Qt build folders
 build-*/
@@ -272,3 +276,31 @@ TSWLatexianTemp*
 
 # expex forward references with \gathertags
 *-tags.tex
+
+# Files built by visual studio
+*_i.c
+*_p.c
+*_i.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc

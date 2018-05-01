@@ -1,5 +1,5 @@
-#ifndef TOUCH_SENSOR_RING_PLUGIN_H
-#define TOUCH_SENSOR_RING_PLUGIN_H
+//! \file
+#pragma once
 
 #include <QObject>
 
@@ -12,16 +12,20 @@
 //do conditional compilation so this would be used only on windows
 #include "../../../install/include/sdsmt_simulator/world_object_component_plugin.h"
 
-class Touch_Sensor_Plugin : public QObject, public WorldObjectComponent_Plugin_If
+/*!
+ * \brief Plugin interface to provide lidar components
+ */
+class Lidar_Sensor_Plugin : public QObject, public WorldObjectComponent_Plugin_If
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID LIDAR_IID)
     Q_INTERFACES(WorldObjectComponent_Plugin_If)
 
 public:
-    Touch_Sensor_Plugin();
+    /*!
+     * \brief Creates a new lidar component
+     * \return A newly construted Lidar Component
+     */
     WorldObjectComponent* createComponent();
 
 };
-
-#endif

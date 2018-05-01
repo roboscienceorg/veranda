@@ -162,7 +162,7 @@ void Mode_Controller::addObjectToView()
         {
             QVector<WorldObject*> rVector;
             rVector.push_back(object->getObject());
-            requestAddWorldObject(rVector, true);
+            requestAddWorldObjects(rVector, true);
             delete object;
         }
         else
@@ -183,7 +183,7 @@ void Mode_Controller::deleteObjectFromView()
     {
         QVector<object_id> rVector;
         rVector.push_back(oId);
-        requestRemoveWorldObject(rVector);
+        requestRemoveWorldObjects(rVector);
     }
     else
     {

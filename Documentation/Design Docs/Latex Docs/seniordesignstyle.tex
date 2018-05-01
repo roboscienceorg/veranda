@@ -1,7 +1,5 @@
 % !TEX root = DesignDocument.tex
 
-
-
 \usepackage[width=6.5in, height=9.2in, top=1.0in, papersize={8.5in,11in}]{geometry}
 \usepackage[pdftex]{graphicx}
 \usepackage{amsmath}
@@ -22,20 +20,22 @@
 \usepackage{color}
 \usepackage{listings}
 \usepackage{calc}
-\usepackage{doxygen}
+\usepackage{subcaption}
+\usepackage{wrapfig}
 \usepackage[utf8]{inputenc}
 \usepackage{makeidx}
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage[table]{xcolor}
 \usepackage{tabularx}
+\usepackage{makecell}
 \usepackage{framed}
 \usepackage{xspace}
 \usepackage{etex}
 \usepackage{todonotes}
 \usepackage{pdfpages}
 \usepackage{pgfgantt}
-
+\usepackage{dirtree}
 
 %% Computer Modern Bright Font
 %\usepackage{cmbright}
@@ -47,11 +47,17 @@
 \usepackage[T1]{fontenc}
 
 
-\definecolor{SDColor1}{rgb}{0,0,0}
-\definecolor{SDColor2}{rgb}{0,0,0}
-\definecolor{SDColor3}{rgb}{0,0,0}
-\definecolor{SDColor4}{rgb}{0,0,0}
-\definecolor{SDColor5}{rgb}{0,0,0}
+%\definecolor{SDColor1}{rgb}{0,0,0}
+%\definecolor{SDColor2}{rgb}{0,0,0}
+%\definecolor{SDColor3}{rgb}{0,0,0}
+%\definecolor{SDColor4}{rgb}{0,0,0}
+%\definecolor{SDColor5}{rgb}{0,0,0}
+
+\definecolor{SDColor1}{rgb}{.204,.353,.541}
+\definecolor{SDColor2}{rgb}{.31,.506,.741}
+\definecolor{SDColor3}{rgb}{0.18,0.35,0.59}
+\definecolor{SDColor4}{rgb}{0.44,0.59,0.82}
+\definecolor{SDColor5}{rgb}{0.2,0.2,0.2}
 
 %%%  --- Here are some other colors.  Keep it conservative --- %%%
 
@@ -71,6 +77,12 @@
 %\definecolor{SDColor5}{rgb}{.45,.15,.15}
 %
 
+\hypersetup{
+    colorlinks = true,
+	urlcolor = SDColor1,
+	linkcolor = SDColor5
+}
+
 
 %% Custom colors for code listing environment
 \definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
@@ -81,7 +93,9 @@
 identifierstyle=\ttfamily\color{DarkBlue}\bfseries,
 commentstyle=\color{OliveGreen},
 stringstyle=\ttfamily,
-showstringspaces=false,tabsize = 3}
+showstringspaces=false,tabsize = 3,
+breaklines=true,
+postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}}
 
 
 \setlength{\oddsidemargin}{0mm} 

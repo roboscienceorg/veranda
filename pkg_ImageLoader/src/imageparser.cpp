@@ -15,6 +15,9 @@
 typedef ImageParser::Shape Shape;
 using std::vector;
 
+/*!
+ * \throws std::exception - A null image is loaded
+ */
 QVector<ImageParser::Shape> ImageParser::parseImage(QString fileName, const uint64_t& colorThreshold, uint64_t &width, uint64_t &height)
 {
     qDebug() << "Opening file...";
@@ -45,7 +48,12 @@ QVector<ImageParser::Shape> ImageParser::parseImage(const QImage& image, const u
     return parseImage(pixMap, colorThreshold);
 }
 
-QVector<Shape> ImageParser::parseImage(const QVector<QVector<QRgb>>& pixMap, const uint64_t& colorThreshold)
+/*!
+ * This function assumes that the input pixmap is rectangular (not jagged)
+ *
+ * \throws std::exception - The pixel map has 0 size
+ */
+QVector<Shape> ImageParser::parseImage(const QVector<QVector<QRgb> >& pixMap, const uint64_t& colorThreshold)
 {
     qDebug() << "Making black and white...";
     if(!pixMap.size() || !pixMap[0].size())
@@ -107,6 +115,10 @@ QVector<Shape> ImageParser::_findShapes(QVector<QVector<bool> >& bwImage)
     return shapes;
 }
 
+/*!
+ * The callback function follows the prototype <void (int, int)>. It is called for each point
+ * touched by the bfs with the parameters x, y
+ */
 void ImageParser::_bfsBlackWhite(const QVector<QVector<bool> >& bwImage, std::function<void (int, int)> handler, int64_t x, int64_t y, bool color)
 {
     QVector<QVector<bool>>visited (bwImage.size(), QVector<bool>(bwImage[0].size(), false));
@@ -218,6 +230,13 @@ Shape ImageParser::_findPoints(QVector<QVector<bool> > &shape)
     return out;
 }
 
+/*!
+ * This is the key part of the image parsing. It works similarly to a breadth first or depth first search, but
+ * the queue is always size 1; only black pixels are considered. At each point, the 8 points surrounding are checked.
+ * Of those points, only the ones with 3 or more black neighbors may be the next point. The first point found which
+ * satisfies these constraints is stepped to as the next point. When searching for a neighbor of that point,
+ * we consider the 8 points around it starting with the one in the same direction that was used to get to it.
+ */
 QPolygonF ImageParser::_followBoundary(const QVector<QVector<bool>>& bwImage, int64_t x, int64_t y, bool outer)
 {
     const std::function<bool(const QVector<QVector<bool>>&, int64_t, int64_t)> isBlack =
