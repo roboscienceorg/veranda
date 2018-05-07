@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     //and it is safe to spin() in one thread and create/destroy publishers/subscribers
     //from another
     QTimer spinTimer;
-    spinTimer.setInterval(0.01);
+    spinTimer.setInterval(0.03);
     QObject::connect(&spinTimer, &QTimer::timeout,
     [&]()
     {

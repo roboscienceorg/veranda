@@ -88,5 +88,9 @@ set(headers include/touch_sensor.h include/touch_sensor_plugin.h)
 set(sources src/touch_sensor.cpp src/touch_sensor_plugin.cpp)
 make_plugin(touch_sensor_plugin "${headers}" "${sources}")
 
+set(headers include/gps_sensor.h include/gps_sensor_plugin.h)
+set(sources src/gps_sensor.cpp src/gps_sensor_plugin.cpp)
+make_plugin(gps_sensor_plugin "${headers}" "${sources}")
+
 ament_package()
 

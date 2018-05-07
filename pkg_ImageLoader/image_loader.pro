@@ -1,6 +1,6 @@
 QT       += core widgets
 
-TARGET = diffDrive_drivetrain
+TARGET = dummy_target
 TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being set
 
 INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include

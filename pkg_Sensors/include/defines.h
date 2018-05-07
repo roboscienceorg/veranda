@@ -6,3 +6,6 @@
 
 //! The plugin IID for the button ring plugin
 #define TOUCH_IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.touchring"
+
+//! The plugin IID for the gps plugin
+#define GPS_IID "org.sdsmt.sim.2d.worldObjectComponent.defaults.gps"

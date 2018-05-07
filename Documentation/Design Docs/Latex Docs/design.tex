@@ -1052,6 +1052,51 @@ The Ackermann steering plugin produces two linked wheels which can be steered to
 \subsection{Sensor Plugins}
 Sensors travel with a world object and collect information about the environment. This information is usually published to the control code through ROS messages so that the control code can react to what is happening. Sensors plugins should produce the same messages as their hardware counterparts so that any control code listening to the messages does not behave differently when the messages are produced by hardware.
 
+\subsubsection*{GPS Sensor}
+The GPS Sensor is used to return the current position of an object in the world. It publishes a ROS Pose2d message, which contains
+X, Y, and Theta values. The sensor can be tuned to simulate a broken GPS which drops values, has noise, or drifts over time. The noise and drift values follow normal distributions, and the chance to drop values is uniform. When a value is dropped, NaN is published instead of the current coordinate or angle. Theta is published in radians. The properties exposed to set these 
+distributions as well as specify the ROS topic can be found in table \ref{tab:gps_props}.
+	
+\begin{table}[h!]
+	\centering
+	\caption{Properties exposed by the GPS Sensor plugin}
+	\label{tab:gps_props}
+	\begin{tabular}{c|c|c}
+	Property Name & Data Type & Description\\ \hline \hline
+	channels/output\_pose & String & Topic to publish Pose2D messages on\\ \hline
+	publish\_rate & double & Rate of publishing (hz)\\ \hline
+	probabilities/x & double & Probability of publishing x coordinate [0.0, 1.0]\\ \hline
+	probabilities/y & double & Probability of publishing y coordinate [0.0, 1.0]\\ \hline
+	probabilities/theta & double & Probability of publishing theta [0.0, 1.0]\\ \hline
+	drift/x/sigma & double & Variance of drift in x direction per second\\ \hline
+	drift/x/mu & double & Mean of drift in x direction per second\\ \hline
+	drift/y/sigma & double & Variance of drift in y direction per second\\ \hline
+	drift/y/mu & double & Mean of drift in y direction per second\\ \hline
+	drift/theta/sigma & double & Variance of drift in theta direction per second\\ \hline
+	drift/theta/mu & double & Mean of drift in theta direction per second\\ \hline
+	noise/x/sigma & double & Variance of noise in x direction\\ \hline
+	noise/x/mu & double & Mean of noise in x direction\\ \hline
+	noise/y/sigma & double & Variance of noise in y direction\\ \hline
+	noise/y/mu & double & Mean of noise in y direction\\ \hline
+	noise/theta/sigma & double & Variance of noise in theta\\ \hline
+	noise/theta/mu & double & Mean of noise in theta
+	\end{tabular}
+\end{table}
+\begin{table}[h!]
+	\centering
+	\caption{ROS Messages used by the GPS Plugin}
+	\label{tab:gps_msgs}
+	\begin{tabular}{c|c|c|c}
+	ROS Topic & Message Type & In/Out & Description\\ \hline \hline
+	channels/output\_channel & geometry\_msgs::msg::Pose2D & Out & \makecell{The 2D Pose message containing x, y, and theta}
+	\end{tabular}
+\end{table}
+\paragraph{Design Details}
+\begin{itemize}
+	\item Drift accumulates over time even on ticks when the value is not published
+	\item NaN is produced using \lstinline|std::numeric_limits<double>::quiet_NaN()|
+\end{itemize}
+
 \subsubsection*{Touch Sensor Ring}
 The touch sensor ring plugin mimics a ring of touch sensors with a specific radius. It is intended to be used on circular robots, so that its radius can be set to the same as the robot. 
 	The sensor ring can be set to sense a specific section of the circle, and the number of sensors used can be specified. Whenever the state of one of the buttons changes, a ROS message is published. Extra circles are drawn on the world visualization to show which touch sensors are triggered. An example of this can be seen in Figure \ref{fig:touchsensorexample}. Details of the properties exposed by the plugin and the ROS messages it utilizes can be found in tables \ref{tab:touch_ring_props} and \ref{tab:touch_ring_msgs}

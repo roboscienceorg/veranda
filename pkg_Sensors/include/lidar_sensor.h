@@ -134,7 +134,7 @@ class Lidar_Sensor : public WorldObjectComponent
 
     //! Property: ROS channel to publish on
     Property output_channel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
-                                                    "Output channel for touch messages"), "");
+                                                    "Output channel for lidar messages"), "");
 
     //! Property: Total range (degrees) covered by the lidar
     Property angle_range = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,

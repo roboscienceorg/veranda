@@ -8,6 +8,7 @@ SUBDIRS = \
     pkg_ImageLoader \
     sensor_lidar \
     sensor_touch \
+    sensor_gps \
     wheel_fixed \
     wheel_ackermann \
     shape_rect \
@@ -20,6 +21,7 @@ pkg_DefaultRobotLoader.file = ../pkg_DefaultRobotLoader/default_robot_loader.pro
 pkg_ImageLoader.file = ../pkg_ImageLoader/image_loader.pro
 sensor_lidar.file = ../pkg_Sensors/lidar_sensor.pro
 sensor_touch.file = ../pkg_Sensors/touch_sensor_ring.pro
+sensor_gps.file = ../pkg_Sensors/gps_sensor.pro
 wheel_fixed.file = ../pkg_Wheels/fixed_wheel.pro
 wheel_ackermann.file = ../pkg_Wheels/ackermann_steer.pro
 shape_rect.file = ../pkg_Shapes/rectangle.pro

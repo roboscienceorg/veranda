@@ -140,7 +140,7 @@ public:
     /*!
      * \brief Validator to check that the stored value is a double
      * The validator rejects any non-numeric values. Values within EPSILON (see const.h)
-     * of 0 are rounded to 0. Any negative values are converted to their absolute valuess.
+     * of 0 are rounded to 0. Any negative values are converted to their absolute values.
      *
      * \param[in] _old The old value stored
      * \param[in] _new The new value requested
@@ -150,6 +150,23 @@ public:
     {
         return std::abs(double_validator(_old, _new).toDouble());
     }
+
+    /*!
+     * \brief Validator to check that the stored value is a double in the range [0, 1]
+     * The validator rejects any non-numeric values. Values within EPSILON (see const.h)
+     * of 0 are rounded to 0. Any negative values are converted to their absolute values.
+     * Any values outside the allowed range are clamped to the range
+     *
+     * \param[in] _old The old value stored
+     * \param[in] _new The new value requested
+     * \return The value that should be stored
+     */
+    static QVariant probability_validator(const QVariant& _old, const QVariant& _new)
+    {
+        double absolute = double_validator(_old, _new).toDouble();
+        return std::max(std::min(absolute, 1.0), 0.0);
+    }
+
 
     /*!
      * \brief Validator to check that the stored value is an angle
