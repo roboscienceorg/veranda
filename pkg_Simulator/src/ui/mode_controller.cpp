@@ -257,6 +257,7 @@ void Mode_Controller::objectSelected(object_id id)
         QStringList propKeys = selectedProps.keys();
         model->setRowCount(selectedProps.size());
 
+        properties->setUpdatesEnabled(false);
         int i = 0;
         for(QString k : propKeys)
         {
@@ -271,6 +272,7 @@ void Mode_Controller::objectSelected(object_id id)
            displayed_properties[i] = k;
            i++;
         }
+        properties->setUpdatesEnabled(true);
 
         connect(model, &QStandardItemModel::dataChanged, [this, obj, model](QModelIndex tl, QModelIndex br)
         {
@@ -279,6 +281,28 @@ void Mode_Controller::objectSelected(object_id id)
         });
 
         updatePropertyInformation();
+
+        properties->reset();
+
+        QBrush disabled(QColor(230, 230, 230));
+        for(auto it = displayed_properties.begin(); it != displayed_properties.end(); it++)
+        {
+            PropertyInfo inf = selectedProps[it.value()]->info();
+
+            QStandardItem* itm = model->item(it.key(), 0);
+            itm->setFlags(itm->flags() & ~Qt::ItemIsEditable);
+            itm->setBackground(disabled);
+            itm->setToolTip(inf.description);
+
+            itm = model->item(it.key(), 1);
+            itm->setToolTip(inf.description);
+
+            if(inf.readOnly)
+            {
+                itm->setFlags(itm->flags() & ~Qt::ItemIsEditable);
+                itm->setBackground(disabled);
+            }
+        }
 
         active->setCurrentItem(listItems[id]);
 
@@ -307,7 +331,6 @@ void Mode_Controller::nothingSelected()
 void Mode_Controller::robotItemClicked(QListWidgetItem* item)
 {
     QString strName = item->data(Qt::DisplayRole).toString().section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty);
-    qDebug() << strName;
     objectSelected(strName.toInt());
 }
 
