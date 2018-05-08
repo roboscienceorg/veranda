@@ -39,35 +39,35 @@ class Ackermann_Steer : public WorldObjectComponent
     rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr _receiveChannel;
 
     //! Property: The name of the ROS subscription channel
-    Property _inputChannel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
+    Property _inputChannel = Property(PropertyInfo(false, true, false, PropertyInfo::STRING,
                                                     "Input channel for turn angle"), "");
 
     //! Property: The radius of the wheels (meters)
-    Property _wradius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property _wradius = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                     "Wheel radius (meters)"), QVariant(0.5),
                                     &Property::abs_double_validator);
 
     //! Property: The width of the wheels (meters)
-    Property _wwidth = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property _wwidth = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                   "Wheel width (meters)"), QVariant(0.2),
                                   &Property::abs_double_validator);
 
     //! Property: Half the length of the axle connecting the wheels (meters)
-    Property _l1 = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property _l1 = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                               "Axle length (meters)"), QVariant(1.0),
                               &Property::abs_double_validator);
 
     //! Property: Distance from the front axle to the back axle (meters)
-    Property _l2 = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property _l2 = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                               "Vehicle length (meters)"), QVariant(1.0),
                               &Property::abs_double_validator);
 
     //! Property: Density of the wheels (Use this to tune how much force they produce)
-    Property _density = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Density of the wheels"),
+    Property _density = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Density of the wheels"),
                                  QVariant(1.0), &Property::abs_double_validator);
 
     //! Property: The current angle being steered to
-    Property _steerAngle = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of steering"),
+    Property _steerAngle = Property(PropertyInfo(true, true, false, PropertyInfo::DOUBLE, "Angle of steering"),
                                  QVariant(0.0), &Property::double_validator);
 
 #define pview(a) QSharedPointer<PropertyView>::create(a)

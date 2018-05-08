@@ -126,11 +126,11 @@ class Polygon : public WorldObjectComponent
     }
 
     //! Property: The number of triangles generated
-    Property _numShapes = Property(PropertyInfo(true, false, PropertyInfo::INT, "Number of polygons in the shape"),
+    Property _numShapes = Property(PropertyInfo(true, false, false, PropertyInfo::INT, "Number of polygons in the shape"),
                                    QVariant(0));
 
     //! The set of points which make up the outer loop of the shape
-    Property _outerShape = Property(PropertyInfo(true, false, PropertyInfo::INT, "The outermost polygon of the shape"),
+    Property _outerShape = Property(PropertyInfo(true, true, false, PropertyInfo::INT, "The outermost polygon of the shape"),
                                     QVariantList{QVariantList{0, 0}, QVariantList{1, 1}, QVariantList{1, 0}},
                                     [](const QVariant& _old, const QVariant& _new)
                                     {
@@ -141,7 +141,7 @@ class Polygon : public WorldObjectComponent
                                     });
 
     //! A List of sets of points which make up holes in the outer shape
-    Property _innerShapes = Property(PropertyInfo(true, false, PropertyInfo::INT, "Inner polygons defining holes"),
+    Property _innerShapes = Property(PropertyInfo(true, true, false, PropertyInfo::INT, "Inner polygons defining holes"),
                                    QVariantList(),
                                     [](const QVariant& _old, const QVariant& _new)
                                     {
@@ -166,19 +166,19 @@ class Polygon : public WorldObjectComponent
                                     });
 
     //! Property: Flag for whether all triangles should be displayed or just the line loops
-    Property _fullDraw = Property(PropertyInfo(true, false, PropertyInfo::BOOL, "Whether or not to draw all triangles"),
+    Property _fullDraw = Property(PropertyInfo(true, true, false, PropertyInfo::BOOL, "Whether or not to draw all triangles"),
                                   QVariant(false), &Property::bool_validator);
 
     //! Property: Threshold under which cross product means the line is straight
-    Property _straight = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "How close to straight an edge has to be to have points removed"),
+    Property _straight = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "How close to straight an edge has to be to have points removed"),
                                   QVariant(0), &Property::abs_double_validator);
 
     //! Property: Horizontal scaling factor
-    Property _scalex = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Horizontal scaling factor"),
+    Property _scalex = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Horizontal scaling factor"),
                                   QVariant(1), &Property::abs_double_validator);
 
     //! Property: Vertical scaling factor
-    Property _scaley = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Vertical scaling factor"),
+    Property _scaley = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Vertical scaling factor"),
                                   QVariant(1), &Property::abs_double_validator);
 
 #define prop(x) QSharedPointer<PropertyView>(new PropertyView(&(x)))

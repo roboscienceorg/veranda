@@ -101,7 +101,7 @@ WorldObjectComponent* WorldObjectComponent::clone(QObject* newParent)
     auto props = getProperties();
     auto outProps = out->getProperties();
     for(QString s : props.keys())
-        if(outProps.contains(s))
+        if(outProps.contains(s) && props[s]->info().shouldSave)
         {
             outProps[s]->set(props[s]->get(), true);
         }

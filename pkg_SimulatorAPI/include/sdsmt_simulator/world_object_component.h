@@ -50,30 +50,30 @@ class SDSMT_SIMULATOR_API WorldObjectComponent : public QObject
     Q_OBJECT
 
     //! Property for component name
-    Property _objName;
+    Property _objName = Property(PropertyInfo(true, true, false, PropertyInfo::STRING, "Name of the component"));
 
     //! Property for local x location
-    Property _locX = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "X coord of the object relative to its parent"),
+    Property _locX = Property(PropertyInfo(true, false, false, PropertyInfo::DOUBLE, "X coord of the object relative to its parent"),
                                 QVariant(0.0), &Property::double_validator);
 
     //! Property for local y location
-    Property _locY = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Y coord of the object relative to its parent"),
+    Property _locY = Property(PropertyInfo(true, false, false, PropertyInfo::DOUBLE, "Y coord of the object relative to its parent"),
                                 QVariant(0.0), &Property::double_validator);
 
     //! Property for local rotation
-    Property _locTheta = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Angle of the object (Degrees) relative to its parent"),
+    Property _locTheta = Property(PropertyInfo(true, false, false, PropertyInfo::DOUBLE, "Angle of the object (Degrees) relative to its parent"),
                                 QVariant(0.0), &Property::angle_validator);
 
     //! Property for global x location
-    Property _globX = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Global X coord of the object"),
+    Property _globX = Property(PropertyInfo(true, true, false, PropertyInfo::DOUBLE, "Global X coord of the object"),
                                 QVariant(0.0), &Property::double_validator);
 
     //! Property for global y location
-    Property _globY = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Global Y coord of the object"),
+    Property _globY = Property(PropertyInfo(true, true, false, PropertyInfo::DOUBLE, "Global Y coord of the object"),
                                 QVariant(0.0), &Property::double_validator);
 
     //! Property for global rotation
-    Property _globTheta = Property(PropertyInfo(true, false, PropertyInfo::DOUBLE, "Global Angle of the object (Degrees)"),
+    Property _globTheta = Property(PropertyInfo(true, true, false, PropertyInfo::DOUBLE, "Global Angle of the object (Degrees)"),
                                 QVariant(0.0), &Property::angle_validator);
 
     //! Mapping of all properties and their identifying keys

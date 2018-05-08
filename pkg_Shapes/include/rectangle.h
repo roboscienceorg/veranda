@@ -23,12 +23,12 @@ class Rectangle : public WorldObjectComponent
     Q_OBJECT
 
     //! Property: Height of the rectangle body
-    Property height = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property height = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                "Height of the rectangle"), QVariant(1.0),
                                &Property::abs_double_validator);
 
     //! Property: Width of the rectangle body
-    Property width = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property width = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                "Width of the rectangle"), QVariant(1.0),
                                &Property::abs_double_validator);
 

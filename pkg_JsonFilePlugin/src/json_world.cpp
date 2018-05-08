@@ -24,7 +24,7 @@ QVector<WorldObject*> JsonWorldLoader::loadFile(QString filePath, QMap<QString, 
 void JsonWorldSaver::saveFile(QString filePath, QVector<WorldObject*> objects)
 {
     QFile saveFile(filePath);
-    saveFile.open(QIODevice::WriteOnly);
+    saveFile.open(QIODevice::WriteOnly  | QIODevice::Truncate);
     QJsonArray robotArray;
 
     for (int i = 0; i < objects.size(); i++)

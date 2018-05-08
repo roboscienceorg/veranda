@@ -6,6 +6,9 @@ WorldObject::WorldObject(QVector<WorldObjectComponent *> components, QString nam
 {
     QMap<QString, int> groupcounts;
 
+    //Copy all properties that are part of self into the aggregation properties
+    _properties = _selfProperties;
+
     //Quick tally of if any components use the same group name
     for(WorldObjectComponent* c : _components)
     {
