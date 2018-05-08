@@ -257,6 +257,7 @@ void Mode_Controller::objectSelected(object_id id)
         QStringList propKeys = selectedProps.keys();
         model->setRowCount(selectedProps.size());
 
+        displayed_properties.clear();
         properties->setUpdatesEnabled(false);
         int i = 0;
         for(QString k : propKeys)
@@ -289,19 +290,25 @@ void Mode_Controller::objectSelected(object_id id)
         {
             PropertyInfo inf = selectedProps[it.value()]->info();
 
+            //Null keys shouldn't happen here, but if they do we want to know about it and not crash
             QStandardItem* itm = model->item(it.key(), 0);
+            if(!itm){ qDebug() << "Null key item for" << it.key() << "->" << it.value(); continue; }
             itm->setFlags(itm->flags() & ~Qt::ItemIsEditable);
             itm->setBackground(disabled);
             itm->setToolTip(inf.description);
 
+
             itm = model->item(it.key(), 1);
+            if(!itm){ qDebug() << "Null value item for" << it.key() << "->" << it.value(); continue; }
             itm->setToolTip(inf.description);
 
-            if(inf.readOnly)
+            //Only disable readonly properties in simulation mode
+            if(simulator && inf.readOnly)
             {
                 itm->setFlags(itm->flags() & ~Qt::ItemIsEditable);
                 itm->setBackground(disabled);
             }
+
         }
 
         active->setCurrentItem(listItems[id]);
