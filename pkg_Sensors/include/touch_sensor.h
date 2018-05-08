@@ -50,26 +50,26 @@ class Touch_Sensor : public WorldObjectComponent
     rclcpp::Publisher<std_msgs::msg::ByteMultiArray>::SharedPtr _sendChannel;
 
     //! Property: ROS channel to publish on
-    Property output_channel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
+    Property output_channel = Property(PropertyInfo(false, true, false, PropertyInfo::STRING,
                                                     "Output channel for touch messages"), "");
 
     //! Property: Starting angle of the sensed area
-    Property angle_start = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property angle_start = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                     "Start angle of the sensors(degrees)"), QVariant(0.0),
                                     &Property::angle_validator);
 
     //! Property: Ending angle of the sensed area (Counterclockwise from start)
-    Property angle_end = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property angle_end = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                   "End angle of the sensors (degrees)"), QVariant(360.0),
                                   &Property::angle_validator);
 
     //! Property: Radius of the bump ring (meters)
-    Property radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property radius = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                "Radius of the touch sensor ring"), QVariant(1.0),
                                &Property::abs_double_validator);
 
     //! Property: Number of distinct bump locations
-    Property sensor_count = Property(PropertyInfo(false, false, PropertyInfo::INT,
+    Property sensor_count = Property(PropertyInfo(false, true, false, PropertyInfo::INT,
                                                   "Number of sensors on the ring"), QVariant(10),
                                                   [](QVariant _old, QVariant _new)
                                                   {

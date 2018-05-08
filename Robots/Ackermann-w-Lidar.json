@@ -4,15 +4,15 @@
             "pluginName": "org.sdsmt.sim.2d.worldObjectComponent.defaults.fixedwheel",
             "properties": [
                 {
-                    "key": "LocalPos/Theta",
+                    "key": "GlobalPos/Theta",
                     "value": 90
                 },
                 {
-                    "key": "LocalPos/X",
+                    "key": "GlobalPos/X",
                     "value": 1.5
                 },
                 {
-                    "key": "LocalPos/Y",
+                    "key": "GlobalPos/Y",
                     "value": -2.75
                 },
                 {
@@ -45,15 +45,15 @@
             "pluginName": "org.sdsmt.sim.2d.worldObjectComponent.defaults.fixedwheel",
             "properties": [
                 {
-                    "key": "LocalPos/Theta",
+                    "key": "GlobalPos/Theta",
                     "value": 90
                 },
                 {
-                    "key": "LocalPos/X",
+                    "key": "GlobalPos/X",
                     "value": -1.5
                 },
                 {
-                    "key": "LocalPos/Y",
+                    "key": "GlobalPos/Y",
                     "value": -2.75
                 },
                 {
@@ -86,15 +86,15 @@
             "pluginName": "org.sdsmt.sim.2d.worldObjectComponent.defaults.rectangle",
             "properties": [
                 {
-                    "key": "LocalPos/Theta",
+                    "key": "GlobalPos/Theta",
                     "value": 0
                 },
                 {
-                    "key": "LocalPos/X",
+                    "key": "GlobalPos/X",
                     "value": 0
                 },
                 {
-                    "key": "LocalPos/Y",
+                    "key": "GlobalPos/Y",
                     "value": 0
                 },
                 {
@@ -115,15 +115,15 @@
             "pluginName": "org.sdsmt.sim.2d.worldObjectComponent.defaults.lidar",
             "properties": [
                 {
-                    "key": "LocalPos/Theta",
+                    "key": "GlobalPos/Theta",
                     "value": 90
                 },
                 {
-                    "key": "LocalPos/X",
+                    "key": "GlobalPos/X",
                     "value": 0
                 },
                 {
-                    "key": "LocalPos/Y",
+                    "key": "GlobalPos/Y",
                     "value": 1.5
                 },
                 {
@@ -156,15 +156,15 @@
             "pluginName": "org.sdsmt.sim.2d.worldObjectComponent.defaults.ackermann",
             "properties": [
                 {
-                    "key": "LocalPos/Theta",
+                    "key": "GlobalPos/Theta",
                     "value": 0
                 },
                 {
-                    "key": "LocalPos/X",
+                    "key": "GlobalPos/X",
                     "value": 0
                 },
                 {
-                    "key": "LocalPos/Y",
+                    "key": "GlobalPos/Y",
                     "value": 2.75
                 },
                 {
@@ -203,17 +203,5 @@
         }
     ],
     "properties": [
-        {
-            "key": "GlobalPos/Theta",
-            "value": 0
-        },
-        {
-            "key": "GlobalPos/X",
-            "value": 0
-        },
-        {
-            "key": "GlobalPos/Y",
-            "value": 0
-        }
     ]
 }

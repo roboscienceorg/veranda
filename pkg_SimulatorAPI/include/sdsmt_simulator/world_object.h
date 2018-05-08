@@ -54,6 +54,9 @@ class SDSMT_SIMULATOR_API WorldObject : public WorldObjectComponent
     //! Union of all properties provided by the object's components
     QMap<QString, QSharedPointer<PropertyView>> _properties;
 
+    //! List of properties specific only to self and not children
+    QMap<QString, QSharedPointer<PropertyView>> _selfProperties;
+
 protected:
     QMap<QString, QSharedPointer<PropertyView>> _getProperties()
     { return _properties; }
@@ -101,6 +104,7 @@ public:
 
     QString getPluginName() { return ""; }
 
+    QMap<QString, QSharedPointer<PropertyView>> getSelfProperties(){ return _selfProperties; }
 public slots:
     void connectChannels();
     void disconnectChannels();

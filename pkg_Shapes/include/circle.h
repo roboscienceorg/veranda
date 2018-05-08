@@ -23,7 +23,7 @@ class Circle : public WorldObjectComponent
     Q_OBJECT
 
     //! Property: Radius of the circle body
-    Property radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property radius = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                "Radius of the Circle"), QVariant(1.0),
                                &Property::abs_double_validator);
 

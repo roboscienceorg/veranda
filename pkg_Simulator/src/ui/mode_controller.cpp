@@ -303,7 +303,7 @@ void Mode_Controller::objectSelected(object_id id)
             itm->setToolTip(inf.description);
 
             //Only disable readonly properties in simulation mode
-            if(simulator && inf.readOnly)
+            if((simulator && inf.readOnly) || !inf.shouldSave)
             {
                 itm->setFlags(itm->flags() & ~Qt::ItemIsEditable);
                 itm->setBackground(disabled);

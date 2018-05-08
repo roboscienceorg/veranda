@@ -361,7 +361,7 @@ After construction, shapes and children models can be added and removed with the
  		\item Its value
  	\end{itemize}
  	
- 	The PropertyInfo is a container for any meta information about the Property. This contains data such as the type of the data, whether or not it's read-only, whether or not it's a list, and a description of what the Property is used for. This is intended to be used to aid a UI which displays Properties to the user. It is assigned to a Property once, at construction, and can be accessed through the info() method.
+ 	The PropertyInfo is a container for any meta information about the Property. This contains data such as the type of the data, whether or not it's read-only, whether or not it's a list, whether or not it's required to rebuild the component, and a description of what the Property is used for. This is intended to be used to aid a UI which displays Properties to the user. It is assigned to a Property once, at construction, and can be accessed through the info() method.
  	
  	The validation function follows the prototype \lstinline|function<QVariant(QVariant, QVariant)>| and is used to make sure that the data assigned to the Property is valid. The first parameter represents the previous value, and the second parameter is a potential new value. The function should return the new value if it is acceptable and the old value if the new one is not acceptable (Optionally, the function may change the new value to make it valid and then return it). The default validation function accepts all values. A number of basic validation functions exist as static methods of the Property class for convenience. Some of them are
  	\begin{itemize}

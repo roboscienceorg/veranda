@@ -38,25 +38,25 @@ class Fixed_Wheel : public WorldObjectComponent
     rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr _receiveChannel;
 
     //! Property: The name of the ROS subscription channel
-    Property _inputChannel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
+    Property _inputChannel = Property(PropertyInfo(false, true, false, PropertyInfo::STRING,
                                                     "Input channel for drive speed"), "");
 
     //! Property: The radius of the wheel (meters)
-    Property _radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property _radius = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                     "Wheel radius (meters)"), QVariant(0.5),
                                     &Property::abs_double_validator);
 
     //! Property: The width of the wheel (meters)
-    Property _width = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property _width = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                   "Wheel width (meters)"), QVariant(0.2),
                                   &Property::abs_double_validator);
 
     //! Property: Flag for if the wheel can be driven or not
-    Property _driven = Property(PropertyInfo(false, false, PropertyInfo::BOOL, "Whether or not the wheel is driven"),
+    Property _driven = Property(PropertyInfo(false, true, false, PropertyInfo::BOOL, "Whether or not the wheel is driven"),
                                QVariant(false), &Property::bool_validator);
 
     //! Property: Density of the wheel (Use this to tune how much force it produces)
-    Property _density = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Density of the wheel"),
+    Property _density = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Density of the wheel"),
                                  QVariant(1.0), &Property::abs_double_validator);
 
  #define pview(a) QSharedPointer<PropertyView>::create(a)

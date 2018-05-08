@@ -16,7 +16,7 @@ WorldObject* JsonObjectLoader::loadFile(QString filePath, QMap<QString, WorldObj
 void JsonObjectSaver::saveFile(QString filePath, WorldObject* object)
 {
     QFile saveFile(filePath);
-    saveFile.open(QIODevice::ReadWrite);
+    saveFile.open(QIODevice::WriteOnly | QIODevice::Truncate);
 
     QJsonDocument saveDoc(worldObjectToJsonObject(object));
     saveFile.write(saveDoc.toJson());

@@ -85,7 +85,7 @@ inline QJsonObject worldObjectToJsonObject(WorldObject* obj)
         QMap<QString, QSharedPointer<PropertyView>>::iterator it;
         for (it = compProps.begin(); it != compProps.end(); it++)
         {
-            if (!it.key().contains("GlobalPos"))
+            if (it.value()->info().shouldSave)
             {
                 QJsonObject propObj;
                 propObj["key"] = it.key();
@@ -100,11 +100,11 @@ inline QJsonObject worldObjectToJsonObject(WorldObject* obj)
     robotObject["components"] = compArray;
 
     QJsonArray propArray;
-    QMap<QString, QSharedPointer<PropertyView>> objProps = obj->getProperties();
+    QMap<QString, QSharedPointer<PropertyView>> objProps = obj->getSelfProperties();
     QMap<QString, QSharedPointer<PropertyView>>::iterator it;
     for (it = objProps.begin();it != objProps.end(); it++)
     {
-        if (it.key().contains("GlobalPos") && it.key().count('/') == 1)
+        if (it.value()->info().shouldSave)
         {
             QJsonObject propObj;
             propObj["key"] = it.key();

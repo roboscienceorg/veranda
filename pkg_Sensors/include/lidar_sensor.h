@@ -133,21 +133,21 @@ class Lidar_Sensor : public WorldObjectComponent
     rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr _sendChannel;
 
     //! Property: ROS channel to publish on
-    Property output_channel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
+    Property output_channel = Property(PropertyInfo(false, true, false, PropertyInfo::STRING,
                                                     "Output channel for lidar messages"), "");
 
     //! Property: Total range (degrees) covered by the lidar
-    Property angle_range = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property angle_range = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                     "Total angle covered by the scan (degrees)"), QVariant(360),
                                     &Property::angle_validator);
 
     //! Property: Length of lidar rays (meters)
-    Property radius = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE,
+    Property radius = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                   "Radius of the scan (meters)"), QVariant(1),
                                   &Property::angle_validator);
 
     //! Property: Number of lidar rays
-    Property scan_points = Property(PropertyInfo(false, false, PropertyInfo::INT,
+    Property scan_points = Property(PropertyInfo(false, true, false, PropertyInfo::INT,
                                                   "Number of points per scan"), QVariant(10),
                                                   [](QVariant _old, QVariant _new)
                                                   {
@@ -159,7 +159,7 @@ class Lidar_Sensor : public WorldObjectComponent
                                                   });
 
     //! Property: Rate of publishing messages
-    Property pub_rate = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Scan rate (hz)"),
+    Property pub_rate = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Scan rate (hz)"),
                                  QVariant(10), &Property::abs_double_validator);
 
 #define pview(a) QSharedPointer<PropertyView>(new PropertyView(a))

@@ -50,71 +50,71 @@ class GPS_Sensor : public WorldObjectComponent
     rclcpp::Publisher<geometry_msgs::msg::Pose2D>::SharedPtr _sendChannel;
 
     //! Property: ROS channel to publish on
-    Property output_channel = Property(PropertyInfo(false, false, PropertyInfo::STRING,
+    Property output_channel = Property(PropertyInfo(false, true, false, PropertyInfo::STRING,
                                                     "Output channel for gps messages"), "");
 
     //! Property: Rate of publishing messages
-    Property pub_rate = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Publish rate (hz)"),
+    Property pub_rate = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Publish rate (hz)"),
                                  QVariant(10), &Property::abs_double_validator);
 
     //! Property: Chance of publishing x coord
-    Property x_chance = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Probability of publishing x coord"),
+    Property x_chance = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Probability of publishing x coord"),
                                  QVariant(1.0), &Property::probability_validator);
 
     //! Property: Chance of publishing y coord
-    Property y_chance = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Probability of publishing y coord"),
+    Property y_chance = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Probability of publishing y coord"),
                                  QVariant(1.0), &Property::probability_validator);
 
     //! Property: Chance of publishing theta
-    Property t_chance = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Probability of publishing theta"),
+    Property t_chance = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Probability of publishing theta"),
                                  QVariant(1.0), &Property::probability_validator);
 
     //! Property: Max drift magnitude accumulated per second in x direction (sigma)
-    Property x_drift_sigma = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in x direction (sigma)"),
+    Property x_drift_sigma = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in x direction (sigma)"),
                                 QVariant(0.0), &Property::abs_double_validator);
 
     //! Property: Max drift magnitude accumulated per second in x direction (mu)
-    Property x_drift_mu = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in x direction (mu)"),
+    Property x_drift_mu = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in x direction (mu)"),
                                 QVariant(0.0), &Property::double_validator);
 
     //! Property: Max drift magnitude accumulated per second in y direction (sigma)
-    Property y_drift_sigma = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in y direction (sigma)"),
+    Property y_drift_sigma = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in y direction (sigma)"),
                                 QVariant(0.0), &Property::abs_double_validator);
 
     //! Property: Max drift magnitude accumulated per second in y direction (mu)
-    Property y_drift_mu = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in y direction (mu)"),
+    Property y_drift_mu = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in y direction (mu)"),
                                 QVariant(0.0), &Property::double_validator);
 
     //! Property: Max drift magnitude accumulated per second in theta (sigma)
-    Property t_drift_sigma = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in theta (sigma)"),
+    Property t_drift_sigma = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in theta (sigma)"),
                                 QVariant(0.0), &Property::abs_double_validator);
 
     //! Property: Max drift magnitude accumulated per second in theta (mu)
-    Property t_drift_mu = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in theta (mu)"),
+    Property t_drift_mu = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Max accumulated drift per second in theta (mu)"),
                                 QVariant(0.0), &Property::double_validator);
 
     //! Property: Noise is x readings (sigma)
-    Property x_noise_sigma = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Noise in x readings (sigma)"),
+    Property x_noise_sigma = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Noise in x readings (sigma)"),
                                 QVariant(0.0), &Property::abs_double_validator);
 
     //! Property: Noise in x readings (mu)
-    Property x_noise_mu = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Noise in x readings (mu)"),
+    Property x_noise_mu = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Noise in x readings (mu)"),
                                 QVariant(0.0), &Property::double_validator);
 
     //! Property: Noise is x readings (sigma)
-    Property y_noise_sigma = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Noise in y readings (sigma)"),
+    Property y_noise_sigma = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Noise in y readings (sigma)"),
                                 QVariant(0.0), &Property::abs_double_validator);
 
     //! Property: Noise in x readings (mu)
-    Property y_noise_mu = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Noise in y readings (mu)"),
+    Property y_noise_mu = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Noise in y readings (mu)"),
                                 QVariant(0.0), &Property::double_validator);
 
     //! Property: Noise is x readings (sigma)
-    Property t_noise_sigma = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Noise in t readings (sigma)"),
+    Property t_noise_sigma = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Noise in t readings (sigma)"),
                                 QVariant(0.0), &Property::abs_double_validator);
 
     //! Property: Noise in x readings (mu)
-    Property t_noise_mu = Property(PropertyInfo(false, false, PropertyInfo::DOUBLE, "Noise in t readings (mu)"),
+    Property t_noise_mu = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Noise in t readings (mu)"),
                                 QVariant(0.0), &Property::double_validator);
 
 #define pview(a) QSharedPointer<PropertyView>(new PropertyView(a))
