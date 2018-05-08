@@ -4,10 +4,10 @@
   <version>0.0.1</version>
   <description>2D simulation environment for robots running in ROS</description>
 
-  <maintainer email="andrew.stelter@mines.sdsmt.edu">Andrew Stelter</maintainer>
-  <maintainer email="kendra.deziel@mines.sdsmt.edu">Kendra Deziel</maintainer>
-  <maintainer email="ryley.sutton@mines.sdsmt.edu">Ryley Sutton</maintainer>
-  <maintainer email="samuel.williams@mines.sdsmt.edu">Samuel Williams</maintainer>
+  <maintainer email="andrew.d.stelter@gmail.com">Andrew Stelter</maintainer>
+  <maintainer email="kendra.deziel@gmail.com">Kendra Deziel</maintainer>
+  <maintainer email="suttonryley@gmail.com">Ryley Sutton</maintainer>
+  <maintainer email="samuelcwill@gmail.com">Samuel Williams</maintainer>
 
   <license>TODO</license>
 
