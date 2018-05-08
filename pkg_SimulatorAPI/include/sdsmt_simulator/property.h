@@ -26,7 +26,7 @@ public:
     QString description; //!< Short description of the property that could be shown to a user
     bool readOnly; //!< True if the property should not be changed after a world object has been designed
     bool isList; //!< True if the property is an array of whatever its type is
-    bool shouldSave; //!< True if the property is required to re-create the state of the component, and therefore should be saved
+    bool shouldSave; //!< True if the property is required to re-create the state of the component, and therefore should be saved and cloned
     PropertyType type; //!< Type of property
 
     //! Convenience constructor to initialize all values
