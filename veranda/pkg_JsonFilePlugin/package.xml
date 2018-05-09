@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>veranda_json_file_plugin</name>
+  <version>0.0.1</version>
+  <description>Json File Plugin</description>
+
+  <maintainer email="samuelcwill@gmail.com">Samuel Williams</maintainer>
+
+  <license>TODO</license>
+
+  <depend>veranda_api</depend>
+  <depend>veranda_box2d</depend>
+  
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

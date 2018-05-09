@@ -1,0 +1,17 @@
+% !TEX encoding = UTF-8 Unicode
+% !TEX root = DesignDocument.tex
+
+\chapter{Release -- Setup -- Deployment}
+\section{Deployment Information and Dependencies}
+At the time of this writing, there is no deployment available other than installing the full development environment. Following the steps defined in section \ref{sec:devenv} to get the development environment set up for your system.
+
+In the future, we hope to have pre-made VM's, Docker Containers, and/or Binary packages available for easy installation.
+
+\section{Setup Information}
+Once the development environment is set up, create a folder to be your ROS workspace. Within the workspace, create a \lstinline|src| folder. Within \lstinline|src|, clone the project repository.
+
+\subsection*{Building}
+In a terminal with a build environment (Any linux terminal, a VS2015 Tools terminal on Windows) \lstinline|source| (\lstinline|call| on Windows) the \lstinline|setup.bash/.bat| file appropriate for you system in your ROS installation folder. Now, from the workspace root, run the command \lstinline|ament build|. This will build the project.
+
+\subsection*{Running}
+To run the project, \lstinline|source|/\lstinline|call| the \lstinline|setup.bash/.bat| file in the \lstinline|install| subfolder of the workspace. Then, run \lstinline|ros2 run veranda veranda|

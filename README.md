@@ -1,2 +1,2 @@
-# sdsmt_simulator
+# veranda
 Senior Design Simulator group repository

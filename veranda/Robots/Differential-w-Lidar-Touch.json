@@ -1,0 +1,195 @@
+{
+    "components": [
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.fixedwheel",
+            "properties": [
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": 90
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": -1.5
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Name",
+                    "value": "Left Wheel"
+                },
+                {
+                    "key": "channels/input_speed",
+                    "value": "robot0/left_wheel"
+                },
+                {
+                    "key": "density",
+                    "value": 10
+                },
+                {
+                    "key": "is_driven",
+                    "value": true
+                },
+                {
+                    "key": "wheel_radius",
+                    "value": 0.75
+                },
+                {
+                    "key": "wheel_width",
+                    "value": 0.5
+                }
+            ]
+        },
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.fixedwheel",
+            "properties": [
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": 90
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": 1.5
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Name",
+                    "value": "Right Wheel"
+                },
+                {
+                    "key": "channels/input_speed",
+                    "value": "robot0/right_wheel"
+                },
+                {
+                    "key": "density",
+                    "value": 10
+                },
+                {
+                    "key": "is_driven",
+                    "value": true
+                },
+                {
+                    "key": "wheel_radius",
+                    "value": 0.75
+                },
+                {
+                    "key": "wheel_width",
+                    "value": 0.5
+                }
+            ]
+        },
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.circle",
+            "properties": [
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Name",
+                    "value": "Circle"
+                },
+                {
+                    "key": "radius",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.touchring",
+            "properties": [
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Name",
+                    "value": "Touch Ring"
+                },
+                {
+                    "key": "angle_end",
+                    "value": "360"
+                },
+                {
+                    "key": "angle_start",
+                    "value": 0
+                },
+                {
+                    "key": "channels/output_touches",
+                    "value": ""
+                },
+                {
+                    "key": "ring_radius",
+                    "value": 2
+                },
+                {
+                    "key": "sensor_count",
+                    "value": "10"
+                }
+            ]
+        },
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.lidar",
+            "properties": [
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": 90
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Name",
+                    "value": "Lidar"
+                },
+                {
+                    "key": "channels/output_ranges",
+                    "value": ""
+                },
+                {
+                    "key": "scan_points",
+                    "value": "20"
+                },
+                {
+                    "key": "scan_radius",
+                    "value": "3"
+                },
+                {
+                    "key": "scan_range",
+                    "value": "150"
+                },
+                {
+                    "key": "scan_rate",
+                    "value": 10
+                }
+            ]
+        }
+    ],
+    "properties": [
+    ]
+}
