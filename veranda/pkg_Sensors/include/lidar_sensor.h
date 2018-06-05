@@ -123,9 +123,6 @@ class Lidar_Sensor : public WorldObjectComponent
     //! ROS channel to publish on
     QString _outputChannel;
 
-    //! Flag indicating if the ROS channel is connected
-    bool _connected = false;
-
     //! ROS node to publish messages with
     std::shared_ptr<rclcpp::Node> _rosNode;
 

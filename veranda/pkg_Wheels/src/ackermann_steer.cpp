@@ -226,14 +226,15 @@ void Ackermann_Steer::setROSNode(std::shared_ptr<rclcpp::Node> node)
 
 void Ackermann_Steer::_refreshChannel()
 {
-    disconnectChannels();
-    connectChannels();
+    if(_receiveChannel)
+    {
+        connectChannels();
+    }
 }
 
 void Ackermann_Steer::connectChannels()
 {
-    if(_connected)
-        disconnectChannels();
+    disconnectChannels();
 
     //Only listen when the wheel is driven
     if(_rosNode)
@@ -250,13 +251,11 @@ void Ackermann_Steer::connectChannels()
             _receiveChannel = _rosNode->create_subscription<std_msgs::msg::Float32>(inputChannel.toStdString(), callback);
         }
     }
-    _connected = true;
 }
 
 void Ackermann_Steer::disconnectChannels()
 {
     _receiveChannel.reset();
-    _connected = false;
 }
 
 void Ackermann_Steer::_buildModels()

@@ -119,20 +119,24 @@ void Fixed_Wheel::setROSNode(std::shared_ptr<rclcpp::Node> node)
 
 void Fixed_Wheel::_refreshChannel(QVariant)
 {
-    disconnectChannels();
-    connectChannels();
+    if(_receiveChannel)
+    {
+        connectChannels();
+    }
 }
 
 void Fixed_Wheel::connectChannels()
 {
-    if(_connected)
-        disconnectChannels();
+    //qDebug() << "Connecting Fixed Wheel Channels";
+    disconnectChannels();
 
     //Only listen when the wheel is driven
+    //qDebug() << _driven.get().toBool() << " && " << (bool)_rosNode;
     if(_driven.get().toBool() && _rosNode)
     {
         QString inputChannel = _inputChannel.get().toString();
 
+        //qDebug() << "Channel: " << inputChannel;
         if(inputChannel.size())
         {
             auto callback =
@@ -140,16 +144,17 @@ void Fixed_Wheel::connectChannels()
             {
                 _receiveMessage(msg);
             };
+
+            //qDebug() << "Create callback";
             _receiveChannel = _rosNode->create_subscription<std_msgs::msg::Float32>(inputChannel.toStdString(), callback);
         }
     }
-    _connected = true;
+    //qDebug() << "";
 }
 
 void Fixed_Wheel::disconnectChannels()
 {
     _receiveChannel.reset();
-    _connected = false;
 }
 
 void Fixed_Wheel::_buildModels()

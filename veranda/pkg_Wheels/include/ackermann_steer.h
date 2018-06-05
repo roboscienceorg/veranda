@@ -29,9 +29,6 @@ class Ackermann_Steer : public WorldObjectComponent
 {
     Q_OBJECT
 
-    //! Flag indicating if ROS channels are connected
-    bool _connected = false;
-
     //! Reference to ROS node for process
     std::shared_ptr<rclcpp::Node> _rosNode;
 

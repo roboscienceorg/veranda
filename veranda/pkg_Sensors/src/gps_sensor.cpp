@@ -37,15 +37,13 @@ void GPS_Sensor::_channelChanged()
 {
     if(_sendChannel)
     {
-        disconnectChannels();
         connectChannels();
     }
 }
 
 void GPS_Sensor::connectChannels()
 {
-    if(_sendChannel)
-        disconnectChannels();
+    disconnectChannels();
 
     if(_rosNode)
     {

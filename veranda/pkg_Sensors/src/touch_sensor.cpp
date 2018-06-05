@@ -60,17 +60,15 @@ void Touch_Sensor::setROSNode(std::shared_ptr<rclcpp::Node> node)
 
 void Touch_Sensor::_channelChanged()
 {
-    if(_connected)
+    if(_sendChannel)
     {
-        disconnectChannels();
         connectChannels();
     }
 }
 
 void Touch_Sensor::connectChannels()
 {
-    if(_connected)
-        disconnectChannels();
+    disconnectChannels();
 
     if(_rosNode)
     {
@@ -84,14 +82,11 @@ void Touch_Sensor::connectChannels()
             _sendChannel = _rosNode->create_publisher<std_msgs::msg::ByteMultiArray>(_outputChannel.toStdString(), custom_qos_profile);
         }
     }
-    _connected = true;
-
 }
 
 void Touch_Sensor::disconnectChannels()
 {
     _sendChannel.reset();
-    _connected = false;
 }
 
 void Touch_Sensor::clearBodies()

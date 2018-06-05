@@ -81,7 +81,6 @@ void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectPro
     {
         object_id& oId = p.second;
         WorldObjectProperties* object = p.first;
-        qDebug() << oId;
 
         if(worldObjects.contains(oId)) throw std::logic_error("world object " + std::to_string(oId) + " already exists in ui");
 

@@ -68,17 +68,15 @@ void Lidar_Sensor::setROSNode(std::shared_ptr<rclcpp::Node> node)
 
 void Lidar_Sensor::_channelChanged()
 {
-    if(_connected)
+    if(_sendChannel)
     {
-        disconnectChannels();
         connectChannels();
     }
 }
 
 void Lidar_Sensor::connectChannels()
 {
-    if(_connected)
-        disconnectChannels();
+    disconnectChannels();
 
     if(_rosNode)
     {
@@ -92,13 +90,11 @@ void Lidar_Sensor::connectChannels()
             _sendChannel = _rosNode->create_publisher<sensor_msgs::msg::LaserScan>(_outputChannel.toStdString(), custom_qos_profile);
         }
     }
-    _connected = true;
 }
 
 void Lidar_Sensor::disconnectChannels()
 {
     _sendChannel.reset();
-    _connected = false;
 }
 
 void Lidar_Sensor::clearBodies()
