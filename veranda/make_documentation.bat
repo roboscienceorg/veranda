@@ -4,6 +4,8 @@
 :: * pdflatex
 :: * sphinx
 
+set PROJECTNAME=Veranda
+
 :: Make output folder for results
 mkdir Documentation
 
@@ -24,7 +26,21 @@ pdflatex contract
 pdflatex contract
 cd ../..
 
-:: Generate Sphinx Website and Latex
+:: Generate Sphinx Website
+cd Doc-Files/User-Manual
+sphinx-build -M html source build
+move /Y build/html ../../Documentation/Sphinx-Web-User-Manual
+
+:: Generate Sphinx Latex
+sphinx-build -M latex source build
+cd build/latex
+pdflatex %PROJECTNAME%
+pdflatex %PROJECTNAME%
+copy /Y %PROJECTNAME%.pdf Sphinx-PDF-User-Manual.pdf
+move Sphinx-PDF-User-Manual.pdf ../../../../Documentation/Sphinx-PDF-User-Manual.pdf
+copy /Y %PROJECTNAME%.pdf Sphinx-PDF-User-Manual.pdf
+move Sphinx-PDF-User-Manual.pdf ../../Sphinx-PDF-User-Manual.pdf
+cd ../../../..
 
 :: Generate PDF from Design Document
 cd Doc-Files/Design-Document

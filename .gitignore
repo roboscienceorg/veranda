@@ -1,5 +1,7 @@
 */Documentation
 */Doc-Files/Latex-Reference
+*/Doc-Files/User-Manual/build
+*.pdf
 bin/
 lib/
 msg_gen/
