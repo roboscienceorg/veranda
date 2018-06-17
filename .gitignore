@@ -1,5 +1,5 @@
-build/
-*/Documentation/Design\ Docs/Latex\ Docs/Doxygen/
+*/Documentation
+*/Doc-Files/Latex-Reference
 bin/
 lib/
 msg_gen/
