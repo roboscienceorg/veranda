@@ -132,7 +132,7 @@
                 },
                 {
                     "key": "channels/output_ranges",
-                    "value": ""
+                    "value": "robot1/laser"
                 },
                 {
                     "key": "scan_points",

@@ -136,7 +136,7 @@
                 },
                 {
                     "key": "channels/output_touches",
-                    "value": ""
+                    "value": "robot0/touches"
                 },
                 {
                     "key": "ring_radius",
@@ -169,7 +169,7 @@
                 },
                 {
                     "key": "channels/output_ranges",
-                    "value": ""
+                    "value": "robot0/laser"
                 },
                 {
                     "key": "scan_points",

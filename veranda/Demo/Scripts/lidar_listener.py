@@ -12,11 +12,11 @@ def main():
     args = sys.argv
 
     if len(args) != 2:
-        print("Usage: lidar_listener channel")
+        print("Usage: lidar_listener topic")
         return
 
     channel = str(args[1])
-    print("Listening on channel \'" + channel + "\'")
+    print("Listening on topic \'" + channel + "\'")
 
     rclpy.init(args=args)
 

@@ -132,12 +132,18 @@ def formatJoystickMessage(button_states, axis_states):
     return msg
 
 def main():
-    # Iterate over the joystick devices.
-    print('Available devices:')
-
-    for fn in os.listdir('/dev/input'):
-        if fn.startswith('js'):
-            print('\t/dev/input/%s' % (fn))
+    args = sys.argv
+    joyname = ""
+    if len(args) > 1:
+        joyname = args[1]
+    else:
+        # Iterate over the joystick devices.
+        print("Available Joysticks:")
+        for fn in os.listdir('/dev/input'):
+            if fn.startswith('js'):
+                print('\t%s' % (fn))
+        
+        sys.exit()
 
     # We'll store the states here.
     axis_states = {}
@@ -145,13 +151,6 @@ def main():
 
     axis_map = []
     button_map = []
-
-    args = sys.argv
-    joyname = ""
-    if len(args) > 1:
-        joyname = args[1]
-    else:
-        sys.exit()
 
     # Open the joystick device.
     fn = '/dev/input/' + joyname

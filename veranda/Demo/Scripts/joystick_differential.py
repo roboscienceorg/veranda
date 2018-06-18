@@ -25,10 +25,10 @@ def main():
     args = sys.argv
 
     if len(args) != 2 and len(args) != 3:
-        print("Usage: joystick_differential {channelin} [channelout]")
-        print("Joystick should be {channelin}/joystick")
-        print("Wheels will be {channelout}/left_wheel and {channelout}/right_wheel")
-        print("If no {channelout} given, {channelin} will be used for both")
+        print("Usage: joystick_differential {topic-in} [topic-out]")
+        print("Joystick should be {topic-in}/joystick")
+        print("Wheels will be {topic-out}/left_wheel and {topic-out}/right_wheel")
+        print("If no {topic-out} given, {topic-in} will be used for both")
         return
 
     channelin = channelout = args[1]
