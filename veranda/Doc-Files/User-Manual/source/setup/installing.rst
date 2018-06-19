@@ -1,4 +1,4 @@
-Installing Veranda
+Setting up Veranda
 ==================
 
 Getting set up to use Veranda is, at the moment, somewhat of an in-depth endeavor. It requires first installing ROS2, and then downloading the source for Verand and building it. A one-stop install is coming soon to Operating Systems near you!
