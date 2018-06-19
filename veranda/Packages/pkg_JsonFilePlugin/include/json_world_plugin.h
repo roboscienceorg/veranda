@@ -8,7 +8,7 @@
 //however, a bug? in MSVC prevents the Qt MOC from resolving interfaces
 //if the path isn't relative like this and it doesn't seem to work to
 //do conditional compilation so this would be used only on windows
-#include "../../../../install/include/veranda/file_handler_plugin.h"
+#include "../../../../../install/include/veranda/file_handler_plugin.h"
 
 /*!
  * \brief Plugin interface for load/save objects to work with multiple objects in JSON files
