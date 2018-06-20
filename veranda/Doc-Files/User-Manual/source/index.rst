@@ -7,16 +7,16 @@ Veranda: A 2D Robotics Simulation Tool
 ======================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
 
-   overview
-   setup/installing
-   setup/demos
-   usage/simulator
-   usage/designer
-   plugins/documentation
-   plugins/custom
+    overview
+    setup/installing
+    setup/demos
+    usage/designer
+    usage/simulator
+    plugins/documentation
+    plugins/custom
 
 
 Indices and tables
