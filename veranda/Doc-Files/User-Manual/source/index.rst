@@ -19,9 +19,9 @@ Veranda: A 2D Robotics Simulation Tool
     plugins/custom
 
 
-Indices and tables
-==================
+..  Indices and tables
+..  ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+..  * :ref:`genindex`
+..  * :ref:`modindex`
+..  * :ref:`search`
