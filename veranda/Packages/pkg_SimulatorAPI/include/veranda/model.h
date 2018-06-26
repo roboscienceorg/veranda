@@ -4,10 +4,32 @@
 #include <QObject>
 #include <QVector>
 #include <QDebug>
+#include <QColor>
 
 #include <Box2D/Box2D.h>
 
 #include "dllapi.h"
+
+/*!
+ * \brief Group of settings that can be added to models to hint at how they should be drawn
+ */
+struct veranda_API DrawHint
+{
+    //! Color hint for outline
+    QColor outlineColor;
+
+    //! Style hint for outline
+    Qt::PenStyle outlineStyle;
+
+    //! Color hint for fill
+    QColor fillColor;
+
+    //! Sytle hint for fill
+    Qt::BrushStyle fillStyle;
+
+    //! True hints that model should inherit all other hints from parent model
+    bool inherit;
+};
 
 /*!
  * \brief Contains shapes to be drawn together
@@ -45,6 +67,9 @@ class veranda_API Model : public QObject
     //! List of shapes in this model
     QVector<b2Shape*> _shapes;
 
+    //! Parent model of this model
+    Model* _parent = nullptr;
+
     //! Current x coordinate of model
     double _x=0;
 
@@ -53,6 +78,19 @@ class veranda_API Model : public QObject
 
     //! Current rotation of model (Degrees)
     double _theta=0;
+
+    //! Current drawhint for the model
+    DrawHint _hint = {QColor(0, 0, 0), Qt::SolidLine, QColor(0, 0, 0), Qt::NoBrush, true};
+
+    /*!
+     * \brief Update the parent model of this mode; if drawhint is dependent on it, signal the hint changed
+     * \param parent New model (or nullptr) to be parent
+     */
+    void _setParent(Model* parent)
+    {
+        _parent = parent;
+        if(_hint.inherit) hintChanged(this);
+    }
 
 signals:
     /*!
@@ -72,6 +110,12 @@ signals:
      * \param[in] dt Delta angle (degrees)
      */
     void transformChanged(Model* mdl, double dx, double dy, double dt);
+
+    /*!
+     * \brief Indicates that the model's drawhint was set
+     * \param[in] mdl Pointer to the model that changed
+     */
+    void hintChanged(Model* mdl);
 
 public:
 
@@ -168,7 +212,10 @@ public:
         {
             for(Model* s : newChildren)
                 if(!_children.contains(s))
+                {
                     _children.push_back(s);
+                    s->setParent(this);
+                }
             modelChanged(this);
         }
     }
@@ -187,6 +234,7 @@ public:
             {
                 _children.removeAll(s);
                 disconnect(s, 0, this, 0);
+                s->setParent(nullptr);
             }
             modelChanged(this);
         }
@@ -224,5 +272,32 @@ public:
 
             modelChanged(this);
         }
+    }
+
+    /*!
+     * \brief Sets the drawhint for the model and triggers the associated signal
+     * \param[in] newHint The new drawhint
+     */
+    void setDrawHint(DrawHint newHint)
+    {
+        _hint = newHint;
+    }
+
+    /*!
+     * \brief Gets the drawhint set for the model
+     * \return DrawHint - The current hint for the model
+     */
+    DrawHint getDrawHint()
+    {
+        return _hint;
+    }
+
+    /*!
+     * \brief Gets the parent model of this model (may be null)
+     * \return Pointer to parent model or nullptr
+     */
+    Model* getParent()
+    {
+        return _parent;
     }
 };
