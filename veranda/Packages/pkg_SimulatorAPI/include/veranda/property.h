@@ -290,8 +290,8 @@ class veranda_API PropertyView : public QObject
         {
             connect(_origin, &Property::valueSet, this, &PropertyView::valueSet);
             connect(_origin, &Property::destroyed, this, &PropertyView::_invalidate);
-            connect(this, QOverload<QVariant, bool>::of(&PropertyView::requestValue),
-                    _origin, QOverload<QVariant, bool>::of(&Property::set));
+            connect(this, static_cast<void (PropertyView::*)(QVariant, bool)>(&PropertyView::requestValue),
+                    _origin, static_cast<void (Property::*)(QVariant, bool)>(&Property::set));
         }
     }
 
