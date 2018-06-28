@@ -42,6 +42,7 @@ QVector<WorldObject *> ImageLoader::loadFile(QString filePath, QMap<QString, Wor
         uint64_t crossThreshold = lastOptions->getCrossProductThreshold();
         double scaleY = lastOptions->getPxPerHeight();
         double scaleX = lastOptions->getPxPerWidth();
+        QColor drawColor = lastOptions->getDrawColor();
 
         qDebug() << "Loading...";
         QVector<ImageParser::Shape> shapes = getShapesFromFile(filePath, colorThreshold);
@@ -52,7 +53,7 @@ QVector<WorldObject *> ImageLoader::loadFile(QString filePath, QMap<QString, Wor
         {
             if(!sh.outer.size()) continue;
 
-            qDebug() << "Normalize and build World Objects...";
+            //qDebug() << "Normalize and build World Objects...";
             QPointF max = sh.outer[0], min = max;
 
             //Normalize each object so it's
@@ -99,6 +100,9 @@ QVector<WorldObject *> ImageLoader::loadFile(QString filePath, QMap<QString, Wor
             props["scale/vert"]->set(QVariant::fromValue(scaleY), true);
             props["outer_shape"]->set(outer, true);
             props["inner_shapes"]->set(inner, true);
+            props["color/red"]->set(drawColor.red(), true);
+            props["color/green"]->set(drawColor.green(), true);
+            props["color/blue"]->set(drawColor.blue(), true);
 
             WorldObject* obj(new WorldObject({comp}, "Image Chunk #" + QString::number(objNum++)));
             obj->translate(avg.x()/scaleX, avg.y()/scaleY);

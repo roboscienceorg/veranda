@@ -125,6 +125,21 @@ class Polygon : public WorldObjectComponent
         return count >= 3;
     }
 
+    /*!
+     * \brief Check that RGB values are in the range [0, 255]
+     *
+     * Value is set from the new value by clamping it to the range; the old
+     * value is not used
+     * \param[in] oldVal Color value that was previously set
+     * \param[in] newVal New color value to set
+     * \return The new color value clamped to the range [0, 255]
+     */
+    static QVariant colorValidator(const QVariant& oldVal, const QVariant& newVal)
+    {
+        Q_UNUSED(oldVal);
+        return std::max(0, std::min(255, newVal.toInt(0)));
+    }
+
     //! Property: The number of triangles generated
     Property _numShapes = Property(PropertyInfo(true, false, false, PropertyInfo::INT, "Number of polygons in the shape"),
                                    QVariant(0));
@@ -134,9 +149,9 @@ class Polygon : public WorldObjectComponent
                                     QVariantList{QVariantList{0, 0}, QVariantList{1, 1}, QVariantList{1, 0}},
                                     [](const QVariant& _old, const QVariant& _new)
                                     {
-                                        qDebug() << "Validate outer loop";
+                                        //qDebug() << "Validate outer loop";
                                         if(isPoly(_new)) return toPoly(_new);
-                                        qDebug() << "Failed";
+                                        //qDebug() << "Failed";
                                         return _old;
                                     });
 
@@ -145,9 +160,9 @@ class Polygon : public WorldObjectComponent
                                    QVariantList(),
                                     [](const QVariant& _old, const QVariant& _new)
                                     {
-                                        qDebug() << "Validate inner loops";
+                                        //qDebug() << "Validate inner loops";
                                         if (!_new.canConvert<QVariantList>()) return _old;
-                                        qDebug() << "Is a list";
+                                        //qDebug() << "Is a list";
                                         QSequentialIterable iterable = _new.value<QSequentialIterable>();
 
                                         QVariantList polyList;
@@ -156,7 +171,7 @@ class Polygon : public WorldObjectComponent
                                         {
                                             if(!isPoly(vi))
                                             {
-                                                qDebug() << "Failed";
+                                                //qDebug() << "Failed";
                                                 return _old;
                                             }
                                             polyList.append(toPoly(vi));
@@ -165,8 +180,8 @@ class Polygon : public WorldObjectComponent
                                         return QVariant(polyList);
                                     });
 
-    //! Property: Flag for whether all triangles should be displayed or just the line loops
-    Property _fullDraw = Property(PropertyInfo(true, true, false, PropertyInfo::BOOL, "Whether or not to draw all triangles"),
+    //! Property: Flag for whether all triangles should be displayed or a solid mass
+    Property _drawTriangles = Property(PropertyInfo(false, true, false, PropertyInfo::BOOL, "Whether or not to draw all triangles instead of solid shape"),
                                   QVariant(false), &Property::bool_validator);
 
     //! Property: Threshold under which cross product means the line is straight
@@ -181,6 +196,18 @@ class Polygon : public WorldObjectComponent
     Property _scaley = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Vertical scaling factor"),
                                   QVariant(1), &Property::abs_double_validator);
 
+    //! Property: Color Red Component
+    Property _colorr = Property(PropertyInfo(false, true, false, PropertyInfo::INT, "Red Color Component"),
+                                  QVariant(0), &colorValidator);
+
+    //! Property: Color Green Component
+    Property _colorg = Property(PropertyInfo(false, true, false, PropertyInfo::INT, "Green Color Component"),
+                                  QVariant(0), &colorValidator);
+
+    //! Property: Color Blue Component
+    Property _colorb = Property(PropertyInfo(false, true, false, PropertyInfo::INT, "Blue Color Component"),
+                                  QVariant(0), &colorValidator);
+
 #define prop(x) QSharedPointer<PropertyView>(new PropertyView(&(x)))
     //! Mapping of polygon properties by identifiers
     QMap<QString, QSharedPointer<PropertyView>> _properties
@@ -188,18 +215,25 @@ class Polygon : public WorldObjectComponent
         {"polgyon_count", prop(_numShapes)},
         {"outer_shape", prop(_outerShape)},
         {"inner_shapes", prop(_innerShapes)},
-        //{"draw_triangles", prop(_fullDraw)},
+        {"draw_triangles", prop(_drawTriangles)},
         {"straightness", prop(_straight)},
         {"scale/horiz", prop(_scalex)},
-        {"scale/vert", prop(_scaley)}
+        {"scale/vert", prop(_scaley)},
+        {"color/red", prop(_colorr)},
+        {"color/green", prop(_colorg)},
+        {"color/blue", prop(_colorb)}
     };
 #undef prop
 
+    //! Creates box2d fixtures for all the triangles created in the last makeTriangles() call
+    void makeFixtures();
+
+private slots:
     //! Straightens, scales, and triangulates the current line loops
     void makeTriangles();
 
-    //! Creates box2d fixtures for all the triangles created in the last makeTriangles() call
-    void makeFixtures();
+    //! Updates the draw hint in the model shown on screen
+    void setDrawHint();
 
 protected:
     /*!

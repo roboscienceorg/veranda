@@ -534,10 +534,12 @@ void BasicViewer::nothingSelected()
 {
     if(_currSelection != 0)
     {
-        for(Model* m : _models[_currSelection])
+        auto prevSelection = _currSelection;
+        _currSelection = 0;
+
+        for(Model* m : _models[prevSelection])
             _updateColoring(m);
 
-        _currSelection = 0;
         _scene->removeItem(_tools);
     }
 }
