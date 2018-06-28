@@ -29,6 +29,17 @@ struct veranda_API DrawHint
 
     //! True hints that model should inherit all other hints from parent model
     bool inherit;
+
+    /*!
+     * \brief Not equal comparator for DrawHints
+     * \param[in] other DrawHint to compare to
+     * \return true of any of the DrawHint values don't match those of 'other'
+     */
+    bool operator != (const DrawHint& other) {
+        return outlineColor != other.outlineColor || fillColor != other.fillColor ||
+               outlineStyle != other.outlineStyle || fillStyle != other.fillStyle ||
+               inherit != other.inherit;
+    }
 };
 
 /*!
@@ -280,7 +291,11 @@ public:
      */
     void setDrawHint(DrawHint newHint)
     {
-        _hint = newHint;
+        if(_hint != newHint)
+        {
+            _hint = newHint;
+            hintChanged(this);
+        }
     }
 
     /*!
