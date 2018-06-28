@@ -135,6 +135,11 @@ class BasicViewer : public Simulator_Visual_If
     Q_OBJECT
 
     /*!
+     * Color to use when drawing things that are selected
+     */
+    const QColor SELECTED_COLOR = QColor(50, 163, 103);
+
+    /*!
      * Constant scaling factor between simulation and drawing.
      * This is not implemented as just a QGraphicsView::scale because
      * that reduces resolution when the objects drawn are very small
@@ -147,8 +152,11 @@ class BasicViewer : public Simulator_Visual_If
     //! Top level QGraphicsItemGroups for each set of models
     QMap<object_id, QGraphicsItemGroup*> _topShapes;
 
-    //! The QGraphicsItem* for each model, whether its a submodel or not
-    QMap<Model*, QGraphicsItem*> _shapes;
+    //! The QGraphicsItemGroup* for each model, whether its a submodel or not
+    QMap<Model*, QGraphicsItemGroup*> _shapes;
+
+    //! Record of the pens and brushes being used to draw models
+    QMap<Model*, QPair<QPen, QBrush>> _modelPensBrushes;
 
     //! Mapping of QGraphicsItem to object id
     QMap<QGraphicsItem*, object_id> _shapeToObject;
@@ -196,7 +204,7 @@ class BasicViewer : public Simulator_Visual_If
      * \param[in] m The model to draw
      * \return A QGraphicsItemGroup with all the shapes in the Model
      */
-    QGraphicsItem* _drawModel(Model* m);
+    QGraphicsItemGroup *_drawModel(Model* m);
 
     /*!
      * \brief Rescales the view based on the physical height and width (Like when the window size changes)
@@ -204,19 +212,17 @@ class BasicViewer : public Simulator_Visual_If
     void _rescale();
 
     /*!
-     * \brief Generates a QColor based on the drawlevel and state of selected-ness of an object
-     * \param[in] level Drawlevel to use
-     * \param[in] selected Whether or not the color should represent an object being selected
-     * \return
+     * \brief Gets the alpha value that should be used to draw a model
+     * \param[in] m The model to query for
+     * \return 0-255
      */
-    QColor _color(DrawLevel level, bool selected);
+    uint8_t _getAlpha(Model* m);
 
     /*!
-     * \brief Recursively sets the outline color of a QGraphicsItem and all its children
-     * \param[in] item QGraphicsItem to color
-     * \param[in] color The color to make the item and its children
+     * \brief Recursively sets the pen and brush for a model and its children
+     * \param[in] m The model to update
      */
-    void _setOutlineColor(QGraphicsItem* item, const QColor& color);
+    void _updateColoring(Model* m);
 
     //! Flag for if click drag tools are allowed
     bool _toolsEnabled = true;
@@ -305,6 +311,12 @@ private slots:
      * \param[in] m The model that changed
      */
     void modelChanged(Model* m);
+
+    /*!
+     * \brief Listener for model draw hint changing
+     * \param[in] m The model that had a draw hint change
+     */
+    void modelHinted(Model* m);
 
     /*!
      * \brief Undraws a model, stops tracking all its information, and removes the model's children

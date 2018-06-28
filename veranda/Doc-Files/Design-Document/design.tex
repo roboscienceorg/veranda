@@ -936,9 +936,13 @@ used by other plugins to create specifically shaped masses. In the future, it ma
 	polygon\_count & Integer & Read Only: The number of triangles produced in triangulation\\ \hline
 	outer\_shape & List of Points & The points that make up the outer loop of the shape.\\ \hline
 	inner\_shape & List of Lists of Points & The loops of points making up the holes in the outer shape.\\ \hline
+	draw\_triangles & Boolean & Whether individual triangles should be drawn, or a solid object.\\ \hline
 	straightness & Integer $ > 0 $ & Threshold for cross product in the simplification algorithm\\ \hline
 	scale/horiz & Double & Horizontal scaling factor\\ \hline
-	scale/vert & Double & Vertical scaling factor  
+	scale/vert & Double & Vertical scaling factor\\ \hline
+	color/red & Unsigned Char & Red component of polygon color\\ \hline
+	color/green & Unsigned Char & Green component of polygon color\\ \hline
+	color/blue & Unsigned Char & Blue componenet of polygon color
 	\end{tabular}
 \end{table}
 

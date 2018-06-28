@@ -9,6 +9,10 @@
 #include <QLabel>
 #include <QDoubleValidator>
 #include <QIntValidator>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QPalette>
+#include <QColorDialog>
 
 #include <limits>
 
@@ -48,11 +52,20 @@ class ImageOptions : public QDialog
     //! Editor for straightness value
     QLineEdit* _crossThresh;
 
+    //! Button to open color editor
+    QPushButton* _colorButton;
+
+    //! Lable to display chosen color
+    QLabel* _colorLabel;
+
     //! Width of the image in pixels
     uint64_t _width;
 
     //! Height of the image in pixels
     uint64_t _height;
+
+    //! Currently selected color
+    QColor _drawColor = QColor(0, 0, 0);
 
 private slots:
     //! Uses the entered pixels per meter values to compute the width and height in meters
@@ -75,6 +88,25 @@ private slots:
         _pxpmy->setText(QString::number(_height / my));
     }
 
+    /*!
+     * \brief Displays the currently selected color using the color label
+     */
+    void updateColorLabel()
+    {
+        QPalette palette = _colorLabel->palette();
+        palette.setColor(_colorLabel->backgroundRole(), _drawColor);
+        _colorLabel->setAutoFillBackground(true);
+        _colorLabel->setPalette(palette);
+    }
+
+    /*!
+     * \brief Prompt the user to choose a color, and then update the label
+     */
+    void getNewColor()
+    {
+        _drawColor = QColorDialog::getColor(_drawColor, this, "Drawing Color");
+        updateColorLabel();
+    }
 public:
     /*!
      * \brief Builds the dialog box for a specific size image
@@ -111,6 +143,16 @@ public:
         form->addRow(QString("Image Height (m):"), _my = new QLineEdit(height, this));
         form->addRow(QString("Pixels / Meter Horizontal:"), _pxpmx = new QLineEdit("1", this));
         form->addRow(QString("Pixels / Meter Vertical:"), _pxpmy = new QLineEdit("1", this));
+
+        form->addRow(new QLabel("Drawing Options", this));
+
+        QHBoxLayout* colorRow = new QHBoxLayout(this);
+        colorRow->addWidget(_colorButton = new QPushButton("Color", this));
+        colorRow->addWidget(_colorLabel = new QLabel(this));
+        form->addRow(colorRow);
+
+        updateColorLabel();
+        connect(_colorButton, &QPushButton::pressed, this, &ImageOptions::getNewColor);
 
         QDialogButtonBox* bbox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, this);
         form->addRow(bbox);
@@ -169,4 +211,14 @@ public:
     {
         return _pxpmy->text().toDouble();
     }
+
+    /*!
+     * \brief Getter for the selected drawing color
+     * \return An RGB Color
+     */
+    QColor getDrawColor()
+    {
+        return _drawColor;
+    }
+
 };

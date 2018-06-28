@@ -221,20 +221,6 @@ public:
     const PropertyInfo& info()
     { return _info; }
 
-    /*!
-     * \brief Sets a new value using the validation function an signals listeners
-     * \param[in] v The value to set
-     * \param[in] notifyOwner If true, the valueRequested signal is emitted in addition to valueSet (Default false)
-     */
-    void set(const QVariant& v, bool notifyOwner = false)
-    {
-        //Update to value if valid
-        _value = _validate(_value, v);
-
-        //Notify watchers
-        _update(notifyOwner);
-    }
-
 signals:
     /*!
      * \brief Signal that the value was set for the Property; this does not guarantee that it changed
@@ -248,19 +234,27 @@ signals:
      */
     void valueRequested(QVariant value);
 
-private slots:
+public slots:
     /*!
-     * \brief Internal function used to change the value
-     * \param[in] newValue The value to update to through the validator
+     * \brief Sets a new value using the validation function an signals listeners
+     * \param[in] v The value to set
+     * \param[in] notifyOwner If true, the valueRequested signal is emitted in addition to valueSet (Default false)
      */
-    void _request(QVariant newValue)
+    void set(QVariant v, bool notifyOwner = false)
     {
-        //qDebug() << "Validate value at origin" << this;
-        _value = _validate(_value, newValue);
+        //Update to value if valid
+        v = _validate(_value, v);
 
-        //Push value to viewers created from this one
-        _update(true);
+        if(v != _value)
+        {
+            _value = v;
+
+            //Notify watchers
+            _update(notifyOwner);
+        }
     }
+
+private slots:
 
     /*!
      * \brief Notifies watchers that the value may have changed
@@ -296,7 +290,8 @@ class veranda_API PropertyView : public QObject
         {
             connect(_origin, &Property::valueSet, this, &PropertyView::valueSet);
             connect(_origin, &Property::destroyed, this, &PropertyView::_invalidate);
-            connect(this, &PropertyView::requestValue, _origin, &Property::_request);
+            connect(this, static_cast<void (PropertyView::*)(QVariant, bool)>(&PropertyView::requestValue),
+                    _origin, static_cast<void (Property::*)(QVariant, bool)>(&Property::set));
         }
     }
 
@@ -350,7 +345,7 @@ public:
     {
         //qDebug() << "Set " << _origin << "from" << this;
         if(_origin && (!_origin->info().readOnly || force))
-            requestValue(value);
+            requestValue(value, true);
     }
 
     /*!
@@ -378,7 +373,8 @@ signals:
      * \brief Signal requesting a new value to be set
      * This should not be called directly; use the set() method instead
      * \param[in] value The value requested
+     * \param[in] isRequest Should always be true to indicate to Property this is not from itself
      */
-    void requestValue(QVariant value);
+    void requestValue(QVariant value, bool isRequest);
 };
 

@@ -97,7 +97,7 @@ QGraphicsItem* BasicViewer::_drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
     return newShape;
 }
 
-QGraphicsItem* BasicViewer::_drawModel(Model* m)
+QGraphicsItemGroup* BasicViewer::_drawModel(Model* m)
 {
     QGraphicsItemGroup* baseItem = new QGraphicsItemGroup();
 
@@ -127,7 +127,6 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 {
     _models[id] = objects;
 
-    QColor newColor = _color(Solid, false);
     _drawLevels[id] = Solid;
 
     //qDebug() << "Add object " << id;
@@ -139,8 +138,8 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
         QGraphicsItem* graphic = addModel(m, id);
 
         group->addToGroup(graphic);
+        _updateColoring(m);
     }
-    _setOutlineColor(group, newColor);
     _scene->addItem(group);
 
     _shapeToObject[group] = id;
@@ -160,7 +159,7 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
 {
     //qDebug() << "Add model " << m << " with " << m->children().size() << " children";
-    QGraphicsItem* graphic = _drawModel(m);
+    QGraphicsItemGroup* graphic = _drawModel(m);
 
     _shapes[m] = graphic;
     _shapeToObject[graphic] = id;
@@ -173,6 +172,9 @@ QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
     //If the base model moves, update the transform
     connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
 
+    //If the drawhint for the model changes, update it's pen and brush
+    connect(m, &Model::hintChanged, this, &BasicViewer::modelHinted);
+
     for(Model* child : m->children())
     {
         //qDebug() << "Draw child of " << m;
@@ -181,6 +183,12 @@ QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
     }
 
     return graphic;
+}
+
+//! When a model draw hint changes we update it and its children
+void BasicViewer::modelHinted(Model *m)
+{
+    _updateColoring(m);
 }
 
 /*!
@@ -226,8 +234,7 @@ void BasicViewer::modelChanged(Model *m)
 
     replace->setParentItem(parent);
 
-    QColor newColor = _color(_drawLevels[oid], _currSelection == oid);
-    _setOutlineColor(replace, newColor);
+    _updateColoring(m);
 
     if(parent == nullptr)
         _scene->addItem(replace);
@@ -482,16 +489,14 @@ void BasicViewer::removeModel(Model *m)
 void BasicViewer::objectDrawLevelSet(object_id id, DrawLevel level)
 {
     _drawLevels[id] = level;
-    QColor newColor = _color(level, _currSelection == id);
     for(Model* m : _models[id])
-        _setOutlineColor(_shapes[m], newColor);
+        _updateColoring(m);
 }
 
 //The object identified by object_id has been selcted
 //maybe we draw a selection box around it?
 void BasicViewer::objectSelected(object_id id)
 {
-    QColor newColor;
     if(id != _currSelection)
     {
         nothingSelected();
@@ -499,8 +504,9 @@ void BasicViewer::objectSelected(object_id id)
         if(_models.contains(id))
         {
             _currSelection = id;
-            newColor = _color(_drawLevels[_currSelection], true);
-            _setOutlineColor(_topShapes[id], newColor);
+
+            for(Model* m : _models[_currSelection])
+                _updateColoring(m);
 
             if(_toolsEnabled)
             {
@@ -526,44 +532,30 @@ void BasicViewer::_placeTools()
 //No objects are selected, draw without highlights
 void BasicViewer::nothingSelected()
 {
-    QColor newColor;
     if(_currSelection != 0)
     {
-        newColor = _color(_drawLevels[_currSelection], false);
-        for(Model* m : _models[_currSelection])
-            _setOutlineColor(_shapes[m], newColor);
-
+        auto prevSelection = _currSelection;
         _currSelection = 0;
+
+        for(Model* m : _models[prevSelection])
+            _updateColoring(m);
+
         _scene->removeItem(_tools);
     }
 }
 
-/*!
- * By default, all colors are black. If the object is selected,
- * then we use a green color instead. The DrawLevel parameter determines
- * the level of transparency of the color
- */
-QColor BasicViewer::_color(DrawLevel level, bool selected)
+uint8_t BasicViewer::_getAlpha(Model* m)
 {
-    QColor out(0, 0, 0);
+    object_id modelObject = _modelToObject[m];
+    DrawLevel level = _drawLevels[modelObject];
 
-    if(selected)
-        out.setRgb(50, 163, 103);
-
-    switch(level)
-    {
-        case Solid:
-            out.setAlpha(255);
-        break;
-        case Transparent:
-            out.setAlpha(125);
-        break;
-        case Off:
-            out.setAlpha(0);
-        break;
+    switch(level) {
+        case Solid: return 255;
+        case Transparent: return 127;
+        case Off: return 0;
     }
 
-    return out;
+    return 255;
 }
 
 /*!
@@ -575,30 +567,88 @@ QColor BasicViewer::_color(DrawLevel level, bool selected)
  * In the first two cases, the color can just be set. After possibly setting
  * the color, the method recurses on the children GraphicsItems
  */
-void BasicViewer::_setOutlineColor(QGraphicsItem* item, const QColor& color)
+void BasicViewer::_updateColoring(Model* m)
 {
-    QAbstractGraphicsShapeItem* asShape = dynamic_cast<QAbstractGraphicsShapeItem*>(item);
+    // Bookkeeping to get data about model
+    object_id modelObject = _modelToObject[m];
+    uint8_t alpha = _getAlpha(m);
 
-    if(asShape)
+    //Record of colors to use
+    QColor penColor(m->getDrawHint().outlineColor);
+    QColor brushColor(m->getDrawHint().fillColor);
+
+    //Record of styles to use
+    QPen pen(m->getDrawHint().outlineStyle);
+    QBrush brush(m->getDrawHint().fillStyle);
+
+    //If inheriting draw rules and parent is known, use its pen and brush
+    auto it = _modelPensBrushes.begin();
+    if(m->getDrawHint().inherit && m->getParent() &&
+      (it = _modelPensBrushes.find(m->getParent())) != _modelPensBrushes.end())
     {
-        asShape->setPen(QPen(color));
-    }
-    else
-    {
-        //QGraphicsLine is not a QAbstractGraphicsShapeItem so it needs to be a special check
-        QGraphicsLineItem* asLine = dynamic_cast<QGraphicsLineItem*>(item);
-        if(asLine)
-            asLine->setPen(QPen(color));
+        penColor = it.value().first.color();
+        brushColor = it.value().second.color();
+
+        pen.setStyle(it.value().first.style());
+        brush.setStyle(it.value().second.style());
     }
 
-    for(QGraphicsItem* i : item->childItems())
-        _setOutlineColor(i, color);
+    //Get colors; override drawhint color when selected
+    if(_currSelection == modelObject)
+    {
+        penColor = SELECTED_COLOR;
+        brushColor =  SELECTED_COLOR;
+    }
+
+    //Set alpha rules regardless of other rules
+    penColor.setAlpha(alpha);
+    brushColor.setAlpha(alpha);
+
+    //Merge styles and colors, and save
+    pen.setColor(penColor);
+    brush.setColor(brushColor);
+
+    _modelPensBrushes[m] = {pen, brush};
+
+    //Grab shapes onscreen assocated
+    QGraphicsItemGroup* itemGroup = _shapes[m];
+
+    //We know that all models are drawn as an itemgroup
+    //with various single shapes inside (and then also the child models' groups)
+    //For each of those non-group shapes, update the coloring
+    for(QGraphicsItem* child : itemGroup->childItems())
+    {
+        //Using dynamic cast because the qgraphics item cast always returns nullptr with
+        //abstract classes
+        QAbstractGraphicsShapeItem* asShape = dynamic_cast<QAbstractGraphicsShapeItem*>(child);
+
+        if(asShape)
+        {
+            asShape->setPen(pen);
+            asShape->setBrush(brush);
+        }
+        else
+        {
+            //QGraphicsLine is not a QAbstractGraphicsShapeItem so it needs to be a special check
+            QGraphicsLineItem* asLine = dynamic_cast<QGraphicsLineItem*>(child);
+            if(asLine)
+            {
+                asLine->setPen(pen);
+            }
+        }
+    }
+
+    //Update all child colors
+    //if they inherit, then they will use the pen
+    //and brush determined here
+    for(Model* child : m->children())
+        _updateColoring(child);
 }
 
 QGraphicsItem* BasicViewer::_makeTranslater()
 {
-    QBrush b(QColor(50, 163, 103));
-    QPen p(QColor(50, 163, 103));
+    QBrush b(SELECTED_COLOR);
+    QPen p(SELECTED_COLOR);
 
     QGraphicsItemGroup* group = new QGraphicsItemGroup;
 
@@ -622,8 +672,8 @@ QGraphicsItem* BasicViewer::_makeTranslater()
 
 QGraphicsItem* BasicViewer::_makeRotater()
 {
-    QBrush b(QColor(50, 163, 103));
-    QPen p(QColor(50, 163, 103));
+    QBrush b(SELECTED_COLOR);
+    QPen p(SELECTED_COLOR);
 
     QGraphicsItemGroup* group = new QGraphicsItemGroup;
 

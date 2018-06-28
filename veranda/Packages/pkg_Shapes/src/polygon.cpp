@@ -5,6 +5,7 @@
 Polygon::Polygon(QObject* parent) : WorldObjectComponent("Polygon", "Shapes", parent)
 {
     _triangleModel = new Model({}, {}, this);
+    _triangleModel->setDrawHint(DrawHint{QColor(0, 0, 0), Qt::SolidLine, QColor(0, 0, 0), Qt::SolidPattern, true});
     registerModel(_triangleModel);
 
     connect(&_outerShape, &Property::valueRequested, this, &Polygon::makeTriangles);
@@ -12,6 +13,11 @@ Polygon::Polygon(QObject* parent) : WorldObjectComponent("Polygon", "Shapes", pa
     connect(&_scalex, &Property::valueRequested, this, &Polygon::makeTriangles);
     connect(&_scaley, &Property::valueRequested, this, &Polygon::makeTriangles);
     connect(&_straight, &Property::valueRequested, this, &Polygon::makeTriangles);
+
+    connect(&_drawTriangles, &Property::valueRequested, this, &Polygon::setDrawHint);
+    connect(&_colorr, &Property::valueRequested, this, &Polygon::setDrawHint);
+    connect(&_colorb, &Property::valueRequested, this, &Polygon::setDrawHint);
+    connect(&_colorg, &Property::valueRequested, this, &Polygon::setDrawHint);
 
     makeTriangles();
 }
@@ -86,8 +92,6 @@ void toPolygon(const QVariantList& points, QPolygonF& poly)
 
 void Polygon::makeTriangles()
 {
-    qDebug() << "Build Triangles";
-
     //Clear out old shapes
     _triangleModel->removeShapes(_triangleModel->shapes());
 
@@ -136,4 +140,15 @@ void Polygon::makeTriangles()
     _triangleModel->addShapes(_triangleShapes);
     _numShapes.set(_triangleShapes.size());
     makeFixtures();
+}
+
+void Polygon::setDrawHint()
+{
+    DrawHint newHint;
+    newHint.fillColor = QColor(_colorr.get().toInt(), _colorg.get().toInt(), _colorb.get().toInt());
+    newHint.outlineColor = newHint.fillColor;
+    newHint.outlineStyle = Qt::SolidLine;
+    newHint.fillStyle = _drawTriangles.get().toBool() ? Qt::NoBrush : Qt::SolidPattern;
+
+    _triangleModel->setDrawHint(newHint);
 }
