@@ -70,8 +70,12 @@ polygon_count            Integer                      Read only: Number of trian
 outer_shape              List of Points               The points that make up the outer loop of the shape
 inner_shape              List of Lists of Points      The loops of points making up the holes in the outer shape
 straightness             Integer > 0                  Threshold for cross product in the simplification algorithm
+draw_triangles           Boolean                      Whether individual triangles or a solid shape should be drawn
 scale/horiz              Double                       Horizantal scaling factor
 scale/vert               Double                       Vertical scaling factor
+color/red                Unsigned Char                Red component of polygon color
+color/green              Unsigned Char                Green component of polygon color
+color/blue               Unsigned Char                Blue component of polygon color
 ======================   ==========================   ==================================================
 
 Design Details 
