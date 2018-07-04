@@ -21,7 +21,7 @@
 #include <QFileDialog>
 
 #include "basic_physics.h"
-#include "basic_viewer.h"
+#include "ui/qgraphicssimulationviewer.h"
 
 #include <veranda/world_object_component_plugin.h>
 #include <veranda/file_handler_plugin.h>
@@ -157,7 +157,7 @@ int main(int argc, char** argv)
     MainWindow::visualizerFactory visuals =
     []()
     {
-        return new BasicViewer;
+        return new QGraphicsSimulationViewer();
     };
 
     //Get rid of defaultLoader so

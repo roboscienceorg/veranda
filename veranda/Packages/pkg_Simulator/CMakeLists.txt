@@ -52,25 +52,26 @@ set(MOC_HDRS
     include/interfaces/world_object_wrappers.h
 
     include/basic_physics.h
-    include/basic_viewer.h
     include/simulator_core.h
 
     include/ui/mainwindow.h
     include/ui/joystickprototype.h
     include/ui/mode_controller.h
     include/ui/settingspopup.h
+    include/ui/qgraphicssimulationviewer.h
+    include/ui/customgraphicsview.h
     )
 
 ## .ui qt widgets form files
 set(UI_FILES
     ui/mainwindow.ui
     ui/joystickprototype.ui
-    ui/settingspopup.ui)
+    ui/settingspopup.ui
+    ui/qgraphicssimulationviewer.ui)
 
 ## Any other source files
 set(CPP_SRCS
     src/basic_physics.cpp
-    src/basic_viewer.cpp
     src/simulator_core.cpp
 
     src/ui/mainwindow.cpp
@@ -78,6 +79,8 @@ set(CPP_SRCS
     src/ui/mode_controller.cpp
     src/ui/settingspopup.cpp
     src/ui/designer_widget.cpp
+    src/ui/qgraphicssimulationviewer.cpp
+
     src/main.cpp
     )
 
