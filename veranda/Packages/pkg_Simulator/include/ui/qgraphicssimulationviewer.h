@@ -68,7 +68,7 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
     CustomGraphicsView* _viewer;
 
     //! The QGraphicsScene holding all drawn objects
-    QGraphicsScene* _scene;
+    QGraphicsScene* _scene = nullptr;
 
     //! Group of shapes for the drag to move tool
     QGraphicsItem* _translater;
@@ -78,6 +78,15 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
 
     //! Group of shapes for all of the click to drag tools
     QGraphicsItemGroup* _tools;
+
+    //! Scene point in center of viewport
+    QPointF _viewCenter;
+
+    //! Rectangle containing the whole scene
+    QRectF _sceneRect;
+
+    //! Percentage of the screen that can be seen due to zoom
+    double _zoomLevel = 1;
 
     /*!
      * \brief Converts a b2Shape pointer to a QGraphicsItem
@@ -93,6 +102,11 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
      * \return A QGraphicsItemGroup with all the shapes in the Model
      */
     QGraphicsItemGroup *_drawModel(Model* m);
+
+    /*!
+     * \brief Determines the zoom level that corresponds to the current view/scene sizes
+     */
+    void _determineZoomLevel();
 
     /*!
      * \brief Rescales the view based on the physical height and width (Like when the window size changes)
@@ -154,6 +168,11 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
      */
     void _placeTools();
 
+    /*!
+     * \brief Creates a QGraphicsScene and makes it the current one
+     */
+    void _makeScene();
+
 public:
     /*!
      * \brief Constructs the view widget
@@ -166,20 +185,7 @@ public:
      */
     ~QGraphicsSimulationViewer();
 
-    /*!
-     * \brief Sets the bounds of the world in the view
-     * \param[in] xMin Min x coordinate shown
-     * \param[in] xMax Max x coordinate shown
-     * \param[in] yMin Min y coordinate shown
-     * \param[in] yMax Max y coordinate shown
-     */
-    void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
-
-    /*!
-     * \brief Sets the bounds of the world in the view
-     * \param[in] rect Rectangle to bound view to
-     */
-    void setWorldBounds(QRectF rect);
+    void setNavigationEnabled(bool allowed);
 
 public slots:
     void objectAddedToScreen(QVector<Model *> objects, object_id id) override;
@@ -197,7 +203,7 @@ private slots:
      * \param[in] dy Delta movement in y direction
      * \param[in] dt Delta rotation (degrees)
      */
-    void modelMoved(Model* m, double dx, double dy, double dt);
+    void modelMoved(Model *m, const double& dx, const double& dy, const double& dt);
 
     /*!
      * \brief Listener for models changing
@@ -253,14 +259,25 @@ private slots:
      * \brief Handle zoom in,out commands
      * \param[in] z The direction to zoom
      */
-    void viewZoom(int z);
+    void viewZoom(const int& z);
 
     /*!
      * \brief Handle viewport shift commands
      * \param[in] x Amount to shift horizontal
      * \param[in] y Amount to shift vertical
      */
-    void viewShift(int x, int y);
+    void viewShift(const int& x, const int& y);
+
+    /*!
+     * \brief Updates the view to have the current centerpoint in its center
+     */
+    void setViewCenter();
+
+    /*!
+     * \brief Updates the local copy of the rectangle containing all scene items
+     * \param newRect New scene Rectangle
+     */
+    void updateRect(const QRectF& newRect);
 
 private:
     Ui::qgraphicssimulationviewer *ui;

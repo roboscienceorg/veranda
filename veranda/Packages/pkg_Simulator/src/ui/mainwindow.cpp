@@ -60,9 +60,6 @@ MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectCompo
     designer = new Mode_Controller(factory, ui->designerButton, ui->designerMenuWidget, ui->designerToolsMenu, ui->designerActiveWidget,
                                    ui->designerPropertiesTableView, ui->designerToolsList, this);
 
-    //make designer small to match small components
-    designer->visual->setWorldBounds(-5, 5, -5, 5);
-
     //Initialize designer/simulator start states
     simulator->simulator = true;
     ui->worldViewLayout->addWidget(simulator->visual);

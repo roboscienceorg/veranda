@@ -125,18 +125,6 @@ private:
         objectsRemovedFromSimulation(oIds);
     }
 
-    /*!
-     * \brief Sets the bounds of what is viewable in the simulation
-     * \param[in] xMin Minimum x coordinate to show
-     * \param[in] xMax Maximum x coordinate to show
-     * \param[in] yMin Minimum y coordinate to show
-     * \param[in] yMax Maximum y coordinate to show
-     */
-    void setWorldBounds(double xMin, double xMax, double yMin, double yMax)
-    {
-        simulator->setWorldBounds(xMin, xMax, yMin, yMax);
-    }
-
     //! Flag indicating if physics is running or not
     bool play = false;
 

@@ -28,13 +28,11 @@ public:
     Simulator_Visual_If(QWidget* parent = nullptr) : QWidget(parent){}
 
     /*!
-     * \brief Sets the bounds of the simulation shown in the viewport
-     * \param[in] xMin Minimum x location to show
-     * \param[in] xMax Maximum x location to show
-     * \param[in] yMin Minimum y location to show
-     * \param[in] yMax Maximum y location to show
+     * \brief Sets whether or not this view can be navigated by keys or scrollbars
+     * \param allowed True if navigation is allowed
      */
-    virtual void setWorldBounds(double xMin, double xMax, double yMin, double yMax) = 0;
+    virtual void setNavigationEnabled(bool allowed) = 0;
+
 signals:
     /*!
      * \brief Signals that the user clicked on an object to select it

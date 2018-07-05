@@ -120,7 +120,7 @@ signals:
      * \param[in] dy Delta y
      * \param[in] dt Delta angle (degrees)
      */
-    void transformChanged(Model* mdl, double dx, double dy, double dt);
+    void transformChanged(Model* mdl, const double& dx, const double& dy, const double& dt);
 
     /*!
      * \brief Indicates that the model's drawhint was set
@@ -204,7 +204,7 @@ public:
      * \param[out] y y coordinate
      * \param[out] theta angle (degrees)
      */
-    void getTransform(double& x, double& y, double& theta)
+    void getTransform(double& x, double& y, double& theta) const
     {
         x = _x;
         y = _y;
@@ -302,7 +302,7 @@ public:
      * \brief Gets the drawhint set for the model
      * \return DrawHint - The current hint for the model
      */
-    DrawHint getDrawHint()
+    DrawHint getDrawHint() const
     {
         return _hint;
     }
@@ -311,7 +311,7 @@ public:
      * \brief Gets the parent model of this model (may be null)
      * \return Pointer to parent model or nullptr
      */
-    Model* getParent()
+    Model* getParent() const
     {
         return _parent;
     }
