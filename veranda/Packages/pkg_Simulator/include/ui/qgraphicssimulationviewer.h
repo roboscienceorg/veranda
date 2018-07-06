@@ -79,14 +79,8 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
     //! Group of shapes for all of the click to drag tools
     QGraphicsItemGroup* _tools;
 
-    //! Scene point in center of viewport
-    QPointF _viewCenter;
-
-    //! Rectangle containing the whole scene
-    QRectF _sceneRect;
-
-    //! Percentage of the screen that can be seen due to zoom
-    double _zoomLevel = 1;
+    //! Target viewport
+    QRectF _targetView;
 
     /*!
      * \brief Converts a b2Shape pointer to a QGraphicsItem
@@ -102,16 +96,6 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
      * \return A QGraphicsItemGroup with all the shapes in the Model
      */
     QGraphicsItemGroup *_drawModel(Model* m);
-
-    /*!
-     * \brief Determines the zoom level that corresponds to the current view/scene sizes
-     */
-    void _determineZoomLevel();
-
-    /*!
-     * \brief Rescales the view based on the physical height and width (Like when the window size changes)
-     */
-    void _rescale();
 
     /*!
      * \brief Gets the alpha value that should be used to draw a model
@@ -169,9 +153,15 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
     void _placeTools();
 
     /*!
-     * \brief Creates a QGraphicsScene and makes it the current one
+     * \brief Resets the viewport and zoom level; makes the scene if it is null
      */
-    void _makeScene();
+    void _resetScene();
+
+    /*!
+     * \brief Fits the viewer rect around the target view as well as possible by scaling the picture
+     * \param targetView Rectangle that should be shown in view
+     */
+    void _fitInView(const QRectF& targetView);
 
 public:
     /*!
@@ -267,17 +257,6 @@ private slots:
      * \param[in] y Amount to shift vertical
      */
     void viewShift(const int& x, const int& y);
-
-    /*!
-     * \brief Updates the view to have the current centerpoint in its center
-     */
-    void setViewCenter();
-
-    /*!
-     * \brief Updates the local copy of the rectangle containing all scene items
-     * \param newRect New scene Rectangle
-     */
-    void updateRect(const QRectF& newRect);
 
 private:
     Ui::qgraphicssimulationviewer *ui;

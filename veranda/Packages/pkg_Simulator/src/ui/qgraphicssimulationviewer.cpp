@@ -29,7 +29,7 @@ QGraphicsSimulationViewer::QGraphicsSimulationViewer(QWidget *parent) :
     _translater->moveBy(-_rotater->boundingRect().width()*1.5, 0);
     setNavigationEnabled(true);
 
-    _makeScene();
+    _resetScene();
 }
 
 QGraphicsSimulationViewer::~QGraphicsSimulationViewer()
@@ -37,22 +37,19 @@ QGraphicsSimulationViewer::~QGraphicsSimulationViewer()
     delete ui;
 }
 
-void QGraphicsSimulationViewer::_makeScene()
+void QGraphicsSimulationViewer::_resetScene()
 {
-    if(_tools->scene())
-        _scene->removeItem(_tools);
-
     if(_scene)
     {
+        if(_tools->scene())
+            _scene->removeItem(_tools);
+
         _scene->deleteLater();
-        disconnect(_scene, &QGraphicsScene::sceneRectChanged, this, &QGraphicsSimulationViewer::updateRect);
+        _scene = nullptr;
     }
 
     _scene = new QGraphicsScene(this);
-    connect(_scene, &QGraphicsScene::sceneRectChanged, this, &QGraphicsSimulationViewer::updateRect);
-
     _viewer->setScene(_scene);
-    _zoomLevel = 1;
 }
 
 void QGraphicsSimulationViewer::setNavigationEnabled(bool allowed)
@@ -165,6 +162,11 @@ void QGraphicsSimulationViewer::objectAddedToScreen(QVector<Model*> objects, obj
 
     _shapeToObject[group] = id;
     _topShapes[id] = group;
+
+    if(_models.size() == 1)
+    {
+        _fitInView(_scene->sceneRect());
+    }
 }
 
 /*!
@@ -378,9 +380,23 @@ void QGraphicsSimulationViewer::viewMouseRelease(QMouseEvent *event)
 
 void QGraphicsSimulationViewer::resizeEvent(QResizeEvent *event)
 {
-    _determineZoomLevel();
-    _rescale();
+    QRectF viewport = _viewer->geometry();
+    double dx, dy;
+    if((dx = (viewport.width() - _targetView.width())) > 0)
+    {
+        _targetView.translate(dx/2, 0);
+        _targetView.setWidth(_targetView.width()-dx);
+    }
+
+    if((dy = (viewport.height() - _targetView.height())) > 0)
+    {
+        _targetView.translate(dy/2, 0);
+        _targetView.setHeight(_targetView.height()-dy);
+    }
+
+    _fitInView(_targetView);
 }
+
 
 /*!
  * It appears that QGraphicsView::fitInView is broken in
@@ -388,71 +404,19 @@ void QGraphicsSimulationViewer::resizeEvent(QResizeEvent *event)
  * calculate how much of the view should be visible based on the
  * canvas size and the scene size and rescale the viewport
  */
-void QGraphicsSimulationViewer::_rescale()
+void QGraphicsSimulationViewer::_fitInView(const QRectF &targetView)
 {
-    double w_actual = _viewer->geometry().width()*0.9;
-    double h_actual = _viewer->geometry().height()*0.9;
+    QRectF viewSize = _viewer->geometry();
 
-    double w_need = _scene->width()*_zoomLevel;
-    double h_need = _scene->height()*_zoomLevel;
-
-    if(w_need < 0.001 || h_need < 0.001) return;
-
-    double scale = std::min(w_actual/w_need, h_actual/h_need);
+    double scale = std::min(viewSize.width()/targetView.width(), viewSize.height()/targetView.height());
 
     QTransform matrix;
     matrix.scale(scale,
                  scale);
     _viewer->setTransform(matrix);
 
-    //Rescale click/drag buttons
-    QPointF corner1 = _viewer->mapToScene(0, 0);
-    QPointF corner2 = _viewer->mapToScene(_viewer->geometry().width(), _viewer->geometry().height());
-    corner1 -= corner2;
-
-    _tools->setScale(1/scale);
-    _placeTools();
-}
-
-void QGraphicsSimulationViewer::updateRect(const QRectF &newRect)
-{
-    _sceneRect = newRect;
-    if(1.0 - _zoomLevel < 0.0001)
-    {
-        _viewCenter = newRect.center();
-        setViewCenter();
-    }
-    _determineZoomLevel();
-    _rescale();
-}
-
-void QGraphicsSimulationViewer::_determineZoomLevel()
-{
-    if(1.0 - _zoomLevel < 0.0001)
-    {
-        _zoomLevel = 1;
-        return;
-    }
-
-    double w_actual = _viewer->geometry().width()*0.9;
-    double h_actual = _viewer->geometry().height()*0.9;
-
-    QPointF corner1 = _viewer->mapToScene(0, 0);
-    QPointF corner2 = _viewer->mapToScene(_viewer->geometry().width(), _viewer->geometry().height());
-    corner1 -= corner2;
-
-    double w_need = fabs(corner1.x());
-    double h_need = fabs(corner1.y());
-
-    if(w_need < 0.001 || h_need < 0.001) return;
-
-    _zoomLevel = std::max(0.001, std::min(1.0, std::min(w_actual/w_need, h_actual/h_need)));
-}
-
-void QGraphicsSimulationViewer::setViewCenter()
-{
-    _viewer->centerOn(_viewCenter);
-    _viewCenter = _viewer->mapToScene(_viewer->rect().center());
+    _viewer->centerOn(targetView.center());
+    _targetView = targetView;
 }
 
 void QGraphicsSimulationViewer::viewShift(const int& x, const int& y)
@@ -460,25 +424,21 @@ void QGraphicsSimulationViewer::viewShift(const int& x, const int& y)
     double pctx = x*0.1;
     double pcty = y*0.1;
 
-    QPointF corner1 = _viewer->mapToScene(0, 0);
-    QPointF corner2 = _viewer->mapToScene(_viewer->geometry().width(), _viewer->geometry().height());
-    corner1 -= corner2;
+    _targetView.translate(_targetView.width()*pctx, _targetView.height()*pcty);
 
-    double h = fabs(corner1.y());
-    double w = fabs(corner1.x());
-
-    _viewCenter.setX(_viewCenter.x() + w*pctx);
-    _viewCenter.setY(_viewCenter.y() + h*pcty);
-
-    setViewCenter();
+    _fitInView(_targetView);
 }
 
 void QGraphicsSimulationViewer::viewZoom(const int& z)
 {
-    _zoomLevel *= 1+.1*z;
-    _zoomLevel = std::min(1.0, std::max(0.001, _zoomLevel));
+    double dx = _targetView.width() * 0.1 * z;
+    double dy = _targetView.height() * 0.1 * z;
 
-    _rescale();
+    _targetView.translate(dx/2, dy/2);
+    _targetView.setWidth(_targetView.width()+dx);
+    _targetView.setHeight(_targetView.height()+dy);
+
+    _fitInView(_targetView);
 }
 
 //for after the MVP
@@ -508,7 +468,7 @@ void QGraphicsSimulationViewer::objectRemovedFromScreen(object_id id)
     //If last item is removed, reset the scene
     //entirely to shrink the auto view rect
     if(_models.empty())
-        _makeScene();
+        _resetScene();
 }
 
 void QGraphicsSimulationViewer::removeModel(Model *m)
