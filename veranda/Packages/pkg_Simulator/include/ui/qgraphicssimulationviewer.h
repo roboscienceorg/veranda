@@ -79,9 +79,6 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
     //! Group of shapes for all of the click to drag tools
     QGraphicsItemGroup* _tools;
 
-    //! Target viewport
-    QRectF _targetView;
-
     /*!
      * \brief Converts a b2Shape pointer to a QGraphicsItem
      * \param[in] s The b2Shape to draw
@@ -156,12 +153,6 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
      * \brief Resets the viewport and zoom level; makes the scene if it is null
      */
     void _resetScene();
-
-    /*!
-     * \brief Fits the viewer rect around the target view as well as possible by scaling the picture
-     * \param targetView Rectangle that should be shown in view
-     */
-    void _fitInView(const QRectF& targetView);
 
 public:
     /*!

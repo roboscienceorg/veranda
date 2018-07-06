@@ -19,6 +19,8 @@ QGraphicsSimulationViewer::QGraphicsSimulationViewer(QWidget *parent) :
     connect(_viewer, &CustomGraphicsView::mouseMoved, this, &QGraphicsSimulationViewer::viewMouseMove);
     connect(_viewer, &CustomGraphicsView::mousePress, this, &QGraphicsSimulationViewer::viewMousePress);
     connect(_viewer, &CustomGraphicsView::mouseRelease, this, &QGraphicsSimulationViewer::viewMouseRelease);
+    connect(ui->button_zoomIn, &QPushButton::clicked, [this](){this->viewZoom(1);});
+    connect(ui->button_zoomOut, &QPushButton::clicked, [this](){this->viewZoom(-1);});
 
     _translater = _makeTranslater();
     _rotater = _makeRotater();
@@ -27,6 +29,7 @@ QGraphicsSimulationViewer::QGraphicsSimulationViewer(QWidget *parent) :
     _tools->addToGroup(_translater);
     _tools->addToGroup(_rotater);
     _translater->moveBy(-_rotater->boundingRect().width()*1.5, 0);
+    _tools->setFlags(_tools->flags() | QGraphicsItem::ItemIgnoresTransformations);
     setNavigationEnabled(true);
 
     _resetScene();
@@ -48,8 +51,10 @@ void QGraphicsSimulationViewer::_resetScene()
         _scene = nullptr;
     }
 
+    _viewer->setTransform(QTransform());
     _scene = new QGraphicsScene(this);
     _viewer->setScene(_scene);
+    _tools->setScale(1);
 }
 
 void QGraphicsSimulationViewer::setNavigationEnabled(bool allowed)
@@ -65,10 +70,10 @@ void QGraphicsSimulationViewer::setNavigationEnabled(bool allowed)
         disconnect(_viewer, &CustomGraphicsView::screenShift, this, &QGraphicsSimulationViewer::viewShift);
     }
 
-    ui->scroll_horizontal->setVisible(allowed);
-    ui->scroll_vertical->setVisible(allowed);
     ui->button_zoomIn->setVisible(allowed);
     ui->button_zoomOut->setVisible(allowed);
+    _viewer->setHorizontalScrollBarPolicy(allowed ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAlwaysOff);
+    _viewer->setVerticalScrollBarPolicy(allowed ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAlwaysOff);
 }
 
 /*!
@@ -162,11 +167,6 @@ void QGraphicsSimulationViewer::objectAddedToScreen(QVector<Model*> objects, obj
 
     _shapeToObject[group] = id;
     _topShapes[id] = group;
-
-    if(_models.size() == 1)
-    {
-        _fitInView(_scene->sceneRect());
-    }
 }
 
 /*!
@@ -272,19 +272,12 @@ void QGraphicsSimulationViewer::viewMousePress(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
-        QPointF hit = event->localPos();
+        bool startDrag = false, startRotate = false;
 
-        bool startDrag = _toolsEnabled && _translater->contains(
-                    _translater->sceneTransform().inverted().map(
-                        _viewer->mapToScene(
-                            _viewer->mapFromGlobal(
-                                event->globalPos()))));
-
-        bool startRotate = _toolsEnabled && _rotater->contains(
-                    _rotater->sceneTransform().inverted().map(
-                        _viewer->mapToScene(
-                            _viewer->mapFromGlobal(
-                                event->globalPos()))));
+        if(_translater->isAncestorOf(_viewer->itemAt(event->pos())))
+            startDrag = true;
+        else if(_rotater->isAncestorOf(_viewer->itemAt(event->pos())))
+            startRotate = true;
 
         if(!_draggingTranslate && startDrag)
         {
@@ -306,12 +299,16 @@ void QGraphicsSimulationViewer::viewMousePress(QMouseEvent *event)
         }
         else
         {
-            QGraphicsItem* shape = _viewer->itemAt((int)(hit.x()+0.5), (int)(hit.y() + 0.5));
+            QGraphicsItem* shape = _viewer->itemAt(event->pos());
             while(shape && shape->parentItem())
                 shape = shape->parentItem();
-            object_id oid = _shapeToObject[shape];
 
-            userSelectedObject(oid);
+            if(_shapeToObject.contains(shape))
+            {
+                object_id oid = _shapeToObject[shape];
+
+                userSelectedObject(oid);
+            }
         }
     }
 }
@@ -380,43 +377,6 @@ void QGraphicsSimulationViewer::viewMouseRelease(QMouseEvent *event)
 
 void QGraphicsSimulationViewer::resizeEvent(QResizeEvent *event)
 {
-    QRectF viewport = _viewer->geometry();
-    double dx, dy;
-    if((dx = (viewport.width() - _targetView.width())) > 0)
-    {
-        _targetView.translate(dx/2, 0);
-        _targetView.setWidth(_targetView.width()-dx);
-    }
-
-    if((dy = (viewport.height() - _targetView.height())) > 0)
-    {
-        _targetView.translate(dy/2, 0);
-        _targetView.setHeight(_targetView.height()-dy);
-    }
-
-    _fitInView(_targetView);
-}
-
-
-/*!
- * It appears that QGraphicsView::fitInView is broken in
- * Qt 5.5. This should be an acceptable alternative. We manually
- * calculate how much of the view should be visible based on the
- * canvas size and the scene size and rescale the viewport
- */
-void QGraphicsSimulationViewer::_fitInView(const QRectF &targetView)
-{
-    QRectF viewSize = _viewer->geometry();
-
-    double scale = std::min(viewSize.width()/targetView.width(), viewSize.height()/targetView.height());
-
-    QTransform matrix;
-    matrix.scale(scale,
-                 scale);
-    _viewer->setTransform(matrix);
-
-    _viewer->centerOn(targetView.center());
-    _targetView = targetView;
 }
 
 void QGraphicsSimulationViewer::viewShift(const int& x, const int& y)
@@ -424,21 +384,13 @@ void QGraphicsSimulationViewer::viewShift(const int& x, const int& y)
     double pctx = x*0.1;
     double pcty = y*0.1;
 
-    _targetView.translate(_targetView.width()*pctx, _targetView.height()*pcty);
-
-    _fitInView(_targetView);
+    QRectF sceneView = _viewer->mapToScene(_viewer->rect()).boundingRect();
+    _viewer->translate(sceneView.width() * pctx, sceneView.height() * pcty);
 }
 
 void QGraphicsSimulationViewer::viewZoom(const int& z)
 {
-    double dx = _targetView.width() * 0.1 * z;
-    double dy = _targetView.height() * 0.1 * z;
-
-    _targetView.translate(dx/2, dy/2);
-    _targetView.setWidth(_targetView.width()+dx);
-    _targetView.setHeight(_targetView.height()+dy);
-
-    _fitInView(_targetView);
+    _viewer->scale(1.0 + z * 0.1, 1.0 + z * 0.1);
 }
 
 //for after the MVP
