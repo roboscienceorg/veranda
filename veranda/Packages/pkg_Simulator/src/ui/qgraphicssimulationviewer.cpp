@@ -1,6 +1,8 @@
 #include "ui/qgraphicssimulationviewer.h"
 #include "ui_qgraphicssimulationviewer.h"
 
+#include <QScrollBar>
+
 //ScreenModel_if - found in a header file
 
 //Constructor
@@ -47,6 +49,7 @@ void QGraphicsSimulationViewer::_resetScene()
         if(_tools->scene())
             _scene->removeItem(_tools);
 
+        disconnect(_scene, nullptr, this, nullptr);
         _scene->deleteLater();
         _scene = nullptr;
     }
@@ -55,6 +58,15 @@ void QGraphicsSimulationViewer::_resetScene()
     _scene = new QGraphicsScene(this);
     _viewer->setScene(_scene);
     _tools->setScale(1);
+
+    connect(_scene, &QGraphicsScene::sceneRectChanged,
+    [this](){
+    if(_zoomedExtents && !_zooming)
+    {
+        _zooming = true;
+        zoomExtents();
+        _zooming = false;
+    }});
 }
 
 void QGraphicsSimulationViewer::setNavigationEnabled(bool allowed)
@@ -375,21 +387,53 @@ void QGraphicsSimulationViewer::viewMouseRelease(QMouseEvent *event)
     _draggingRotate = false;
 }
 
+void QGraphicsSimulationViewer::zoomExtents()
+{
+    _fitInView(_scene->sceneRect());
+    _zoomedExtents = true;
+}
+
+/*!
+ * It appears that QGraphicsView::fitInView is broken in
+ * Qt 5.5. This should be an acceptable alternative. We manually
+ * calculate how much of the view should be visible based on the
+ * canvas size and the scene size and rescale the viewport
+ */
+void QGraphicsSimulationViewer::_fitInView(const QRectF &targetView)
+{
+    QRectF viewSize = _viewer->viewport()->rect();
+
+    double scale = std::min(viewSize.width()/targetView.width(), viewSize.height()/targetView.height());
+
+    QTransform matrix;
+    matrix.scale(scale,
+                 scale);
+    _viewer->setTransform(matrix);
+
+    _viewer->centerOn(targetView.center());
+}
+
 void QGraphicsSimulationViewer::resizeEvent(QResizeEvent *event)
 {
 }
 
 void QGraphicsSimulationViewer::viewShift(const int& x, const int& y)
 {
+    _zoomedExtents = false;
+
     double pctx = x*0.1;
     double pcty = y*0.1;
 
-    QRectF sceneView = _viewer->mapToScene(_viewer->rect()).boundingRect();
-    _viewer->translate(sceneView.width() * pctx, sceneView.height() * pcty);
+    QRectF sceneView = _viewer->mapToScene(_viewer->viewport()->rect()).boundingRect();
+    double dx = sceneView.width() * pctx, dy = sceneView.height() * pcty;
+
+    //It looks like QGraphicsView::translate is broken, so this works instead
+    _viewer->centerOn(sceneView.center().x() + dx, sceneView.center().y() + dy);
 }
 
 void QGraphicsSimulationViewer::viewZoom(const int& z)
 {
+    _zoomedExtents = false;
     _viewer->scale(1.0 + z * 0.1, 1.0 + z * 0.1);
 }
 

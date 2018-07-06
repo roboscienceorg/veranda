@@ -119,6 +119,12 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
     //! Last location recorded for click to drag
     QPointF _dragStart;
 
+    //! Tracks if we are supposed to be zoomed out entirely
+    bool _zoomedExtents;
+
+    //! Prevent recursive zoom
+    bool _zooming = false;
+
     /*!
      * \brief Creates the drag-to-move tool
      * \return A QGraphicsGroup with all the shapes for the tool
@@ -154,6 +160,12 @@ class QGraphicsSimulationViewer : public Simulator_Visual_If
      */
     void _resetScene();
 
+    /*!
+     * \brief Fits the viewer rect around the target view as well as possible by scaling the picture
+     * \param targetView Rectangle that should be shown in view
+     */
+    void _fitInView(const QRectF& targetView);
+
 public:
     /*!
      * \brief Constructs the view widget
@@ -166,8 +178,6 @@ public:
      */
     ~QGraphicsSimulationViewer();
 
-    void setNavigationEnabled(bool allowed);
-
 public slots:
     void objectAddedToScreen(QVector<Model *> objects, object_id id) override;
     void objectRemovedFromScreen(object_id id) override;
@@ -175,6 +185,8 @@ public slots:
     void objectSelected(object_id id) override;
     void nothingSelected() override;
     void setToolsEnabled(bool enabled);
+    void setNavigationEnabled(bool allowed);
+    virtual void zoomExtents();
 
 private slots:
     /*!

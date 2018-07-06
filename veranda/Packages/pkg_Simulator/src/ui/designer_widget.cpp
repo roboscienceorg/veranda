@@ -13,6 +13,7 @@ Designer_Widget::Designer_Widget(WorldObjectComponent *object, WorldObjectProper
     view->setNavigationEnabled(false);
     view->objectAddedToScreen(properties->getModels(), 1);
     view->nothingSelected();
+    view->zoomExtents();
 
     //set pixmap to size of view minus obnoxious black border of indetermined origin
     QPixmap pixmap(view->width()/* - 40*/, view->height()/* - 75*/);

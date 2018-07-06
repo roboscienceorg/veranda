@@ -74,6 +74,7 @@ void Mode_Controller::close()
 //add robot to the simulation world view (will be auto-called from the backend in the simulator)
 void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties *, object_id>> objs)
 {
+    bool wasEmpty = !worldObjects.size();
     for(auto& p : objs)
     {
         object_id& oId = p.second;
@@ -89,8 +90,13 @@ void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectPro
         listItems[oId]->setData(Qt::DisplayRole, QString::number(oId) + " " + object->getName());
         active->addItem(listItems[oId]);
     }
+
     if(objs.size())
         objectSelected(objs.last().second);
+
+    //First time any object or group of objects is inserted, zoom out to see them
+    if(wasEmpty)
+        visual->zoomExtents();
 }
 
 //remove robot from the simulation world view (will be auto-called from the backend in the simulator)
