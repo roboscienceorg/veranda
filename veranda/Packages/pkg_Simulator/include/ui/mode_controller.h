@@ -50,15 +50,6 @@ public:
      */
     Mode_Controller(visualizerFactory factory, QToolButton* pModeButton, QWidget* pMenu, QWidget* pToolsMenu, QListWidget* pActive, QTableView* pProperties, QTabWidget* pTabs, QWidget *parent = nullptr);
 
-    /*!
-     * \brief Sets the bounds of the viewport for this mode
-     * \param xMin Min x coordinate to show
-     * \param xMax Max x coordinate to show
-     * \param yMin Min y coordinate to show
-     * \param yMax Max y coordinate to show
-     */
-    void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
-
     //! Objects visible in this mode
     QMap<object_id, WorldObjectProperties*> worldObjects;
 

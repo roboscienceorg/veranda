@@ -2,6 +2,7 @@
 #pragma once
 
 #include "interfaces/simulator_visual_if.h"
+#include "customgraphicsview.h"
 
 #include <QMap>
 #include <QTimer>
@@ -16,121 +17,11 @@
 #include <Box2D/Box2D.h>
 #include <veranda/model.h>
 
-/*!
- * \brief Extension of QGraphicsView to capture events
- * Captures and publishes events for 'w','s','a','d','q', and 'e'
- * as navigation keys, as well as mouse clicks and mouse moves
- *
- * \todo Add 'follow' feature
- * \todo Add 'zoom to fill' feature to zoom in on a specific object
- */
-class CustomGraphicsView : public QGraphicsView
-{
-    Q_OBJECT
+namespace Ui {
+class qgraphicssimulationviewer;
+}
 
-public:
-    /*!
-     * \brief Constructs the CustomGraphicsView
-     * \param[in] scene QGraphicsScene to draw a view of
-     * \param[in] parent QWidget parent
-     */
-    CustomGraphicsView(QGraphicsScene* scene, QWidget* parent = nullptr) :
-        QGraphicsView(scene, parent){}
-
-signals:
-    /*!
-     * \brief Signals a mouse moved event
-     * \param[in] event The mouse moved event
-     */
-    void mouseMoved(QMouseEvent* event);
-
-    /*!
-     * \brief Signals a mouse press event
-     * \param[in] event The mouse pressed event
-     */
-    void mousePress(QMouseEvent* event);
-
-    /*!
-     * \brief Signals a mouse released event
-     * \param[in] event The mouse released event
-     */
-    void mouseRelease(QMouseEvent* event);
-
-    /*!
-     * \brief Signals that one of the zoom in,out keys was pressed
-     * \param[in] z Amount to zoom (-1 or 1)
-     */
-    void zoomTick(int z);
-
-    /*!
-     * \brief Signals that navigation keys were pressed
-     * \param[in] x Amount to move horizontal (-1, 0, or 1)
-     * \param[in] y Amount to move vertial (-1, 0, 1)
-     */
-    void screenShift(int x, int y);
-
-private:
-    /*!
-     * \brief Capture and forward mouse move events
-     * \param[in] event The mouse move event
-     */
-    void mouseMoveEvent(QMouseEvent* event)
-    {
-        mouseMoved(event);
-    }
-
-    /*!
-     * \brief Capture and forward mouse press events
-     * \param[in] event The mouse press event
-     */
-    void mousePressEvent(QMouseEvent* event)
-    {
-        mousePress(event);
-    }
-
-    /*!
-     * \brief Capture and forward mouse release events
-     * \param[in] event The mouse release event
-     */
-    void mouseReleaseEvent(QMouseEvent* event)
-    {
-        mouseRelease(event);
-    }
-
-    /*!
-     * \brief Capture keypress events and check for navigation in the viewport
-     * \param[in] event The keypress event
-     */
-    void keyPressEvent(QKeyEvent* event)
-    {
-        switch(event->key())
-        {
-            case Qt::Key_W: screenShift(0, -1); break;
-            case Qt::Key_A: screenShift(-1, 0); break;
-            case Qt::Key_S: screenShift(0, 1); break;
-            case Qt::Key_D: screenShift(1, 0); break;
-            case Qt::Key_Q: zoomTick(1); break;
-            case Qt::Key_E: zoomTick(-1); break;
-        }
-    }
-};
-
-/*!
- * \brief Default viewing widget fulfilling Simulator_Visual_If
- * This is the default widget used to draw WorldObjectComponents
- * on a viewport. The widget uses the QGraphics Framework to draw
- * objects. This was chosen because it is optimized for 2D graphics and
- * because it allows creating a tree hierarchy of objects to place
- * elements relative to each other.
- *
- * Every object id is associated with a top-level QGraphicsItemGroup. That
- * group contains the drawn shapes for all of the models associated with that id.
- * Models are drawn by adding all shapes for the model to a QGraphicsItemGroup along
- * with the QGraphicsItemGroup used to drawn any children models. When any model on any
- * level is moved or modified, as few QGraphicsItems are updated as possible
- * to keep the view accurate
- */
-class BasicViewer : public Simulator_Visual_If
+class QGraphicsSimulationViewer : public Simulator_Visual_If
 {
     Q_OBJECT
 
@@ -177,10 +68,7 @@ class BasicViewer : public Simulator_Visual_If
     CustomGraphicsView* _viewer;
 
     //! The QGraphicsScene holding all drawn objects
-    QGraphicsScene* _scene;
-
-    //! Layout to put the QGraphicsView in
-    QLayout* _children;
+    QGraphicsScene* _scene = nullptr;
 
     //! Group of shapes for the drag to move tool
     QGraphicsItem* _translater;
@@ -207,11 +95,6 @@ class BasicViewer : public Simulator_Visual_If
     QGraphicsItemGroup *_drawModel(Model* m);
 
     /*!
-     * \brief Rescales the view based on the physical height and width (Like when the window size changes)
-     */
-    void _rescale();
-
-    /*!
      * \brief Gets the alpha value that should be used to draw a model
      * \param[in] m The model to query for
      * \return 0-255
@@ -235,6 +118,12 @@ class BasicViewer : public Simulator_Visual_If
 
     //! Last location recorded for click to drag
     QPointF _dragStart;
+
+    //! Tracks if we are supposed to be zoomed out entirely
+    bool _zoomedExtents;
+
+    //! Prevent recursive zoom
+    bool _zooming = false;
 
     /*!
      * \brief Creates the drag-to-move tool
@@ -266,27 +155,28 @@ class BasicViewer : public Simulator_Visual_If
      */
     void _placeTools();
 
+    /*!
+     * \brief Resets the viewport and zoom level; makes the scene if it is null
+     */
+    void _resetScene();
+
+    /*!
+     * \brief Fits the viewer rect around the target view as well as possible by scaling the picture
+     * \param targetView Rectangle that should be shown in view
+     */
+    void _fitInView(const QRectF& targetView);
+
 public:
     /*!
      * \brief Constructs the view widget
      * \param[in] parent QWidget parent
      */
-    BasicViewer(QWidget* parent = nullptr);
+    explicit QGraphicsSimulationViewer(QWidget *parent = 0);
 
     /*!
-     * \brief Sets the bounds of the world in the view
-     * \param[in] xMin Min x coordinate shown
-     * \param[in] xMax Max x coordinate shown
-     * \param[in] yMin Min y coordinate shown
-     * \param[in] yMax Max y coordinate shown
+     * \brief Destructs the view widget
      */
-    void setWorldBounds(double xMin, double xMax, double yMin, double yMax);
-
-    /*!
-     * \brief Sets the bounds of the world in the view
-     * \param[in] rect Rectangle to bound view to
-     */
-    void setWorldBounds(QRectF rect);
+    ~QGraphicsSimulationViewer();
 
 public slots:
     void objectAddedToScreen(QVector<Model *> objects, object_id id) override;
@@ -295,6 +185,8 @@ public slots:
     void objectSelected(object_id id) override;
     void nothingSelected() override;
     void setToolsEnabled(bool enabled);
+    void setNavigationEnabled(bool allowed);
+    virtual void zoomExtents();
 
 private slots:
     /*!
@@ -304,7 +196,7 @@ private slots:
      * \param[in] dy Delta movement in y direction
      * \param[in] dt Delta rotation (degrees)
      */
-    void modelMoved(Model* m, double dx, double dy, double dt);
+    void modelMoved(Model *m, const double& dx, const double& dy, const double& dt);
 
     /*!
      * \brief Listener for models changing
@@ -360,12 +252,15 @@ private slots:
      * \brief Handle zoom in,out commands
      * \param[in] z The direction to zoom
      */
-    void viewZoom(int z);
+    void viewZoom(const int& z);
 
     /*!
      * \brief Handle viewport shift commands
      * \param[in] x Amount to shift horizontal
      * \param[in] y Amount to shift vertical
      */
-    void viewShift(int x, int y);
+    void viewShift(const int& x, const int& y);
+
+private:
+    Ui::qgraphicssimulationviewer *ui;
 };

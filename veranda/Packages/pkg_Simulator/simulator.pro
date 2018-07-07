@@ -13,16 +13,16 @@ INCLUDEPATH += include \
 
 SOURCES += \
     src/main.cpp \
-    src/basic_viewer.cpp \
     src/basic_physics.cpp \
 \
     src/ui/mainwindow.cpp \
     src/simulator_core.cpp \
     src/ui/joystickprototype.cpp \
-    ui/settingspopup.cpp \
     src/ui/settingspopup.cpp \
     src/ui/designer_widget.cpp \
-    src/ui/mode_controller.cpp
+    src/ui/mode_controller.cpp \
+    src/ui/settingspopup.cpp \
+    src/ui/qgraphicssimulationviewer.cpp
 
 HEADERS += \
 \
@@ -31,25 +31,27 @@ HEADERS += \
     include/interfaces/simulator_physics_if.h \
 \
     include/basic_physics.h \
-    include/basic_viewer.h \
 \
     include/ui/mainwindow.h \
 \
     include/simulator_core.h \
     include/interfaces/world_object_wrappers.h \
     include/ui/joystickprototype.h \
-    ui/settingspopup.h \
     include/ui/settingspopup.h \
-    src/ui/designer_widget.h \
     include/ui/designer_widget.h \
-    src/ui/mode_controller.h \
-    include/ui/mode_controller.h
+    include/ui/mode_controller.h \
+    include/ui/qgraphicssimulationviewer.h \
+    include/ui/settingspopup.h \
+    include/ui/designer_widget.h \
+    include/ui/mode_controller.h \
+    include/ui/customgraphicsview.h
 
 FORMS    += \
     ui/mainwindow.ui \
     ui/emptysimwindow.ui \
     ui/joystickprototype.ui \
-    ui/settingspopup.ui
+    ui/settingspopup.ui \
+    ui/qgraphicssimulationviewer.ui
 
 RESOURCES += \
     ui/resources.qrc

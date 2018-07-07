@@ -415,10 +415,18 @@
            </widget>
           </item>
           <item>
-           <widget class="QTableView" name="designerPropertiesTableView"/>
+           <widget class="QTableView" name="designerPropertiesTableView">
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+           </widget>
           </item>
           <item>
-           <widget class="QTableView" name="propertiesTableView"/>
+           <widget class="QTableView" name="propertiesTableView">
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+           </widget>
           </item>
          </layout>
         </widget>

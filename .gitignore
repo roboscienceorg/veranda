@@ -18,7 +18,8 @@ msg/_*.py
 *.vscode*
 
 # Auto-Generated Makefiles from Qt Creator
-*.Makefile.*
+*Makefile.*
+*.stash
 
 # Qt build folders
 build-*/

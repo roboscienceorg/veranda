@@ -150,13 +150,4 @@ public slots:
 
     //! Slot to display the main UI window on startup
     virtual void showMainWindow() = 0;
-
-    /*!
-     * \brief Sets the bounds of the world in the view
-     * \param[in] xMin Min x coordinate shown
-     * \param[in] xMax Max x coordinate shown
-     * \param[in] yMin Min y coordinate shown
-     * \param[in] yMax Max y coordinate shown
-     */
-    virtual void setWorldBounds(double xMin, double xMax, double yMin, double yMax) = 0;
 };

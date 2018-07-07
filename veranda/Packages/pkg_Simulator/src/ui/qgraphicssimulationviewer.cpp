@@ -1,46 +1,29 @@
-//! \file
+#include "ui/qgraphicssimulationviewer.h"
+#include "ui_qgraphicssimulationviewer.h"
 
-#include "basic_viewer.h"
-
-#include <QPainter>
-#include <QDebug>
-#include <QVBoxLayout>
-#include <QMouseEvent>
-#include <QMessageBox>
-#include <QQueue>
-
-#include <QGraphicsEllipseItem>
-#include <QGraphicsLineItem>
-#include <QGraphicsPolygonItem>
-#include <QGraphicsItemGroup>
-
-#include <QThread>
-
-#include <cmath>
+#include <QScrollBar>
 
 //ScreenModel_if - found in a header file
 
 //Constructor
 //Sets up widget with subwidget to view a graphics scene
 //makes the
-BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
+QGraphicsSimulationViewer::QGraphicsSimulationViewer(QWidget *parent) :
+    Simulator_Visual_If(parent),
+    ui(new Ui::qgraphicssimulationviewer)
 {
-    _children = new QVBoxLayout(this);
+    ui->setupUi(this);
+    _viewer = ui->view;
 
-    _scene = new QGraphicsScene(this);
-    _viewer = new CustomGraphicsView(_scene, this);
-    _viewer->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+    //_viewer->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
     _viewer->setMouseTracking(true);
 
-    connect(_viewer, &CustomGraphicsView::mouseMoved, this, &BasicViewer::viewMouseMove);
-    connect(_viewer, &CustomGraphicsView::mousePress, this, &BasicViewer::viewMousePress);
-    connect(_viewer, &CustomGraphicsView::mouseRelease, this, &BasicViewer::viewMouseRelease);
-
-    connect(_viewer, &CustomGraphicsView::zoomTick, this, &BasicViewer::viewZoom);
-    connect(_viewer, &CustomGraphicsView::screenShift, this, &BasicViewer::viewShift);
-
-    _children->addWidget(_viewer);
-    setLayout(_children);
+    connect(_viewer, &CustomGraphicsView::mouseMoved, this, &QGraphicsSimulationViewer::viewMouseMove);
+    connect(_viewer, &CustomGraphicsView::mousePress, this, &QGraphicsSimulationViewer::viewMousePress);
+    connect(_viewer, &CustomGraphicsView::mouseRelease, this, &QGraphicsSimulationViewer::viewMouseRelease);
+    connect(ui->button_zoomIn, &QPushButton::clicked, [this](){this->viewZoom(1);});
+    connect(ui->button_zoomOut, &QPushButton::clicked, [this](){this->viewZoom(-1);});
+    connect(ui->button_zoomExtents, &QPushButton::clicked, this, &QGraphicsSimulationViewer::zoomExtents);
 
     _translater = _makeTranslater();
     _rotater = _makeRotater();
@@ -49,8 +32,63 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
     _tools->addToGroup(_translater);
     _tools->addToGroup(_rotater);
     _translater->moveBy(-_rotater->boundingRect().width()*1.5, 0);
+    _tools->setFlags(_tools->flags() | QGraphicsItem::ItemIgnoresTransformations);
+    setNavigationEnabled(true);
 
-    setWorldBounds(-200, 200, -200, 200);
+    _resetScene();
+}
+
+QGraphicsSimulationViewer::~QGraphicsSimulationViewer()
+{
+    delete ui;
+}
+
+void QGraphicsSimulationViewer::_resetScene()
+{
+    if(_scene)
+    {
+        if(_tools->scene())
+            _scene->removeItem(_tools);
+
+        disconnect(_scene, nullptr, this, nullptr);
+        _scene->deleteLater();
+        _scene = nullptr;
+    }
+
+    _viewer->setTransform(QTransform());
+    _scene = new QGraphicsScene(this);
+    _viewer->setScene(_scene);
+    _tools->setScale(1);
+
+    /*connect(_scene, &QGraphicsScene::sceneRectChanged,
+    [this](){
+    if(_zoomedExtents && !_zooming)
+    {
+        _zooming = true;
+        _fitInView(_scene->sceneRect());
+
+        _zooming = false;
+    }});*/
+}
+
+void QGraphicsSimulationViewer::setNavigationEnabled(bool allowed)
+{
+    if(allowed)
+    {
+        connect(_viewer, &CustomGraphicsView::zoomTick, this, &QGraphicsSimulationViewer::viewZoom);
+        connect(_viewer, &CustomGraphicsView::screenShift, this, &QGraphicsSimulationViewer::viewShift);
+    }
+    else
+    {
+        disconnect(_viewer, &CustomGraphicsView::zoomTick, this, &QGraphicsSimulationViewer::viewZoom);
+        disconnect(_viewer, &CustomGraphicsView::screenShift, this, &QGraphicsSimulationViewer::viewShift);
+    }
+
+    ui->button_zoomExtents->setVisible(allowed);
+    ui->button_zoomIn->setVisible(allowed);
+    ui->button_zoomOut->setVisible(allowed);
+    _viewer->setHorizontalScrollBarPolicy(allowed ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAlwaysOff);
+    _viewer->setVerticalScrollBarPolicy(allowed ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAlwaysOff);
 }
 
 /*!
@@ -61,7 +99,7 @@ BasicViewer::BasicViewer(QWidget *parent) : Simulator_Visual_If(parent)
  *
  * Drawing any of these results in a single QGrahicsItem with no children
  */
-QGraphicsItem* BasicViewer::_drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
+QGraphicsItem* QGraphicsSimulationViewer::_drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
 {
     QGraphicsItem* newShape = nullptr;
     switch(s->m_type)
@@ -97,7 +135,7 @@ QGraphicsItem* BasicViewer::_drawb2Shape(b2Shape* s, QGraphicsItem* itemParent)
     return newShape;
 }
 
-QGraphicsItemGroup* BasicViewer::_drawModel(Model* m)
+QGraphicsItemGroup* QGraphicsSimulationViewer::_drawModel(Model* m)
 {
     QGraphicsItemGroup* baseItem = new QGraphicsItemGroup();
 
@@ -123,7 +161,7 @@ QGraphicsItemGroup* BasicViewer::_drawModel(Model* m)
  * When the model updates, (transformChanged) the graphics shape
  * needs to be moved within the scene
  */
-void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
+void QGraphicsSimulationViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
 {
     _models[id] = objects;
 
@@ -156,7 +194,7 @@ void BasicViewer::objectAddedToScreen(QVector<Model*> objects, object_id id)
  * This method also connects the signals from the model which
  * indicate that the model moved or its shapes or children were changed
  */
-QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
+QGraphicsItem* QGraphicsSimulationViewer::addModel(Model *m, object_id id)
 {
     //qDebug() << "Add model " << m << " with " << m->children().size() << " children";
     QGraphicsItemGroup* graphic = _drawModel(m);
@@ -167,13 +205,13 @@ QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
     _modelChildren[m] = m->children();
 
     //If the model or one of its submodels changes, redraw the whole thing
-    connect(m, &Model::modelChanged, this, &BasicViewer::modelChanged);
+    connect(m, &Model::modelChanged, this, &QGraphicsSimulationViewer::modelChanged);
 
     //If the base model moves, update the transform
-    connect(m, &Model::transformChanged, this, &BasicViewer::modelMoved);
+    connect(m, &Model::transformChanged, this, &QGraphicsSimulationViewer::modelMoved);
 
     //If the drawhint for the model changes, update it's pen and brush
-    connect(m, &Model::hintChanged, this, &BasicViewer::modelHinted);
+    connect(m, &Model::hintChanged, this, &QGraphicsSimulationViewer::modelHinted);
 
     for(Model* child : m->children())
     {
@@ -186,7 +224,7 @@ QGraphicsItem* BasicViewer::addModel(Model *m, object_id id)
 }
 
 //! When a model draw hint changes we update it and its children
-void BasicViewer::modelHinted(Model *m)
+void QGraphicsSimulationViewer::modelHinted(Model *m)
 {
     _updateColoring(m);
 }
@@ -195,7 +233,7 @@ void BasicViewer::modelHinted(Model *m)
  * When a model moves, we find the QGraphicsItem that represents it
  * and move that the same amount
  */
-void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
+void QGraphicsSimulationViewer::modelMoved(Model* m, const double &dx, const double &dy, const double &dt)
 {
     double x, y, t;
     m->getTransform(x, y, t);
@@ -203,10 +241,7 @@ void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
     x *= WORLD_SCALE;
     y *= WORLD_SCALE;
 
-    dx *= WORLD_SCALE;
-    dy *= WORLD_SCALE;
-
-    _shapes[m]->moveBy(dx, -dy);
+    _shapes[m]->moveBy(dx * WORLD_SCALE, -dy * WORLD_SCALE);
     _shapes[m]->setRotation(-t);
 
     if(_modelToObject[m] == _currSelection)
@@ -217,7 +252,7 @@ void BasicViewer::modelMoved(Model *m, double dx, double dy, double dt)
  * When a model changes, we destroy the QGraphicsItem that
  * was representing it and rebuild it
  */
-void BasicViewer::modelChanged(Model *m)
+void QGraphicsSimulationViewer::modelChanged(Model *m)
 {
     object_id oid = _modelToObject[m];
 
@@ -248,23 +283,16 @@ void BasicViewer::modelChanged(Model *m)
  * if they clicked on one of the drawn models, and if so signal that
  * it should be the selected model
  */
-void BasicViewer::viewMousePress(QMouseEvent *event)
+void QGraphicsSimulationViewer::viewMousePress(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
-        QPointF hit = event->localPos();
+        bool startDrag = false, startRotate = false;
 
-        bool startDrag = _toolsEnabled && _translater->contains(
-                    _translater->sceneTransform().inverted().map(
-                        _viewer->mapToScene(
-                            _viewer->mapFromGlobal(
-                                event->globalPos()))));
-
-        bool startRotate = _toolsEnabled && _rotater->contains(
-                    _rotater->sceneTransform().inverted().map(
-                        _viewer->mapToScene(
-                            _viewer->mapFromGlobal(
-                                event->globalPos()))));
+        if(_translater->isAncestorOf(_viewer->itemAt(event->pos())))
+            startDrag = true;
+        else if(_rotater->isAncestorOf(_viewer->itemAt(event->pos())))
+            startRotate = true;
 
         if(!_draggingTranslate && startDrag)
         {
@@ -286,12 +314,16 @@ void BasicViewer::viewMousePress(QMouseEvent *event)
         }
         else
         {
-            QGraphicsItem* shape = _viewer->itemAt((int)(hit.x()+0.5), (int)(hit.y() + 0.5));
+            QGraphicsItem* shape = _viewer->itemAt(event->pos());
             while(shape && shape->parentItem())
                 shape = shape->parentItem();
-            object_id oid = _shapeToObject[shape];
 
-            userSelectedObject(oid);
+            if(_shapeToObject.contains(shape))
+            {
+                object_id oid = _shapeToObject[shape];
+
+                userSelectedObject(oid);
+            }
         }
     }
 }
@@ -301,7 +333,7 @@ void BasicViewer::viewMousePress(QMouseEvent *event)
  * emit signals that the object which is currently selected
  * is being moved or rotate.
  */
-void BasicViewer::viewMouseMove(QMouseEvent* event)
+void QGraphicsSimulationViewer::viewMouseMove(QMouseEvent* event)
 {
     if(_draggingTranslate)
     {
@@ -335,7 +367,7 @@ void BasicViewer::viewMouseMove(QMouseEvent* event)
     }
 }
 
-void BasicViewer::setToolsEnabled(bool enabled)
+void QGraphicsSimulationViewer::setToolsEnabled(bool enabled)
 {
     _toolsEnabled = enabled;
     if(enabled)
@@ -352,15 +384,17 @@ void BasicViewer::setToolsEnabled(bool enabled)
     }
 }
 
-void BasicViewer::viewMouseRelease(QMouseEvent *event)
+void QGraphicsSimulationViewer::viewMouseRelease(QMouseEvent *event)
 {
     _draggingTranslate = false;
     _draggingRotate = false;
 }
 
-void BasicViewer::resizeEvent(QResizeEvent *event)
+void QGraphicsSimulationViewer::zoomExtents()
 {
-    _rescale();
+    QRectF boundRect = _scene->itemsBoundingRect();
+    _fitInView(boundRect);
+    _zoomedExtents = true;
 }
 
 /*!
@@ -369,80 +403,48 @@ void BasicViewer::resizeEvent(QResizeEvent *event)
  * calculate how much of the view should be visible based on the
  * canvas size and the scene size and rescale the viewport
  */
-void BasicViewer::_rescale()
+void QGraphicsSimulationViewer::_fitInView(const QRectF &targetView)
 {
-    double w_acutal = geometry().width()*0.9;
-    double h_actual = geometry().height()*0.9;
+    QRectF viewSize = _viewer->viewport()->rect();
 
-    double w_need = _scene->width();
-    double h_need = _scene->height();
-
-    double scale = std::min(w_acutal/w_need, h_actual/h_need);
+    //double scale = 1/std::min(viewSize.width()/targetView.width(), viewSize.height()/targetView.height());
+    double scale = std::min(width()*0.9/targetView.width(), height()*0.9/targetView.height());
 
     QTransform matrix;
     matrix.scale(scale,
                  scale);
     _viewer->setTransform(matrix);
 
-    //Rescale click/drag buttons
-    //_transformer->setScale(std::min(_viewer->height(), _viewer->width()) * TOOL_SCALE);
+    _viewer->centerOn(targetView.center());
 }
 
-void BasicViewer::viewShift(int x, int y)
+void QGraphicsSimulationViewer::resizeEvent(QResizeEvent *event)
 {
+}
+
+void QGraphicsSimulationViewer::viewShift(const int& x, const int& y)
+{
+    _zoomedExtents = false;
+
     double pctx = x*0.1;
     double pcty = y*0.1;
 
-    QRectF rect = _viewer->sceneRect();
+    QRectF sceneView = _viewer->mapToScene(_viewer->viewport()->rect()).boundingRect();
+    double dx = sceneView.width() * pctx, dy = sceneView.height() * pcty;
 
-    double h = rect.height();
-    double w = rect.width();
-
-    rect.setTop(rect.top() + h * pcty);
-    rect.setBottom(rect.bottom() + h * pcty);
-    rect.setLeft(rect.left() + w * pctx);
-    rect.setRight(rect.right() + w * pctx);
-
-    setWorldBounds(rect);
+    //It looks like QGraphicsView::translate is broken, so this works instead
+    _viewer->centerOn(sceneView.center().x() + dx, sceneView.center().y() + dy);
 }
 
-void BasicViewer::viewZoom(int z)
+void QGraphicsSimulationViewer::viewZoom(const int& z)
 {
-    double pct = z*0.1;
-
-    QRectF rect = _viewer->sceneRect();
-
-    double h = rect.height();
-    double w = rect.width();
-
-    rect.setTop(rect.top() + h * pct);
-    rect.setBottom(rect.bottom() - h * pct);
-    rect.setLeft(rect.left() + w * pct);
-    rect.setRight(rect.right() - w * pct);
-
-    setWorldBounds(rect);
-}
-
-void BasicViewer::setWorldBounds(QRectF rect)
-{
-    _scene->setSceneRect(rect);
-    _viewer->setSceneRect(rect);
-
-    _rescale();
-
-    _tools->setScale(std::min(_viewer->sceneRect().width(), _viewer->sceneRect().height()) * 0.001);
-    _placeTools();
-}
-
-void BasicViewer::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
-{
-    QRectF viewRect(xMin*WORLD_SCALE, -yMax*WORLD_SCALE, (xMax-xMin)*WORLD_SCALE, (yMax-yMin)*WORLD_SCALE);
-    setWorldBounds(viewRect);
+    _zoomedExtents = false;
+    _viewer->scale(1.0 + z * 0.1, 1.0 + z * 0.1);
 }
 
 //for after the MVP
 //The object identified by object_id is no longer on the world
-void BasicViewer::objectRemovedFromScreen(object_id id)
+void QGraphicsSimulationViewer::objectRemovedFromScreen(object_id id)
 {
     //qDebug() << "Removing object" << id << "?";
     if(_models.contains(id))
@@ -460,11 +462,17 @@ void BasicViewer::objectRemovedFromScreen(object_id id)
         delete _topShapes[id];
         _topShapes.remove(id);
     }
+
     if(_currSelection == id)
         nothingSelected();
+
+    //If last item is removed, reset the scene
+    //entirely to shrink the auto view rect
+    if(_models.empty())
+        _resetScene();
 }
 
-void BasicViewer::removeModel(Model *m)
+void QGraphicsSimulationViewer::removeModel(Model *m)
 {
     for(Model* child : _modelChildren[m])
         removeModel(child);
@@ -486,7 +494,7 @@ void BasicViewer::removeModel(Model *m)
 
 //The object identified by object_id is in the world, but should not be drawn
 //for users not wanting to see their sensors drawn
-void BasicViewer::objectDrawLevelSet(object_id id, DrawLevel level)
+void QGraphicsSimulationViewer::objectDrawLevelSet(object_id id, DrawLevel level)
 {
     _drawLevels[id] = level;
     for(Model* m : _models[id])
@@ -495,7 +503,7 @@ void BasicViewer::objectDrawLevelSet(object_id id, DrawLevel level)
 
 //The object identified by object_id has been selcted
 //maybe we draw a selection box around it?
-void BasicViewer::objectSelected(object_id id)
+void QGraphicsSimulationViewer::objectSelected(object_id id)
 {
     if(id != _currSelection)
     {
@@ -517,7 +525,7 @@ void BasicViewer::objectSelected(object_id id)
     }
 }
 
-void BasicViewer::_placeTools()
+void QGraphicsSimulationViewer::_placeTools()
 {
     if(_topShapes.contains(_currSelection) && _tools)
     {
@@ -530,21 +538,23 @@ void BasicViewer::_placeTools()
 }
 
 //No objects are selected, draw without highlights
-void BasicViewer::nothingSelected()
+void QGraphicsSimulationViewer::nothingSelected()
 {
     if(_currSelection != 0)
     {
         auto prevSelection = _currSelection;
         _currSelection = 0;
 
-        for(Model* m : _models[prevSelection])
-            _updateColoring(m);
-
-        _scene->removeItem(_tools);
+        if(_models.contains(prevSelection))
+            for(Model* m : _models[prevSelection])
+                _updateColoring(m);
     }
+
+    if(_tools->scene())
+        _scene->removeItem(_tools);
 }
 
-uint8_t BasicViewer::_getAlpha(Model* m)
+uint8_t QGraphicsSimulationViewer::_getAlpha(Model* m)
 {
     object_id modelObject = _modelToObject[m];
     DrawLevel level = _drawLevels[modelObject];
@@ -567,7 +577,7 @@ uint8_t BasicViewer::_getAlpha(Model* m)
  * In the first two cases, the color can just be set. After possibly setting
  * the color, the method recurses on the children GraphicsItems
  */
-void BasicViewer::_updateColoring(Model* m)
+void QGraphicsSimulationViewer::_updateColoring(Model* m)
 {
     // Bookkeeping to get data about model
     object_id modelObject = _modelToObject[m];
@@ -645,7 +655,7 @@ void BasicViewer::_updateColoring(Model* m)
         _updateColoring(child);
 }
 
-QGraphicsItem* BasicViewer::_makeTranslater()
+QGraphicsItem* QGraphicsSimulationViewer::_makeTranslater()
 {
     QBrush b(SELECTED_COLOR);
     QPen p(SELECTED_COLOR);
@@ -670,7 +680,7 @@ QGraphicsItem* BasicViewer::_makeTranslater()
     return group;
 }
 
-QGraphicsItem* BasicViewer::_makeRotater()
+QGraphicsItem* QGraphicsSimulationViewer::_makeRotater()
 {
     QBrush b(SELECTED_COLOR);
     QPen p(SELECTED_COLOR);
@@ -695,7 +705,7 @@ QGraphicsItem* BasicViewer::_makeRotater()
     return group;
 }
 
-QGraphicsItem* BasicViewer::_makeArrow(double pointx, double pointy, double angle, QPen p, QBrush b)
+QGraphicsItem* QGraphicsSimulationViewer::_makeArrow(double pointx, double pointy, double angle, QPen p, QBrush b)
 {
     QGraphicsItemGroup* group = new QGraphicsItemGroup;
 

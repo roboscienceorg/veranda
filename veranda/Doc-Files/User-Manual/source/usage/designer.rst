@@ -21,7 +21,7 @@ Once you are in designer mode, a couple of options specific to designing will be
     
     The Designer mode button and Designer-specific option buttons. Select the 'Plus' button to clear the designer and start a new robot. Choose the save button to save your robot in a file. Press the folder button to load a robot that was saved in a file previously.
 
-The next two things you will see on the left panel of the designer are the :ref:`components list <fig-designer_components>` and the :ref:`properties window <fig-designer_properties>`. The components list shows you the names of all the components you've added to the designer, and lets you select one to make it active so you can move it or change its properties. The Properties window shows the named properties of the currently selected component. Some properties cannot be changed; they are read-only data that will be calculated during simulation.
+The next two things you will see on the left panel of the designer are the :ref:`components list <fig-designer_components>` and the :ref:`properties window <fig-designer_properties>`. The components list shows you the names of all the components you've added to the designer, and lets you select one to make it active so you can move it or change its properties. The Properties window shows the named properties of the currently selected component. Some properties cannot be changed; they are read-only data that will be calculated during simulation. If you need more room in the properties window to view the text displayed, you can click between the header values and drag left or right to resize the columns.
 
 .. _fig-designer_components:
 

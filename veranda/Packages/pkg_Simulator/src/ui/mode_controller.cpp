@@ -13,9 +13,6 @@ Mode_Controller::Mode_Controller(visualizerFactory factory, QToolButton *pModeBu
     tabs = pTabs;
     tabs->clear();
 
-    //designer world bounds will be redefined smaller in the main window because designer objects are small
-    setWorldBounds(-100, 100, -100, 100);
-
     //connect slots to alter which mode is active and user interaction with the world view
     connect(active, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(robotItemClicked(QListWidgetItem*)));
     connect(this, SIGNAL(objectIsSelected(object_id)), visual, SLOT(objectSelected(object_id)));
@@ -40,7 +37,7 @@ void Mode_Controller::setPropertiesTableView()
     propertiesModel = new QStandardItemModel(0,2,this); //12 Rows and 2 Columns
     propertiesModel->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
     propertiesModel->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
-    properties->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    properties->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     properties->setModel(propertiesModel);
 
     nothingSelected();
@@ -77,6 +74,7 @@ void Mode_Controller::close()
 //add robot to the simulation world view (will be auto-called from the backend in the simulator)
 void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectProperties *, object_id>> objs)
 {
+    bool wasEmpty = !worldObjects.size();
     for(auto& p : objs)
     {
         object_id& oId = p.second;
@@ -92,8 +90,13 @@ void Mode_Controller::worldObjectsAddedToSimulation(QVector<QPair<WorldObjectPro
         listItems[oId]->setData(Qt::DisplayRole, QString::number(oId) + " " + object->getName());
         active->addItem(listItems[oId]);
     }
+
     if(objs.size())
         objectSelected(objs.last().second);
+
+    //First time any object or group of objects is inserted, zoom out to see them
+    if(wasEmpty)
+        visual->zoomExtents();
 }
 
 //remove robot from the simulation world view (will be auto-called from the backend in the simulator)
@@ -112,15 +115,6 @@ void Mode_Controller::worldObjectsRemovedFromSimulation(QVector<object_id> oIds)
         if(selected == oId)
             nothingSelected();
     }
-}
-
-//alter the reference size of the world view (zoom in/out)
-void Mode_Controller::setWorldBounds(double xMin, double xMax, double yMin, double yMax)
-{
-    if(xMin > xMax) std::swap(xMin, xMax);
-    if(yMin > yMax) std::swap(yMin, yMax);
-
-    visual->setWorldBounds(xMin, xMax, yMin, yMax);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
