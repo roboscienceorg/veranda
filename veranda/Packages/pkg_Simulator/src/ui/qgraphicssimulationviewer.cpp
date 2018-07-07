@@ -23,6 +23,7 @@ QGraphicsSimulationViewer::QGraphicsSimulationViewer(QWidget *parent) :
     connect(_viewer, &CustomGraphicsView::mouseRelease, this, &QGraphicsSimulationViewer::viewMouseRelease);
     connect(ui->button_zoomIn, &QPushButton::clicked, [this](){this->viewZoom(1);});
     connect(ui->button_zoomOut, &QPushButton::clicked, [this](){this->viewZoom(-1);});
+    connect(ui->button_zoomExtents, &QPushButton::clicked, this, &QGraphicsSimulationViewer::zoomExtents);
 
     _translater = _makeTranslater();
     _rotater = _makeRotater();
@@ -59,14 +60,15 @@ void QGraphicsSimulationViewer::_resetScene()
     _viewer->setScene(_scene);
     _tools->setScale(1);
 
-    connect(_scene, &QGraphicsScene::sceneRectChanged,
+    /*connect(_scene, &QGraphicsScene::sceneRectChanged,
     [this](){
     if(_zoomedExtents && !_zooming)
     {
         _zooming = true;
-        zoomExtents();
+        _fitInView(_scene->sceneRect());
+
         _zooming = false;
-    }});
+    }});*/
 }
 
 void QGraphicsSimulationViewer::setNavigationEnabled(bool allowed)
@@ -82,6 +84,7 @@ void QGraphicsSimulationViewer::setNavigationEnabled(bool allowed)
         disconnect(_viewer, &CustomGraphicsView::screenShift, this, &QGraphicsSimulationViewer::viewShift);
     }
 
+    ui->button_zoomExtents->setVisible(allowed);
     ui->button_zoomIn->setVisible(allowed);
     ui->button_zoomOut->setVisible(allowed);
     _viewer->setHorizontalScrollBarPolicy(allowed ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAlwaysOff);
@@ -389,7 +392,8 @@ void QGraphicsSimulationViewer::viewMouseRelease(QMouseEvent *event)
 
 void QGraphicsSimulationViewer::zoomExtents()
 {
-    _fitInView(_scene->sceneRect());
+    QRectF boundRect = _scene->itemsBoundingRect();
+    _fitInView(boundRect);
     _zoomedExtents = true;
 }
 
@@ -403,7 +407,8 @@ void QGraphicsSimulationViewer::_fitInView(const QRectF &targetView)
 {
     QRectF viewSize = _viewer->viewport()->rect();
 
-    double scale = std::min(viewSize.width()/targetView.width(), viewSize.height()/targetView.height());
+    //double scale = 1/std::min(viewSize.width()/targetView.width(), viewSize.height()/targetView.height());
+    double scale = std::min(width()*0.9/targetView.width(), height()*0.9/targetView.height());
 
     QTransform matrix;
     matrix.scale(scale,
