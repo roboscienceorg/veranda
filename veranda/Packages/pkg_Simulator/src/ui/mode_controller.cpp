@@ -37,7 +37,7 @@ void Mode_Controller::setPropertiesTableView()
     propertiesModel = new QStandardItemModel(0,2,this); //12 Rows and 2 Columns
     propertiesModel->setHorizontalHeaderItem(0, new QStandardItem(QString("Property")));
     propertiesModel->setHorizontalHeaderItem(1, new QStandardItem(QString("Value")));
-    properties->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    properties->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     properties->setModel(propertiesModel);
 
     nothingSelected();
