@@ -596,6 +596,8 @@ void MainWindow::loadObjectButtonClick()
     types = types.left(types.size()-2);
 
     QString objFile = QFileDialog::getOpenFileName(nullptr, "", "", types, nullptr);
+    if(objFile.isNull()) return;
+
     QString suff = QFileInfo(objFile).suffix().toLower();
 
     bool done = false;
@@ -688,37 +690,44 @@ void MainWindow::loadObjectsForSimButtonClick()
 
     types = types.left(types.size()-2);
 
-    QString objFile = QFileDialog::getOpenFileName(nullptr, "", "", types, nullptr);
-    QString suff = QFileInfo(objFile).suffix().toLower();
+    QStringList objFiles = QFileDialog::getOpenFileNames(nullptr, "", "", types, nullptr);
 
-    bool done = false;
-    for(QString k : objectLoaders.keys())
+    for(const QString& objFile : objFiles)
     {
-        if(k.toLower().contains(suff))
-        {
-            for(WorldObjectLoader_If* l : objectLoaders[k])
-            {
-                if(l->canLoadFile(objFile, componentPlugins))
-                {
-                    l->getUserOptions(objFile, componentPlugins);
+        QString suff = QFileInfo(objFile).suffix().toLower();
 
-                    try
+        bool done = false;
+        for(QString k : objectLoaders.keys())
+        {
+            if(k.toLower().contains(suff))
+            {
+                for(WorldObjectLoader_If* l : objectLoaders[k])
+                {
+                    if(l->canLoadFile(objFile, componentPlugins))
                     {
-                        WorldObject* wobj = l->loadFile(objFile, componentPlugins);
-                        simulator->addObjectToTools(wobj);
-                        return;
-                    }catch(std::exception&)
-                    {
-                        error("Unable to load world object file '" + objFile + "'");
+                        l->getUserOptions(objFile, componentPlugins);
+
+                        try
+                        {
+                            WorldObject* wobj = l->loadFile(objFile, componentPlugins);
+                            QString name = QFileInfo(objFile).baseName();
+                            wobj->getProperties()["Name"]->set(name, true);
+                            simulator->addObjectToTools(wobj);
+                            done = true;
+                            break;
+                        }catch(std::exception&)
+                        {
+                            error("Unable to load world object file '" + objFile + "'");
+                        }
+                        done = true;
                     }
-                    done = true;
+                    if(done) break;
                 }
-                if(done) break;
             }
+            if(done) continue;
         }
-        if(done) break;
+        if(!done) error("No plugin to load world object file '" + objFile + "'");
     }
-    if(!done) error("No plugin to load world object file '" + objFile + "'");
 }
 
 void MainWindow::exportObjectButtonClick()
