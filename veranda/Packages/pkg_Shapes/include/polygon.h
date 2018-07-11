@@ -186,7 +186,7 @@ class Polygon : public WorldObjectComponent
 
     //! Property: Threshold under which cross product means the line is straight
     Property _straight = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "How close to straight an edge has to be to have points removed"),
-                                  QVariant(0), &Property::abs_double_validator);
+                                  QVariant(0.05), &Property::abs_double_validator);
 
     //! Property: Horizontal scaling factor
     Property _scalex = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Horizontal scaling factor"),

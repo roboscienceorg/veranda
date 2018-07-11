@@ -134,7 +134,7 @@ public:
         form->addRow(QString("Black/White Threshold:"), _color = new QLineEdit("125", this));
 
         form->addRow(new QLabel("Parsing Options", this));
-        form->addRow(QString("'Straight' threshold"), _crossThresh = new QLineEdit("0", this));
+        form->addRow(QString("'Straight' threshold"), _crossThresh = new QLineEdit("0.05", this));
 
         form->addRow(new QLabel("Scaling Options", this));
         form->addRow(QString("Image Width (px):"), new QLabel(width, this));
@@ -167,7 +167,7 @@ public:
 
         _color->setValidator(new QIntValidator(0, 255, this));
 
-        _crossThresh->setValidator(new QIntValidator(0, std::numeric_limits<int>::max(), this));
+        _crossThresh->setValidator(new QDoubleValidator(0, std::numeric_limits<double>::max(), 3, this));
 
         connect(_pxpmx, &QLineEdit::editingFinished, this, &ImageOptions::constrain1);
         connect(_pxpmy, &QLineEdit::editingFinished, this, &ImageOptions::constrain1);
@@ -189,9 +189,9 @@ public:
      * \brief Getter for straightness threshold
      * \return A positive integer value
      */
-    uint64_t getCrossProductThreshold()
+    double getCrossProductThreshold()
     {
-        return _crossThresh->text().toInt();
+        return _crossThresh->text().toDouble();
     }
 
     /*!

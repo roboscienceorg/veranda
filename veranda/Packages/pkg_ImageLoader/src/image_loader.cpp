@@ -39,7 +39,7 @@ QVector<WorldObject *> ImageLoader::loadFile(QString filePath, QMap<QString, Wor
     try
     {
         uint64_t colorThreshold = lastOptions->getBlackWhiteThreshold();
-        uint64_t crossThreshold = lastOptions->getCrossProductThreshold();
+        double crossThreshold = lastOptions->getCrossProductThreshold();
         double scaleY = lastOptions->getPxPerHeight();
         double scaleX = lastOptions->getPxPerWidth();
         QColor drawColor = lastOptions->getDrawColor();

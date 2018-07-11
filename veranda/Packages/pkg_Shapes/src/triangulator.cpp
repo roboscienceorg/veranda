@@ -1,84 +1,30 @@
 //! \file
 #include "triangulator.h"
+#include "psimpl/psimpl.h"
+#include "polygon_iterator.h"
 
 #include <functional>
 #include <cmath>
 
 #include <QDebug>
 
-void simplify(Shape &s, const uint64_t& crossThreshold)
+void simplify(Shape &s, const double &crossThreshold)
 {
     s.outer = simplify(s.outer, crossThreshold);
     for(QPolygonF& p : s.inner)
         p = simplify(p, crossThreshold);
 }
 
-QPolygonF simplify(const QPolygonF &p, const uint64_t& crossThreshold)
+QPolygonF simplify(const QPolygonF &p, const double& crossThreshold)
 {
-    if(p.size() <= 3) return p;
-
-    //Cross product of vectors AB, AC using points A, B, C
-    const std::function<double(const QPointF&, const QPointF&, const QPointF&)> cross =
-    [](const QPointF& A, const QPointF& B, const QPointF& C)
-    {
-        QPointF AB(B.x() - A.x(), B.y() - A.y());
-        QPointF AC(C.x() - A.x(), C.y() - A.y());
-        return AB.x() * AC.y() - AB.y() * AC.x();
-    };
-
     QPolygonF out;
+    out.resize(p.size());
 
-    //Assume point 0 is a corner
-    QPointF pointA = p[0];
-    uint64_t indexA = 0;
-    uint64_t indexB = 1;
-    uint64_t indexC = 2;
+    PolygonIterator inStart((QPolygonF::iterator)p.begin()), inEnd((QPolygonF::iterator)p.end()), outStart((QPolygonF::iterator)out.begin());
+    PolygonIterator outEnd = psimpl::simplify_douglas_peucker<2, PolygonIterator, PolygonIterator>
+                                (inStart, inEnd, crossThreshold, outStart);
 
-    bool lastCorner = false, firstPoint = true;
-    uint64_t firstIndex = 0;
-
-    //Walk two consecutive points around the polygon
-    //Checking the cross product between them and the last corner
-    //If it's non-0, then B is a new corner
-    do
-    {
-        //qDebug() << indexA << indexB << indexC;
-        //qDebug() << indexB/(double)p.size() * 100;
-        double cProd = std::abs(cross(pointA, p[indexB], p[indexC]));
-        if(cProd > crossThreshold)
-        {
-            //qDebug() << "Corner";
-
-            indexA = indexB;
-            pointA = p[indexA];
-
-            //Don't double-push first point
-            if(indexA != firstIndex)
-                out.push_back(pointA);
-
-            if(lastCorner) break;
-
-            //If this is the first corner found
-            //set flags so we don't exit,
-            //and mark the corner
-            if(firstPoint)
-            {
-                firstPoint = false;
-                firstIndex = indexA;
-            }
-        }
-        indexB = (indexB+1) % p.size();
-        indexC = (indexC+1) % p.size();
-
-        if(indexB == firstIndex) lastCorner = true;
-
-        //If the entire thing is a line, or we can't otherwise simplify it
-        //break out of infinite loop
-        if(indexC == indexA) return p;
-
-    //Continue around until the first corner is found
-    //a second time
-    }while(true);
+    out.resize(outEnd.parentIterator() - out.begin());
 
     return out;
 }

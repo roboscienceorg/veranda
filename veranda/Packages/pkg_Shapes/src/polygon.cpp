@@ -114,7 +114,7 @@ void Polygon::makeTriangles()
         toPolygon(v.value<QVariantList>(), *(iter++));
 
     //Clean up polygons
-    simplify(sh, _straight.get().toULongLong());
+    simplify(sh, _straight.get().toDouble());
 
     //Form triangle shapes
     QVector<QPolygonF> shapes = triangulate(sh);
