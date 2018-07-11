@@ -923,7 +923,7 @@ used by other plugins to create specifically shaped masses. In the future, it ma
 \paragraph{Design Details}
 \begin{enumerate}
 \item The Box2D polygon type does not work properly with concave polygon and has a limitation on how many points can be in a polygon. To prevent either of these limitations from being a problem, the polygon is triangulated and all of the triangles are loaded as separate shapes. The triangulation algorithm is provided by the OpenGL GLU Tesselator.
-\item Polygons are simplified according to the straightness property setting. The simplification algorithm can be found in Algorithm \ref{algo:straighten}; this algorithm is called with the straightness value as its cross product threshold.
+\item Polygons are simplified according to the straightness property setting. The simplification algorithm is the PSimpl implementation of the Douglas-Peucker algorithm found at \url{http://psimpl.sourceforge.net/douglas-peucker.html}
 \item Triangulation is performed each time the straightness property or one of the scaling properties changes.
 \end{enumerate}
 
@@ -945,45 +945,6 @@ used by other plugins to create specifically shaped masses. In the future, it ma
 	color/blue & Unsigned Char & Blue componenet of polygon color
 	\end{tabular}
 \end{table}
-
-\begin{algorithm}
-\begin{algorithmic}
-	\STATE{Given loop of points p and double threshold}
-	\IF{Points in p <= 3} \STATE{Return p} \ENDIF
-	\STATE{Let out be the output polygon}
-	\STATE{Let indexA be 0}
-	\COMMENT{Indices for the edges being considered}
-	\STATE{Let indexB be 1}
-	\STATE{Let indexC be 2}
-	\STATE{Let lastCorner be false}
-	\COMMENT{Set some flags and create sentinel}
-	\STATE{Let firstPoint be true}
-	\STATE{Let firstIndex be 0}
-	\WHILE{true}
-		\STATE{Let cProd be the cross product between the edges with points in p at indexA, indexB and indexA, indexC}
-		\IF{cProd greather than threshold}
-			\STATE{Let indexA be indexB}
-			\IF{indexA is not the firstIndex}
-				\STATE{Add the point in p at indexA to out}
-			\ENDIF
-			\IF{lastCorner is true} \STATE{break} \ENDIF
-			\IF{firstPoint is true}
-				\STATE{Let firstPoint be false}
-				\STATE{Let firstIndex be indexA}
-				\COMMENT{Set sentinel to the first point used in the output}
-			\ENDIF
-		\ENDIF
-		\STATE{Increment indexB and mod size of p}
-		\STATE{Increment indexC and mod size of p}
-		\IF{indexB equals firstPoint} \STATE{Let lastCorner be true} \COMMENT{Set flag to end if we get back to the first point that was used in the output}\ENDIF
-		\IF{indexC equals indexA} \STATE{Return p} 		\COMMENT{If indexC reaches indexA, the polygon is some degenerate case that this will not simplify (such as a line)}
-		\ENDIF
-	\ENDWHILE
-	\STATE{Return out}
-\end{algorithmic}
-\caption{Algorithm for simplification of line loops}
-\label{algo:straighten}
-\end{algorithm}
 
 \subsection{Driving Plugins}
 Driving plugins produce force to propel a world object. Perhaps they would be better named 'propulsion plugins', but they usually emulate wheel-like hardware, so we're calling them driving plugins. Box2D does not actually simulate rolling of wheels in a top-down environment, so it is all done virtually. Given the size of a wheel and its angular velocity, we can calculate its linear velocity, and apply that velocity. Similarly, given its linear velocity, we can calculate the portions of that velocity in invalid directions and negate it (for example, to prevent a wheel from slipping or sliding).

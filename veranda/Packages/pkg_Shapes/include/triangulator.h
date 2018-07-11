@@ -37,7 +37,7 @@ QVector<QPolygonF> triangulate(const Shape& s);
  * \param[in] s Shape to simplify
  * \param[in] crossThreshold Threshold that cross products must be over to be considered non-colinear
  */
-void simplify(Shape &s, const uint64_t &crossThreshold);
+void simplify(Shape &s, const double &crossThreshold);
 
 /*!
  * \brief Simplifies a line loop by removing points between line segments that are almost colinear
@@ -45,4 +45,4 @@ void simplify(Shape &s, const uint64_t &crossThreshold);
  * \param[in] crossThreshold Threshold that cross products must be over to be considered non-colinear
  * \return The simplified polygon
  */
-QPolygonF simplify(const QPolygonF& p, const uint64_t &crossThreshold);
+QPolygonF simplify(const QPolygonF& p, const double &crossThreshold);

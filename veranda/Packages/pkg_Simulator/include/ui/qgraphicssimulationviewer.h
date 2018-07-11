@@ -21,6 +21,11 @@ namespace Ui {
 class qgraphicssimulationviewer;
 }
 
+/*!
+ * \brief View widget to display simulation state
+ *
+ * \todo Add 'follow' feature
+ */
 class QGraphicsSimulationViewer : public Simulator_Visual_If
 {
     Q_OBJECT

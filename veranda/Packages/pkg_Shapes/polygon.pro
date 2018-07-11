@@ -14,7 +14,9 @@ HEADERS += \
     include/polygon.h \
     include/polygon_plugin.h \
     include/triangulator.h \
-    include/defines.h
+    include/defines.h \
+    include/psimpl/psimpl.h \
+    include/polygon_iterator.h
 
 DISTFILES += \
     CMakeLists.txt \

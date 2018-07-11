@@ -82,7 +82,7 @@ Design Details
 """"""""""""""
 
     #. The Box2D polygon type does not work properly with concave polygon and has a limitation on how many points can be in a polygon. To prevent either of these limitations from being a problem, the polygon is triangulated and all of the triangles are loaded as separate shapes. The triangulation algorithm is provided by the OpenGL GLU Tesselator.
-    #. Polygons are simplified according to the straightness property setting. This simplification algorithm is called with the straightness value as its cross product threshold.
+    #. Polygons are simplified according to the straightness property setting. The simplification algorithm is the PSimpl implementation of the Douglas-Peucker algorithm found at `<http://psimpl.sourceforge.net/douglas-peucker.html>`_.
     #. Triangulation is performed each time the straightness property or one of the scaling properties changes.
 
 
