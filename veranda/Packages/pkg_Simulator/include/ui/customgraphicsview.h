@@ -9,9 +9,6 @@
  * \brief Extension of QGraphicsView to capture events
  * Captures and publishes events for 'w','s','a','d','q', and 'e'
  * as navigation keys, as well as mouse clicks and mouse moves
- *
- * \todo Add 'follow' feature
- * \todo Add 'zoom to fill' feature to zoom in on a specific object
  */
 class CustomGraphicsView : public QGraphicsView
 {
@@ -20,7 +17,6 @@ class CustomGraphicsView : public QGraphicsView
 public:
     /*!
      * \brief Constructs the CustomGraphicsView
-     * \param[in] scene QGraphicsScene to draw a view of
      * \param[in] parent QWidget parent
      */
     CustomGraphicsView(QWidget* parent = nullptr) :
