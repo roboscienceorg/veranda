@@ -49,7 +49,7 @@ public:
      * \brief Copy Constructor of PolygonIterator
      * \param[in] other PolygonIterator to copy
      */
-    PolygonIterator(PolygonIterator& other) : _parentIter(other._parentIter), _index(other._index) {}
+    PolygonIterator(const PolygonIterator& other) : _parentIter(other._parentIter), _index(other._index) {}
 
     /*!
      * \brief Equality check; returns true when both the parent iterators are equal and the coodinate indexes are equal
