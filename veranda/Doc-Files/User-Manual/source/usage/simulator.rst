@@ -72,10 +72,15 @@ The simulator publishes a timestamp message containing
 both the delta time for the most recent tick and the total time passed in the 
 simulation. This message can be used to make control code more accurate when it relies 
 on dead reckoning and when the simulator is progressing at non-realtime. To make using this message easier, the python SimTimer class is included 
-with the project. The SimTimer has two simple methods:
+with the project. The SimTimer has a couple simple methods:
 
     #. double global_time() - Returns total number of seconds 
-    #. void create_timer(delta, callback) - Starts calling [callback] every [delta] seconds
+    #. timer_handle create_timer(delta, callback) - Starts calling [callback] every [delta] seconds
+    #. bool destroy_timer(timer_handle) - Stops the timer indicated by the handle if it exists
+
+The actual type of timer_handle depends upon if the SimTimer is using the system clock through ROS or the 
+Simulation clock; it will be the rclpy.Node.create_timer return type in the former case, and just an integer
+in the latter.
 
 Depending on its initialization parameters, the SimTimer will either listen 
 to the simulator messages for its timestamp, in which case the global time 
