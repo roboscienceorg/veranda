@@ -124,19 +124,20 @@ public:
      * \param[in] parent QObject parent
      */
     Touch_Sensor(QObject* parent=nullptr);
+    virtual ~Touch_Sensor() override {}
 
     /*!
      * \brief Creates a new Touch Ring Component
      * \param[in] newParent QObject parent of copy
      * \return A newly constructed Touch Ring component
      */
-    WorldObjectComponent* _clone(QObject *newParent);
+    WorldObjectComponent* _clone(QObject *newParent) override;
 
     /*!
      * \brief Getter for the touch ring-specific properties
      * \return Mapping of touch ring properties by identifiers
      */
-    QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
+    QMap<QString, QSharedPointer<PropertyView>> _getProperties() override{
         return _properties;
     }
 
@@ -144,7 +145,7 @@ public:
      * \brief Check if component uses ROS channels
      * \return true
      */
-    bool usesChannels(){
+    bool usesChannels() override{
         return true;
     }
 
@@ -154,22 +155,22 @@ public:
      * \param[in] oId object_id of the object the lidar is part of
      * \param[in] anchor Anchor body to joint self to
      */
-    void generateBodies(b2World *world, object_id oId, b2Body *anchor);
+    void _generateBodies(b2World *world, object_id oId, b2Body *anchor) override;
 
     //! Clears all bodies the ring has in the Box2d world
-    void clearBodies();
+    void _clearBodies() override;
 
     /*!
      * \brief Sets the ROS node to publish messages with
      * \param[in] node The ROS node to use
      */
-    void setROSNode(std::shared_ptr<rclcpp::Node> node);
+    void _setROSNode(std::shared_ptr<rclcpp::Node> node) override;
 
     /*!
      * \brief Getter for the name of the plugin which provides this component
      * \return "org.roboscience.veranda.worldObjectComponent.defaults.touchring"
      */
-    QString getPluginName() { return TOUCH_IID; }
+    QString getPluginName() override { return TOUCH_IID; }
 
 private slots:
     //! Refreshes ROS channel
@@ -194,11 +195,11 @@ private slots:
 
 public slots:
     //! Connects to all ROS topics
-    virtual void connectChannels();
+    virtual void _connectChannels() override;
 
     //! Disconnects all ROS topics
-    virtual void disconnectChannels();
+    virtual void _disconnectChannels() override;
 
     //! Checks for button states to change, and if so publishes a message
-    virtual void _worldTicked(const double);
+    virtual void _worldTicked(const double) override;
 };

@@ -35,7 +35,7 @@ void Circle::_buildModels()
     shape_model->addShapes({circle});
 }
 
-void Circle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+void Circle::_generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     clearBodies();
     _world = world;
@@ -75,7 +75,7 @@ void Circle::_makeFixtures()
     }
 }
 
-void Circle::clearBodies()
+void Circle::_clearBodies()
 {
     if(_world)
     {

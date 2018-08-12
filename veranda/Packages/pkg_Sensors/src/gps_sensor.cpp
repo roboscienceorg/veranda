@@ -37,7 +37,7 @@ WorldObjectComponent *GPS_Sensor::_clone(QObject *newParent)
     return out;
 }
 
-void GPS_Sensor::setROSNode(std::shared_ptr<rclcpp::Node> node)
+void GPS_Sensor::_setROSNode(std::shared_ptr<rclcpp::Node> node)
 {
     _sendChannel.reset();
     _rosNode = node;
@@ -51,7 +51,7 @@ void GPS_Sensor::_channelChanged()
     }
 }
 
-void GPS_Sensor::connectChannels()
+void GPS_Sensor::_connectChannels()
 {
     disconnectChannels();
 
@@ -66,12 +66,12 @@ void GPS_Sensor::connectChannels()
     }
 }
 
-void GPS_Sensor::disconnectChannels()
+void GPS_Sensor::_disconnectChannels()
 {
     _sendChannel.reset();
 }
 
-void GPS_Sensor::clearBodies()
+void GPS_Sensor::_clearBodies()
 {
     if(_world)
     {
@@ -85,7 +85,7 @@ void GPS_Sensor::clearBodies()
     _world = nullptr;
 }
 
-void GPS_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+void GPS_Sensor::_generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     clearBodies();
     _world = world;

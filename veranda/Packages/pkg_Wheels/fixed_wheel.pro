@@ -3,7 +3,7 @@ QT       += core
 TARGET = dummy_target
 TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being set
 
-INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include
+INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include /opt/ros/ardent/include
 
 SOURCES += \
     src/fixed_wheel.cpp \

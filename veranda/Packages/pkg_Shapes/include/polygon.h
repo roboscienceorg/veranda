@@ -240,7 +240,7 @@ protected:
      * \brief Gets all the properties specific to this polygon component
      * \return A mapping of all the properties by their identifiers
      */
-    QMap<QString, QSharedPointer<PropertyView>> _getProperties(){ return _properties; }
+    QMap<QString, QSharedPointer<PropertyView>> _getProperties()override{ return _properties; }
 
 public:
     /*!
@@ -250,14 +250,14 @@ public:
     Polygon(QObject* parent=nullptr);
 
     //! Cleans up all the triangles in the Polygon
-    ~Polygon();
+    virtual ~Polygon() override;
 
     /*!
      * \brief Constructs a new empty Polygon component
      * \param[in] newParent Parent QObject of the copy
      * \return A newly constructed Polygon component
      */
-    WorldObjectComponent *_clone(QObject* newParent=nullptr);
+    WorldObjectComponent *_clone(QObject* newParent=nullptr)override;
 
     /*!
      * \brief Create the physics body used by the component
@@ -267,14 +267,14 @@ public:
      * \param[in] oId object_id of the object the Polygon is part of
      * \param[in] anchor Anchor body the component should joint to
      */
-    void generateBodies(b2World* world, object_id oId, b2Body* anchor);
+    void _generateBodies(b2World* world, object_id oId, b2Body* anchor) override;
 
     //! Clears the Polygon from the Box2D world
-    void clearBodies();
+    void _clearBodies() override;
 
     /*!
      * \brief Getter for the IID of the plugin that creates Polygons
      * \return "org.roboscience.veranda.worldObjectComponent.defaults.polygon"
      */
-    QString getPluginName(){ return POLYGON_IID; }
+    QString getPluginName() override { return POLYGON_IID; }
 };

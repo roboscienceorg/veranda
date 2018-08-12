@@ -36,7 +36,7 @@ void Rectangle::_buildModels()
     shape_model->addShapes({rectangle});
 }
 
-void Rectangle::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+void Rectangle::_generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     clearBodies();
     _world = world;
@@ -78,7 +78,7 @@ void Rectangle::_makeFixtures()
     }
 }
 
-void Rectangle::clearBodies()
+void Rectangle::_clearBodies()
 {
     if(_world)
     {

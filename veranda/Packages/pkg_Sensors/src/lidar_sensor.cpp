@@ -60,7 +60,7 @@ WorldObjectComponent *Lidar_Sensor::_clone(QObject *newParent)
     return out;
 }
 
-void Lidar_Sensor::setROSNode(std::shared_ptr<rclcpp::Node> node)
+void Lidar_Sensor::_setROSNode(std::shared_ptr<rclcpp::Node> node)
 {
     _sendChannel.reset();
     _rosNode = node;
@@ -74,7 +74,7 @@ void Lidar_Sensor::_channelChanged()
     }
 }
 
-void Lidar_Sensor::connectChannels()
+void Lidar_Sensor::_connectChannels()
 {
     disconnectChannels();
 
@@ -89,12 +89,12 @@ void Lidar_Sensor::connectChannels()
     }
 }
 
-void Lidar_Sensor::disconnectChannels()
+void Lidar_Sensor::_disconnectChannels()
 {
     _sendChannel.reset();
 }
 
-void Lidar_Sensor::clearBodies()
+void Lidar_Sensor::_clearBodies()
 {
     if(_world)
     {
@@ -108,7 +108,7 @@ void Lidar_Sensor::clearBodies()
     _world = nullptr;
 }
 
-void Lidar_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+void Lidar_Sensor::_generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     clearBodies();
     _world = world;

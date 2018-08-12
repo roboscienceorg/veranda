@@ -58,12 +58,8 @@ class veranda_API WorldObject : public WorldObjectComponent
     QMap<QString, QSharedPointer<PropertyView>> _selfProperties;
 
 protected:
-    QMap<QString, QSharedPointer<PropertyView>> _getProperties()
+    QMap<QString, QSharedPointer<PropertyView>> _getProperties() override
     { return _properties; }
-
-protected slots:
-    void _worldTicked(const double t);
-    void _syncModels();
 
 public:
     /*!
@@ -76,9 +72,10 @@ public:
      * \param[in] parent QObject parent
      */
     WorldObject(QVector<WorldObjectComponent*> components, QString name = "object", QString type = "Component Group", QObject* parent = nullptr);
+    virtual ~WorldObject() override {}
 
     //Constructs copy of object
-    WorldObject* _clone(QObject* newParent=nullptr);
+    WorldObject* _clone(QObject* newParent=nullptr) override;
 
     /*!
      * \brief Getter for the children components
@@ -87,25 +84,15 @@ public:
     QVector<WorldObjectComponent*> getComponents()
     {return _components; }
 
-    bool usesChannels()
+    bool usesChannels() override
     { return _useChannels; }
 
     //Physics Interactions
-    void generateBodies(b2World* world, object_id oId, b2Body* anchorBody = nullptr);
+    void _generateBodies(b2World* world, object_id oId, b2Body* anchorBody = nullptr) override;
 
-    void clearBodies();
+    void _clearBodies() override;
 
-    //ROS Interactions
-    void setROSNode(std::shared_ptr<rclcpp::Node> node);
-
-    //WILL BE USED TO OUTPUT ADDITIONAL INFO
-    //void readJson(const QJsonObject &json);
-    //void writeJson(QJsonObject &json) const;
-
-    QString getPluginName() { return ""; }
+    QString getPluginName() override { return ""; }
 
     QMap<QString, QSharedPointer<PropertyView>> getSelfProperties(){ return _selfProperties; }
-public slots:
-    void connectChannels();
-    void disconnectChannels();
 };

@@ -16,6 +16,9 @@ msg/*Result.msg
 msg/_*.py
 *.autosave
 *.vscode*
+*.o
+*/moc_*
+*/ui_*
 
 # Auto-Generated Makefiles from Qt Creator
 *Makefile.*

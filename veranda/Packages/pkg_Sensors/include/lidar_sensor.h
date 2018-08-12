@@ -206,19 +206,20 @@ public:
      * \param[in] parent QObject parent
      */
     Lidar_Sensor(QObject* parent=nullptr);
+    virtual ~Lidar_Sensor() override {}
 
     /*!
      * \brief Creates a new Lidar Component
      * \param[in] newParent QObject parent of copy
      * \return A newly constructed Lidar component
      */
-    WorldObjectComponent *_clone(QObject *newParent);
+    WorldObjectComponent *_clone(QObject *newParent) override;
 
     /*!
      * \brief Getter for the lidar-specific properties
      * \return Mapping of lidar properties by identifiers
      */
-    QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
+    QMap<QString, QSharedPointer<PropertyView>> _getProperties() override{
         return _properties;
     }
 
@@ -226,7 +227,7 @@ public:
      * \brief Check if component uses ROS channels
      * \return true
      */
-    bool usesChannels(){
+    bool usesChannels() override{
         return true;
     }
 
@@ -236,22 +237,22 @@ public:
      * \param[in] oId object_id of the object the lidar is part of
      * \param[in] anchor Anchor body to joint self to
      */
-    void generateBodies(b2World *world, object_id oId, b2Body *anchor);
+    void _generateBodies(b2World *world, object_id oId, b2Body *anchor) override;
 
     //! Clears all bodies the lidar has in the Box2d world
-    void clearBodies();
+    void _clearBodies() override;
 
     /*!
      * \brief Sets the ROS node to publish messages with
      * \param[in] node The ROS node to use
      */
-    void setROSNode(std::shared_ptr<rclcpp::Node> node);
+    void _setROSNode(std::shared_ptr<rclcpp::Node> node) override;
 
     /*!
      * \brief Getter for the name of the plugin which provides this component
      * \return "org.roboscience.veranda.worldObjectComponent.defaults.lidar"
      */
-    QString getPluginName() { return LIDAR_IID; }
+    QString getPluginName() override { return LIDAR_IID; }
 
 private:
     /*!
@@ -277,11 +278,11 @@ private slots:
 
 public slots:
     //! Connects to all ROS topics
-    virtual void connectChannels();
+    virtual void _connectChannels() override;
 
     //! Disconnects all ROS topics
-    virtual void disconnectChannels();
+    virtual void _disconnectChannels() override;
 
     //! Updates the time since last message, and if it is time to publish a new message, the lidar ranges are recomputed
-    virtual void _worldTicked(const double dt);
+    virtual void _worldTicked(const double dt) override;
 };

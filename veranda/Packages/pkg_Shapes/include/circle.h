@@ -56,19 +56,20 @@ public:
      * \param[in] parent QObject parent of the component
      */
     Circle(QObject* parent=nullptr);
+    virtual ~Circle() override {}
 
     /*!
      * \brief Creates a copy of the circle
      * \param[in] newParent QObject parent of the clone
      * \return A newly constructed component which is a copy of this one
      */
-    WorldObjectComponent* _clone(QObject *newParent);
+    WorldObjectComponent* _clone(QObject *newParent) override;
 
     /*!
      * \brief Returns the properties specific to the circle component
      * \return The mapping of properties by id/name
      */
-    virtual QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
+    virtual QMap<QString, QSharedPointer<PropertyView>> _getProperties() override {
         return _properties;
     }
 
@@ -78,16 +79,16 @@ public:
      * \param[in] oId object_id of the WorldObject this component is part of
      * \param[in] anchor The anchor body to connect to
      */
-    void generateBodies(b2World *world, object_id oId, b2Body *anchor);
+    void _generateBodies(b2World *world, object_id oId, b2Body *anchor) override;
 
     //! Clears the physics bodies created by the last call to generateBodies()
-    void clearBodies();
+    void _clearBodies() override;
 
     /*!
      * \brief Getter for the name of the plugin that creates this component
      * \return "org.roboscience.veranda.worldObjectComponent.defaults.circle"
      */
-    QString getPluginName() { return CIRCLE_IID; }
+    QString getPluginName() override { return CIRCLE_IID; }
 
 private slots:
     //! Creates the circle models

@@ -52,7 +52,7 @@ WorldObjectComponent *Touch_Sensor::_clone(QObject *newParent)
     return out;
 }
 
-void Touch_Sensor::setROSNode(std::shared_ptr<rclcpp::Node> node)
+void Touch_Sensor::_setROSNode(std::shared_ptr<rclcpp::Node> node)
 {
     _sendChannel.reset();
     _rosNode = node;
@@ -66,7 +66,7 @@ void Touch_Sensor::_channelChanged()
     }
 }
 
-void Touch_Sensor::connectChannels()
+void Touch_Sensor::_connectChannels()
 {
     disconnectChannels();
 
@@ -81,12 +81,12 @@ void Touch_Sensor::connectChannels()
     }
 }
 
-void Touch_Sensor::disconnectChannels()
+void Touch_Sensor::_disconnectChannels()
 {
     _sendChannel.reset();
 }
 
-void Touch_Sensor::clearBodies()
+void Touch_Sensor::_clearBodies()
 {
     if(_world)
     {
@@ -100,7 +100,7 @@ void Touch_Sensor::clearBodies()
     _world = nullptr;
 }
 
-void Touch_Sensor::generateBodies(b2World *world, object_id oId, b2Body *anchor)
+void Touch_Sensor::_generateBodies(b2World *world, object_id oId, b2Body *anchor)
 {
     clearBodies();
     _world = world;

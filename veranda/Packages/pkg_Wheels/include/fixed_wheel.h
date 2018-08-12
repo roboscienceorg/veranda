@@ -96,19 +96,20 @@ public:
      * \param[in] parent QObject parent
      */
     Fixed_Wheel(QObject* parent=nullptr);
+    virtual ~Fixed_Wheel() override {}
 
     /*!
      * \brief Creates a copy wheel componenet
      * \param[in] newParent QObject parent of new component
      * \return A newly constructcted wheel component
      */
-    WorldObjectComponent* _clone(QObject *newParent);
+    WorldObjectComponent* _clone(QObject *newParent) override;
 
     /*!
      * \brief Getter for properties unique to Ackermann Steer
      * \return Mapping of the properties unique to Ackermann Steer
      */
-    virtual QMap<QString, QSharedPointer<PropertyView>> _getProperties(){
+    virtual QMap<QString, QSharedPointer<PropertyView>> _getProperties() override{
         return _properties;
     }
 
@@ -116,7 +117,7 @@ public:
      * \brief Getter to check if the component uses ROS channels
      * \return true
      */
-    bool usesChannels(){
+    bool usesChannels() override{
         return true;
     }
 
@@ -126,19 +127,19 @@ public:
      * \param[in] oId The id of the object this component is part of
      * \param[in] anchor The anchor body to joint to
      */
-    void generateBodies(b2World* world, object_id oId, b2Body* anchor);
+    void _generateBodies(b2World* world, object_id oId, b2Body* anchor) override;
 
     //! The component removes itself from the b2World it was last added to
-    void clearBodies();
+    void _clearBodies() override;
 
     //! Sets the ROS node to be used for subscriptions
-    void setROSNode(std::shared_ptr<rclcpp::Node> node);
+    void _setROSNode(std::shared_ptr<rclcpp::Node> node) override;
 
     /*!
      * \brief Returns the plugin IID
      * \return "org.roboscience.veranda.worldObjectComponent.defaults.fixedwheel"
      */
-    QString getPluginName() { return FIXEDWHEEL_IID; }
+    QString getPluginName() override { return FIXEDWHEEL_IID; }
 
 signals:
     /*!
@@ -165,11 +166,11 @@ private slots:
 
 public slots:
     //! Creates the ROS subscription channel
-    virtual void connectChannels();
+    virtual void _connectChannels() override;
 
     //! Destroys the ROS subscription channel
-    virtual void disconnectChannels();
+    virtual void _disconnectChannels() override;
 
     //! Applies slip/slide constraints each tick of the physics
-    virtual void _worldTicked(const double);
+    virtual void _worldTicked(const double) override;
 };

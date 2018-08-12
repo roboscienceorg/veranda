@@ -36,7 +36,7 @@ WorldObjectComponent* Polygon::_clone(QObject* newParent)
     return out;
 }
 
-void Polygon::generateBodies(b2World* world, object_id oId, b2Body* anchor)
+void Polygon::_generateBodies(b2World* world, object_id oId, b2Body* anchor)
 {
     clearBodies();
     _world = world;
@@ -64,7 +64,7 @@ void Polygon::makeFixtures()
     }
 }
 
-void Polygon::clearBodies()
+void Polygon::_clearBodies()
 {
     if(_world)
     {

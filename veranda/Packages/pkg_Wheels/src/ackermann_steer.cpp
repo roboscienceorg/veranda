@@ -52,7 +52,7 @@ Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent("Ackerm
     _buildModels();
 }
 
-void Ackermann_Steer::generateBodies(b2World* world, object_id oId, b2Body* anchor)
+void Ackermann_Steer::_generateBodies(b2World* world, object_id oId, b2Body* anchor)
 {
     clearBodies();
 
@@ -135,7 +135,7 @@ void Ackermann_Steer::_jointWheels()
     }
 }
 
-void Ackermann_Steer::clearBodies()
+void Ackermann_Steer::_clearBodies()
 {
     if(_world)
     {
@@ -218,7 +218,7 @@ WorldObjectComponent *Ackermann_Steer::_clone(QObject *newParent)
     return out;
 }
 
-void Ackermann_Steer::setROSNode(std::shared_ptr<rclcpp::Node> node)
+void Ackermann_Steer::_setROSNode(std::shared_ptr<rclcpp::Node> node)
 {
     _receiveChannel.reset();
     _rosNode = node;
@@ -232,7 +232,7 @@ void Ackermann_Steer::_refreshChannel()
     }
 }
 
-void Ackermann_Steer::connectChannels()
+void Ackermann_Steer::_connectChannels()
 {
     disconnectChannels();
 
@@ -253,7 +253,7 @@ void Ackermann_Steer::connectChannels()
     }
 }
 
-void Ackermann_Steer::disconnectChannels()
+void Ackermann_Steer::_disconnectChannels()
 {
     _receiveChannel.reset();
 }

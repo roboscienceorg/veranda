@@ -211,6 +211,35 @@ void WorldObjectComponent::unregisterModel(Model* mod)
     _models.removeAll(mod);
 }
 
+void WorldObjectComponent::registerChild(WorldObjectComponent* child)
+{
+    if(!_children.contains(child))
+    {
+        _children.insert(child);
+
+        //Connect child to our location; their current location is now where they stay relative to us
+        connect(this, &WorldObjectComponent::transformChanged, child, &WorldObjectComponent::setParentTransform);
+        child->setParentTransform(globalTransform, false);
+
+        //Register all child models as our own
+        for(Model* m : child->getModels())
+            registerModel(m);
+    }
+}
+
+void WorldObjectComponent::unregisterChild(WorldObjectComponent* child)
+{
+    if(_children.remove(child))
+    {
+        //Stop updating child location when we move
+        disconnect(this, &WorldObjectComponent::transformChanged, child, &WorldObjectComponent::setParentTransform);
+
+        //Unregister child models
+        for(Model* m : child->getModels())
+            unregisterModel(m);
+    }
+}
+
 void WorldObjectComponent::shiftComponent(const QTransform& tOldI, const QTransform& tNew)
 {
     QTransform tDiff = tOldI * tNew;
@@ -357,18 +386,14 @@ void WorldObjectComponent::setParentTransform(QTransform t, bool cascade)
 
 void WorldObjectComponent::worldTicked(const double t)
 {
+    for(WorldObjectComponent* c : _children)
+        c->worldTicked(t);
+
     _worldTicked(t);
 }
 
 void WorldObjectComponent::syncModels()
 {
-    //Nothing to do if no bodies are registered
-    if(!_bodies.size())
-    {
-        _syncModels();
-        return;
-    }
-
     //For every model tied to a body
     //update it's transform to that body's
     //global location
@@ -417,16 +442,53 @@ void WorldObjectComponent::syncModels()
         transformChanged(transform(globalPos, globalRadians), false);
     }
 
+    for(WorldObjectComponent* c : _children)
+        c->syncModels();
+
     _syncModels();
     updateProperties();
 }
 
-QMap<QString, QSharedPointer<PropertyView>> WorldObjectComponent::getProperties()
+QMap<QString, QSharedPointer<PropertyView>> WorldObjectComponent::getProperties(bool includeChildren)
 {
     QMap<QString, QSharedPointer<PropertyView>> out = _getProperties();
 
     for(auto iter = _properties.begin(); iter != _properties.end(); iter++)
         out[iter.key()] = QSharedPointer<PropertyView>(new PropertyView(iter.value()));
+
+    if(includeChildren)
+    {
+        QMap<QString, int> groupcounts;
+
+        //Quick tally of if any components use the same group name
+        for(WorldObjectComponent* c : _children)
+        {
+            groupcounts[c->getName()]++;
+        }
+
+        QSet<QString> multiples;
+        for(auto iter = groupcounts.begin(); iter != groupcounts.end(); iter++)
+            if(iter.value() > 1) multiples.insert(iter.key());
+
+        //Initialize all aggregates
+        for(WorldObjectComponent* c : _children)
+        {
+            QMap<QString, QSharedPointer<PropertyView>> props = c->getProperties();
+
+            //If more than 1 child uses group, append a number
+            //to the group
+            QString group = c->getName();
+
+            if(multiples.contains(group))
+                group += QString::number(groupcounts[group]--);
+
+            //Add all properties to property map
+            for(auto iter = props.begin(); iter != props.end(); iter++)
+            {
+                out[group + "/" + iter.key()] = iter.value();
+            }
+        }
+    }
 
     return out;
 }

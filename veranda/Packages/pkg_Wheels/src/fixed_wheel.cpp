@@ -39,7 +39,7 @@ Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent("Fixed Wheel", 
     _buildModels();
 }
 
-void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
+void Fixed_Wheel::_generateBodies(b2World* world, object_id oId, b2Body* anchor)
 {
     clearBodies();
     _world = world;
@@ -63,7 +63,7 @@ void Fixed_Wheel::generateBodies(b2World* world, object_id oId, b2Body* anchor)
     _attachWheelFixture();
 }
 
-void Fixed_Wheel::clearBodies()
+void Fixed_Wheel::_clearBodies()
 {
     if(_world)
     {
@@ -111,7 +111,7 @@ WorldObjectComponent *Fixed_Wheel::_clone(QObject *newParent)
     return out;
 }
 
-void Fixed_Wheel::setROSNode(std::shared_ptr<rclcpp::Node> node)
+void Fixed_Wheel::_setROSNode(std::shared_ptr<rclcpp::Node> node)
 {
     _receiveChannel.reset();
     _rosNode = node;
@@ -125,7 +125,7 @@ void Fixed_Wheel::_refreshChannel(QVariant)
     }
 }
 
-void Fixed_Wheel::connectChannels()
+void Fixed_Wheel::_connectChannels()
 {
     //qDebug() << "Connecting Fixed Wheel Channels";
     disconnectChannels();
@@ -152,7 +152,7 @@ void Fixed_Wheel::connectChannels()
     //qDebug() << "";
 }
 
-void Fixed_Wheel::disconnectChannels()
+void Fixed_Wheel::_disconnectChannels()
 {
     //qDebug() << "Channel: " << _inputChannel.get().toString() << " deleted";
     _receiveChannel.reset();

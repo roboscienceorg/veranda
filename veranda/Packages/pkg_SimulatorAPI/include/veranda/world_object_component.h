@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QTransform>
 #include <QSharedPointer>
+#include <QSet>
 
 #include <memory>
 
@@ -94,6 +95,9 @@ class veranda_API WorldObjectComponent : public QObject
     //! List of registered models
     QVector<Model*> _models;
 
+    //! List of children components
+    QSet<WorldObjectComponent*> _children;
+
     //! List of registered bodies and the models tied to them
     QMap<b2Body*, QVector<Model*>> _bodies;
 
@@ -164,6 +168,9 @@ protected:
      */
     void unregisterModel(Model* mod);
 
+    void registerChild(WorldObjectComponent* child);
+    void unregisterChild(WorldObjectComponent* child);
+
     /*!
      * \brief Gets the properties specific to inheriting types
      * \return A string mapping of PropertyView pointers
@@ -204,6 +211,12 @@ protected:
      */
     virtual WorldObjectComponent* _clone(QObject* newParent=nullptr) = 0;
 
+    virtual void _generateBodies(b2World* world, object_id oId, b2Body* anchor) {}
+    virtual void _clearBodies() {}
+    virtual void _connectChannels() {}
+    virtual void _disconnectChannels() {}
+    virtual void _setROSNode(std::shared_ptr<rclcpp::Node> node) {}
+
 public:
     /*!
      * \brief Constructs a component with a default name and a type
@@ -216,6 +229,7 @@ public:
      * \param[in] parent QObject parent
      */
     WorldObjectComponent(QString defaultName = "", QString type = "", QObject* parent=nullptr);
+    virtual ~WorldObjectComponent(){}
 
     /*!
      * \brief Creates a complete copy of the WorldObjectComponent
@@ -245,9 +259,10 @@ public:
      * so that if the UI does not let go of property views right away, it
      * is not left with dangling pointers.
      *
+     * \param includeChildren Indicates that the returned property list should contain properties of all nested components
      * \return A map of property observers for the component
      */
-    QMap<QString, QSharedPointer<PropertyView>> getProperties();
+    QMap<QString, QSharedPointer<PropertyView>> getProperties(bool includeChildren = true);
 
     /*!
      * \brief Getter for the current name of the component
@@ -298,12 +313,20 @@ public:
      *
      * \param[in] node The ROS 2 Node to use (Or nullptr)
      */
-    virtual void setROSNode(std::shared_ptr<rclcpp::Node> node){}
+    void setROSNode(std::shared_ptr<rclcpp::Node> node)
+    {
+        for(WorldObjectComponent* c : _children)
+            c->setROSNode(node);
+
+        _setROSNode(node);
+    }
 
     /*!
      * \brief Getter to check if the component needs ROS 2 channels
      * If the component returns false, the application may optimize by removing
      * calls to connectChannels() and disconnectChannels() for this component
+     *
+     * DEPRACATED; this optimization is too pointless to try to do
      *
      * \return True it the component will ever want to publish or subscribe ROS 2 messages
      */
@@ -337,7 +360,13 @@ public:
      * \param[in] oId The object id this component is part of
      * \param[in] anchor The body that this component should joint itself to
      */
-    virtual void generateBodies(b2World* world, object_id oId, b2Body* anchor){}
+    void generateBodies(b2World* world, object_id oId, b2Body* anchor = nullptr)
+    {
+        _generateBodies(world, oId, anchor);
+
+        for(WorldObjectComponent* c : _children)
+            c->generateBodies(world, oId, _mainBody);
+    }
 
     /*!
      * \brief Signals the component to destroy all bodies it has created
@@ -347,7 +376,13 @@ public:
      * pointers. After this call completes, the component should treat the b2World*
      * as an invalid reference.
      */
-    virtual void clearBodies(){}
+    void clearBodies()
+    {
+        for(WorldObjectComponent* c : _children)
+            c->clearBodies();
+
+        _clearBodies();
+    }
 
     /*!
      * \brief Gets the name of the plugin that generated the component
@@ -369,14 +404,25 @@ public slots:
      * start publishing on and listening to ROS 2 channels; if
      * it uses them
      */
-    virtual void connectChannels(){}
+    void connectChannels()
+    {
+        _connectChannels();
+
+        for(WorldObjectComponent* c : _children)
+            c->connectChannels();
+    }
 
     /*!
      * Slot triggered when the component should
      * stop publishing on and listening to ROS 2 channels; if
      * it uses them
      */
-    virtual void disconnectChannels(){}
+    void disconnectChannels()
+    {
+        for(WorldObjectComponent* c : _children)
+            c->disconnectChannels();
+        _disconnectChannels();
+    }
 
     /*!
      * \brief Slot to update the parent WorldObjectComponent when physics ticks
