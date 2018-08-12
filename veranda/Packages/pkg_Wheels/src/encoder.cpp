@@ -35,7 +35,7 @@ double Encoder::_calculateAngularVelocity(const b2Body* body, const double& radi
     return angularVelocity;
 }
 
-void Encoder::setROSNode(std::shared_ptr<rclcpp::Node> node)
+void Encoder::_setROSNode(std::shared_ptr<rclcpp::Node> node)
 {
     _sendChannel.reset();
     _rosNode = node;
@@ -49,7 +49,7 @@ void Encoder::_refreshChannel(QVariant)
     }
 }
 
-void Encoder::connectChannels()
+void Encoder::_connectChannels()
 {
     disconnectChannels();
 
@@ -64,7 +64,7 @@ void Encoder::connectChannels()
     }
 }
 
-void Encoder::disconnectChannels()
+void Encoder::_disconnectChannels()
 {
     _sendChannel.reset();
 }
@@ -79,7 +79,10 @@ void Encoder::_worldTicked(const double dt)
         {
             _lastPublish = 0;
 
-            _sendMessage->data = static_cast<float>(_calculateAngularVelocity(_wheelBody, _wheelRadius));
+            double angularActual = _calculateAngularVelocity(_wheelBody, _wheelRadius);
+            double angularNoisy = angularActual + noise_filter.apply();
+
+            _sendMessage->data = static_cast<float>(angularNoisy);
 
             _sendChannel->publish(_sendMessage);
         }

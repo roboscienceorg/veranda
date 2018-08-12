@@ -63,15 +63,17 @@ class Encoder : public WorldObjectComponent
 
 protected:
     WorldObjectComponent* _clone(QObject* parent) override;
-    void setROSNode(std::shared_ptr<rclcpp::Node> node) override;
-    void connectChannels() override;
-    void disconnectChannels() override;
+    void _setROSNode(std::shared_ptr<rclcpp::Node> node) override;
+    void _connectChannels() override;
+    void _disconnectChannels() override;
     void _worldTicked(double) override;
+    QMap<QString, QSharedPointer<PropertyView>> _getProperties() override
+    { return _properties; }
     QString getPluginName() override { return ""; }
 
 public:
-    Encoder(QObject* parent);
-    ~Encoder() override {}
+    Encoder(QObject* parent = nullptr);
+    virtual ~Encoder() override {}
 
     void setWheel(b2Body* wheelBody, double radius);
 };

@@ -2,9 +2,12 @@
 #include "basic_wheel.h"
 
 #include <QDebug>
+#include <QSharedPointer>
 #include <cmath>
 
-Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent("Fixed Wheel", "Wheels", parent)
+Fixed_Wheel::Fixed_Wheel(QObject *parent) :
+    WorldObjectComponent("Fixed Wheel", "Wheels", parent),
+    drive_filter(QSharedPointer<PropertyView>(new PropertyView(&noise_mu)), QSharedPointer<PropertyView>(new PropertyView(&noise_sigma)), 1)
 {
     qRegisterMetaType<std_msgs::msg::Float32::SharedPtr>("std_msgs::msg::Float32::SharedPtr");
 
@@ -35,6 +38,8 @@ Fixed_Wheel::Fixed_Wheel(QObject *parent) : WorldObjectComponent("Fixed Wheel", 
 
     _wheelModel = new Model({}, {}, this);
     registerModel(_wheelModel);
+
+    registerChild(&wheelEncoder);
 
     _buildModels();
 }
@@ -67,6 +72,8 @@ void Fixed_Wheel::_clearBodies()
 {
     if(_world)
     {
+        wheelEncoder.setWheel(nullptr, 0);
+
         _world->DestroyJoint(_weldJoint);
         _world->DestroyBody(_wheelBody);
         unregisterBody(_wheelBody);
@@ -82,6 +89,8 @@ void Fixed_Wheel::_attachWheelFixture()
     //Can only add fixture if body defined
     if(_wheelBody)
     {
+        wheelEncoder.setWheel(_wheelBody, _radius.get().toDouble());
+
         //If old fixture, remove it
         if(_wheelFix)
         {
@@ -177,11 +186,11 @@ void Fixed_Wheel::_worldTicked(const double)
     if(_wheelBody)
     {
         Basic_Wheel::applyNoSlideConstraint(_wheelBody, _radius.get().toDouble());
-        Basic_Wheel::applyNoSlipConstraint(_wheelBody, _radius.get().toDouble(), _targetAngularVelocity);
+        Basic_Wheel::applyNoSlipConstraint(_wheelBody, _radius.get().toDouble(), drive_filter.apply() + _targetAngularVelocity);
     }
 }
 
 void Fixed_Wheel::_processMessage(const std_msgs::msg::Float32::SharedPtr data)
 {
-    _targetAngularVelocity = data->data;
+    _targetAngularVelocity = static_cast<double>(data->data);
 }

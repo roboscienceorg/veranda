@@ -14,6 +14,8 @@
 
 #include <memory>
 
+#include <veranda/filter.h>
+#include "encoder.h"
 #include "defines.h"
 
 /*!
@@ -30,6 +32,8 @@ class Fixed_Wheel : public WorldObjectComponent
 
     //! Reference to ROS node for process
     std::shared_ptr<rclcpp::Node> _rosNode;
+
+    Encoder wheelEncoder;
 
     //! The ROS Subscriptiong channel for steering angles
     rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr _receiveChannel;
@@ -56,6 +60,16 @@ class Fixed_Wheel : public WorldObjectComponent
     Property _density = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Density of the wheel"),
                                  QVariant(1.0), &Property::abs_double_validator);
 
+    //! Property: Noise is control (sigma)
+    Property noise_sigma = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Noise in control (sigma)"),
+                                QVariant(0.0), &Property::abs_double_validator);
+
+    //! Property: Noise in control (mu)
+    Property noise_mu = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Noise in control (mu)"),
+                                QVariant(0.0), &Property::double_validator);
+
+    NormalFilter<> drive_filter;
+
  #define pview(a) QSharedPointer<PropertyView>::create(a)
     //! Mapping of ids to properties for the component
     QMap<QString, QSharedPointer<PropertyView>> _properties{
@@ -63,7 +77,9 @@ class Fixed_Wheel : public WorldObjectComponent
         {"wheel_radius", pview(&_radius)},
         {"wheel_width", pview(&_width)},
         {"is_driven", pview(&_driven)},
-        {"density", pview(&_density)}
+        {"density", pview(&_density)},
+        {"control_noise/mu", pview(&noise_mu)},
+        {"control_noise/sigma", pview(&noise_sigma)}
     };
 #undef pview
     //! Record of the object id this component is part of

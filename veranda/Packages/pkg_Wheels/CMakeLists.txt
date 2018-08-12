@@ -77,8 +77,8 @@ if(NOT ${CMAKE_VERSION} VERSION_LESS "3.10")
     cmake_policy(SET CMP0071 NEW)
 endif()
 
-set(headers include/fixed_wheel.h include/fixed_wheel_plugin.h)
-set(sources src/fixed_wheel.cpp src/fixed_wheel_plugin.cpp)
+set(headers include/fixed_wheel.h include/fixed_wheel_plugin.h include/encoder.h)
+set(sources src/fixed_wheel.cpp src/fixed_wheel_plugin.cpp src/encoder.cpp)
 make_plugin(fixed_wheel_plugin "${headers}" "${sources}")
 
 set(headers include/ackermann_steer.h include/ackermann_steer_plugin.h)

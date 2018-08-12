@@ -29,6 +29,38 @@
             "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.fixedwheel",
             "properties": [
                 {
+                    "key": "Encoder/GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/Name",
+                    "value": "Encoder"
+                },
+                {
+                    "key": "Encoder/channels/angular_velocity",
+                    "value": "robot0/left_encoder"
+                },
+                {
+                    "key": "Encoder/channels/angular_velocity/publish_rate",
+                    "value": 10
+                },
+                {
+                    "key": "Encoder/noise/mu",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/noise/sigma",
+                    "value": 0
+                },
+                {
                     "key": "GlobalPos/Theta",
                     "value": 90
                 },
@@ -69,6 +101,38 @@
         {
             "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.fixedwheel",
             "properties": [
+                {
+                    "key": "Encoder/GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/Name",
+                    "value": "Encoder"
+                },
+                {
+                    "key": "Encoder/channels/angular_velocity",
+                    "value": "robot0/right_encoder"
+                },
+                {
+                    "key": "Encoder/channels/angular_velocity/publish_rate",
+                    "value": 10
+                },
+                {
+                    "key": "Encoder/noise/mu",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/noise/sigma",
+                    "value": 0
+                },
                 {
                     "key": "GlobalPos/Theta",
                     "value": 90
