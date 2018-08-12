@@ -7,8 +7,9 @@
 
 #include <random>
 #include <iostream>
+#include "dllapi.h"
 
-class Bindable : public QObject
+class veranda_API Bindable : public QObject
 {
     Q_OBJECT
 
@@ -45,9 +46,9 @@ class NormalFilter : public Filter<double>
 public:
     NormalFilter(QSharedPointer<reng> engine = QSharedPointer<reng>())
     {
-        _sigma = 1;
-        _mu = 0;
-        _nonNanChance = 1;
+        _sigma = 1.0;
+        _mu = 0.0;
+        _nonNanChance = 1.0;
 
         _engine = engine;
 
@@ -98,4 +99,4 @@ public:
 };
 
 template<class reng>
-std::uniform_real_distribution<> NormalFilter<reng>::_uniDist{0.0, 1.0};
+std::uniform_real_distribution<> NormalFilter<reng>::_uniDist = std::uniform_real_distribution<>(0.0, 1.0);

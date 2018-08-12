@@ -160,7 +160,7 @@ class GPS_Sensor : public WorldObjectComponent
         {"noise/y/sigma", pview(&y_noise_sigma)},
         {"noise/y/mu", pview(&y_noise_mu)},
         {"noise/theta/sigma", pview(&t_noise_sigma)},
-        {"noise/theta/mu", pview(&t_noise_mu)},
+        {"noise/theta/mu", pview(&t_noise_mu)}
     };
 #undef pview
 
