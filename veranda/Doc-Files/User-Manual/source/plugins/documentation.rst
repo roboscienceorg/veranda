@@ -127,6 +127,8 @@ wheel\_radius            Double           Radius of the wheel in meters
 wheel\_width             Double           Width of the wheel in meters
 is_driven                Bool             Whether or not the wheel should produce driving force based on the input speed
 density                  Double           Density of the wheel. Can be tuned to give more or less mass of the object better
+drive_noise/mu           Double           Mean of noise applied to commanded velocity
+drive_noise/sigma        Double           Std. Dev. of noise applied to commanded velocity
 ======================   ==============   ========================================================
 
 
@@ -202,17 +204,17 @@ publish\_rate            double           Rate of publishing (hz)\\ \hline
 probabilities/x          double           Probability of publishing x coordinate [0.0, 1.0]\\ \hline
 probabilities/y          double           Probability of publishing y coordinate [0.0, 1.0]\\ \hline
 probabilities/theta      double           Probability of publishing theta [0.0, 1.0]\\ \hline
-drift/x/sigma            double           Variance of drift in x direction per second\\ \hline
+drift/x/sigma            double           Std. Dev. of drift in x direction per second\\ \hline
 drift/x/mu               double           Mean of drift in x direction per second\\ \hline
-drift/y/sigma            double           Variance of drift in y direction per second\\ \hline
+drift/y/sigma            double           Std. Dev. of drift in y direction per second\\ \hline
 drift/y/mu               double           Mean of drift in y direction per second\\ \hline
-drift/theta/sigma        double           Variance of drift in theta direction per second\\ \hline
+drift/theta/sigma        double           Std. Dev. of drift in theta direction per second\\ \hline
 drift/theta/mu           double           Mean of drift in theta direction per second\\ \hline
-noise/x/sigma            double           Variance of noise in x direction\\ \hline
+noise/x/sigma            double           Std. Dev. of noise in x direction\\ \hline
 noise/x/mu               double           Mean of noise in x direction\\ \hline
-noise/y/sigma            double           Variance of noise in y direction\\ \hline
+noise/y/sigma            double           Std. Dev. of noise in y direction\\ \hline
 noise/y/mu               double           Mean of noise in y direction\\ \hline
-noise/theta/sigma        double           Variance of noise in theta\\ \hline
+noise/theta/sigma        double           Std. Dev. of noise in theta\\ \hline
 noise/theta/mu           double           Mean of noise in theta
 ======================   ==============   ========================================================
 
@@ -318,6 +320,39 @@ Design Details
     #. Given a range of x degrees, the lidar will report beams from the angle of -x/2 to x/2, relative to the lidar body.	
     #. Any beams which do not detect an obstacle will report a distance of infinity, as defined by the implementation of :code:`std::numeric_limits<float32>::infinity()`.
 
+Wheel Encoders
+^^^^^^^^^^^^^^
+
+Wheel Encoders are sensors that are added as a part of the fixed-wheel plugin.
+They cannot be used on any other type of wheel, but for all other purposes, they
+behave just like any other component. Wheel encoders will publish the angular velocity
+of the wheel they are attached to on a regular timer.
+
+:ref:`Properties Table <tab-encoder_properties>`
+
+:ref:`ROS Channels <tab-encoder_channels>`
+
+.. _tab-encoder_properties:
+
+========================================   ==============   ========================================================
+Property Name                              Data Type	    Description
+========================================   ==============   ========================================================
+channels/angular\_velocity                 String           ROS topic to output sensor messages
+channels/angular\_velocity/publish\_rate   Double           Rate (hz) that the sensor should publish at
+noise/mu                                   Double           Mean of noise in sensor readings
+noise/sigma                                Double           Std. Dev. of noise in sensor readings
+========================================   ==============   ========================================================
+
+
+.. _tab-encoder_channels:
+
+==========================   ========================   =========   ========================================================
+ROS Topic                    Message Type               In/Out      Description
+==========================   ========================   =========   ========================================================
+channels/angular\_velocity   std_msgs::msg::Float32     Out         Floating point value of the wheel's angular velocity in rad/s
+==========================   ========================   =========   ========================================================
+
+
 Image Loading Plugin
 --------------------
 
@@ -336,7 +371,7 @@ presented with a prompt in which they can specify the following:
 If you load up an image and there are pieces missing or shaped incorrectly, try loading it again with different settings and you might have better luck.
 
 Design Details 
-""""""""""""""
+^^^^^^^^^^^^^^
 
     #. The triangulation and simplification necessary to load polygons into the physics engine is not done in the plugin, but in the polygon component type. Similarly, scaling is also done in the polygon component type.
 	
