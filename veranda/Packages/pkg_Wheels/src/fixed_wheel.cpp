@@ -186,7 +186,12 @@ void Fixed_Wheel::_worldTicked(const double)
     if(_wheelBody)
     {
         Basic_Wheel::applyNoSlideConstraint(_wheelBody, _radius.get().toDouble());
-        Basic_Wheel::applyNoSlipConstraint(_wheelBody, _radius.get().toDouble(), drive_filter.apply() + _targetAngularVelocity);
+
+        // If the wheel is driven, we apply a constraint that it cannot
+        // 'roll' faster or slower than the target speed; otherwise, it's just
+        // free spinning, so we don't care how fast it moves
+        if(_driven.get().toBool())
+            Basic_Wheel::applyNoSlipConstraint(_wheelBody, _radius.get().toDouble(), drive_filter.apply() + _targetAngularVelocity);
     }
 }
 
