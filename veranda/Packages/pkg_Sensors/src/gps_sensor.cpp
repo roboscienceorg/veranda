@@ -5,7 +5,17 @@
 #include <cmath>
 #include <limits>
 
-GPS_Sensor::GPS_Sensor(QObject *parent) : WorldObjectComponent("GPS", "Sensors", parent)
+GPS_Sensor::GPS_Sensor(QObject *parent) :
+    WorldObjectComponent("GPS", "Sensors", parent),
+    _reng(new reng_type()),
+#define pview(a) QSharedPointer<PropertyView>(new PropertyView(a))
+    t_drift_filter(pview(&t_drift_mu), pview(&t_drift_sigma), 1, _reng),
+    t_noise_filter(pview(&t_noise_mu), pview(&t_noise_sigma), pview(&t_chance), _reng),
+    x_drift_filter(pview(&x_drift_mu), pview(&x_drift_sigma), 1, _reng),
+    x_noise_filter(pview(&x_noise_mu), pview(&x_noise_sigma), pview(&x_chance), _reng),
+    y_drift_filter(pview(&y_drift_mu), pview(&y_drift_sigma), 1, _reng),
+    y_noise_filter(pview(&y_noise_mu), pview(&y_noise_sigma), pview(&y_chance), _reng)
+#undef pview
 {
     //Update channel out
     connect(&output_channel, &Property::valueSet, this, &GPS_Sensor::_channelChanged);
@@ -51,10 +61,7 @@ void GPS_Sensor::connectChannels()
 
         if(_outputChannel.size())
         {
-            rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
-            custom_qos_profile.depth = 7;
-
-            _sendChannel = _rosNode->create_publisher<geometry_msgs::msg::Pose2D>(_outputChannel.toStdString(), custom_qos_profile);
+            _sendChannel = _rosNode->create_publisher<geometry_msgs::msg::Pose2D>(_outputChannel.toStdString(), 7);
         }
     }
 }
@@ -161,17 +168,12 @@ void GPS_Sensor::_buildModels()
     sensor_model->addShapes({line});
 }
 
-double GPS_Sensor::observe(const double& actual, const double& chance,
-               double &drift, const double& drift_sigma, const double& drift_mu, const double &drift_scale,
-               const double& noise_sigma, const double& noise_mu)
+double GPS_Sensor::observe(const double &actual, double& accumulatedDrift, const double &drift_scale, const NormalFilter<reng_type> &drift, const NormalFilter<reng_type> &noise)
 {
-    double newDrift = std::normal_distribution<>(drift_mu, drift_sigma)(_reng) * drift_scale;
-    drift += newDrift;
+    double newDrift = drift.apply(drift_scale);
+    accumulatedDrift += newDrift;
 
-    double beNan = _uniDist(_reng);
-    if(beNan >= chance) return std::numeric_limits<double>::quiet_NaN();
-
-    return actual + drift + std::normal_distribution<>(noise_mu, noise_sigma)(_reng);
+    return actual + accumulatedDrift + noise.apply();
 }
 
 void GPS_Sensor::_worldTicked(const double dt)
@@ -185,17 +187,14 @@ void GPS_Sensor::_worldTicked(const double dt)
         {
             //Observe current location, updating drift and calculating
             //values to be published
-            data->x = observe(sensorBody->GetPosition().x, x_chance.get().toDouble(),
-                              _drift_x, x_drift_sigma.get().toDouble(), x_drift_mu.get().toDouble(), _timeSincePublish,
-                              x_noise_sigma.get().toDouble(), x_noise_mu.get().toDouble());
+            data->x = observe(sensorBody->GetPosition().x, _drift_x, _timeSincePublish,
+                              x_drift_filter, x_noise_filter);
 
-            data->y = observe(sensorBody->GetPosition().y, y_chance.get().toDouble(),
-                              _drift_y, y_drift_sigma.get().toDouble(), y_drift_mu.get().toDouble(), _timeSincePublish,
-                              y_noise_sigma.get().toDouble(), y_noise_mu.get().toDouble());
+            data->y = observe(sensorBody->GetPosition().y, _drift_y, _timeSincePublish,
+                              y_drift_filter, y_noise_filter);
 
-            data->theta = observe(sensorBody->GetAngle(), t_chance.get().toDouble(),
-                              _drift_t, t_drift_sigma.get().toDouble(), t_drift_mu.get().toDouble(), _timeSincePublish,
-                              t_noise_sigma.get().toDouble(), t_noise_mu.get().toDouble());
+            data->theta = observe(sensorBody->GetAngle(), _drift_t, _timeSincePublish,
+                                  t_drift_filter, t_noise_filter);
 
             if(_sendChannel)
             {

@@ -136,7 +136,6 @@ void Fixed_Wheel::connectChannels()
     {
         QString inputChannel = _inputChannel.get().toString();
 
-        //qDebug() << "Channel: " << inputChannel;
         if(inputChannel.size())
         {
             auto callback =
@@ -145,8 +144,9 @@ void Fixed_Wheel::connectChannels()
                 _receiveMessage(msg);
             };
 
-            //qDebug() << "Create callback";
             _receiveChannel = _rosNode->create_subscription<std_msgs::msg::Float32>(inputChannel.toStdString(), callback);
+
+            //qDebug() << "Channel: " << inputChannel << " created: " << _receiveChannel.get();
         }
     }
     //qDebug() << "";
@@ -154,6 +154,7 @@ void Fixed_Wheel::connectChannels()
 
 void Fixed_Wheel::disconnectChannels()
 {
+    //qDebug() << "Channel: " << _inputChannel.get().toString() << " deleted";
     _receiveChannel.reset();
 }
 

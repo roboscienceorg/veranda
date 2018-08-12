@@ -65,10 +65,7 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     _timestampMsg->layout.dim[0].stride = 2;
 
     //Create channel to publish timestamps on
-    rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
-    custom_qos_profile.depth = 7;
-
-    _timestampChannel = _node->create_publisher<std_msgs::msg::Float64MultiArray>("veranda/timestamp", custom_qos_profile);
+    _timestampChannel = _node->create_publisher<std_msgs::msg::Float64MultiArray>("veranda/timestamp", 10);
 
     //Publish on every physics tick
     connect(_physicsEngine, &Simulator_Physics_If::physicsTicked,
@@ -231,10 +228,7 @@ SimulatorCore::joymsg SimulatorCore::initJoystick(QString channel)
     {
         if(_node)
         {
-            rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
-            custom_qos_profile.depth = 7;
-
-            joy._channel = _node->create_publisher<joymsg::msgType>(channel.toStdString(), custom_qos_profile);
+            joy._channel = _node->create_publisher<joymsg::msgType>(channel.toStdString(), 7);
         }
     }
 

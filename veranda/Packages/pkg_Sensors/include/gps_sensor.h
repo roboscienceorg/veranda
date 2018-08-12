@@ -4,6 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/pose2_d.hpp"
 
+#include <veranda/filter.h>
 #include <veranda/world_object_component.h>
 #include <Box2D/Box2D.h>
 
@@ -33,6 +34,11 @@
 class GPS_Sensor : public WorldObjectComponent
 {
     Q_OBJECT
+
+    typedef std::mt19937_64 reng_type;
+
+    //! Random number engine
+    QSharedPointer<reng_type> _reng;
 
     //! Size of the gps body when drawn on screen
     constexpr static double SHAPE_RADIUS = 0.5;
@@ -117,8 +123,26 @@ class GPS_Sensor : public WorldObjectComponent
     Property t_noise_mu = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE, "Noise in t readings (mu)"),
                                 QVariant(0.0), &Property::double_validator);
 
+    //! Filter for theta drift
+    NormalFilter<reng_type> t_drift_filter;
+
+    //! Filter for theta noise
+    NormalFilter<reng_type> t_noise_filter;
+
+    //! Filter for x drift
+    NormalFilter<reng_type> x_drift_filter;
+
+    //! Filter for x noise
+    NormalFilter<reng_type> x_noise_filter;
+
+    //! Filter for y drift
+    NormalFilter<reng_type> y_drift_filter;
+
+    //! Filter for y noise
+    NormalFilter<reng_type> y_noise_filter;
+
 #define pview(a) QSharedPointer<PropertyView>(new PropertyView(a))
-    //! Mapping of lidar propertys by their identifiers
+    //! Mapping of gps propertys by their identifiers
     QMap<QString, QSharedPointer<PropertyView>> _properties{
         {"channels/output_pose", pview(&output_channel)},
         {"publish_rate", pview(&pub_rate)},
@@ -170,12 +194,6 @@ class GPS_Sensor : public WorldObjectComponent
     //! Accumulated drift in theta
     double _drift_t;
 
-    //! Random number engine
-    std::mt19937_64 _reng;
-
-    //! Distribution for uniform probabilities
-    std::uniform_real_distribution<> _uniDist = std::uniform_real_distribution<>(0.0, 1.0);
-
     /*!
      * \brief Augments a value using the noise, drift, and likelihood properties this object can apply.
      * Takes a ground-truth value and
@@ -186,18 +204,14 @@ class GPS_Sensor : public WorldObjectComponent
      * Drift is always calculated, regardless of if the output is nan
      *
      * \param[in] actual Ground truth value
-     * \param[in] chance Probability of the value not becoming nan
-     * \param[in, out] drift Total accumulated drift
-     * \param[in] drift_sigma Sigma for normal distribution of drift
-     * \param[in] drift_mu Mu for normal distribution of drift
-     * \param[in] drift_scale Scaling factor for drift added
-     * \param[in] noise_sigma Sigma for normal distribution of noise
-     * \param[in] noise_mu Mu for normal distribution of noise
+     * \param[in, out] accumulatedDrift Total accumulated drift
+     * \param[in] drift Normal Filter for generating drift
+     * \param[in] drift_scale Scaling factor for drift over time
+     * \param[in] noise Normal Filter for generating noise
      * \return The value resulting with noise and drift taken into account
      */
-    double observe(const double& actual, const double& chance,
-                   double &drift, const double& drift_sigma, const double& drift_mu, const double& drift_scale,
-                   const double& noise_sigma, const double& noise_mu);
+    double observe(const double& actual, double &accumulatedDrift, const double &drift_scale,
+                   const NormalFilter<reng_type> &drift, const NormalFilter<reng_type> &noise);
 
 public:
     /*!

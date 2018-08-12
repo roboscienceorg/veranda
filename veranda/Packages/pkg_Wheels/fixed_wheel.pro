@@ -7,13 +7,15 @@ INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include
 
 SOURCES += \
     src/fixed_wheel.cpp \
-    src/fixed_wheel_plugin.cpp
+    src/fixed_wheel_plugin.cpp \
+    src/encoder.cpp
 
 HEADERS += \
     include/fixed_wheel.h \
     include/fixed_wheel_plugin.h\
     include/basic_wheel.h \
-    include/defines.h
+    include/defines.h \
+    include/encoder.h
 
 DISTFILES += \
     CMakeLists.txt \

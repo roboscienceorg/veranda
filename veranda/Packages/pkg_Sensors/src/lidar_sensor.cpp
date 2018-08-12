@@ -84,10 +84,7 @@ void Lidar_Sensor::connectChannels()
 
         if(_outputChannel.size())
         {
-            rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
-            custom_qos_profile.depth = 7;
-
-            _sendChannel = _rosNode->create_publisher<sensor_msgs::msg::LaserScan>(_outputChannel.toStdString(), custom_qos_profile);
+            _sendChannel = _rosNode->create_publisher<sensor_msgs::msg::LaserScan>(_outputChannel.toStdString(), 7);
         }
     }
 }

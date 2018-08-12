@@ -16,7 +16,8 @@ SOURCES += \
     src/world_object.cpp \
     src/world_object_component.cpp \
     tests/test_model.cpp \
-    tests/test_property.cpp
+    tests/test_property.cpp \
+    src/filter.cpp
 
 HEADERS += \
     include/veranda/world_object.h \
@@ -38,7 +39,8 @@ HEADERS += \
     include/veranda/property.h \
     include/veranda/world_object.h \
     include/veranda/world_object_component.h \
-    include/veranda/world_object_component_plugin.h
+    include/veranda/world_object_component_plugin.h \
+    include/veranda/filter.h
 
 DISTFILES += \
     CMakeLists.txt \

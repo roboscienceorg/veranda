@@ -267,11 +267,6 @@ public:
      */
     QString getType(){ return _type; }
 
-    /*
-    void setType(QString pType){ _type = pType; }
-    void setName(QString pName){ _objName.set(pName); }
-    */
-
     /*!
      * \brief Moves the component some delta x and delta y
      * Use this function to move the component and all of its

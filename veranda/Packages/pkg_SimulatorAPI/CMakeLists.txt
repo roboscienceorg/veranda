@@ -47,6 +47,7 @@ set(MOC_HDRS
     include/veranda/model.h
     include/veranda/property.h
     include/veranda/world_object_component.h
+    include/veranda/filter.h
 )
 
 set(CPP_HDRS
@@ -59,6 +60,7 @@ set(CPP_HDRS
 set(CPP_SRCS
     src/world_object.cpp
     src/world_object_component.cpp
+    src/filter.cpp
 )
 
 ###########
