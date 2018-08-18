@@ -22,14 +22,18 @@
 #include <stddef.h>
 #include <assert.h>
 #include <float.h>
+#include <stdexcept>
 #include "Box2D/Common/b2Api.h"
 
 #if !defined(NDEBUG)
 	#define b2DEBUG
 #endif
 
+class b2Exception : public std::exception{};
+
 #define B2_NOT_USED(x) ((void)(x))
-#define b2Assert(A) assert(A)
+//#define b2Assert(A) assert(A)
+#define b2Assert(A) if(!(A)){throw b2Exception();}
 
 typedef signed char	int8;
 typedef signed short int16;
