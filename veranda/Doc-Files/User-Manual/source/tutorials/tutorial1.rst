@@ -28,29 +28,100 @@ Part 1: Build a Turtle
 The first step to simulating robots is having a robot to simulate. When you are greeted with the Veranda
 application, select the 'Editor' button to open the editor.
 
+.. figure:: /images/tutorial1/editorbutton.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    The editor button
+
 In the editor, you can place robot components together to build your very own robot! Let's start by adding
 a circular body...
 
+.. figure:: /images/tutorial1/addcircle.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    To select the circle from the shapes tab, and press the green plus to add it
+
 Next, we'll add a couple of wheels...
 
+.. figure:: /images/tutorial1/addwheels.png
+    :figwidth: 90%
+    :width: 75%
+    :align: center
+
+    Completed turtle bot
 Now, you may be noticing that my robot looks much more square than yours; if you want to make sure the wheels
 are exactly where you want them, you can set their position properties to the exact coordinates you want. I made the wheels
 be exactly 0.6m to the left/right of the center, and 0m above it.
 
+.. figure:: /images/tutorial1/wheelproperties.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    With a wheel selected, you can set properties for it
+
 Now that you have a robot built, we need to load it into the simulation. Choose the 'save' button, and save your robot as ``Turtle.json``. Don't
-forget the ``.json``! It will not be added automatically if you forget it. First we have to switch back to simulator mode.
+forget the ``.json``! It will not be added automatically if you forget it.
+
+.. figure:: /images/tutorial1/saverobot.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    Save your robot by pressing the save button in the editor mode
+
+Next we have to switch back to simulator mode.
+
+.. figure:: /images/tutorial1/simulatorbutton.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    The simulator button
 
 Now, we can load the robot into our toolbox on the right.
 
+.. figure:: /images/tutorial1/simulatorloadrobot.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    Press the load button on the simulator toolbox to load a robot file
+
 And once your robot is in the toolbox, you can add it to the simulation and position it wherever you want!
 
+.. figure:: /images/tutorial1/simulatoraddrobot.png
+    :figwidth: 90%
+    :width: 75%
+    :align: center
+
+    Add robots from the toolbox by selecting them and pressing the green plus
+
 Finally, we can start the simulation with the 'play' button on the left.
+
+.. figure:: /images/tutorial1/simulatorplaybutton.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    The play button to start a simulation
 
 Congratuations! You just simulated your first robot; it sat there, and did nothing. Next, we're going to write some code to make it move.
 
 .. TIP::
     If you don't want to go through the trouble of saving your robot in a file and then loading it again, you can use the 'quick-add' button
     on the editor to put it directly in the toolbox, but beware, if you close Veranda, the robot will be lost forever!
+
+    .. figure:: /images/tutorial1/designerquickadd.png
+        :figwidth: 90%
+        :width: 50%
+        :align: center
+
+        The designer quick-add button
 
 Part 2: Drive your robot in a circle
 ------------------------------------
@@ -59,6 +130,13 @@ Now that we have a robot designed, we need to write some code to control it and 
 First, we will pick names for the ROS topics we want to use. Select your turtle robot in the simulator, and then search through its properties
 for the topic settings for the wheels. Since I left my wheels named 'Fixed Wheel', I am looking for the properties called 'Fixed Wheel1/channels/input_speed', and
 'Fixed Wheel2/channels/input_speed'. In my turtle, 'Fixed Wheel1' is on the left, and 'Fixed Wheel2' is on the right, so I named the ROS topics 'robot0/left_wheel' and 'robot0/right_wheel', respectively.
+
+.. figure:: /images/tutorial1/wheelchannels.png
+    :figwidth: 90%
+    :width: 75%
+    :align: center
+
+    Setting the wheel control topics
 
 We also need to indicate that the wheels can be driven. Find the properties 'Fixed Wheel1/is_driven' and Fixed Wheel2/is_driven' and set them both
 to be 'true'
@@ -183,6 +261,13 @@ to send and receive messages, you can stop it with ``Ctrl-C``
 
     Want to reset the simulation? Instead of removing the robot and putting it in again, you can use the quicksave before starting the simulation
     and quickload to reset to the saved version.
+
+    .. figure:: /images/tutorial1/quicksaveload.png
+        :figwidth: 90%
+        :width: 25%
+        :align: center
+
+        Quicksave (left) and Quickload (right)
 
 Part 3: Drive a more complex path
 ---------------------------------
@@ -310,6 +395,13 @@ Part 4: Hooking into the Simulation Clock
 Now that you have a couple of scripts running, let's take a look at what happens when we use the time-warp capabilities of Veranda.
 Click the time-warp button while your ``wiggle.py`` is driving a robot.
 
+.. figure:: /images/tutorial1/timewarpbutton.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    The time warp button; press it multiple times to cycle through 2x, 3x, and 0.5x speeds
+
 That probably didn't do what you expected, did it? The issue here is that, in the simulation, time started moving faster, but the clock
 in your control script didn't! So for every 1 second of wiggling that the control code thought it was doing, the simulator was actually
 driving the robot for more than 1 second.
@@ -404,6 +496,13 @@ The first step to doing that is having things for the robot to hit. Veranda can 
 can hit. To do this, choose the 'load simulation' button, and find your image file. My image is just a black square; we're going to put the robot
 in a box.
 
+.. figure:: /images/tutorial1/loadimage.png
+    :figwidth: 90%
+    :width: 75%
+    :align: center
+
+    Use the 'Load Simulation' button to to load images as obstacles
+
 .. TIP::
 
     Loading images in Veranda works best if they contain only black and white pixels, with no other colors (including grey).
@@ -412,11 +511,18 @@ in a box.
 
 .. IMPORTANT::
 
-    Veranda can load a number of different files as full simulations, make sure you pick the correct file type.
+    Veranda can load a number of different files as full simulations, make sure you pick the correct file type in the file-choose dialog so that you are able to select the file you want.
 
 Once you choose an image, you will be presented with some import options. The most important will be the size options, followed
 by the threshold options. Veranda will report the size of the image, in pixels, and you will have the option to set the pixel/m ratio, or
 and the image size (in meters). Our little roomba has a radius of 2m, so if we make the 5m x 5m, then the robot will have very little room to move about.
+
+.. figure:: /images/tutorial1/importoptions.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    The image importing options
 
 Part 6: Getting feedback
 ------------------------
@@ -427,16 +533,46 @@ to the control script whenever it touches something.
 In the editor, add a Touch Ring to your turtle bot. If you kept your robot at the default size, you will not be able to see any difference,
 because the touch ring is also a circle, and it defaults to 1m radius.
 
+.. figure:: /images/tutorial1/touchring.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    Touch Ring is found under the sensors tab of the editor toolbox
+
 The touch ring represents a ring of bump sensors evenly spaced around the robot; by default, the 'angle_start' and 'angle_end' properties, which
 specify which part of the robot has the sensors, encompass the entire chassis. Let's make
 there be 20 buttons them by setting the property 'sensor_count' to 20. Don't forget to set the ROS topic property 'channels/output_touches' to 'robot0/touches'.
+
+.. figure:: /images/tutorial1/touchringproperties.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    The properties we want to set for the touch ring
 
 .. TIP::
 
     Don't have your robot loaded in the editor anymore? You can load it into the editor from file!
 
+    .. figure:: /images/tutorial1/editorloadbutton.png
+        :figwidth: 90%
+        :width: 50%
+        :align: center
+
+        The load button in the editor
+
 Now, when your robot runs into a wall, you'll see a little circle appear on the simulation representing the location of the touch
-sensor that was triggered. The last step is to set up a callback in your script to respond to this stimulus. Let's modify ``circle.py`` for
+sensor that was triggered. 
+
+.. figure:: /images/tutorial1/collisioncircles.png
+    :figwidth: 90%
+    :width: 50%
+    :align: center
+
+    The indicators that your touch ring is sensing something
+
+The last step is to set up a callback in your script to respond to this stimulus. Let's modify ``circle.py`` for
 this one.
 
 First, we have to import the message type that the touch ring publishes: ByteMultiArray

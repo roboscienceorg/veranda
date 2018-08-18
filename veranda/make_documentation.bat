@@ -44,8 +44,12 @@ if "%1" neq "" goto end
 cd Doc-Files/User-Manual
 sphinx-build -M html source build
 robocopy build/html ../../Documentation/Sphinx-Web-User-Manual /e /purge /move
+cd ../..
+
+if "%2" == "--no-latex" goto end
 
 :: Generate Sphinx Latex
+cd Doc-Files/User-Manual
 sphinx-build -M latex source build
 cd build/latex
 pdflatex %PROJECTNAME%
