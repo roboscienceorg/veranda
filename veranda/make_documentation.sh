@@ -41,8 +41,13 @@ function build_sphinx
     sphinx-build -M html source build
     rsync -a build/html/ ../../Documentation/Sphinx-Web-User-Manual/
     rm -rf build/html
+    cd ../..
+}
 
+function build_sphinx_latex
+{
     # Generate Sphinx Latex
+    cd Doc-Files/User-Manual
     sphinx-build -M latex source build
     cd build/latex
     pdflatex $PROJECTNAME
@@ -68,6 +73,9 @@ fi
 
 if [ -z "$1" ] || [ "$1" = "sphinx" ]; then
     build_sphinx
+    if [ -z "$2" ] || [ "$2" != "--no-latex" ]; then
+        build_sphinx_latex
+    fi
 fi
 
 if [ -z "$1" ] || [ "$1" = "contract" ]; then
