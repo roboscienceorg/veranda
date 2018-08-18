@@ -101,8 +101,8 @@ void Polygon::makeTriangles()
     //Get point values out of QVariantLists and scale
     Shape sh;
 
-    double scalex = _scalex.get().toDouble();
-    double scaley = _scaley.get().toDouble();
+    double scalex = _scalex.get().toDouble()/2;
+    double scaley = _scaley.get().toDouble()/2;
 
     QVariantList tmp = _outerShape.get().value<QVariantList>();
     toPolygon(tmp, sh.outer);
@@ -128,13 +128,12 @@ void Polygon::makeTriangles()
         triBuffer[2].Set(poly[2].x()/scalex, poly[2].y()/scaley);
 
         //Remove 'triangles' that are just a line
-        if(std::abs(b2Cross(triBuffer[1] - triBuffer[0], triBuffer[2] - triBuffer[0])) > 0.001)
-        {
+        try {
             b2PolygonShape* triangle = new b2PolygonShape();
             triangle->Set(triBuffer, 3);
 
             _triangleShapes.push_back(triangle);
-        }
+        }catch(b2Exception&){/*The triangle is degenerate*/}
     }
 
     _triangleModel->addShapes(_triangleShapes);

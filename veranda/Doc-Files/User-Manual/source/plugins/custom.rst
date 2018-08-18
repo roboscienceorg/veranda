@@ -6,8 +6,8 @@ to resolve build order.
 
 .. code-block:: xml
 
-	<depend>sdsmt_simulator</depend>
-	<depend>sdsmt_simulator_box2d</depend>
+	<depend>veranda_simulator</depend>
+	<depend>veranda_simulator_box2d</depend>
 
 Once Ament is aware of package dependencies, the CMakeLists file must be set up to find the required libraries and files and build the plugin correctly.
 
@@ -32,16 +32,16 @@ In order to resolve dependencies for Box2D and the header files from the simulat
 
 .. code-block:: cmake
 
-	find_package(sdsmt_simulator REQUIRED)
-	find_package(sdsmt_simulator_box2d REQUIRED)
+	find_package(veranda_simulator REQUIRED)
+	find_package(veranda_simulator_box2d REQUIRED)
     
 	ament_export_dependencies(
-    		sdsmt_simulator
-    		sdsmt_simulator_box2d
+    		veranda_simulator
+    		veranda_simulator_box2d
 	)
 
-	include_directories(${sdsmt_simulator_api_INCLUDE_DIRS})
-	include_directories(${sdsmt_simulator_box2d_INCLUDE_DIRS})
+	include_directories(${veranda_simulator_api_INCLUDE_DIRS})
+	include_directories(${veranda_simulator_box2d_INCLUDE_DIRS})
 
 Next, any headers in the plugin containing the Q_OBJECT or other Q_* macros need to be preprocessed by the MOC
 
@@ -60,8 +60,8 @@ Finally, the plugin needs to be built as a shared library and linked against Qt 
 	qt5_use_modules([plugin name] Core Gui)
 
 	ament_target_dependencies([plugin name]
-	"sdsmt_simulator_box2d"
-	"sdsmt_simulator_api"
+	"veranda_simulator_box2d"
+	"veranda_simulator_api"
 	)
 
 The last detail is that the plugin must be deployed in the directory above the simulator executable. This can be achieved by installing the plugin to 

@@ -17,7 +17,7 @@ Veranda: A 2D Robotics Simulation Tool
     usage/simulator
     plugins/documentation
     plugins/custom
-
+    tutorials/tutorial1
 
 ..  Indices and tables
 ..  ==================
