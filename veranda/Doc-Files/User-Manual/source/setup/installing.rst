@@ -21,7 +21,7 @@ NOTE: A couple of the steps below state that you should 'source the ROS environm
 
     #. Make a workspace directory
     #. Within that directory, make a directory called ``src``
-    #. ``cd`` into the ``src`` directory, and execute ``git clone https://github.com/CsmithSD/sdsmt_simulator.git``
+    #. ``cd`` into the ``src`` directory, and execute ``git clone https://github.com/roboscienceorg/veranda.git``
 
 Once your workspace is set up and the project has been cloned into the ``src`` directory, we can build the project
 

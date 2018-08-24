@@ -53,6 +53,7 @@ Next, we'll add a couple of wheels...
     :align: center
 
     Completed turtle bot
+
 Now, you may be noticing that my robot looks much more square than yours; if you want to make sure the wheels
 are exactly where you want them, you can set their position properties to the exact coordinates you want. I made the wheels
 be exactly 0.6m to the left/right of the center, and 0m above it.
