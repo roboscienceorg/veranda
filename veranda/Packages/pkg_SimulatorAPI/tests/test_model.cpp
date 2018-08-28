@@ -29,7 +29,7 @@ TEST_CASE("Get/Set Model Transform")
 
     SECTION("Using setter correlates to result of getter")
     {
-        for(int i=0; i<1000; i++)
+        for(int i=0; i<100; i++)
         {
             double x = locDist(reng), y = locDist(reng);
             double t = degDist(reng);
@@ -64,7 +64,7 @@ TEST_CASE("Get/Set Model Transform")
            count++;
         });
 
-        for(int i=0; i<1000; i++)
+        for(int i=0; i<100; i++)
         {
             double xd, yd, td;
             testModel.getTransform(xd, yd, td);
@@ -104,7 +104,7 @@ TEST_CASE("Get/Set Model Shapes")
     {
         std::unordered_set<b2Shape*> shapes;
 
-        for(int i=0; i<1000; i++)
+        for(int i=0; i<100; i++)
         {
             b2Shape* newShape1 = new b2EdgeShape();
             b2Shape* newShape2 = new b2EdgeShape();
@@ -140,7 +140,7 @@ TEST_CASE("Get/Set Model Shapes")
     {
         std::unordered_set<b2Shape*> shapes;
 
-        for(int i=0; i<3000; i++)
+        for(int i=0; i<300; i++)
         {
             b2Shape* newShape1 = new b2EdgeShape();
 
@@ -148,7 +148,7 @@ TEST_CASE("Get/Set Model Shapes")
             testModel.addShapes({newShape1});
         }
 
-        for(int i=0; i<1000; i++)
+        for(int i=0; i<100; i++)
         {
             auto iter = shapes.begin();
             b2Shape* oldShape1 = *(iter++);
@@ -185,7 +185,7 @@ TEST_CASE("Get/Set Model Shapes")
         {
             modelChanges = 0;
 
-            for(int i=0; i<1000; i++)
+            for(int i=0; i<100; i++)
             {
                 b2Shape* newShape1 = new b2EdgeShape();
                 b2Shape* newShape2 = new b2EdgeShape();
@@ -217,7 +217,7 @@ TEST_CASE("Get/Set Model Shapes")
 
         SECTION("Emitted when shapes removed")
         {
-            for(int i=0; i<3000; i++)
+            for(int i=0; i<300; i++)
             {
                 b2Shape* newShape1 = new b2EdgeShape();
 
@@ -226,7 +226,7 @@ TEST_CASE("Get/Set Model Shapes")
 
             modelChanges = 0;
 
-            for(int i=0; i<1000; i++)
+            for(int i=0; i<100; i++)
             {
                 b2Shape* oldShape1 = testModel.shapes()[0];
                 b2Shape* oldShape2 = testModel.shapes()[1];
@@ -275,7 +275,7 @@ TEST_CASE("Get/Set Model Children")
     {
         std::unordered_set<Model*> models;
 
-        for(int i=0; i<1000; i++)
+        for(int i=0; i<100; i++)
         {
             Model* newModel1 = new Model();
             Model* newModel2 = new Model();
@@ -311,7 +311,7 @@ TEST_CASE("Get/Set Model Children")
     {
         std::unordered_set<Model*> models;
 
-        for(int i=0; i<3000; i++)
+        for(int i=0; i<300; i++)
         {
             Model* newModel1 = new Model();
 
@@ -319,7 +319,7 @@ TEST_CASE("Get/Set Model Children")
             testModel.addChildren({newModel1});
         }
 
-        for(int i=0; i<1000; i++)
+        for(int i=0; i<100; i++)
         {
             auto iter = models.begin();
             Model* oldModel1 = *(iter++);
@@ -356,7 +356,7 @@ TEST_CASE("Get/Set Model Children")
         {
             modelChanges = 0;
 
-            for(int i=0; i<1000; i++)
+            for(int i=0; i<100; i++)
             {
                 Model* newModel1 = new Model();
                 Model* newModel2 = new Model();
@@ -388,7 +388,7 @@ TEST_CASE("Get/Set Model Children")
 
         SECTION("Emitted when models removed")
         {
-            for(int i=0; i<3000; i++)
+            for(int i=0; i<300; i++)
             {
                 Model* newModel1 = new Model();
 
@@ -397,7 +397,7 @@ TEST_CASE("Get/Set Model Children")
 
             modelChanges = 0;
 
-            for(int i=0; i<1000; i++)
+            for(int i=0; i<100; i++)
             {
                 Model* oldModel1 = testModel.children()[0];
                 Model* oldModel2 = testModel.children()[1];

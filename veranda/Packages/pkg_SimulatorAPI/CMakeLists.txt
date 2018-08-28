@@ -129,7 +129,7 @@ if(BUILD_TESTING)
         "model_datatype_tests"
         CPP_SOURCES tests/test_model.cpp
         QT_HEADERS include/veranda/model.h
-        QT_LIBS Core
+        QT_LIBS Core Gui
         ROS_LIBS "veranda_box2d"
         )
 
@@ -137,7 +137,7 @@ if(BUILD_TESTING)
         "property_datatype_tests"
         CPP_SOURCES tests/test_property.cpp
         QT_HEADERS include/veranda/property.h
-        QT_LIBS Core
+        QT_LIBS Core Gui
         )
 endif()
 

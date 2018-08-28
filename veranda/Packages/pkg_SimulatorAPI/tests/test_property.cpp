@@ -305,13 +305,13 @@ TEST_CASE("Value sets")
     {
         SECTION("In Property")
         {
-            p.set(text = "newText1");
+            p.set(text = "newText1", true);
             REQUIRE(internalCount == 1);
         }
 
         SECTION("In multiple view")
         {
-            p.set(text = "newText2");
+            p.set(text = "newText2", true);
             REQUIRE(externalCount == 3);
         }
     }
@@ -320,27 +320,27 @@ TEST_CASE("Value sets")
     {
         SECTION("In Property")
         {
-            v1.requestValue(text = "request1");
+            v1.set(text = "request1", true);
             REQUIRE(internalCount == 1);
 
-            v2.requestValue(text = "request2");
+            v2.set(text = "request2", true);
             REQUIRE(internalCount == 2);
 
-            v3.requestValue(text = "request3");
+            v3.set(text = "request3", true);
             REQUIRE(internalCount == 3);
         }
 
         SECTION("In multiple view")
         {
-            v1.requestValue(text = "request1");
+            v1.set(text = "request1", true);
             REQUIRE(externalCount == 3);
             REQUIRE(p.get().toString() == text);
 
-            v2.requestValue(text = "request2");
+            v2.set(text = "request2", true);
             REQUIRE(externalCount == 6);
             REQUIRE(p.get().toString() == text);
 
-            v3.requestValue(text = "request3");
+            v3.set(text = "request3", true);
             REQUIRE(externalCount == 9);
             REQUIRE(p.get().toString() == text);
         }
@@ -371,15 +371,15 @@ TEST_CASE("Value requests")
 
     SECTION("From mutiple views")
     {
-        v1.requestValue(text = "request1");
+        v1.set(text = "request1", true);
         REQUIRE(internalCount == 1);
         REQUIRE(p.get().toString() == text);
 
-        v2.requestValue(text = "request2");
+        v2.set(text = "request2", true);
         REQUIRE(internalCount == 2);
         REQUIRE(p.get().toString() == text);
 
-        v3.requestValue(text = "request3");
+        v3.set(text = "request3", true);
         REQUIRE(internalCount == 3);
         REQUIRE(p.get().toString() == text);
     }
@@ -397,16 +397,16 @@ TEST_CASE("View copy construct")
     QObject::connect(&v2, &PropertyView::valueSet, [&](QVariant v){REQUIRE(v.toString() == text); externalCount++;});
     QObject::connect(&v3, &PropertyView::valueSet, [&](QVariant v){REQUIRE(v.toString() == text); externalCount++;});
 
-    v1.requestValue(text = "request1");
+    v1.set(text = "request1", true);
     REQUIRE(externalCount == 3);
 
-    v2.requestValue(text = "request2");
+    v2.set(text = "request2", true);
     REQUIRE(externalCount == 6);
 
-    v3.requestValue(text = "request3");
+    v3.set(text = "request3", true);
     REQUIRE(externalCount == 9);
 
-    p.set(text = "request4");
+    p.set(text = "request4", true);
     REQUIRE(externalCount == 12);
 }
 
@@ -424,11 +424,11 @@ TEST_CASE("View auto-invalidate")
 
     delete p;
 
-    v1.requestValue(text = "not happening");
+    v1.set(text = "not happening", true);
     REQUIRE(externalCount == 0);
 
     PropertyView invalidCopy = v1;
-    invalidCopy.requestValue(text = "also not happening");
+    invalidCopy.set(text = "also not happening", true);
 
     REQUIRE(v2.get().isNull());
     REQUIRE(v3.get().isNull());

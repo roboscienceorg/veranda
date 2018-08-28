@@ -32,7 +32,7 @@
 class b2Exception : public std::exception{};
 
 #define B2_NOT_USED(x) ((void)(x))
-//#define b2Assert(A) assert(A)
+#define b2HardAssert(A) assert(A)
 #define b2Assert(A) if(!(A)){throw b2Exception();}
 
 typedef signed char	int8;

@@ -29,8 +29,8 @@ b2StackAllocator::b2StackAllocator()
 
 b2StackAllocator::~b2StackAllocator()
 {
-	b2Assert(m_index == 0);
-	b2Assert(m_entryCount == 0);
+	b2HardAssert(m_index == 0);
+	b2HardAssert(m_entryCount == 0);
 }
 
 void* b2StackAllocator::Allocate(int32 size)
