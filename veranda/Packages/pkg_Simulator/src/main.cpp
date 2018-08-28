@@ -104,8 +104,8 @@ int main(int argc, char** argv)
     //As of October, 2017, this is what ${CATKIN_PACKAGE_LIB_DESTINATION} points to
     //All packages for a workspace are put together in the same folders, so as long as all
     //plugins are set up as packages in the same workspace as this project, they should be found
-    qInfo() << "Searching" << QCoreApplication::applicationDirPath() + "/.." << "for plugins";
-    QDirIterator dir(QCoreApplication::applicationDirPath() + "/..", {"*.so", "*.dll"}, QDir::Files, QDirIterator::Subdirectories);
+    qInfo() << "Searching" << QCoreApplication::applicationDirPath() + "/../../.." << "for plugins";
+    QDirIterator dir(QCoreApplication::applicationDirPath() + "/../../..", {"*.so", "*.dll"}, QDir::Files, QDirIterator::Subdirectories);
     while(dir.hasNext())
     {
         dir.next();

@@ -4,9 +4,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(veranda_api)
 
-## Compile as C++11
+## Compile as C++14
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
@@ -29,7 +29,6 @@ include_directories( include ${CMAKE_BINARY_DIR} )
 ## TODO If possible: Figure out how to mark Qt as a dependency
 ament_export_dependencies(
     veranda_box2d
-    veranda_api
     rclcpp
 )
 
@@ -118,10 +117,11 @@ install(
 if(BUILD_TESTING)
     find_package(veranda_catch_tests REQUIRED)
 
-    ament_export_dependencies(
-        veranda_catch_tests
-    )
+    #ament_export_dependencies(
+    #    veranda_catch_tests
+    #)
 
+    message(Catch Include ${veranda_catch_tests_INCLUDE_DIRS})
     set(CATCH_CMAKE "${veranda_catch_tests_INCLUDE_DIRS}/Catch/ament_cmake_add_catch_test.cmake")
     include(${CATCH_CMAKE})
 

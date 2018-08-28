@@ -4,9 +4,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(veranda_box2d)
 
-## Compile as C++11 Library
+## Compile as C++14 Library
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 add_definitions(-DBOX2D_DLL)
 find_package(ament_cmake REQUIRED)
