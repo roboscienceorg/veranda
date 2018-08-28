@@ -102,4 +102,5 @@ private slots:
 
     //! Adds the rectangle fixture shapes to the physics body
     void _makeFixtures();
-};\
+};
+

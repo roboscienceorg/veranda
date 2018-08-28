@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(veranda_json_file_plugin)
 
-## Compile as C++11 Library
+## Compile as C++14 Library
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
@@ -59,7 +59,7 @@ function(make_plugin plugin_name plugin_moc_hdrs plugin_srcs)
     ## Install lib into same directory as simulator executable
     install(
       TARGETS ${plugin_name}
-      DESTINATION lib
+      DESTINATION .
     )
 endfunction()
 

@@ -1,6 +1,7 @@
 function(ament_add_catch_test target)
     set(catch_main "${veranda_catch_tests_INCLUDE_DIRS}/Catch/catch_main.cpp")
 
+    include_directories(${veranda_catch_tests_INCLUDE_DIRS})
     cmake_parse_arguments(ARG
         ""
         ""

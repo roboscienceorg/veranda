@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(veranda_image_loader_plugin)
 
-## Compile as C++11 Library
+## Compile as C++14 Library
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
@@ -86,7 +86,7 @@ ament_target_dependencies(image_loader_plugin
 ## Install lib into same directory as simulator executable
 install(
   TARGETS image_loader_plugin
-  DESTINATION lib
+  DESTINATION .
 )
 
 ament_package()
