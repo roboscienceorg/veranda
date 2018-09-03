@@ -2,8 +2,15 @@
 
 This repository contains the code for a 2D Robotics simulation tool. The tool is written to interface with other applications through the ROS2 communication layer, and is usable on all operating systems that can have Qt and ROS2 installed.
 
+## Project Structure
+For anyone who is interested in building this project, the target version of ROS 2 is Ardent Apalone. If the project developers choose to support other versions of ROS, side branches will be created with the changes necessary to build/run Veranda under other versions of ROS.
+
+### Current Support
+ * ROS Ardent is supported on the 'master' branch; it is built using the ROS build tool Ament
+ * ROS Bouncy is supported on the 'bouncy' branch; it is built using the ROS build tool Colcon; Ament is not supported for this branch.
+
 ## Project Documentation
-Instructions for building, running, and developing this project are found in the User Manual and Design Document which can be built from this repository. Building these documents requires thee command line tools to be installed
+Detailed instructions for building, running, and developing this project are found in the User Manual and Design Document which can be built from this repository. Building these documents requires thee command line tools to be installed
  * pdflatex
  * doxygen
  * sphinx
