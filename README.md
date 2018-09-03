@@ -6,8 +6,13 @@ This repository contains the code for a 2D Robotics simulation tool. The tool is
 For anyone who is interested in building this project, the target version of ROS 2 is Ardent Apalone. If the project developers choose to support other versions of ROS, side branches will be created with the changes necessary to build/run Veranda under other versions of ROS.
 
 ### Current Support
- * ROS Ardent is supported on the 'master' branch; it is built using the ROS build tool Ament
- * ROS Bouncy is supported on the 'bouncy' branch; it is built using the ROS build tool Colcon; Ament is not supported for this branch.
+ * ROS Ardent
+   * Supported on the 'master' branch
+   * Built using the ROS build tool Ament
+ * ROS Bouncy
+   * Supported on the 'bouncy' branch
+   * Built using the ROS build tool Colcon; Ament is not supported
+   * May require modifying CMAKE_PREFIX_PATH so that Qt5Config.cmake can be found
 
 ## Project Documentation
 Detailed instructions for building, running, and developing this project are found in the User Manual and Design Document which can be built from this repository. Building these documents requires thee command line tools to be installed
