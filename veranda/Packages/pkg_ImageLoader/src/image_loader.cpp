@@ -105,7 +105,7 @@ QVector<WorldObject *> ImageLoader::loadFile(QString filePath, QMap<QString, Wor
             props["color/blue"]->set(drawColor.blue(), true);
 
             WorldObject* obj(new WorldObject({comp}, "Image Chunk #" + QString::number(objNum++)));
-            obj->translate(avg.x()/scaleX, avg.y()/scaleY);
+            obj->translate(avg.x()/(scaleX/2), avg.y()/(scaleY/2));
             objects.push_back(obj);
         }
         return objects;
