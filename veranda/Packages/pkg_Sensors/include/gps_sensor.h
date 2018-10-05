@@ -186,13 +186,13 @@ class GPS_Sensor : public WorldObjectComponent
     b2World* _world = nullptr;
 
     //! Accumulated drift in x direction
-    double _drift_x;
+    double _drift_x = 0;
 
     //! Accumulated drift in y direction
-    double _drift_y;
+    double _drift_y = 0;
 
     //! Accumulated drift in theta
-    double _drift_t;
+    double _drift_t = 0;
 
     /*!
      * \brief Augments a value using the noise, drift, and likelihood properties this object can apply.

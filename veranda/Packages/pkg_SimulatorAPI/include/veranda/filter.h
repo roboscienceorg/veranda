@@ -42,6 +42,7 @@ class NormalFilter : public Filter<double>
 
     QSharedPointer<reng> _engine;
     static std::uniform_real_distribution<> _uniDist;
+    mutable std::normal_distribution<> _normDist = std::normal_distribution<>();
 
 public:
     NormalFilter(QSharedPointer<reng> engine = QSharedPointer<reng>())
@@ -51,6 +52,7 @@ public:
         _nonNanChance = 1.0;
 
         _engine = engine;
+        _normDist = std::normal_distribution<>{_mu().toDouble(), _sigma().toDouble()};
 
         if(!_engine)
             _engine = QSharedPointer<reng>(new reng());
@@ -64,6 +66,7 @@ public:
         _nonNanChance = nonNanChance;
 
         _engine = engine;
+        _normDist = std::normal_distribution<>{_mu().toDouble(), _sigma().toDouble()};
 
         if(!_engine)
             _engine = QSharedPointer<reng>(new reng());
@@ -71,24 +74,25 @@ public:
 
     double apply(const double& input = 1) const override
     {
-        auto normDist = std::normal_distribution<>{_mu().toDouble(), _sigma().toDouble()};
 
         double beNan = _uniDist(*_engine);
         if(beNan >= _nonNanChance().toDouble()) return std::numeric_limits<double>::quiet_NaN();
 
-        return input * normDist(*_engine);
+        return input * _normDist(*_engine);
     }
 
     template<class sigma_type>
     void sigma(sigma_type sigma)
     {
         _sigma = sigma;
+        _normDist = std::normal_distribution<>{_mu().toDouble(), _sigma().toDouble()};
     }
 
     template<class mu_type>
     void mu(mu_type mu)
     {
         _mu = mu;
+        _normDist = std::normal_distribution<>{_mu().toDouble(), _sigma().toDouble()};
     }
 
     template<class nan_type>
