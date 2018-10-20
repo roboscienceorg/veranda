@@ -1,0 +1,197 @@
+{
+    "components": [
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.omni_drive",
+            "properties": [
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Name",
+                    "value": "Omni Drive"
+                },
+                {
+                    "key": "ball_radius",
+                    "value": 2
+                },
+                {
+                    "key": "channels/input_speeds",
+                    "value": "robot0/target_velocity"
+                },
+                {
+                    "key": "channels/reported_speeds",
+                    "value": "robot0/actual_velocity"
+                },
+                {
+                    "key": "control_noise/mu",
+                    "value": 0
+                },
+                {
+                    "key": "control_noise/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "density",
+                    "value": 10
+                },
+                {
+                    "key": "is_driven",
+                    "value": true
+                },
+                {
+                    "key": "report_rate",
+                    "value": 10
+                },
+                {
+                    "key": "reported_noise/mu",
+                    "value": 0
+                },
+                {
+                    "key": "reported_noise/sigma",
+                    "value": 0
+                }
+            ]
+        },
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.gps",
+            "properties": [
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": "90"
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": "-0.9"
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": "-0.9"
+                },
+                {
+                    "key": "Name",
+                    "value": "GPS"
+                },
+                {
+                    "key": "channels/output_pose",
+                    "value": "robot0/position"
+                },
+                {
+                    "key": "drift/theta/mu",
+                    "value": 0
+                },
+                {
+                    "key": "drift/theta/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "drift/x/mu",
+                    "value": 0
+                },
+                {
+                    "key": "drift/x/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "drift/y/mu",
+                    "value": 0
+                },
+                {
+                    "key": "drift/y/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "noise/theta/mu",
+                    "value": 0
+                },
+                {
+                    "key": "noise/theta/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "noise/x/mu",
+                    "value": 0
+                },
+                {
+                    "key": "noise/x/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "noise/y/mu",
+                    "value": 0
+                },
+                {
+                    "key": "noise/y/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "probabilities/theta",
+                    "value": 1
+                },
+                {
+                    "key": "probabilities/x",
+                    "value": 1
+                },
+                {
+                    "key": "probabilities/y",
+                    "value": 1
+                },
+                {
+                    "key": "publish_rate",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.lidar",
+            "properties": [
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": "90"
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Name",
+                    "value": "Lidar"
+                },
+                {
+                    "key": "channels/output_ranges",
+                    "value": "robot0/lidar"
+                },
+                {
+                    "key": "scan_points",
+                    "value": 10
+                },
+                {
+                    "key": "scan_radius",
+                    "value": "3"
+                },
+                {
+                    "key": "scan_range",
+                    "value": 360
+                },
+                {
+                    "key": "scan_rate",
+                    "value": 10
+                }
+            ]
+        }
+    ],
+    "properties": [
+    ]
+}

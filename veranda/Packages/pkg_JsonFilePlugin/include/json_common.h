@@ -6,6 +6,7 @@
 
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDebug>
 
 #include <veranda/object_loader_if.h>
 #include <veranda/object_saver_if.h>
@@ -40,7 +41,11 @@ inline WorldObject* jsonObjectToWorldObject(const QJsonObject &json, QMap<QStrin
                         QJsonObject propertyObject = propArray[k].toObject();
                         if (propertyObject.contains("key") && propertyObject.contains("value"))
                         {
-                            props[propertyObject["key"].toString()]->set(propertyObject["value"].toVariant(), true);
+                            QString target_key = propertyObject["key"].toString();
+                            if(!props.value(target_key))
+                                qWarning() << "Warning! Plugin object does not contain property '" << target_key << "'";
+                            else
+                                props[target_key]->set(propertyObject["value"].toVariant(), true);
                         }
                     }
                 }
@@ -59,7 +64,7 @@ inline WorldObject* jsonObjectToWorldObject(const QJsonObject &json, QMap<QStrin
             QJsonObject propertyObject = propertyArray[j].toObject();
             if (propertyObject.contains("key") && propertyObject.contains("value"))
             {
-                std::cout << propertyObject["key"].toString().toStdString() << std::endl;
+                //qDebug() << propertyObject["key"].toString().toStdString();
                 robot->getProperties()[propertyObject["key"].toString()]->set(propertyObject["value"].toVariant(), true);
             }
         }
