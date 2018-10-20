@@ -104,6 +104,48 @@ object is much more massive than the wheels, the wheels will have little effect 
 object. This can be compensated for by allowing the user to tune the density of wheels 
 so that their mass can be tweaked and made closer to the mass of what they are moving.
 
+Omnidirectional Drive Plugin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The omni drive plugin adds a new robot piece that can be used to propel the robot at defined velocity. The component
+accpets the ros Pose2D message and interprets the values as meters/s in the x and y directions and rad/s. These values are then
+used as the target velocities of the component in the in global coordinate frame. Omni drive components can also be configured
+to publish the Pose2D message regularly. When published by the omni drive, this message should be interpereted
+as the current velocity of the robot in the given directions. Think of the omni drive as a all that can roll in any
+direction with the rest of the robot mounted above it.
+
+:ref:`Properties Table <tab-omnidrive_properties>`
+
+:ref:`ROS Channels <tab-omnidrive_channels>`
+
+.. _tab-omnidrive_properties:
+
+=========================  ==============   ========================================================
+Property Name              Data Type	    Description
+=========================  ==============   ========================================================
+channels/input\_speeds     String           The ROS topic to listen on for target angular velocity
+channels/reported\_speeds  String           The ROS topic to report actual velocities on
+report\_rate               Double           Rate (hz) at which messages should be published on the reported speeds topic
+ball\_radius               Double           Radius of the wheel in meters
+is_driven                  Bool             Whether or not the wheel should produce driving force based on the input speed
+density                    Double           Density of the wheel. Can be tuned to give more or less mass of the object better
+control_noise/mu           Double           Mean of noise applied to commanded velocity
+control_noise/sigma        Double           Std. Dev. of noise applied to commanded velocity
+reported_noise/mu          Double           Mean of noise applied to reported velocity
+reported_noise/sigma       Double           Std. Dev. of noise applied to reported velocity
+=========================  ==============   ========================================================
+
+
+.. _tab-omnidrive_channels:
+
+==========================   =============================   =========   ========================================================
+ROS Topic                    Message Type                    In/Out      Description
+==========================   =============================   =========   ========================================================
+channels/[input_speeds]      geometry_msgs::msg::Pose2D      In          Target velocities of the driver in m/s for the x, y directions and rad/seconds for the angle. This information is ignored if [is_drive] is false.
+channels/[reported_speeds]   geometry_msgs::msg::Pose2D      Out         Current actual velocities of the driver in m/s for the x, y directions and rad/seconds for the angle.
+==========================   =============================   =========   ========================================================
+
+
 Fixed Wheel Plugin
 ^^^^^^^^^^^^^^^^^^
 
