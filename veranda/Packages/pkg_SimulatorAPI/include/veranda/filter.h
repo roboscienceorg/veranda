@@ -23,6 +23,9 @@ public:
 
     void operator = (QSharedPointer<PropertyView> prop);
     void operator = (const QVariant& newValue);
+
+signals:
+    void value_set(const QVariant&);
 };
 
 template<class T>
@@ -44,6 +47,11 @@ class NormalFilter : public Filter<double>
     static std::uniform_real_distribution<> _uniDist;
     mutable std::normal_distribution<> _normDist = std::normal_distribution<>();
 
+    void _refresh()
+    {
+        _normDist = std::normal_distribution<>{_mu().toDouble(), _sigma().toDouble()};
+    }
+
 public:
     NormalFilter(QSharedPointer<reng> engine = QSharedPointer<reng>())
     {
@@ -53,6 +61,9 @@ public:
 
         _engine = engine;
         _normDist = std::normal_distribution<>{_mu().toDouble(), _sigma().toDouble()};
+
+        QObject::connect(&_sigma, &Bindable::value_set, [this](){_refresh();});
+        QObject::connect(&_mu, &Bindable::value_set, [this](){_refresh();});
 
         if(!_engine)
             _engine = QSharedPointer<reng>(new reng());
@@ -67,6 +78,9 @@ public:
 
         _engine = engine;
         _normDist = std::normal_distribution<>{_mu().toDouble(), _sigma().toDouble()};
+
+        QObject::connect(&_sigma, &Bindable::value_set, [this](){_refresh();});
+        QObject::connect(&_mu, &Bindable::value_set, [this](){_refresh();});
 
         if(!_engine)
             _engine = QSharedPointer<reng>(new reng());
@@ -85,14 +99,14 @@ public:
     void sigma(sigma_type sigma)
     {
         _sigma = sigma;
-        _normDist = std::normal_distribution<>{_mu().toDouble(), _sigma().toDouble()};
+        _refresh();
     }
 
     template<class mu_type>
     void mu(mu_type mu)
     {
         _mu = mu;
-        _normDist = std::normal_distribution<>{_mu().toDouble(), _sigma().toDouble()};
+        _refresh();
     }
 
     template<class nan_type>

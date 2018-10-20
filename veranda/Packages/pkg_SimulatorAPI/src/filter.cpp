@@ -3,6 +3,7 @@
 void Bindable::set_bound(const QVariant& v)
 {
     _value = v;
+    value_set(_value);
 }
 
 const QVariant& Bindable::operator()() const
@@ -26,4 +27,5 @@ void Bindable::operator = (const QVariant& newValue)
     if(_binding)
         disconnect(_binding.data(), nullptr, this, nullptr);
     _value = newValue;
+    value_set(_value);
 }
