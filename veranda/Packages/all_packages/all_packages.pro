@@ -11,6 +11,7 @@ SUBDIRS = \
     sensor_gps \
     wheel_fixed \
     wheel_ackermann \
+    wheel_omni \
     shape_rect \
     shape_circle \
     shape_polygon
@@ -24,6 +25,7 @@ sensor_touch.file = ../pkg_Sensors/touch_sensor_ring.pro
 sensor_gps.file = ../pkg_Sensors/gps_sensor.pro
 wheel_fixed.file = ../pkg_Wheels/fixed_wheel.pro
 wheel_ackermann.file = ../pkg_Wheels/ackermann_steer.pro
+wheel_omni.file = ../pkg_Wheels/omni_drive.pro
 shape_rect.file = ../pkg_Shapes/rectangle.pro
 shape_circle.file = ../pkg_Shapes/circle.pro
 shape_polygon.file = ../pkg_Shapes/polygon.pro
