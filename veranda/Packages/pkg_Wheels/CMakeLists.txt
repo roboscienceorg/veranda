@@ -11,6 +11,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(veranda_api REQUIRED)
 find_package(veranda_box2d REQUIRED)
 
@@ -34,6 +35,7 @@ ament_export_dependencies(
     veranda_api
     veranda_box2d
     std_msgs
+    geometry_msgs
 )
 
 # Need to include this early so that moc is happy
@@ -60,7 +62,8 @@ function(make_plugin plugin_name plugin_moc_hdrs plugin_srcs)
         "rclcpp"
         "veranda_box2d"
         "veranda_api"
-        "std_msgs")
+        "std_msgs"
+        "geometry_msgs")
 
     ## Install lib into same directory as simulator executable
     install(
@@ -84,6 +87,10 @@ make_plugin(fixed_wheel_plugin "${headers}" "${sources}")
 set(headers include/ackermann_steer.h include/ackermann_steer_plugin.h)
 set(sources src/ackermann_steer.cpp src/ackermann_steer_plugin.cpp)
 make_plugin(ackermann_steer_plugin "${headers}" "${sources}")
+
+set(headers include/omni_drive.h include/omni_drive_plugin.h)
+set(sources src/omni_drive.cpp src/omni_drive_plugin.cpp)
+make_plugin(omni_drive_plugin "${headers}" "${sources}")
 
 ament_package()
 
