@@ -1,0 +1,375 @@
+{
+    "components": [
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.circle",
+            "properties": [
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Name",
+                    "value": "Circle"
+                },
+                {
+                    "key": "radius",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.swedishwheel",
+            "properties": [
+                {
+                    "key": "Encoder/GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/Name",
+                    "value": "Encoder"
+                },
+                {
+                    "key": "Encoder/channels/angular_velocity",
+                    "value": ""
+                },
+                {
+                    "key": "Encoder/channels/angular_velocity/publish_rate",
+                    "value": 10
+                },
+                {
+                    "key": "Encoder/noise/mu",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/noise/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": "120"
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": 1.8804235458374023
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 1.0645784139633179
+                },
+                {
+                    "key": "Name",
+                    "value": "Swedish Wheel"
+                },
+                {
+                    "key": "channels/input_speed",
+                    "value": "robot3/right_wheel"
+                },
+                {
+                    "key": "control_noise/mu",
+                    "value": 0
+                },
+                {
+                    "key": "control_noise/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "density",
+                    "value": 10
+                },
+                {
+                    "key": "is_driven",
+                    "value": true
+                },
+                {
+                    "key": "roller_angle",
+                    "value": 0
+                },
+                {
+                    "key": "wheel_radius",
+                    "value": 1
+                },
+                {
+                    "key": "wheel_width",
+                    "value": 0.29999999999999999
+                }
+            ]
+        },
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.swedishwheel",
+            "properties": [
+                {
+                    "key": "Encoder/GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/Name",
+                    "value": "Encoder"
+                },
+                {
+                    "key": "Encoder/channels/angular_velocity",
+                    "value": ""
+                },
+                {
+                    "key": "Encoder/channels/angular_velocity/publish_rate",
+                    "value": 10
+                },
+                {
+                    "key": "Encoder/noise/mu",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/noise/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": "-2.15"
+                },
+                {
+                    "key": "Name",
+                    "value": "Swedish Wheel"
+                },
+                {
+                    "key": "channels/input_speed",
+                    "value": "robot3/back_wheel"
+                },
+                {
+                    "key": "control_noise/mu",
+                    "value": 0
+                },
+                {
+                    "key": "control_noise/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "density",
+                    "value": 10
+                },
+                {
+                    "key": "is_driven",
+                    "value": true
+                },
+                {
+                    "key": "roller_angle",
+                    "value": 0
+                },
+                {
+                    "key": "wheel_radius",
+                    "value": 1
+                },
+                {
+                    "key": "wheel_width",
+                    "value": 0.29999999999999999
+                }
+            ]
+        },
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.swedishwheel",
+            "properties": [
+                {
+                    "key": "Encoder/GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/Name",
+                    "value": "Encoder"
+                },
+                {
+                    "key": "Encoder/channels/angular_velocity",
+                    "value": ""
+                },
+                {
+                    "key": "Encoder/channels/angular_velocity/publish_rate",
+                    "value": 10
+                },
+                {
+                    "key": "Encoder/noise/mu",
+                    "value": 0
+                },
+                {
+                    "key": "Encoder/noise/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": "60"
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": -1.8505752086639404
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 1.1143248081207275
+                },
+                {
+                    "key": "Name",
+                    "value": "Swedish Wheel"
+                },
+                {
+                    "key": "channels/input_speed",
+                    "value": "robot3/left_wheel"
+                },
+                {
+                    "key": "control_noise/mu",
+                    "value": 0
+                },
+                {
+                    "key": "control_noise/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "density",
+                    "value": 10
+                },
+                {
+                    "key": "is_driven",
+                    "value": true
+                },
+                {
+                    "key": "roller_angle",
+                    "value": 0
+                },
+                {
+                    "key": "wheel_radius",
+                    "value": 1
+                },
+                {
+                    "key": "wheel_width",
+                    "value": 0.29999999999999999
+                }
+            ]
+        },
+        {
+            "pluginName": "org.roboscience.veranda.worldObjectComponent.defaults.gps",
+            "properties": [
+                {
+                    "key": "GlobalPos/Theta",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/X",
+                    "value": 0
+                },
+                {
+                    "key": "GlobalPos/Y",
+                    "value": 0
+                },
+                {
+                    "key": "Name",
+                    "value": "GPS"
+                },
+                {
+                    "key": "channels/output_pose",
+                    "value": ""
+                },
+                {
+                    "key": "drift/theta/mu",
+                    "value": 0
+                },
+                {
+                    "key": "drift/theta/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "drift/x/mu",
+                    "value": 0
+                },
+                {
+                    "key": "drift/x/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "drift/y/mu",
+                    "value": 0
+                },
+                {
+                    "key": "drift/y/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "noise/theta/mu",
+                    "value": 0
+                },
+                {
+                    "key": "noise/theta/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "noise/x/mu",
+                    "value": 0
+                },
+                {
+                    "key": "noise/x/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "noise/y/mu",
+                    "value": 0
+                },
+                {
+                    "key": "noise/y/sigma",
+                    "value": 0
+                },
+                {
+                    "key": "probabilities/theta",
+                    "value": 1
+                },
+                {
+                    "key": "probabilities/x",
+                    "value": 1
+                },
+                {
+                    "key": "probabilities/y",
+                    "value": 1
+                },
+                {
+                    "key": "publish_rate",
+                    "value": 10
+                }
+            ]
+        }
+    ],
+    "properties": [
+    ]
+}
