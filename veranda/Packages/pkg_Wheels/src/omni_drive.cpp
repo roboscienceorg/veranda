@@ -205,14 +205,14 @@ void Omni_Drive::_worldTicked(const double dt)
 
         if(_driven.get().toBool())
         {
-            double x_impulse = _targetXVelocity - linVelocity.x;
-            double y_impulse = _targetYVelocity - linVelocity.y;
+            double x_impulse = (_targetXVelocity + drive_filter.apply()) - linVelocity.x;
+            double y_impulse = (_targetYVelocity + drive_filter.apply()) - linVelocity.y;
 
             b2Vec2 impulse = b2Vec2(x_impulse, y_impulse) * _ballBody->GetMass();
 
             _ballBody->ApplyLinearImpulse( impulse, _ballBody->GetWorldCenter(), true );
 
-            double t_impulse = (_targetAngularVelocity - rotVelocity)*_ballBody->GetMass();
+            double t_impulse = ((_targetAngularVelocity + drive_filter.apply()) - rotVelocity)*_ballBody->GetMass();
             _ballBody->ApplyAngularImpulse(t_impulse, true);
         }
 
@@ -238,7 +238,7 @@ void Omni_Drive::_worldTicked(const double dt)
 
 void Omni_Drive::_processMessage(const geometry_msgs::msg::Pose2D::SharedPtr data)
 {
-    _targetAngularVelocity = static_cast<double>(data->theta) + drive_filter.apply();
-    _targetXVelocity = static_cast<double>(data->x) + drive_filter.apply();
-    _targetYVelocity = static_cast<double>(data->y) + drive_filter.apply();
+    _targetAngularVelocity = static_cast<double>(data->theta);
+    _targetXVelocity = static_cast<double>(data->x);
+    _targetYVelocity = static_cast<double>(data->y);
 }
