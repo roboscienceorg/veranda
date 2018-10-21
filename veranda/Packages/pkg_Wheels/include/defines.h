@@ -9,3 +9,6 @@
 
 //! The plugin IID for the omni drive plugin
 #define OMNI_IID "org.roboscience.veranda.worldObjectComponent.defaults.omni_drive"
+
+//! The plugin IID for the swedish wheel plugin
+#define SWEDISHWHEEL_IID "org.roboscience.veranda.worldObjectComponent.defaults.swedishwheel"

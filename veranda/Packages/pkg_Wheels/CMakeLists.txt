@@ -84,6 +84,10 @@ set(headers include/fixed_wheel.h include/fixed_wheel_plugin.h include/encoder.h
 set(sources src/fixed_wheel.cpp src/fixed_wheel_plugin.cpp src/encoder.cpp)
 make_plugin(fixed_wheel_plugin "${headers}" "${sources}")
 
+set(headers include/swedish_wheel.h include/swedish_wheel_plugin.h include/encoder.h)
+set(sources src/swedish_wheel.cpp src/swedish_wheel_plugin.cpp src/encoder.cpp)
+make_plugin(swedish_wheel_plugin "${headers}" "${sources}")
+
 set(headers include/ackermann_steer.h include/ackermann_steer_plugin.h)
 set(sources src/ackermann_steer.cpp src/ackermann_steer_plugin.cpp)
 make_plugin(ackermann_steer_plugin "${headers}" "${sources}")
