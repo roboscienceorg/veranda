@@ -91,7 +91,7 @@ void JoystickPrototype::rotationMoved(int val)
     //qDebug() << "joystick moved " << joystickWidget->xVector << " " << joystickWidget->yVector << " " << val - rotationWidget->maximum()/2;
 
     joystickMoved(joystickWidget->xVector, joystickWidget->yVector,
-                  val - rotationWidget->maximum()/2,
+                  double(val - rotationWidget->maximum()/2)/rotationWidget->maximum(),
                   joystickUi->setChannel->text());
 }
 
