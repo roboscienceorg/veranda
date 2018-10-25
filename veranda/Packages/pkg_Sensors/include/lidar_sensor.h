@@ -141,7 +141,7 @@ class Lidar_Sensor : public WorldObjectComponent
     //! Property: Length of lidar rays (meters)
     Property radius = Property(PropertyInfo(false, true, false, PropertyInfo::DOUBLE,
                                   "Radius of the scan (meters)"), QVariant(1),
-                                  &Property::angle_validator);
+                                  &Property::abs_double_validator);
 
     //! Property: Number of lidar rays
     Property scan_points = Property(PropertyInfo(false, true, false, PropertyInfo::INT,
