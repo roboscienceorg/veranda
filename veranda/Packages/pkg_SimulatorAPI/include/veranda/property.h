@@ -171,7 +171,7 @@ public:
 
     /*!
      * \brief Validator to check that the stored value is an angle
-     *  The validator requires that angle values be numeric between 0 and 360 inclusive.
+     *  The validator requires that angle values be numeric in the range [0, 360)
      * \param[in] _old The old value stored
      * \param[in] _new The new value requested
      * \return The value that should be stored
@@ -180,8 +180,17 @@ public:
     {
         bool isDouble;
         double asDouble = _new.toDouble(&isDouble);
-        if(isDouble && asDouble >= 0 && asDouble <= 360)
-            return asDouble < EPSILON ? 0.0 : _new;
+        if(isDouble)
+        {
+            //Add or subtract a multiple of 360 to get
+            //into the range of [0, 360]
+            if(asDouble < 0)
+                asDouble += (int(asDouble)/360+1)*360;
+            else if(asDouble >= 360)
+                asDouble -= (int(asDouble)/360)*360;
+
+            return asDouble < EPSILON || asDouble > 360-EPSILON ? 0.0 : asDouble;
+        }
         return _old;
     }
 
