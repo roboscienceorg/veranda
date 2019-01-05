@@ -29,8 +29,9 @@ find_package(veranda_box2d REQUIRED)
 find_package(rclcpp REQUIRED)
 
 ## Find and configure QT
+set(QT_COMPONENTS Core Gui Widgets)
 find_package(Qt5 REQUIRED COMPONENTS
-  Core Gui
+    ${QT_COMPONENTS}
 )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -59,6 +60,9 @@ set(MOC_HDRS
     ${HEADERS_DIR}/property.h
     ${HEADERS_DIR}/world_object_component.h
     ${HEADERS_DIR}/filter.h
+    ${HEADERS_DIR}/interfaces/simulator_ui_if.h
+    ${HEADERS_DIR}/interfaces/simulator_physics_if.h
+    ${HEADERS_DIR}/interfaces/world_object_wrappers.h
 )
 
 set(CPP_HDRS
@@ -90,12 +94,12 @@ endif()
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 
 ## Build Library
-add_definitions(-DVERANDA_DLL)
+add_definitions(-Dveranda_DLL)
 add_library(${PROJECT_NAME} SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to library
 ## this will find all the headers and link all the libraries
-qt5_use_modules(${PROJECT_NAME} Core Gui)
+qt5_use_modules(${PROJECT_NAME} ${QT_COMPONENTS})
 
 ## Pull in stuff exported from other packages
 ament_target_dependencies(${PROJECT_NAME}
@@ -117,6 +121,10 @@ install(
   TARGETS ${PROJECT_NAME}
   DESTINATION ${LIB_INSTALL_DIR}
 )
+
+#############
+## Tests ##
+#############
 
 if(BUILD_TESTING)
     find_package(veranda_catch2 REQUIRED)

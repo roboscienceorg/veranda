@@ -8,7 +8,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include "veranda_core/world_object.h"
-#include "veranda_core/dllapi.h"
 
 
 /*!

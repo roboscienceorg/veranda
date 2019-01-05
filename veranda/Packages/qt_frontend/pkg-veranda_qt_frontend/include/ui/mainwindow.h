@@ -9,16 +9,17 @@
 #include <QPair>
 #include <QMap>
 
-#include "interfaces/simulator_ui_if.h"
-#include "interfaces/simulator_visual_if.h"
-#include "interfaces/world_object_wrappers.h"
 #include "ui/joystickprototype.h"
 #include "ui/designer_widget.h"
 #include "ui/mode_controller.h"
+#include "interfaces/simulator_visual_if.h"
 
-#include <veranda_core/world_object_component_plugin.h>
-#include <veranda_core/object_loader_if.h>
-#include <veranda_core/object_saver_if.h>
+#include <veranda_core/interfaces/simulator_ui_if.h>
+#include <veranda_core/interfaces/world_object_wrappers.h>
+#include <veranda_core/interfaces/world_object_component_factory_if.h>
+
+#include <veranda_qt_frontend/object_loader_if.h>
+#include <veranda_qt_frontend/object_saver_if.h>
 
 namespace Ui {
 class MainWindow;
@@ -60,7 +61,7 @@ public:
      * \param[in] defaultLoader_ Loader to create default objects in all simulations
      * \param[in] parent QWidget parent
      */
-    explicit MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If*> components,
+    explicit MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Factory_If*> components,
                         QVector<WorldObjectLoader_If*> oloaders, QVector<WorldObjectSaver_If*> osavers,
                         QVector<WorldLoader_If*> wloaders, QVector<WorldSaver_If*> wsavers, WorldLoader_If *defaultLoader_=nullptr, QWidget *parent = 0);
 
@@ -78,8 +79,8 @@ private:
     //! Widget collection for designer mode
     Mode_Controller* designer;
 
-    //! Map of available component plugins
-    QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
+    //! Map of available component factories
+    QMap<QString, WorldObjectComponent_Factory_If*> componentFactories;
 
     //! Map of single object loaders; mapped by file type
     QMap<QString, QVector<WorldObjectLoader_If*>> objectLoaders;

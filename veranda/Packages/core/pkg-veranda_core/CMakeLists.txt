@@ -4,6 +4,16 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(PROJECT_NAME veranda_core)
+set(HEADER_INSTALL_DIR include/${PROJECT_NAME})
+
+## On ubuntu (and presumably other unix), install/lib is
+## added to LD_LIBRARY_PATH; but on windows, install/bin
+## is added
+set(LIB_INSTALL_DIR lib)
+if(WIN32)
+    set(LIB_INSTALL_DIR bin)
+endif()
+
 project(${PROJECT_NAME})
 
 ## Compile as C++11
@@ -21,10 +31,9 @@ find_package(veranda_box2d REQUIRED)
 find_package(veranda_core_api REQUIRED)
 
 ## Find and configure QT
+set(QT_COMPONENTS Core Gui Widgets)
 find_package(Qt5 REQUIRED COMPONENTS
-  Core
-  Widgets
-  Gui
+  ${QT_COMPONENTS}
 )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -40,53 +49,26 @@ ament_export_dependencies(
     veranda_core_api
 )
 
+ament_export_include_directories(${HEADER_INSTALL_DIR})
+ament_export_libraries(${PROJECT_NAME})
+
 ###################
 ## FILE LISTINGS ##
 ###################
+set(HEADERS_DIR include/veranda_core)
 
 ## Files that have any Qt macros or keywords in them
 ## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
 set(MOC_HDRS
-    include/interfaces/simulator_physics_if.h
-    include/interfaces/simulator_ui_if.h
-    include/interfaces/simulator_visual_if.h
-    include/interfaces/world_object_wrappers.h
-
-    include/basic_physics.h
-    include/simulator_core.h
-
-    include/ui/mainwindow.h
-    include/ui/joystickprototype.h
-    include/ui/mode_controller.h
-    include/ui/settingspopup.h
-    include/ui/qgraphicssimulationviewer.h
-    include/ui/customgraphicsview.h
+    ${HEADERS_DIR}/basic_physics.h
+    ${HEADERS_DIR}/simulator_core.h
     )
-
-## .ui qt widgets form files
-set(UI_FILES
-    ui/mainwindow.ui
-    ui/joystickprototype.ui
-    ui/settingspopup.ui
-    ui/qgraphicssimulationviewer.ui)
 
 ## Any other source files
 set(CPP_SRCS
     src/basic_physics.cpp
     src/simulator_core.cpp
-
-    src/ui/mainwindow.cpp
-    src/ui/joystickprototype.cpp
-    src/ui/mode_controller.cpp
-    src/ui/settingspopup.cpp
-    src/ui/designer_widget.cpp
-    src/ui/qgraphicssimulationviewer.cpp
-
-    src/main.cpp
     )
-
-set(RCC_FILES ui/resources.qrc)
-qt5_add_resources(RCC_SRCS ${RCC_FILES})
 
 ###########
 ## Build ##
@@ -104,14 +86,13 @@ endif()
 ## Run MOC on files with Qt Keywords and Macros
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 
-## Wrap .ui files as cpp files
-qt5_wrap_ui(UI_SRCS ${UI_FILES})
-
-add_executable(${PROJECT_NAME} ${UI_SRCS} ${CPP_SRCS} ${MOC_SRCS} ${RCC_SRCS})
+## Build Library
+add_definitions(-Dveranda_DLL)
+add_library(${PROJECT_NAME} SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to executable
 ## this will find all the headers and link all the libraries
-qt5_use_modules(${PROJECT_NAME} Core Gui Widgets)
+qt5_use_modules(${PROJECT_NAME} ${QT_COMPONENTS})
 
 ## Pull in stuff exported from other packages
 ament_target_dependencies(${PROJECT_NAME}
@@ -126,33 +107,19 @@ ament_target_dependencies(${PROJECT_NAME}
 ## Install ##
 #############
 
-## Install executable
+## Install include dir
+install(
+  DIRECTORY ${HEADERS_DIR}
+  DESTINATION ${HEADER_INSTALL_DIR}
+)
+
 install(
   TARGETS ${PROJECT_NAME}
-  DESTINATION lib/${PROJECT_NAME}
+  DESTINATION ${LIB_INSTALL_DIR}
 )
 
 ## Install python timer object
 ament_python_install_package(veranda)
-
-## On windows, we need to run windeployqt
-## To set up plugins and dlls because Windows
-if(WIN32)
-    install(CODE 
-        "
-        MESSAGE(\"Running WindDeployQt.\")
-
-        execute_process (
-            COMMAND cmd /c echo ${CMAKE_INSTALL_PREFIX}
-        )
-
-        execute_process (
-            COMMAND cmd /c \"%QT5_DIR%/bin/windeployqt ${PROJECT_NAME}.exe --no-compiler-runtime  --no-translations\"
-            WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}
-        )
-        "
-    )
-endif()
 
 ament_package()
 

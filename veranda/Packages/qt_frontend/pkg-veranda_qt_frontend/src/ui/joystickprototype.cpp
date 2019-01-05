@@ -1,4 +1,4 @@
-#include "include/ui/joystickprototype.h"
+#include "ui/joystickprototype.h"
 #include "ui_joystickprototype.h"
 
 #include <QDebug>

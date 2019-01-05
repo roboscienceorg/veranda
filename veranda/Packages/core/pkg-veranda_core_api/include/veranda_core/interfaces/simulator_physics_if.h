@@ -6,7 +6,8 @@
 
 #include <Box2D/Box2D.h>
 
-#include "interfaces/world_object_wrappers.h"
+#include "veranda_core/interfaces/world_object_wrappers.h"
+#include "veranda_core/dllapi.h"
 
 /*!
  * \brief Interface between the physics engine and the rest of the simulation
@@ -16,7 +17,7 @@
  * rate of simulation to be able to optimize for a specific computer
  * and provide the time warping functionalities
  */
-class Simulator_Physics_If : public QObject
+class veranda_API Simulator_Physics_If : public QObject
 {
     Q_OBJECT
 

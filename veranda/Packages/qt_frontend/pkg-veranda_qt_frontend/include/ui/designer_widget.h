@@ -4,11 +4,11 @@
 #include <QWidget>
 #include <QListWidgetItem>
 
-#include "interfaces/simulator_ui_if.h"
-#include "interfaces/simulator_visual_if.h"
-#include "interfaces/world_object_wrappers.h"
+#include <veranda_core/interfaces/simulator_ui_if.h>
+#include <veranda_core/interfaces/world_object_wrappers.h>
 
-#include <veranda_core/world_object_component_plugin.h>
+#include "interfaces/simulator_visual_if.h"
+
 
 /*!
  * \brief Container for an item in one of the UI toolboxes

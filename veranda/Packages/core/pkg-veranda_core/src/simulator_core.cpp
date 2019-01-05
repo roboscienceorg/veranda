@@ -1,5 +1,5 @@
 //! \file
-#include "simulator_core.h"
+#include "veranda_core/simulator_core.h"
 
 #include <iostream>
 #include <QDebug>
@@ -65,7 +65,7 @@ _physicsEngine(physics), _userInterface(ui), _node(node)
     _timestampMsg->layout.dim[0].stride = 2;
 
     //Create channel to publish timestamps on
-    _timestampChannel = _node->create_publisher<std_msgs::msg::Float64MultiArray>("veranda_core/timestamp", 10);
+    _timestampChannel = _node->create_publisher<std_msgs::msg::Float64MultiArray>("veranda/timestamp", 10);
 
     //Publish on every physics tick
     connect(_physicsEngine, &Simulator_Physics_If::physicsTicked,

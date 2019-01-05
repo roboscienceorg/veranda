@@ -2,7 +2,7 @@
 #pragma once
 
 #include "veranda_core/world_object_component.h"
-#include "veranda_core/dllapi.h"
+#include "veranda_core/interfaces/world_object_component_factory_if.h"
 
 /*!
  * \brief Plugin interface for plugins that provide new components
@@ -10,7 +10,7 @@
  * through plugins loaded at runtime; this is the plugin interface that
  * plugins should use to indicate that they provide a component
  */
-class WorldObjectComponent_Plugin_If
+class WorldObjectComponent_Plugin_If : public WorldObjectComponent_Factory_If
 {
 public:
     //! Virtual destructor
@@ -23,4 +23,4 @@ public:
     virtual WorldObjectComponent* createComponent() = 0;
 };
 
-Q_DECLARE_INTERFACE(WorldObjectComponent_Plugin_If, "org.roboscience.veranda.worldObjectComponent")
+Q_DECLARE_INTERFACE(WorldObjectComponent_Plugin_If, "org.roboscience.veranda.frontend.qt.worldObjectComponent")

@@ -1,4 +1,4 @@
-#include "include/ui/designer_widget.h"
+#include "ui/designer_widget.h"
 
 Designer_Widget::Designer_Widget(WorldObjectComponent *object, WorldObjectProperties* object2, visualizerFactory factory, QListWidget *parent, bool simulator) :
               QListWidgetItem(parent)

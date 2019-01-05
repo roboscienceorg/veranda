@@ -1,8 +1,8 @@
 //! \file
 #pragma once
 
-#include "interfaces/simulator_visual_if.h"
 #include "customgraphicsview.h"
+#include "interfaces/simulator_visual_if.h"
 
 #include <QMap>
 #include <QTimer>

@@ -1,7 +1,8 @@
 //! \file
 #pragma once
 
-#include "interfaces/simulator_physics_if.h"
+#include "veranda_core/interfaces/simulator_physics_if.h"
+#include "veranda_core/dllapi.h"
 #include <QTimer>
 
 #include <QObject>
@@ -14,7 +15,7 @@
  *
  * \todo Support gravity for side-view simulations instead of top-down
  */
-class BasicPhysics : public Simulator_Physics_If
+class veranda_API BasicPhysics : public Simulator_Physics_If
 {
     Q_OBJECT
 

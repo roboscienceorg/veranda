@@ -17,11 +17,11 @@
 #include <string>
 #include <limits>
 
-MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Plugin_If *> components,
+MainWindow::MainWindow(visualizerFactory factory, QMap<QString, WorldObjectComponent_Factory_If *> components,
                        QVector<WorldObjectLoader_If*> oloaders, QVector<WorldObjectSaver_If*> osavers,
                        QVector<WorldLoader_If *> wloaders, QVector<WorldSaver_If *> wsavers, WorldLoader_If* defaultLoader_, QWidget *parent) :
     Simulator_Ui_If(parent),
-    makeWidget(factory), componentPlugins(components),
+    makeWidget(factory), componentFactories(components),
     ui(new Ui::MainWindow)
 {
     qRegisterMetaType<QVector<object_id>>("QVector<object_id>");
@@ -284,10 +284,10 @@ void MainWindow::loadSimButtonClick()
 
                           //Find the first loader that can load this file
                           //and try to load. If it fails, we can't load it
-                          if(!done && wl->canLoadFile(path, componentPlugins))
+                          if(!done && wl->canLoadFile(path, componentFactories))
                           {
                               //Get user options in main thread
-                              wl->getUserOptions(path, componentPlugins);
+                              wl->getUserOptions(path, componentFactories);
 
                               //Spin up side thread to actually load it
                               QtConcurrent::run([this, path, wl](){
@@ -296,7 +296,7 @@ void MainWindow::loadSimButtonClick()
                                   {
                                       //Load file in separate thread
                                       qDebug() << "Load file";
-                                      loadedObjs=wl->loadFile(path, componentPlugins);
+                                      loadedObjs=wl->loadFile(path, componentFactories);
                                   }catch(std::exception&){}
 
                                   if(loadedObjs.size())
@@ -309,12 +309,12 @@ void MainWindow::loadSimButtonClick()
 
 
                                       //Add default robots
-                                      if(defaultLoader && defaultLoader->canLoadFile(path, componentPlugins))
+                                      if(defaultLoader && defaultLoader->canLoadFile(path, componentFactories))
                                       {
                                           loadedObjs.clear();
                                           try
                                           {
-                                              loadedObjs=defaultLoader->loadFile(path, componentPlugins);
+                                              loadedObjs=defaultLoader->loadFile(path, componentFactories);
                                           }catch(std::exception&){}
 
                                           userAddWorldObjectsToSimulation(loadedObjs, false);
@@ -492,10 +492,10 @@ void MainWindow::quickLoadButtonClick()
                   for(WorldLoader_If* wl : it.value())
 
                       //Find the json world loader
-                      if(!done && wl->canLoadFile(path, componentPlugins))
+                      if(!done && wl->canLoadFile(path, componentFactories))
                       {
                           //Get user options in main thread
-                          wl->getUserOptions(path, componentPlugins);
+                          wl->getUserOptions(path, componentFactories);
 
                           //Spin up side thread to actually load it
                           QtConcurrent::run([this, path, wl](){
@@ -504,7 +504,7 @@ void MainWindow::quickLoadButtonClick()
                               {
                                   //Load file in separate thread
                                   qDebug() << "Load file";
-                                  loadedObjs=wl->loadFile(path, componentPlugins);
+                                  loadedObjs=wl->loadFile(path, componentFactories);
                               }catch(std::exception&){}
 
                               if(loadedObjs.size())
@@ -517,12 +517,12 @@ void MainWindow::quickLoadButtonClick()
 
 
                                   //Add default robots
-                                  if(defaultLoader && defaultLoader->canLoadFile(path, componentPlugins))
+                                  if(defaultLoader && defaultLoader->canLoadFile(path, componentFactories))
                                   {
                                       loadedObjs.clear();
                                       try
                                       {
-                                          loadedObjs=defaultLoader->loadFile(path, componentPlugins);
+                                          loadedObjs=defaultLoader->loadFile(path, componentFactories);
                                       }catch(std::exception&){}
 
                                       userAddWorldObjectsToSimulation(loadedObjs, false);
@@ -607,13 +607,13 @@ void MainWindow::loadObjectButtonClick()
         {
             for(WorldObjectLoader_If* l : objectLoaders[k])
             {
-                if(l->canLoadFile(objFile, componentPlugins))
+                if(l->canLoadFile(objFile, componentFactories))
                 {
-                    l->getUserOptions(objFile, componentPlugins);
+                    l->getUserOptions(objFile, componentFactories);
 
                     try
                     {
-                        WorldObject* wobj = l->loadFile(objFile, componentPlugins);
+                        WorldObject* wobj = l->loadFile(objFile, componentFactories);
                         designer->clear();
                         object_id i = 1;
                         for(WorldObjectComponent* c : wobj->getComponents())
@@ -703,13 +703,13 @@ void MainWindow::loadObjectsForSimButtonClick()
             {
                 for(WorldObjectLoader_If* l : objectLoaders[k])
                 {
-                    if(l->canLoadFile(objFile, componentPlugins))
+                    if(l->canLoadFile(objFile, componentFactories))
                     {
-                        l->getUserOptions(objFile, componentPlugins);
+                        l->getUserOptions(objFile, componentFactories);
 
                         try
                         {
-                            WorldObject* wobj = l->loadFile(objFile, componentPlugins);
+                            WorldObject* wobj = l->loadFile(objFile, componentFactories);
                             QString name = QFileInfo(objFile).baseName();
                             wobj->getProperties()["Name"]->set(name, true);
                             simulator->addObjectToTools(wobj);
@@ -761,7 +761,7 @@ void MainWindow::exportObjectButtonClick()
 void MainWindow::loadToolsButtonClick()
 {
     //tools can only be loaded from initial component plugins
-    for( auto it = componentPlugins.begin(); it != componentPlugins.end(); it++)
+    for( auto it = componentFactories.begin(); it != componentFactories.end(); it++)
     {
         WorldObjectComponent* component = it.value()->createComponent();
         designer->addObjectToTools(component);

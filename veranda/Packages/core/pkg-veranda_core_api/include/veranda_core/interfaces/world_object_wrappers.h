@@ -5,6 +5,7 @@
 #include <veranda_core/world_object.h>
 #include <veranda_core/property.h>
 #include <veranda_core/model.h>
+#include <veranda_core/dllapi.h>
 #include <Box2D/Box2D.h>
 
 #include <QObject>
@@ -18,7 +19,7 @@
  * UI does not have access to the WorldObjectComponent methods used
  * in the physics engine
  */
-class WorldObjectProperties : public QObject
+class veranda_API WorldObjectProperties : public QObject
 {
     Q_OBJECT
 
@@ -117,7 +118,7 @@ public slots:
  * physics engine does not have access to the WorldObjectComponent methods used
  * in the UI
  */
-class WorldObjectPhysics : public QObject
+class veranda_API WorldObjectPhysics : public QObject
 {
     Q_OBJECT
 

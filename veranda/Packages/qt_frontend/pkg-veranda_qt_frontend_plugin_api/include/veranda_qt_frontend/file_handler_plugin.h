@@ -1,9 +1,8 @@
 //! \file
 
 #pragma once
-#include "veranda_core/object_loader_if.h"
-#include "veranda_core/object_saver_if.h"
-#include "veranda_core/dllapi.h"
+#include "veranda_qt_frontend/object_loader_if.h"
+#include "veranda_qt_frontend/object_saver_if.h"
 
 #include <QVector>
 
@@ -33,7 +32,7 @@ public:
     virtual QVector<WorldObjectSaver_If*> getSavers() = 0;
 };
 
-Q_DECLARE_INTERFACE(WorldObjectFileHandler_Plugin_If, "org.roboscience.veranda.objFileHandler")
+Q_DECLARE_INTERFACE(WorldObjectFileHandler_Plugin_If, "org.roboscience.veranda.frontend.qt.objFileHandler")
 
 /*!
  * \brief Plugin interface for file handlers of full simulations
@@ -61,4 +60,4 @@ public:
     virtual QVector<WorldSaver_If*> getSavers() = 0;
 };
 
-Q_DECLARE_INTERFACE(WorldFileHandler_Plugin_If, "org.roboscience.veranda.wrldFileHandler")
+Q_DECLARE_INTERFACE(WorldFileHandler_Plugin_If, "org.roboscience.veranda.frontend.qt.worldFileHandler")

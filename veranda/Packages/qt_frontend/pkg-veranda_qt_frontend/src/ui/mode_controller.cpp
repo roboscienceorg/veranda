@@ -1,4 +1,4 @@
-#include "include/ui/mode_controller.h"
+#include "ui/mode_controller.h"
 
 Mode_Controller::Mode_Controller(visualizerFactory factory, QToolButton *pModeButton, QWidget* pMenu, QWidget* pToolsMenu, QListWidget* pActive, QTableView* pProperties, QTabWidget* pTabs, QWidget *parent)
 {

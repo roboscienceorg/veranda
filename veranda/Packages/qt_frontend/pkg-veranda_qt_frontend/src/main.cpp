@@ -20,13 +20,14 @@
 #include <QMap>
 #include <QFileDialog>
 
-#include "basic_physics.h"
 #include "ui/qgraphicssimulationviewer.h"
 
-#include <veranda_core/world_object_component_plugin.h>
-#include <veranda_core/file_handler_plugin.h>
+#include <veranda_core/basic_physics.h>
+#include <veranda_core/simulator_core.h>
+#include <veranda_core/interfaces/world_object_component_factory_if.h>
 
-#include "simulator_core.h"
+#include <veranda_qt_frontend/file_handler_plugin.h>
+#include <veranda_qt_plugins/world_object_component_plugin.h>
 
 //This MUST be the last include
 //For some reason, MSVC will hate you forever if
@@ -90,7 +91,7 @@ int main(int argc, char** argv)
    /*************************************
     * Load robot part plugins
     *************************************/
-    QMap<QString, WorldObjectComponent_Plugin_If*> componentPlugins;
+    QMap<QString, WorldObjectComponent_Factory_If*> componentPlugins;
     QVector<WorldObjectLoader_If*> objectLoaders;
     QVector<WorldObjectSaver_If*> objectSavers;
     QVector<WorldLoader_If*> worldLoaders;
