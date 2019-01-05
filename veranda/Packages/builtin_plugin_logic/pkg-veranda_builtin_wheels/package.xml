@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>veranda_builtin_wheels</name>
+  <version>0.0.1</version>
+  <description>Default Wheel Plugins</description>
+
+  <maintainer email="andrew.d.stelter@gmail.com">Andrew Stelter</maintainer>
+
+  <license>TODO</license>
+
+  <depend>veranda_core_api</depend>
+  <depend>veranda_box2d</depend>
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

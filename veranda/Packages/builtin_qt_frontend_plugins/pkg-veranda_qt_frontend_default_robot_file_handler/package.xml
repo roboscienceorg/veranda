@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>veranda_qt_frontend_default_robot_file_handler</name>
+  <version>0.0.1</version>
+  <description>Default Robot Loader Plugin</description>
+
+  <maintainer email="andrew.d.stelter@gmail.com">Andrew Stelter</maintainer>
+
+  <license>TODO</license>
+
+  <depend>veranda_core_api</depend>
+  <depend>veranda_box2d</depend>
+  
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
