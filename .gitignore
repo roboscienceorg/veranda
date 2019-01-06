@@ -17,12 +17,13 @@ msg/_*.py
 *.autosave
 *.vscode*
 *.o
-*/moc_*
-*/ui_*
+*moc_*
+*ui_*
+
 
 # Auto-Generated Makefiles from Qt Creator
 *Makefile.*
-*.stash
+*.stash*
 
 # Qt build folders
 build-*/
