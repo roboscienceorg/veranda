@@ -3,7 +3,9 @@
 #include <QDebug>
 #include <cmath>
 
-Rectangle::Rectangle(QObject *parent) : WorldObjectComponent("Rectangle", "Shapes", parent)
+Rectangle::Rectangle(const QString& pluginIID, QObject *parent) 
+    : WorldObjectComponent("Rectangle", "Shapes", parent)
+    , _pluginIID(pluginIID)
 {
     shape_model = new Model({}, {}, this);
     registerModel(shape_model);
@@ -18,7 +20,7 @@ Rectangle::Rectangle(QObject *parent) : WorldObjectComponent("Rectangle", "Shape
 
 WorldObjectComponent *Rectangle::_clone(QObject *newParent)
 {
-    Rectangle* out = new Rectangle(newParent);
+    Rectangle* out = new Rectangle(_pluginIID, newParent);
 
     return out;
 }

@@ -5,7 +5,9 @@
 #include <cmath>
 #include <limits>
 
-Lidar_Sensor::Lidar_Sensor(QObject *parent) : WorldObjectComponent("Lidar", "Sensors", parent)
+Lidar_Sensor::Lidar_Sensor(const QString& pluginIID, QObject *parent) 
+    : WorldObjectComponent("Lidar", "Sensors", parent)
+    , _pluginIID(pluginIID)
 {
     //Update channel out
     connect(&output_channel, &Property::valueSet, this, &Lidar_Sensor::_channelChanged);
@@ -55,7 +57,7 @@ void Lidar_Sensor::_updateDataMessageDimensions()
 
 WorldObjectComponent *Lidar_Sensor::_clone(QObject *newParent)
 {
-    Lidar_Sensor* out = new Lidar_Sensor(newParent);
+    Lidar_Sensor* out = new Lidar_Sensor(_pluginIID, newParent);
 
     return out;
 }

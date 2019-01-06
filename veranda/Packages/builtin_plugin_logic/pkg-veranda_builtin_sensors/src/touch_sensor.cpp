@@ -5,7 +5,9 @@
 #include <QDebug>
 #include <cmath>
 
-Touch_Sensor::Touch_Sensor(QObject *parent) : WorldObjectComponent("Touch Ring", "Sensors", parent)
+Touch_Sensor::Touch_Sensor(const QString& pluginIID, QObject *parent) 
+    : WorldObjectComponent("Touch Ring", "Sensors", parent)
+    , _pluginIID(pluginIID)
 {
     //Update channel out
     connect(&output_channel, &Property::valueSet, this, &Touch_Sensor::_channelChanged);
@@ -47,7 +49,7 @@ void Touch_Sensor::_updateDataMessageDimensions()
 
 WorldObjectComponent *Touch_Sensor::_clone(QObject *newParent)
 {
-    Touch_Sensor* out = new Touch_Sensor(newParent);
+    Touch_Sensor* out = new Touch_Sensor(_pluginIID, newParent);
 
     return out;
 }

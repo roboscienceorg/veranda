@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>veranda_builtin_wheels</name>
+  <name>veranda_qt_frontend_default_robot_file_handler</name>
   <version>0.0.1</version>
-  <description>Builtin Wheel Plugin Logic</description>
+  <description>Default Robot Loader Plugin</description>
 
   <maintainer email="andrew.d.stelter@gmail.com">Andrew Stelter</maintainer>
 
@@ -10,9 +10,7 @@
 
   <depend>veranda_core_api</depend>
   <depend>veranda_box2d</depend>
-  <depend>rclcpp</depend>
-  <depend>std_msgs</depend>
-  <depend>geometry_msgs</depend>
+  <depend>veranda_qt_frontend_plugin_api</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

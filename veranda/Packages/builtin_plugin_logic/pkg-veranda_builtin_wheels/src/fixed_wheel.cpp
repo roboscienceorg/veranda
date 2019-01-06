@@ -5,9 +5,11 @@
 #include <QSharedPointer>
 #include <cmath>
 
-Fixed_Wheel::Fixed_Wheel(QObject *parent) :
-    WorldObjectComponent("Fixed Wheel", "Wheels", parent),
-    drive_filter(QSharedPointer<PropertyView>(new PropertyView(&noise_mu)), QSharedPointer<PropertyView>(new PropertyView(&noise_sigma)), 1)
+Fixed_Wheel::Fixed_Wheel(const QString& pluginIID, QObject *parent) 
+    : WorldObjectComponent("Fixed Wheel", "Wheels", parent)
+    , drive_filter(QSharedPointer<PropertyView>(new PropertyView(&noise_mu)), QSharedPointer<PropertyView>(new PropertyView(&noise_sigma)), 1)
+    , _pluginIID(pluginIID)
+
 {
     qRegisterMetaType<std_msgs::msg::Float32::SharedPtr>("std_msgs::msg::Float32::SharedPtr");
 
@@ -115,7 +117,7 @@ void Fixed_Wheel::_attachWheelFixture()
 
 WorldObjectComponent *Fixed_Wheel::_clone(QObject *newParent)
 {
-    Fixed_Wheel* out = new Fixed_Wheel(newParent);
+    Fixed_Wheel* out = new Fixed_Wheel(_pluginIID, newParent);
 
     return out;
 }

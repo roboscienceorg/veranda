@@ -5,7 +5,9 @@
 #include <cmath>
 #include <functional>
 
-Ackermann_Steer::Ackermann_Steer(QObject *parent) : WorldObjectComponent("Ackermann Steer", "Wheels", parent)
+Ackermann_Steer::Ackermann_Steer(const QString& pluginIID, QObject *parent) 
+    : WorldObjectComponent("Ackermann Steer", "Wheels", parent)
+    , _pluginIID(pluginIID)
 {
     qRegisterMetaType<std_msgs::msg::Float32::SharedPtr>("std_msgs::msg::Float32::SharedPtr");
 
@@ -213,7 +215,7 @@ void Ackermann_Steer::_attachWheelFixture()
 
 WorldObjectComponent *Ackermann_Steer::_clone(QObject *newParent)
 {
-    Ackermann_Steer* out = new Ackermann_Steer(newParent);
+    Ackermann_Steer* out = new Ackermann_Steer(_pluginIID, newParent);
 
     return out;
 }

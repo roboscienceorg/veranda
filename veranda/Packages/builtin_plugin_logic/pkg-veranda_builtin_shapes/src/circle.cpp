@@ -3,7 +3,9 @@
 #include <QDebug>
 #include <cmath>
 
-Circle::Circle(QObject *parent) : WorldObjectComponent("Circle", "Shapes", parent)
+Circle::Circle(const QString& pluginIID, QObject *parent) 
+    : WorldObjectComponent("Circle", "Shapes", parent)
+    , _pluginIID(pluginIID)
 {
     shape_model = new Model({}, {}, this);
     registerModel(shape_model);
@@ -16,7 +18,7 @@ Circle::Circle(QObject *parent) : WorldObjectComponent("Circle", "Shapes", paren
 
 WorldObjectComponent *Circle::_clone(QObject *newParent)
 {
-    Circle* out = new Circle(newParent);
+    Circle* out = new Circle(_pluginIID, newParent);
 
     return out;
 }

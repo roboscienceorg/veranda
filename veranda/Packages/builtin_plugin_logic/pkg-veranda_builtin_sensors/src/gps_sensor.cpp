@@ -5,17 +5,18 @@
 #include <cmath>
 #include <limits>
 
-GPS_Sensor::GPS_Sensor(QObject *parent) :
-    WorldObjectComponent("GPS", "Sensors", parent),
-    _reng(new reng_type()),
+GPS_Sensor::GPS_Sensor(const QString& pluginIID, QObject *parent)
+    : WorldObjectComponent("GPS", "Sensors", parent)
+    , _reng(new reng_type())
 #define pview(a) QSharedPointer<PropertyView>(new PropertyView(a))
-    t_drift_filter(pview(&t_drift_mu), pview(&t_drift_sigma), 1, _reng),
-    t_noise_filter(pview(&t_noise_mu), pview(&t_noise_sigma), pview(&t_chance), _reng),
-    x_drift_filter(pview(&x_drift_mu), pview(&x_drift_sigma), 1, _reng),
-    x_noise_filter(pview(&x_noise_mu), pview(&x_noise_sigma), pview(&x_chance), _reng),
-    y_drift_filter(pview(&y_drift_mu), pview(&y_drift_sigma), 1, _reng),
-    y_noise_filter(pview(&y_noise_mu), pview(&y_noise_sigma), pview(&y_chance), _reng)
+    , t_drift_filter(pview(&t_drift_mu), pview(&t_drift_sigma), 1, _reng)
+    , t_noise_filter(pview(&t_noise_mu), pview(&t_noise_sigma), pview(&t_chance), _reng)
+    , x_drift_filter(pview(&x_drift_mu), pview(&x_drift_sigma), 1, _reng)
+    , x_noise_filter(pview(&x_noise_mu), pview(&x_noise_sigma), pview(&x_chance), _reng)
+    , y_drift_filter(pview(&y_drift_mu), pview(&y_drift_sigma), 1, _reng)
+    , y_noise_filter(pview(&y_noise_mu), pview(&y_noise_sigma), pview(&y_chance), _reng)
 #undef pview
+    , _pluginIID(pluginIID)
 {
     //Update channel out
     connect(&output_channel, &Property::valueSet, this, &GPS_Sensor::_channelChanged);
@@ -32,7 +33,7 @@ GPS_Sensor::GPS_Sensor(QObject *parent) :
 
 WorldObjectComponent *GPS_Sensor::_clone(QObject *newParent)
 {
-    GPS_Sensor* out = new GPS_Sensor(newParent);
+    GPS_Sensor* out = new GPS_Sensor(_pluginIID, newParent);
 
     return out;
 }

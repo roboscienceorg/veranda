@@ -2,7 +2,9 @@
 #include "triangulator.h"
 #include "polygon.h"
 
-Polygon::Polygon(QObject* parent) : WorldObjectComponent("Polygon", "Shapes", parent)
+Polygon::Polygon(const QString& pluginIID, QObject* parent) 
+    : WorldObjectComponent("Polygon", "Shapes", parent)
+    , _pluginIID(pluginIID)
 {
     _triangleModel = new Model({}, {}, this);
     _triangleModel->setDrawHint(DrawHint{QColor(0, 0, 0), Qt::SolidLine, QColor(0, 0, 0), Qt::SolidPattern, true});
@@ -31,7 +33,7 @@ Polygon::~Polygon()
 
 WorldObjectComponent* Polygon::_clone(QObject* newParent)
 {
-    Polygon* out = new Polygon(newParent);
+    Polygon* out = new Polygon(_pluginIID, newParent);
 
     return out;
 }

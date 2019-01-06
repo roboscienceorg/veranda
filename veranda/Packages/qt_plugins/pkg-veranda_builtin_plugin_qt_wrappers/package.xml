@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>veranda_builtin_plugin_qt_wrappers</name>
+  <version>0.0.1</version>
+  <description>QT Plugin wrappers for builtin Veranda Plugins</description>
+
+  <maintainer email="andrew.d.stelter@gmail.com">Andrew Stelter</maintainer>
+
+  <license>TODO</license>
+
+  <depend>veranda_core_api</depend>
+  <depend>veranda_qt_plugin_api</depend>   
+  <depend>veranda_builtin_sensors</depend>
+  <depend>veranda_builtin_wheels</depend>
+  <depend>veranda_builtin_shapes</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

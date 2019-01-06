@@ -5,12 +5,13 @@
 #include <QSharedPointer>
 #include <cmath>
 
-Omni_Drive::Omni_Drive(QObject *parent) :
-    WorldObjectComponent("Omni Drive", "Wheels", parent),
+Omni_Drive::Omni_Drive(const QString& pluginIID, QObject *parent)
+    : WorldObjectComponent("Omni Drive", "Wheels", parent)
 #define pview(a) QSharedPointer<PropertyView>(new PropertyView(a))
-    drive_filter(pview(&in_noise_mu), pview(&in_noise_sigma), 1),
-    report_filter(pview(&out_noise_mu), pview(&out_noise_sigma), 1)
+    , drive_filter(pview(&in_noise_mu), pview(&in_noise_sigma), 1)
+    , report_filter(pview(&out_noise_mu), pview(&out_noise_sigma), 1)
 #undef pview
+    , _pluginIID(pluginIID)
 {
     qRegisterMetaType<geometry_msgs::msg::Pose2D::SharedPtr>("geometry_msgs::msg::Pose2D::SharedPtr");
 
@@ -112,7 +113,7 @@ void Omni_Drive::_attachFixture()
 
 WorldObjectComponent *Omni_Drive::_clone(QObject *newParent)
 {
-    Omni_Drive* out = new Omni_Drive(newParent);
+    Omni_Drive* out = new Omni_Drive(_pluginIID, newParent);
 
     return out;
 }
