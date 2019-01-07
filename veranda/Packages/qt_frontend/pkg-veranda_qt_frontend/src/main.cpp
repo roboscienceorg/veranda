@@ -58,13 +58,13 @@ int main(int argc, char** argv)
     //Replaced by timer below
 
     
-    /*-----------------ORIGINAL MULTITHREADING------------------
+    //-----------------ORIGINAL MULTITHREADING------------------
     QFutureWatcher<void> rosThread;
     rosThread.setFuture(QtConcurrent::run([node](){rclcpp::spin(node);}));
     QObject::connect(&rosThread, &QFutureWatcher<void>::finished, &app, &QCoreApplication::quit);
     QObject::connect(&app, &QCoreApplication::aboutToQuit, [](){rclcpp::shutdown();});
-    */
-    //-----------------TIMER REPLACEMENT HACK--------------------
+    
+    /*-----------------TIMER REPLACEMENT HACK--------------------
     //TODO: Remove when ROS2 is threadsafe
     //and it is safe to spin() in one thread and create/destroy publishers/subscribers
     //from another
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
     });
     QObject::connect(&app, &QCoreApplication::aboutToQuit, [](){rclcpp::shutdown();});
     spinTimer.start();
-    //-----------------------------------------------------------
+    //-----------------------------------------------------------*/
 
    /*************************************
     * Load robot part plugins
