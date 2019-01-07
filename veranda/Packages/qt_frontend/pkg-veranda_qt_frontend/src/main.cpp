@@ -102,8 +102,8 @@ int main(int argc, char** argv)
 
     //Minor hack which relies on the build output file structure to find plugins
     //checks all .so or .dll files in directory relative to executable
-    qInfo() << "Searching" << QCoreApplication::applicationDirPath() + "/../../veranda_plugins" << "for plugins";
-    QDirIterator dir(QCoreApplication::applicationDirPath() + "/../../veranda_plugins", {"*.so", "*.dll"}, QDir::Files, QDirIterator::Subdirectories);
+    qInfo() << "Searching" << QCoreApplication::applicationDirPath() + "/../../../veranda_plugins" << "for plugins";
+    QDirIterator dir(QCoreApplication::applicationDirPath() + "/../../../veranda_plugins", {"*.so", "*.dll"}, QDir::Files, QDirIterator::Subdirectories);
     while(dir.hasNext())
     {
         dir.next();
