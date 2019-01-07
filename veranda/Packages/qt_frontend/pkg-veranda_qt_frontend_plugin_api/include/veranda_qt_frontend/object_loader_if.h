@@ -3,8 +3,8 @@
 
 #include <QString>
 #include <QVector>
-#include "veranda_core/interfaces/world_object_component_factory_if.h"
-#include "veranda_core/world_object.h"
+#include "veranda_core/api/interfaces/world_object_component_factory_if.h"
+#include "veranda_core/api/world_object.h"
 
 /*!
  * \brief Loads single world objects from files

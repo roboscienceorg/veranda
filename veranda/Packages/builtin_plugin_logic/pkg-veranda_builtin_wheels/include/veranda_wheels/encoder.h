@@ -3,12 +3,12 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float32.hpp>
 
-#include <veranda_core/filter.h>
-#include <veranda_core/world_object_component.h>
-#include <veranda_core/dllapi.h>
+#include <veranda_core/api/filter.h>
+#include <veranda_core/api/world_object_component.h>
+#include <veranda_wheels/dllapi.h>
 #include <Box2D/Box2D.h>
 
-class Encoder : public WorldObjectComponent
+class VERANDA_WHEELS_DLL Encoder : public WorldObjectComponent
 {
     Q_OBJECT
 
@@ -67,7 +67,7 @@ protected:
     void _setROSNode(std::shared_ptr<rclcpp::Node> node) override;
     void _connectChannels() override;
     void _disconnectChannels() override;
-    void _worldTicked(double) override;
+    void _worldTicked(const double) override;
     QMap<QString, QSharedPointer<PropertyView>> _getProperties() override
     { return _properties; }
     QString getPluginName() override { return ""; }

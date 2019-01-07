@@ -1,4 +1,4 @@
-#include "veranda_core/filter.h"
+#include "veranda_core/api/filter.h"
 
 void Bindable::set_bound(const QVariant& v)
 {

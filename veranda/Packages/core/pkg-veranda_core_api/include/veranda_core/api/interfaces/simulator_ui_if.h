@@ -9,9 +9,9 @@
 #include <QMainWindow>
 
 #include <Box2D/Box2D.h>
-#include <veranda_core/dllapi.h>
-#include <veranda_core/world_object.h>
-#include <veranda_core/interfaces/world_object_wrappers.h>
+#include <veranda_core/api/dllapi.h>
+#include <veranda_core/api/world_object.h>
+#include <veranda_core/api/interfaces/world_object_wrappers.h>
 
 /*!
  * \brief Inteface between the user and the simulation
@@ -25,7 +25,7 @@
  * ROS 2 channel it publishes on, and handlers of the joystick will create, manage, and
  * publish on those channels
  */
-class veranda_API Simulator_Ui_If : public QMainWindow
+class VERANDA_CORE_API_DLL Simulator_Ui_If : public QMainWindow
 {
     Q_OBJECT
 

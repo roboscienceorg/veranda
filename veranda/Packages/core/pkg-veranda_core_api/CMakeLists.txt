@@ -55,21 +55,14 @@ set(HEADERS_DIR include/veranda_core)
 ## Files that have any Qt macros or keywords in them
 ## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
 set(MOC_HDRS
-    ${HEADERS_DIR}/world_object.h
-    ${HEADERS_DIR}/model.h
-    ${HEADERS_DIR}/property.h
-    ${HEADERS_DIR}/world_object_component.h
-    ${HEADERS_DIR}/filter.h
-    ${HEADERS_DIR}/interfaces/simulator_ui_if.h
-    ${HEADERS_DIR}/interfaces/simulator_physics_if.h
-    ${HEADERS_DIR}/interfaces/world_object_wrappers.h
-)
-
-set(CPP_HDRS
-    ${HEADERS_DIR}/world_object_component_plugin.h
-    ${HEADERS_DIR}/world_object_file_handler_plugin.h
-    ${HEADERS_DIR}/object_loader_if.h
-    ${HEADERS_DIR}/object_saver_if.h
+    ${HEADERS_DIR}/api/world_object.h
+    ${HEADERS_DIR}/api/model.h
+    ${HEADERS_DIR}/api/property.h
+    ${HEADERS_DIR}/api/world_object_component.h
+    ${HEADERS_DIR}/api/filter.h
+    ${HEADERS_DIR}/api/interfaces/simulator_ui_if.h
+    ${HEADERS_DIR}/api/interfaces/simulator_physics_if.h
+    ${HEADERS_DIR}/api/interfaces/world_object_wrappers.h
 )
 
 set(CPP_SRCS
@@ -94,7 +87,7 @@ endif()
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 
 ## Build Library
-add_definitions(-Dveranda_DLL)
+add_definitions(-DVERANDA_CORE_API_BUILD_DLL)
 add_library(${PROJECT_NAME} SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to library
@@ -139,7 +132,7 @@ if(BUILD_TESTING)
     ament_add_catch_test(
         "model_datatype_tests"
         CPP_SOURCES tests/test_model.cpp
-        QT_HEADERS ${HEADERS_DIR}/model.h
+        QT_HEADERS ${HEADERS_DIR}/api/model.h
         QT_LIBS Core Gui
         ROS_LIBS "veranda_box2d"
         )
@@ -147,7 +140,7 @@ if(BUILD_TESTING)
     ament_add_catch_test(
         "property_datatype_tests"
         CPP_SOURCES tests/test_property.cpp
-        QT_HEADERS ${HEADERS_DIR}/property.h
+        QT_HEADERS ${HEADERS_DIR}/api/property.h
         QT_LIBS Core Gui
         )
 endif()

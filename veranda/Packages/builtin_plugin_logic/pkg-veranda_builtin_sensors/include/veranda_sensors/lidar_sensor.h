@@ -4,7 +4,9 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 
-#include <veranda_core/world_object_component.h>
+#include <veranda_core/api/world_object_component.h>
+#include <veranda_sensors/dllapi.h>
+
 #include <Box2D/Box2D.h>
 
 #include <QVector>
@@ -28,7 +30,7 @@
  * as inf (as defined by std::numeric_limits<float32>::infinity()). The message published
  * by the lidar component is the standard ROS laser_scan message.
  */
-class Lidar_Sensor : public WorldObjectComponent
+class VERANDA_SENSORS_DLL Lidar_Sensor : public WorldObjectComponent
 {
     Q_OBJECT
 

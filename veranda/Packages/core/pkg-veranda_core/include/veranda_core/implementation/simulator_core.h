@@ -1,11 +1,11 @@
 //! \file
 #pragma once
 
-#include "veranda_core/interfaces/simulator_physics_if.h"
-#include "veranda_core/interfaces/simulator_ui_if.h"
-#include "veranda_core/interfaces/world_object_wrappers.h"
-#include "veranda_core/world_object.h"
-#include "veranda_core/dllapi.h"
+#include "veranda_core/api/interfaces/simulator_physics_if.h"
+#include "veranda_core/api/interfaces/simulator_ui_if.h"
+#include "veranda_core/api/interfaces/world_object_wrappers.h"
+#include "veranda_core/api/world_object.h"
+#include "veranda_core/implementation/dllapi.h"
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joy.hpp"
@@ -32,7 +32,7 @@
  * runtime whenever a new joystick channel is requested. This information is cleared when the simulation stops or starts
  * to prevent it getting too big
  */
-class veranda_API SimulatorCore : public QObject
+class VERANDA_CORE_IMPL_DLL SimulatorCore : public QObject
 {
     Q_OBJECT
 

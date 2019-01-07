@@ -3,8 +3,8 @@
 
 #include <QWidget>
 
-#include <veranda_core/model.h>
-#include <veranda_core/world_object.h>
+#include <veranda_core/api/model.h>
+#include <veranda_core/api/world_object.h>
 
 /*!
  * \brief Interface for the widget which displays the simulation

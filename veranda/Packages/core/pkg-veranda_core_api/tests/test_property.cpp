@@ -1,6 +1,6 @@
 #include "catch2/catch.hpp"
 #include "Box2D/Box2D.h"
-#include "veranda_core/property.h"
+#include "veranda_core/api/property.h"
 
 #include <QDebug>
 #include <QObject>

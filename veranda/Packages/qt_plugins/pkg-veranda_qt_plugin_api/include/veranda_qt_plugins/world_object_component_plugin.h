@@ -1,8 +1,8 @@
 //! \file
 #pragma once
 
-#include "veranda_core/world_object_component.h"
-#include "veranda_core/interfaces/world_object_component_factory_if.h"
+#include "veranda_core/api/world_object_component.h"
+#include "veranda_core/api/interfaces/world_object_component_factory_if.h"
 
 /*!
  * \brief Plugin interface for plugins that provide new components

@@ -8,9 +8,9 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-#include "veranda_core/world_object_component.h"
-#include "veranda_core/model.h"
-#include "veranda_core/property.h"
+#include "veranda_core/api/world_object_component.h"
+#include "veranda_core/api/model.h"
+#include "veranda_core/api/property.h"
 
 #include "Box2D/Box2D.h"
 #include <QVariant>
@@ -32,7 +32,7 @@
  *
  * \todo Move most of this functionality into WorldObjectComponent
  */
-class veranda_API WorldObject : public WorldObjectComponent
+class VERANDA_CORE_API_DLL WorldObject : public WorldObjectComponent
 {
     Q_OBJECT
 

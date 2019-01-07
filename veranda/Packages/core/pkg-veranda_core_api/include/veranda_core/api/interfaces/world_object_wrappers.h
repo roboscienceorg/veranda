@@ -2,10 +2,10 @@
 //! \todo Maybe just remove these wrappers completely?
 #pragma once
 
-#include <veranda_core/world_object.h>
-#include <veranda_core/property.h>
-#include <veranda_core/model.h>
-#include <veranda_core/dllapi.h>
+#include <veranda_core/api/world_object.h>
+#include <veranda_core/api/property.h>
+#include <veranda_core/api/model.h>
+#include <veranda_core/api/dllapi.h>
 #include <Box2D/Box2D.h>
 
 #include <QObject>
@@ -19,7 +19,7 @@
  * UI does not have access to the WorldObjectComponent methods used
  * in the physics engine
  */
-class veranda_API WorldObjectProperties : public QObject
+class VERANDA_CORE_API_DLL WorldObjectProperties : public QObject
 {
     Q_OBJECT
 
@@ -118,7 +118,7 @@ public slots:
  * physics engine does not have access to the WorldObjectComponent methods used
  * in the UI
  */
-class veranda_API WorldObjectPhysics : public QObject
+class VERANDA_CORE_API_DLL WorldObjectPhysics : public QObject
 {
     Q_OBJECT
 

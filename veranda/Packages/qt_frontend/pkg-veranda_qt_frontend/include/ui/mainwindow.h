@@ -14,9 +14,9 @@
 #include "ui/mode_controller.h"
 #include "interfaces/simulator_visual_if.h"
 
-#include <veranda_core/interfaces/simulator_ui_if.h>
-#include <veranda_core/interfaces/world_object_wrappers.h>
-#include <veranda_core/interfaces/world_object_component_factory_if.h>
+#include <veranda_core/api/interfaces/simulator_ui_if.h>
+#include <veranda_core/api/interfaces/world_object_wrappers.h>
+#include <veranda_core/api/interfaces/world_object_component_factory_if.h>
 
 #include <veranda_qt_frontend/object_loader_if.h>
 #include <veranda_qt_frontend/object_saver_if.h>

@@ -33,7 +33,6 @@ function(ament_add_catch_test target)
         list(APPEND cpp_sources ${moc_hdrs})
     endif()
 
-    message(${cpp_sources})
     list(LENGTH cpp_sources source_count)
 
     message("Build test with source files ${cpp_sources}")

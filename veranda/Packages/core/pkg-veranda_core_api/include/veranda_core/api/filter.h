@@ -7,9 +7,9 @@
 
 #include <random>
 #include <iostream>
-#include "veranda_core/dllapi.h"
+#include "veranda_core/api/dllapi.h"
 
-class veranda_API Bindable : public QObject
+class VERANDA_CORE_API_DLL Bindable : public QObject
 {
     Q_OBJECT
 

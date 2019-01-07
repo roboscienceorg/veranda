@@ -62,6 +62,7 @@ set(CPP_SRCS
 # Need to include this early so that moc is happy
 include_directories("${veranda_box2d_INCLUDE_DIRS}")
 include_directories("${veranda_core_api_INCLUDE_DIRS}")
+include_directories("${veranda_qt_frontend_plugin_api_INCLUDE_DIRS}")
 
 # Use new MOC policy if CMake 3.10+
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.10")

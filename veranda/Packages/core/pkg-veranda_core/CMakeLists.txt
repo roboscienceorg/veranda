@@ -60,8 +60,8 @@ set(HEADERS_DIR include/veranda_core)
 ## Files that have any Qt macros or keywords in them
 ## Q_OBJECT, Q_PROPERTY, signals, slots.... etc.
 set(MOC_HDRS
-    ${HEADERS_DIR}/basic_physics.h
-    ${HEADERS_DIR}/simulator_core.h
+    ${HEADERS_DIR}/implementation/basic_physics.h
+    ${HEADERS_DIR}/implementation/simulator_core.h
     )
 
 ## Any other source files
@@ -87,7 +87,7 @@ endif()
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 
 ## Build Library
-add_definitions(-Dveranda_DLL)
+add_definitions(-DVERANDA_CORE_IMPL_BUILD_DLL)
 add_library(${PROJECT_NAME} SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to executable

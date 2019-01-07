@@ -4,7 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/pose2_d.hpp"
 
-#include <veranda_core/world_object_component.h>
+#include <veranda_core/api/world_object_component.h>
 #include <Box2D/Box2D.h>
 
 #include <QVector>
@@ -14,14 +14,14 @@
 
 #include <memory>
 
-#include <veranda_core/filter.h>
-#include <veranda_core/dllapi.h>
+#include <veranda_core/api/filter.h>
+#include <veranda_wheels/dllapi.h>
 
 /*!
  * \brief World Object Component modeling a ball that can roll wherever you want.
  * The drive is commanded with target x, y, and theta velocities in the global reference frame
  */
-class veranda_API Omni_Drive : public WorldObjectComponent
+class VERANDA_WHEELS_DLL Omni_Drive : public WorldObjectComponent
 {
     Q_OBJECT
 

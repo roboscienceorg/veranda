@@ -8,9 +8,9 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-#include "veranda_core/model.h"
-#include "veranda_core/property.h"
-#include "veranda_core/world_object_component.h"
+#include "veranda_core/api/model.h"
+#include "veranda_core/api/property.h"
+#include "veranda_core/api/world_object_component.h"
 
 /*!
  * \brief Creates a QTransform from a point and angle

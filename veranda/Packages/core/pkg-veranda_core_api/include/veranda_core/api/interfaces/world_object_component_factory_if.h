@@ -1,6 +1,6 @@
 #pragma once
 
-#include "veranda_core/world_object_component.h"
+#include "veranda_core/api/world_object_component.h"
 
 class WorldObjectComponent_Factory_If
 {

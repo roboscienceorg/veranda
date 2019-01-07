@@ -4,8 +4,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
 
-#include <veranda_core/world_object_component.h>
-#include <veranda_core/dllapi.h>
+#include <veranda_core/api/world_object_component.h>
+#include <veranda_wheels/dllapi.h>
 #include <Box2D/Box2D.h>
 
 #include <QVector>
@@ -24,7 +24,7 @@
  * value is interpreted as the target angle to steer at (radians). The value
  * is clampted to the range +/-PI/2
  */
-class veranda_API Ackermann_Steer : public WorldObjectComponent
+class VERANDA_WHEELS_DLL Ackermann_Steer : public WorldObjectComponent
 {
     Q_OBJECT
 

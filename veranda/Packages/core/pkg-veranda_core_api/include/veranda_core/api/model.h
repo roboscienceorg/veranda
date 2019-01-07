@@ -8,12 +8,12 @@
 
 #include "Box2D/Box2D.h"
 
-#include "veranda_core/dllapi.h"
+#include "veranda_core/api/dllapi.h"
 
 /*!
  * \brief Group of settings that can be added to models to hint at how they should be drawn
  */
-struct veranda_API DrawHint
+struct VERANDA_CORE_API_DLL DrawHint
 {
     //! Color hint for outline
     QColor outlineColor;
@@ -68,7 +68,7 @@ struct veranda_API DrawHint
  * objects held by the model are intended to be relative to the 'position'
  * of the model itself
  */
-class veranda_API Model : public QObject
+class VERANDA_CORE_API_DLL Model : public QObject
 {
     Q_OBJECT
 

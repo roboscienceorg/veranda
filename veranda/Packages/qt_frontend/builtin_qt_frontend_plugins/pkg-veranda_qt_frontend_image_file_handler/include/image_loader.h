@@ -6,7 +6,7 @@
 #include <QSharedPointer>
 
 #include <veranda_qt_frontend/object_loader_if.h>
-#include <veranda_core/world_object.h>
+#include <veranda_core/api/world_object.h>
 #include <Box2D/Box2D.h>
 
 #include "optiondialog.h"

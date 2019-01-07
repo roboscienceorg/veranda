@@ -10,11 +10,11 @@
 
 #include <memory>
 
-#include "veranda_core/const.h"
+#include "veranda_core/api/const.h"
 #include "rclcpp/rclcpp.hpp"
-#include "veranda_core/model.h"
-#include "veranda_core/property.h"
-#include "veranda_core/dllapi.h"
+#include "veranda_core/api/model.h"
+#include "veranda_core/api/property.h"
+#include "veranda_core/api/dllapi.h"
 
 /*!
  * \brief Component type used to create world objects for simulations
@@ -46,7 +46,7 @@
  * user experience in the designer and allow users to see any visual effects of
  * changing property values.
  */
-class veranda_API WorldObjectComponent : public QObject
+class VERANDA_CORE_API_DLL WorldObjectComponent : public QObject
 {
     Q_OBJECT
 

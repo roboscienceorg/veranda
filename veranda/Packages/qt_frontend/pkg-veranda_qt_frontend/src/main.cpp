@@ -22,9 +22,9 @@
 
 #include "ui/qgraphicssimulationviewer.h"
 
-#include <veranda_core/basic_physics.h>
-#include <veranda_core/simulator_core.h>
-#include <veranda_core/interfaces/world_object_component_factory_if.h>
+#include <veranda_core/implementation/basic_physics.h>
+#include <veranda_core/implementation/simulator_core.h>
+#include <veranda_core/api/interfaces/world_object_component_factory_if.h>
 
 #include <veranda_qt_frontend/file_handler_plugin.h>
 #include <veranda_qt_plugins/world_object_component_plugin.h>

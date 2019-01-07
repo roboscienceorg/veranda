@@ -82,7 +82,7 @@ endif()
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 
 ## Build Library
-add_definitions(-Dveranda_DLL)
+add_definitions(-DVERANDA_SHAPES_BUILD_DLL)
 add_library(${PROJECT_NAME} SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 find_package(OpenGL REQUIRED)

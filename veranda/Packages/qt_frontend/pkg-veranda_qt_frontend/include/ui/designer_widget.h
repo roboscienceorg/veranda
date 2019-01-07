@@ -4,8 +4,8 @@
 #include <QWidget>
 #include <QListWidgetItem>
 
-#include <veranda_core/interfaces/simulator_ui_if.h>
-#include <veranda_core/interfaces/world_object_wrappers.h>
+#include <veranda_core/api/interfaces/simulator_ui_if.h>
+#include <veranda_core/api/interfaces/world_object_wrappers.h>
 
 #include "interfaces/simulator_visual_if.h"
 

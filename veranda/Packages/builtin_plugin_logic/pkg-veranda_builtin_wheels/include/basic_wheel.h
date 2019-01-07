@@ -1,8 +1,7 @@
 //! \file
 #pragma once
 
-#include <veranda_core/model.h>
-#include <veranda_core/dllapi.h>
+#include <veranda_core/api/model.h>
 #include <Box2D/Box2D.h>
 
 #include <QVector>
@@ -13,7 +12,7 @@
  * wheels, as well as manage the no-slip and no-slide constraints on wheels
  * in the physics engine
  */
-class veranda_API Basic_Wheel
+class Basic_Wheel
 {
     constexpr static double PI = 3.14159265359;
     constexpr static double RAD2DEG = 360.0/(2*PI);

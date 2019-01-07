@@ -4,7 +4,8 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include <Box2D/Box2D.h>
-#include <veranda_core/world_object_component.h>
+#include <veranda_core/api/world_object_component.h>
+#include <veranda_shapes/dllapi.h>
 
 #include <QVector>
 #include <QString>
@@ -16,7 +17,7 @@
 /*!
  * \brief WorldObjectComponent which is just a circular body
  */
-class Circle : public WorldObjectComponent
+class VERANDA_SHAPES_DLL Circle : public WorldObjectComponent
 {
     Q_OBJECT
 

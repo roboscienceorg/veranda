@@ -8,8 +8,8 @@
 #include <QDebug>
 #include <functional>
 
-#include "veranda_core/dllapi.h"
-#include "veranda_core/const.h"
+#include "veranda_core/api/dllapi.h"
+#include "veranda_core/api/const.h"
 
 //! Typedef for object identifier numbers
 typedef int32_t object_id;
@@ -17,7 +17,7 @@ typedef int32_t object_id;
 /*!
  * \brief Metadata container for info about a property
  */
-class veranda_API PropertyInfo
+class VERANDA_CORE_API_DLL PropertyInfo
 {
 public:
     //! Enum for types of properties
@@ -54,7 +54,7 @@ public:
  * will be the one stored (this could just be the old value). The default validator
  * accepts all values
  */
-class veranda_API Property : public QObject
+class VERANDA_CORE_API_DLL Property : public QObject
 {
     Q_OBJECT
 
@@ -283,7 +283,7 @@ private slots:
 /*!
  * \brief Observer class that can be used to watch a property and request it to change
  */
-class veranda_API PropertyView : public QObject
+class VERANDA_CORE_API_DLL PropertyView : public QObject
 {
     Q_OBJECT
 

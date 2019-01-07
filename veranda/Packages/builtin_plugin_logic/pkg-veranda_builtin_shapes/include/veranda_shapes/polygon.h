@@ -4,7 +4,8 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include <Box2D/Box2D.h>
-#include <veranda_core/world_object_component.h>
+#include <veranda_core/api/world_object_component.h>
+#include <veranda_shapes/dllapi.h>
 
 #include <QVector>
 #include <QString>
@@ -29,7 +30,7 @@
  * \todo Determine how to make the point lists editable by the user
  * \todo Switch Models to use QPolygonF instead of vector of b2Shape so visual is not limited by box2d polygon point limit; once this is done, allow the user to toggle between only loops and all triangles
  */
-class Polygon : public WorldObjectComponent
+class VERANDA_SHAPES_DLL Polygon : public WorldObjectComponent
 {
     Q_OBJECT
 

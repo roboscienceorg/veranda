@@ -4,8 +4,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
 
-#include <veranda_core/dllapi.h>
-#include <veranda_core/world_object_component.h>
+#include <veranda_wheels/dllapi.h>
+#include <veranda_core/api/world_object_component.h>
 #include <Box2D/Box2D.h>
 
 #include <QVector>
@@ -15,8 +15,8 @@
 
 #include <memory>
 
-#include <veranda_core/filter.h>
-#include "encoder.h"
+#include <veranda_core/api/filter.h>
+#include <veranda_wheels/encoder.h>
 
 /*!
  * \brief World Object Component modeling a single fixed wheel
@@ -26,7 +26,7 @@
  * The component listens on a ROS channel for a Float32 message. This
  * value is interpreted as the speed to drive the wheel (rad/s)
  */
-class veranda_API Fixed_Wheel : public WorldObjectComponent
+class VERANDA_WHEELS_DLL Fixed_Wheel : public WorldObjectComponent
 {
     Q_OBJECT
 

@@ -59,4 +59,4 @@ RESOURCES += \
 DISTFILES += \
     CMakeLists.txt \
     package.xml \
-    veranda_core/SimTimer.py
+    veranda_core/api/SimTimer.py

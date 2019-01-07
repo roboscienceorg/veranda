@@ -4,8 +4,10 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/pose2_d.hpp"
 
-#include <veranda_core/filter.h>
-#include <veranda_core/world_object_component.h>
+#include <veranda_core/api/filter.h>
+#include <veranda_core/api/world_object_component.h>
+#include <veranda_sensors/dllapi.h>
+
 #include <Box2D/Box2D.h>
 
 #include <QVector>
@@ -29,7 +31,7 @@
  * Drift and noise statistics follow a normal distribution, dropped information is
  * uniform
  */
-class GPS_Sensor : public WorldObjectComponent
+class VERANDA_SENSORS_DLL GPS_Sensor : public WorldObjectComponent
 {
     Q_OBJECT
 

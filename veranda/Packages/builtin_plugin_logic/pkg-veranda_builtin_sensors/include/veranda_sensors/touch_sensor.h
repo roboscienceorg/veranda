@@ -4,7 +4,9 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/byte_multi_array.hpp"
 
-#include <veranda_core/world_object_component.h>
+#include <veranda_core/api/world_object_component.h>
+#include <veranda_sensors/dllapi.h>
+
 #include <Box2D/Box2D.h>
 
 #include <QVector>
@@ -28,7 +30,7 @@
  * the start of the ring
  * \todo Check which side of the ring is the start and note that here
  */
-class Touch_Sensor : public WorldObjectComponent
+class VERANDA_SENSORS_DLL Touch_Sensor : public WorldObjectComponent
 {
     Q_OBJECT
 

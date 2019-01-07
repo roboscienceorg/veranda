@@ -36,7 +36,7 @@ find_package(Qt5 REQUIRED COMPONENTS
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-include_directories( include/veranda_wheels )
+include_directories( include include/veranda_wheels )
 include_directories( ${CMAKE_BINARY_DIR} )
 
 ament_export_dependencies(
@@ -85,7 +85,7 @@ endif()
 qt5_wrap_cpp(MOC_SRCS ${MOC_HDRS})
 
 ## Build Library
-add_definitions(-Dveranda_DLL)
+add_definitions(-DVERANDA_WHEELS_BUILD_DLL)
 add_library(${PROJECT_NAME} SHARED ${CPP_SRCS} ${MOC_SRCS})
 
 ## Add qt module dependencies to executable
