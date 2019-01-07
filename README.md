@@ -9,8 +9,8 @@ For anyone who is interested in building this project, the target version of ROS
  * ROS Ardent
    * Supported on the 'master' branch
    * Built using the ROS build tool Ament
- * ROS Bouncy
-   * Supported on the 'bouncy' branch
+ * ROS Bouncy, Crystal
+   * Supported on the 'bouncy' and 'crystal' branches, respectively
    * Built using the ROS build tool Colcon; Ament is not supported
    * May require modifying CMAKE_PREFIX_PATH so that Qt5Config.cmake can be found
 
