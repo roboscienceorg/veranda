@@ -96,6 +96,10 @@ set(headers include/omni_drive_plugin.h)
 set(sources src/omni_drive_plugin.cpp)
 make_plugin(omni_drive_plugin "${headers}" "${sources}" veranda_builtin_wheels)
 
+set(headers include/swedish_wheel_plugin.h)
+set(sources src/swedish_wheel_plugin.cpp)
+make_plugin(swedish_wheel_plugin "${headers}" "${sources}" veranda_builtin_wheels)
+
 set(headers include/gps_sensor_plugin.h)
 set(sources src/gps_sensor_plugin.cpp)
 make_plugin(gps_sensor_plugin "${headers}" "${sources}" veranda_builtin_sensors)

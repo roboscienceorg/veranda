@@ -59,14 +59,16 @@ set(MOC_HDRS
         ${HEADERS_DIR}/ackermann_steer.h
         ${HEADERS_DIR}/encoder.h
         ${HEADERS_DIR}/fixed_wheel.h
-        ${HEADERS_DIR}/omni_drive.h)
+        ${HEADERS_DIR}/omni_drive.h
+        ${HEADERS_DIR}/swedish_wheel.h)
 
 ## Any other source files
 set(CPP_SRCS
     src/ackermann_steer.cpp
     src/encoder.cpp
     src/fixed_wheel.cpp
-    src/omni_drive.cpp)
+    src/omni_drive.cpp
+    src/swedish_wheel.cpp)
 
 ###########
 ## Build ##
