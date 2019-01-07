@@ -62,7 +62,7 @@ function(make_plugin plugin_name plugin_moc_hdrs plugin_srcs)
     ## Install lib into same directory as simulator executable
     install(
       TARGETS ${plugin_name}
-      DESTINATION lib
+      DESTINATION veranda_plugins
     )
 endfunction()
 

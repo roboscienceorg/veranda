@@ -122,10 +122,6 @@ install(
 if(BUILD_TESTING)
     find_package(veranda_catch2 REQUIRED)
 
-    ament_export_dependencies(
-        veranda_catch2
-    )
-
     set(CATCH_CMAKE "${veranda_catch2_INCLUDE_DIRS}/catch2/ament_cmake_add_catch_test.cmake")
     include(${CATCH_CMAKE})
 

@@ -90,7 +90,7 @@ ament_target_dependencies(image_loader_plugin
 ## Install lib into same directory as simulator executable
 install(
   TARGETS image_loader_plugin
-  DESTINATION lib
+  DESTINATION veranda_plugins
 )
 
 ament_package()
