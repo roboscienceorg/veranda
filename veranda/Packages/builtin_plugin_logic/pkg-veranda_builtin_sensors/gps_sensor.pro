@@ -6,13 +6,11 @@ TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being 
 INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include
 
 SOURCES += \
-    src/gps_sensor.cpp \
-    src/gps_sensor_plugin.cpp
+    src/gps_sensor.cpp
 
 HEADERS += \
-    include/defines.h \
-    include/gps_sensor.h \
-    include/gps_sensor_plugin.h
+    include/veranda_sensors/gps_sensor.h \
+    include/veranda_sensors/dllapi.h
 
 DISTFILES += \
     CMakeLists.txt \

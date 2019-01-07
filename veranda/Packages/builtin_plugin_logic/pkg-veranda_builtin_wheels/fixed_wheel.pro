@@ -7,15 +7,13 @@ INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include /opt/ros
 
 SOURCES += \
     src/fixed_wheel.cpp \
-    src/fixed_wheel_plugin.cpp \
     src/encoder.cpp
 
 HEADERS += \
-    include/fixed_wheel.h \
-    include/fixed_wheel_plugin.h\
+    include/veranda_wheels/fixed_wheel.h \
     include/basic_wheel.h \
-    include/defines.h \
-    include/encoder.h
+    include/veranda_wheels/encoder.h \
+    include/veranda_wheels/dllapi.h
 
 DISTFILES += \
     CMakeLists.txt \

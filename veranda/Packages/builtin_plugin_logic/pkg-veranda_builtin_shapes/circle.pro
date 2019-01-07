@@ -6,13 +6,11 @@ TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being 
 INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include
 
 SOURCES += \
-    src/circle.cpp \
-    src/circle_plugin.cpp
+    src/circle.cpp
 
 HEADERS += \
-    include/circle.h \
-    include/circle_plugin.h \
-    include/defines.h
+    include/veranda_shapes/circle.h \
+    include/veranda_shapes/dllapi.h
 
 DISTFILES += \
     CMakeLists.txt \

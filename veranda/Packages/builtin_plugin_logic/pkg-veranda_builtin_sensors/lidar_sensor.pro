@@ -6,13 +6,11 @@ TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being 
 INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include
 
 SOURCES += \
-    src/lidar_sensor.cpp \
-    src/lidar_sensor_plugin.cpp
+    src/lidar_sensor.cpp
 
 HEADERS += \
-    include/lidar_sensor.h \
-    include/lidar_sensor_plugin.h \
-    include/defines.h
+    include/veranda_sensors/lidar_sensor.h \
+    include/veranda_sensors/dllapi.h
 
 DISTFILES += \
     CMakeLists.txt \

@@ -6,13 +6,11 @@ TEMPLATE = app # Technically a plugin, but Intellisense doesn't like that being 
 INCLUDEPATH += include ../pkg_SimulatorAPI/include ../pkg_Box2D/include
 
 SOURCES += \
-    src/touch_sensor.cpp \
-    src/touch_sensor_plugin.cpp
+    src/touch_sensor.cpp
 
 HEADERS += \
-    include/touch_sensor.h \
-    include/touch_sensor_plugin.h \
-    include/defines.h
+    include/veranda_sensors/touch_sensor.h \
+    include/veranda_sensors/dllapi.h
 
 DISTFILES += \
     CMakeLists.txt \
