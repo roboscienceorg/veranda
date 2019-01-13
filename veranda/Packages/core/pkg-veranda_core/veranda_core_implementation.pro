@@ -5,10 +5,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = veranda
 TEMPLATE = app
 
-INCLUDEPATH += include \
-               # Hack to make autocomplete work in qtcreator
-               ../pkg_Box2D/include \
-               ../pkg_SimulatorAPI/include
+INCLUDEPATH += include
+include(../../include_paths.pri)
 
 SOURCES += \
     src/basic_physics.cpp \

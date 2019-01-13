@@ -10,3 +10,5 @@ for(pro_file, pkgs) {
     SUBDIRS += $$pkg_name
     $${pkg_name}.file = $$pro_file
 }
+
+DISTFILES += include_paths.pri
