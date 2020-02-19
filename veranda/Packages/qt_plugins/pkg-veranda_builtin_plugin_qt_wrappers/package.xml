@@ -8,6 +8,8 @@
 
   <license>TODO</license>
 
+  <build_depend>veranda_qt_frontend</build_depend>
+
   <depend>veranda_core_api</depend>
   <depend>veranda_qt_plugin_api</depend>   
   <depend>veranda_builtin_sensors</depend>

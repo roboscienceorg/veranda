@@ -9,6 +9,8 @@
 
   <license>TODO</license>
 
+  <build_depend>veranda_qt_frontend</build_depend>
+
   <depend>veranda_core_api</depend>
   <depend>veranda_box2d</depend>
   <depend>veranda_qt_frontend_plugin_api</depend>
