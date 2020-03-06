@@ -83,10 +83,12 @@ ament_target_dependencies(default_robot_loader_plugin
     "veranda_qt_frontend_plugin_api"
 )
 
+ament_index_get_resource(PLUGIN_PATH "veranda_plugin_path" "veranda_qt_frontend")
+
 ## Install lib into same directory as simulator executable
 install(
   TARGETS default_robot_loader_plugin
-  DESTINATION ../veranda_plugins
+  DESTINATION ${PLUGIN_PATH}
 )
 
 ament_package()

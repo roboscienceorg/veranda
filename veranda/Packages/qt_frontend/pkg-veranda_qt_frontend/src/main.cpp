@@ -35,6 +35,10 @@
 //stuff
 #include "ui/mainwindow.h"
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <ament_index_cpp/get_package_prefix.hpp>
+#include <ament_index_cpp/get_resource.hpp>
+
 using namespace std;
 
 int main(int argc, char** argv)
@@ -46,7 +50,13 @@ int main(int argc, char** argv)
     *************************************/
     //Init ros stuff
     rclcpp::init(argc, argv);
-    shared_ptr<rclcpp::Node> node = make_shared<rclcpp::Node>("veranda");
+
+    rclcpp::NodeOptions options;
+    //rclcpp::NodeOptions options.allow_undeclared_parameters(true).automatically_declare_parameters_from_overrides(true);
+
+    shared_ptr<rclcpp::Node> node = make_shared<rclcpp::Node>("veranda", options.allow_undeclared_parameters(true).automatically_declare_parameters_from_overrides(true));
+
+
 
     //Init Qt
     QApplication app(argc, argv);
@@ -102,8 +112,14 @@ int main(int argc, char** argv)
 
     //Minor hack which relies on the build output file structure to find plugins
     //checks all .so or .dll files in directory relative to executable
-    qInfo() << "Searching" << QCoreApplication::applicationDirPath() + "/../../../veranda_plugins" << "for plugins";
-    QDirIterator dir(QCoreApplication::applicationDirPath() + "/../../../veranda_plugins", {"*.so", "*.dll"}, QDir::Files, QDirIterator::Subdirectories);
+
+    std::string plugins_path;
+    ament_index_cpp::get_resource("veranda_plugin_path", "veranda_qt_frontend", plugins_path);
+
+    qInfo() << "Searching" << plugins_path.c_str() << "for plugins";
+    QDirIterator dir(plugins_path.c_str(), {"*.so", "*.dll"}, QDir::Files, QDirIterator::Subdirectories);
+
+
     while(dir.hasNext())
     {
         dir.next();
@@ -174,9 +190,65 @@ int main(int argc, char** argv)
         sim.addSimObjects(def, false);
     }
 
+    // Automatic object loader
+    std::shared_ptr <rclcpp::Node> parameter_node = node->create_sub_node("parameter_manager");
+
+    bool auto_load_asset;
+
+    try {
+        auto_load_asset = parameter_node->get_parameter("auto_load_asset").as_bool();
+
+    } catch (rclcpp::ParameterTypeException & exception) {
+
+        std::cerr << exception.what() << std::endl;
+        std::cerr << "auto_load_asset parameter type error." << std::endl;
+        auto_load_asset = false;
+    }
+
+
+    if(auto_load_asset)
+    {
+        try {
+
+            std::string json_asset_path = parameter_node->get_parameter("json_asset_path").as_string();
+
+            for (int i = 0; i < worldLoaders.size(); ++i) {
+                if (objectLoaders.at(i)->canLoadFile(json_asset_path.c_str(), componentPlugins)) {
+                    QVector < WorldObject * > new_world_objects;
+                    WorldObject *wo = objectLoaders.at(i)->loadFile(json_asset_path.c_str(), componentPlugins);
+                    new_world_objects.push_back(wo);
+                    sim.addSimObjects(new_world_objects, false);
+                    break;
+                }
+            }
+        } catch (rclcpp::ParameterTypeException & exception) {
+            std::cerr << exception.what() << std::endl;
+            std::cerr << "Failed loading json asset. Parameter type error." << std::endl;
+        }
+    }
+
+
     qDebug() << "Starting Simulation";
     sim.start();
 
+    try {
+
+        bool auto_start_sim = parameter_node->get_parameter("auto_start_sim").as_bool();
+
+        if(auto_start_sim)
+        {
+            // Automatically start simulation
+            sim.userStartPhysics();
+        }
+    } catch (rclcpp::ParameterTypeException & exception) {
+
+        std::cerr << exception.what() << std::endl;
+        std::cerr << "Failed loading auto_start_sim parameter." << std::endl;
+
+    }
+
+
+    
    /******************
     * Run application
     ******************/

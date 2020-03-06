@@ -311,3 +311,5 @@ TSWLatexianTemp*
 *.pidb
 *.svclog
 *.scc
+
+*.kate-swp

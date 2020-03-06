@@ -1,0 +1,7 @@
+veranda:
+  ros__parameters:
+
+    auto_start_sim: yes
+
+    auto_load_asset: no
+    json_asset_path: "/path/to/asset/my_asset.json"

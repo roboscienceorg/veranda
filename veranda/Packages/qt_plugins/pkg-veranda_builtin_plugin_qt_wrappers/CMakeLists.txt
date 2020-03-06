@@ -69,10 +69,12 @@ function(make_plugin plugin_name plugin_moc_hdrs plugin_srcs plugin_roslib)
         "veranda_core_api"
         "${plugin_roslib}")
 
+    ament_index_get_resource(PLUGIN_PATH "veranda_plugin_path" "veranda_qt_frontend")
+
     ## Install lib into same directory as simulator executable
     install(
       TARGETS ${plugin_name}
-      DESTINATION ../veranda_plugins
+      DESTINATION ${PLUGIN_PATH}
     )
 endfunction()
 
